@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE metadata SYSTEM "metadata.dtd">
+<metadata debug="TRUE" owner="beton" dataSchema="public">
+	<versions>
+		<version dateOpen="2019-02-08 15:02:26">1.001</version>
+		<version dateOpen="2019-02-08 15:02:26">1.001</version>
+	</versions>
+	<!--
+	<globalFilters>
+		<field id="store_id"/>
+	</globalFilters>
+	-->
+	<enums cmd="alt">
+		<enum cmd="add" id="locales">
+			<value id="ru">
+				<ru descr="Русский" />
+			</value>
+		</enum>
+		<enum cmd="add" id="role_types">
+			<value id="admin">
+				<ru descr="Администратор" />
+			</value>
+		</enum>
+		<enum cmd="add" id="data_types" descr="Типы данных">
+			<value id="users">
+				<ru descr="Пользователи" />
+			</value>
+		</enum>
+	</enums>
+	<modules></modules>
+	<models limitConstant="doc_per_page_count">
+		<model cmd="add" id="User" parent="ModelSQL" dataTable="users" virtual="FALSE">
+			<defaultOrder>
+				<field id="name" />
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE" />
+			<field id="name" dataType="String" required="TRUE" length="50" />
+			<field id="role_id" dataType="Enum" enumId="role_types" required="TRUE" />
+			<field id="email" dataType="String" required="FALSE" length="50" />
+			<field id="pwd" dataType="Password" length="32" />
+			<index id="users_name_index">
+				<field id="name" unique="TRUE" />
+			</index>
+		</model>
+		<model cmd="add" id="UserList" parent="ModelSQL" dataTable="users_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" />
+			<field id="name" dataType="String" />
+			<field id="email" dataType="String" required="FALSE" length="50" />
+		</model>
+		<model cmd="add" id="UserDialog" parent="ModelSQL" dataTable="users_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код" />
+			<field id="name" dataType="String" alias="Имя" />
+			<field id="email" dataType="String" alias="Эл.почта" />
+			<field id="role_id" dataType="String" />
+		</model>
+		<model cmd="add" id="ConstantList" parent="ModelSQL" dataTable="constants_list_view" virtual="TRUE">
+			<defaultOrder>
+				<field id="name" />
+			</defaultOrder>
+			<field id="id" dataType="String" primaryKey="TRUE" />
+			<field id="name" dataType="String" />
+			<field id="descr" dataType="Text" />
+			<field id="val" dataType="Text" />
+			<field id="val_type" dataType="Text" />
+			<field id="ctrl_class" dataType="Text" />
+			<field id="ctrl_options" dataType="JSON" />
+			<field id="view_class" dataType="Text" />
+			<field id="view_options" dataType="JSON" />
+		</model>
+		<model cmd="add" id="View" parent="ModelSQL" dataTable="views" virtual="FALSE">
+			<defaultOrder>
+				<field id="section" />
+				<field id="descr" />
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код" />
+			<field id="c" dataType="Text" />
+			<field id="f" dataType="Text" />
+			<field id="t" dataType="Text" />
+			<field id="section" dataType="Text" required="TRUE" />
+			<field id="descr" dataType="Text" required="TRUE" />
+			<field id="limited" dataType="bool" />
+			<index id="views_section_descr_idx" unique="TRUE">
+				<field id="section" />
+				<field id="descr" />
+			</index>
+		</model>
+		<model cmd="add" id="ViewList" parent="ModelSQL" dataTable="views_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="user_descr" />
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код" />
+			<field id="c" dataType="Text" />
+			<field id="f" dataType="Text" />
+			<field id="t" dataType="Text" />
+			<field id="href" dataType="Text" />
+			<field id="user_descr" dataType="Text" />
+			<field id="section" dataType="Text" />
+		</model>
+		<model cmd="add" id="ViewSectionList" parent="ModelSQL" dataTable="views_section_list" virtual="TRUE">
+			<field id="section" dataType="Text" />
+		</model>
+		<model cmd="add" id="MainMenuConstructor" parent="ModelSQL" dataTable="main_menus" virtual="FALSE">
+			<defaultOrder>
+				<field id="role_id" />
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код" />
+			<field id="role_id" dataType="Enum" enumId="role_types" required="TRUE" />
+			<field id="user_id" dataType="Int" refTable="users" refField="id" />
+			<field id="content" dataType="Text" required="TRUE" alias="Содержание" />
+			<index id="main_menus_role_user_idx" unique="TRUE">
+				<field id="role_id" />
+				<field id="user_id" />
+			</index>
+		</model>
+		<model cmd="add" id="MainMenuConstructorList" parent="ModelSQL" dataTable="main_menus_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" />
+			<field id="role_id" dataType="String" />
+			<field id="role_descr" dataType="String" />
+			<field id="user_id" dataType="String" />
+			<field id="user_descr" dataType="String" />
+			<field id="content" dataType="Text" />
+		</model>
+		<model id="MainMenuContent" parentJS="ModelXMLTree" parent="Model" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" />
+			<field id="descr" dataType="String" />
+			<field id="viewid" dataType="String" />
+			<field id="viewdescr" dataType="String" />
+			<field id="default" dataType="Bool" />
+			<field id="glyphclass" dataType="String" />
+		</model>
+		<model cmd="add" id="VariantStorage" parent="ModelSQL" dataTable="variant_storages" virtual="FALSE">
+			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE" required="TRUE" />
+			<field id="storage_name" dataType="Text" primaryKey="TRUE" required="TRUE" />
+			<field id="variant_name" dataType="Text" primaryKey="TRUE" required="TRUE" />
+			<field id="default_variant" dataType="Bool" />
+			<field id="filter_data" dataType="Text" />
+			<field id="col_visib_data" dataType="Text" />
+			<field id="col_order_data" dataType="Text" />
+		</model>
+		<model cmd="add" id="VariantStorageList" parent="ModelSQL" dataTable="variant_storages_list" virtual="TRUE">
+			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE" required="TRUE" />
+			<field id="storage_name" dataType="Text" primaryKey="TRUE" required="TRUE" />
+			<field id="default_variant" dataType="Bool" />
+			<field id="variant_name" dataType="Text" />
+		</model>
+		<model id="About" parent="ModelSQL" virtual="TRUE">
+			<field id="author" dataType="String" />
+			<field id="tech_mail" dataType="String" />
+			<field id="app_name" dataType="String" />
+			<field id="fw_version" dataType="String" />
+			<field id="app_version" dataType="String" />
+			<field id="db_name" dataType="String" />
+		</model>
+	</models>
+	<constants cmd="add">
+		<constant cmd="add" id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE" />
+		<constant cmd="add" id="grid_refresh_interval" name="Период обновления таблиц" descr="Период обновления таблиц в секундах" dataType="Int" defaultValue="15" autoload="TRUE" />
+		<constant cmd="add" id="session_live_time" name="Время жизни сессии" descr="Время, в течении которого сессия не будет удаляться на сервере" dataType="Interval" defaultValue="48:00" viewOptions="{'dateFormat':'H:i'}" ctrlOptions="{'editMask':'99:99'}" />
+	</constants>
+	<controllers>
+		<controller id="Constant" parentId="ControllerSQL">
+			<publicMethod id="set_value">
+				<field id="id" dataType="String" required="TRUE" />
+				<field id="val" dataType="String" />
+			</publicMethod>
+			<publicMethod id="get_list" modelId="ConstantList" />
+			<publicMethod id="get_object" modelId="ConstantList" />
+			<publicMethod id="get_values">
+				<field id="id_list" dataType="String" />
+				<field id="field_sep" dataType="String" length="1" />
+			</publicMethod>
+		</controller>
+		<controller id="Enum" parentId="ControllerSQL">
+			<publicMethod id="get_enum_list">
+				<field id="id" dataType="String" />
+			</publicMethod>
+		</controller>
+		<controller id="MainMenuConstructor" parentId="ControllerSQL">
+			<publicMethod id="insert" modelId="MainMenuConstructor" />
+			<publicMethod id="update" modelId="MainMenuConstructor" />
+			<publicMethod id="delete" modelId="MainMenuConstructor" />
+			<publicMethod id="get_list" modelId="MainMenuConstructorList" />
+			<publicMethod id="get_object" modelId="MainMenuConstructor" />
+		</controller>
+		<controller id="MainMenuContent" parentIdJS="ControllerObjClient" server="FALSE">
+			<publicMethod id="insert" modelId="MainMenuContent" />
+			<publicMethod id="update" modelId="MainMenuContent" />
+			<publicMethod id="delete" modelId="MainMenuContent" />
+			<publicMethod id="get_list" modelId="MainMenuContent" />
+			<publicMethod id="get_object" modelId="MainMenuContent" />
+		</controller>
+		<controller id="View" parentId="ControllerSQL">
+			<publicMethod id="get_list" modelId="ViewList" />
+			<publicMethod id="complete" modelId="ViewList" patternFieldId="user_descr" />
+			<publicMethod id="get_section_list" modelId="ViewSectionList" />
+		</controller>
+		<controller id="VariantStorage" parentId="ControllerSQL">
+			<publicMethod id="insert" modelId="VariantStorage" />
+			<publicMethod id="upsert_filter_data" modelId="VariantStorage">
+				<field id="storage_name" dataType="String" required="TRUE" />
+				<field id="variant_name" dataType="String" required="TRUE" />
+				<field id="filter_data" dataType="String" required="TRUE" />
+				<field id="default_variant" dataType="Bool" required="TRUE" />
+			</publicMethod>
+			<publicMethod id="upsert_col_visib_data" modelId="VariantStorage">
+				<field id="storage_name" dataType="String" required="TRUE" />
+				<field id="variant_name" dataType="String" required="TRUE" />
+				<field id="col_visib" dataType="String" required="TRUE" />
+				<field id="default_variant" dataType="Bool" required="TRUE" />
+			</publicMethod>
+			<publicMethod id="upsert_col_order_data" modelId="VariantStorage">
+				<field id="storage_name" dataType="String" required="TRUE" />
+				<field id="variant_name" dataType="String" required="TRUE" />
+				<field id="col_order" dataType="String" required="TRUE" />
+				<field id="default_variant" dataType="Bool" required="TRUE" />
+			</publicMethod>
+			<publicMethod id="update" modelId="VariantStorage" />
+			<publicMethod id="delete" modelId="VariantStorage" />
+			<publicMethod id="get_list">
+				<field id="storage_name" dataType="String" required="TRUE" />
+				<field id="variant_name" dataType="String" />
+			</publicMethod>
+			<publicMethod id="get_object" modelId="VariantStorage" />
+			<publicMethod id="get_filter_data" modelId="VariantStorage">
+				<field id="storage_name" dataType="String" required="TRUE" />
+				<field id="variant_name" dataType="String" />
+			</publicMethod>
+			<publicMethod id="get_col_visib_data" modelId="VariantStorage">
+				<field id="storage_name" dataType="String" required="TRUE" />
+				<field id="variant_name" dataType="String" />
+			</publicMethod>
+			<publicMethod id="get_col_order_data" modelId="VariantStorage">
+				<field id="storage_name" dataType="String" required="TRUE" />
+				<field id="variant_name" dataType="String" />
+			</publicMethod>
+		</controller>
+		<controller id="About" parentId="ControllerSQL">
+			<publicMethod id="get_object" modelId="About" />
+		</controller>
+		<controller id="User" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="User" />
+			<publicMethod id="update" modelId="User" />
+			<publicMethod id="delete" modelId="User" />
+			<publicMethod id="get_list" modelId="UserList" />
+			<publicMethod id="get_object" modelId="UserDialog" />
+			<publicMethod id="complete" modelId="UserList" patternFieldId="name" />
+			<publicMethod id="get_profile" modelId="UserDialog" />
+			<publicMethod id="reset_pwd">
+				<field id="user_id" dataType="Int" required="TRUE" />
+			</publicMethod>
+			<publicMethod id="login">
+				<field id="name" dataType="String" alias="Имя пользователя" length="50" required="TRUE" />
+				<field id="pwd" dataType="Password" alias="Пароль" length="20" required="TRUE" />
+			</publicMethod>
+			<publicMethod id="login_refresh">
+				<field id="refresh_token" dataType="String" required="true" length="50" />
+			</publicMethod>
+			<publicMethod id="logout" />
+			<publicMethod id="logout_html" />
+		</controller>
+	</controllers>
+	<permissions>
+		<permission type="allow" controllerId="all" methodId="all" roleId="admin" />
+		<permission type="allow" controllerId="User" methodId="login" roleId="guest" />
+	</permissions>
+	<views cmd="alt">
+		<view cmd="add" id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи" />
+		<view cmd="add" id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы" />
+	</views>
+	<serverTemplates>
+		<serverTemplate id="About" />
+		<serverTemplate id="ConstantList" class="list" />
+		<serverTemplate id="MainMenuConstructorList" class="list" />
+		<serverTemplate id="ViewList" class="list" />
+		<serverTemplate id="UserList" class="list" />
+	</serverTemplates>
+	<jsTemplates>
+		<jsTemplate id="GridCmdContainerAjx" file="controls/tmpl/GridCmdContainerAjx.html" />
+		<jsTemplate id="ViewGridColManager" file="controls/tmpl/ViewGridColManager.html" />
+		<jsTemplate id="PopOver" file="controls/tmpl/PopOver.html" />
+		<jsTemplate id="GridCmdFilterView" file="controls/tmpl/GridCmdFilterView.html" />
+		<jsTemplate id="EditPeriodDate" file="controls/tmpl/EditPeriodDate.html" />
+		<jsTemplate id="WindowPrint" file="controls/tmpl/WindowPrint.html" />
+		<jsTemplate id="VariantStorageSaveView" file="controls/tmpl/VariantStorageSaveView.html" />
+		<jsTemplate id="VariantStorageOpenView" file="controls/tmpl/VariantStorageOpenView.html" />
+	</jsTemplates>
+	<packages></packages>
+	<sqlScripts>
+		<sqlScript cmd="add" file="logins_process.sql" />
+		<sqlScript cmd="add" file="variant_storages_upsert_col_order_data.sql" />
+		<sqlScript cmd="add" file="variant_storages_upsert_col_visib_data.sql" />
+		<sqlScript cmd="add" file="variant_storages_upsert_filter_data.sql" />
+		<sqlScript cmd="add" file="variant_storages_list.sql" />
+	</sqlScripts>
+	<jsScripts>
+		<jsScript file="ext/jquery-1.12.4/jquery-1.12.4.min.js" compressed="TRUE" standalone="TRUE" />
+		<jsScript file="ext/bootstrap-3.3.6/bootstrap.min.js" compressed="TRUE" standalone="TRUE" version="1.0" />
+		<jsScript file="ext/bootstrap-datepicker/bootstrap-datepicker.min.js" compressed="TRUE" standalone="TRUE" version="1.0" />
+		<jsScript file="ext/bootstrap-datepicker/bootstrap-datepicker.ru.min.js" compressed="TRUE" standalone="TRUE" version="1.0" />
+		<!--<jsScript file="ext/Bush-jquery.maskedinput/dist/jquery.maskedinput.min.js" compressed="TRUE" standalone="TRUE" version="1.0"/>-->
+		<jsScript file="ext/Bush-jquery.maskedinput/jquery.maskedinput.js" compressed="FALSE" standalone="TRUE" version="1.0" />
+		<jsScript file="ext/startbootstrap-sb-admin-2-1.0.8/bower_components/metisMenu/dist/metisMenu.min.js" compressed="TRUE" standalone="TRUE" version="1.0" />
+		<jsScript file="ext/startbootstrap-sb-admin-2-1.0.8/bower_components/raphael/raphael-min.js" compressed="TRUE" standalone="TRUE" version="1.0" />
+		<jsScript file="ext/startbootstrap-sb-admin-2-1.0.8/bower_components/morrisjs/morris.min.js" compressed="TRUE" standalone="TRUE" version="1.0" />
+		<jsScript file="ext/startbootstrap-sb-admin-2-1.0.8/dist/js/sb-admin-2.js" compressed="TRUE" standalone="TRUE" version="1.0" />
+		<jsScript file="ext/jshash-2.2/md5-min.js" compressed="TRUE" standalone="TRUE" />
+		<jsScript file="ext/mustache/mustache.min.js" compressed="TRUE" standalone="TRUE" />
+		<!--Drag && Drop-->
+		<jsScript file="ext/DragnDrop/DragMaster.js" />
+		<jsScript file="ext/DragnDrop/DragObject.js" />
+		<jsScript file="ext/DragnDrop/DropTarget.js" />
+		<!-- core -->
+		<jsScript file="core/extend.js" />
+		<jsScript file="core/App.js" />
+		<jsScript file="core/AppWin.js" />
+		<jsScript file="core/CommonHelper.js" />
+		<jsScript file="core/DOMHelper.js" />
+		<jsScript file="core/DateHelper.js" />
+		<jsScript file="core/EventHelper.js" />
+		<jsScript file="core/ConstantManager.js" />
+		<jsScript file="core/ServConnector.js" />
+		<jsScript file="core/Response.js" />
+		<jsScript file="core/ResponseXML.js" />
+		<jsScript file="core/ResponseJSON.js" />
+		<jsScript file="core/PublicMethod.js" />
+		<jsScript file="core/PublicMethodServer.js" />
+		<jsScript file="core/Controller.js" />
+		<jsScript file="core/ControllerObj.js" />
+		<jsScript file="core/ControllerObjServer.js" />
+		<jsScript file="core/ControllerObjClient.js" />
+		<jsScript file="core/Model.js" />
+		<jsScript file="core/ModelXML.js" />
+		<jsScript file="core/ModelObjectXML.js" />
+		<jsScript file="core/ModelServRespXML.js" />
+		<jsScript file="core/ModelJSON.js" />
+		<jsScript file="core/ModelObjectJSON.js" />
+		<jsScript file="core/ModelServRespJSON.js" />
+		<jsScript file="core/ModelXMLTree.js" />
+		<jsScript file="core/Validator.js" />
+		<jsScript file="core/ValidatorString.js" />
+		<jsScript file="core/ValidatorBool.js" />
+		<jsScript file="core/ValidatorDate.js" />
+		<jsScript file="core/ValidatorDateTime.js" />
+		<jsScript file="core/ValidatorTime.js" />
+		<jsScript file="core/ValidatorInt.js" />
+		<jsScript file="core/ValidatorFloat.js" />
+		<jsScript file="core/ValidatorEnum.js" />
+		<jsScript file="core/ValidatorJSON.js" />
+		<jsScript file="core/ValidatorArray.js" />
+		<jsScript file="core/ValidatorEmail.js" />
+		<jsScript file="core/Field.js" />
+		<jsScript file="core/FieldString.js" />
+		<jsScript file="core/FieldEnum.js" />
+		<jsScript file="core/FieldBool.js" />
+		<jsScript file="core/FieldDate.js" />
+		<jsScript file="core/FieldDateTime.js" />
+		<jsScript file="core/FieldDateTimeTZ.js" />
+		<jsScript file="core/FieldTime.js" />
+		<jsScript file="core/FieldInt.js" />
+		<jsScript file="core/FieldBigInt.js" />
+		<jsScript file="core/FieldSmallInt.js" />
+		<jsScript file="core/FieldFloat.js" />
+		<jsScript file="core/FieldPassword.js" />
+		<jsScript file="core/FieldText.js" />
+		<jsScript file="core/FieldInterval.js" />
+		<jsScript file="core/FieldJSON.js" />
+		<jsScript file="core/FieldArray.js" />
+		<jsScript file="core/ModelFilter.js" />
+		<jsScript file="core/RefType.js" />
+		<jsScript file="core/rs_ru.js" resource="ru" />
+		<!-- **** controls *** -->
+		<jsScript file="controls/DataBinding.js" />
+		<jsScript file="controls/Command.js" />
+		<jsScript file="controls/CommandBinding.js" />
+		<jsScript file="controls/Control.js" />
+		<jsScript file="controls/rs/Control.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ControlContainer.js" />
+		<jsScript file="controls/rs/ControlContainer.rs_ru.js" resource="ru" />
+		<jsScript file="controls/View.js" />
+		<jsScript file="controls/ViewAjx.js" />
+		<jsScript file="controls/rs/ViewAjx.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ErrorControl.js" />
+		<jsScript file="controls/Calculator.js" />
+		<jsScript file="controls/rs/Calculator.rs_ru.js" resource="ru" />
+		<jsScript file="controls/Button.js" />
+		<jsScript file="controls/ButtonCtrl.js" />
+		<jsScript file="controls/ButtonEditCtrl.js" />
+		<jsScript file="controls/rs/ButtonEditCtrl.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonCalc.js" />
+		<jsScript file="controls/rs/ButtonCalc.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonCalendar.js" />
+		<jsScript file="controls/rs/ButtonCalendar.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonClear.js" />
+		<jsScript file="controls/rs/ButtonClear.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonCmd.js" />
+		<jsScript file="controls/ButtonExpToExcel.js" />
+		<jsScript file="controls/rs/ButtonExpToExcel.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonExpToPDF.js" />
+		<jsScript file="controls/rs/ButtonExpToPDF.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonOpen.js" />
+		<jsScript file="controls/rs/ButtonOpen.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonInsert.js" />
+		<jsScript file="controls/rs/ButtonInsert.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonPrint.js" />
+		<jsScript file="controls/rs/ButtonPrint.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonPrintList.js" />
+		<jsScript file="controls/rs/ButtonPrintList.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonSelectRef.js" />
+		<jsScript file="controls/rs/ButtonSelectRef.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonToggle.js" />
+		<jsScript file="controls/Label.js" />
+		<jsScript file="controls/Edit.js" />
+		<jsScript file="controls/rs/Edit.rs_ru.js" resource="ru" />
+		<jsScript file="controls/EditRef.js" />
+		<jsScript file="controls/EditString.js" />
+		<jsScript file="controls/EditText.js" />
+		<jsScript file="controls/EditInt.js" />
+		<jsScript file="controls/EditFloat.js" />
+		<jsScript file="controls/EditMoney.js" />
+		<jsScript file="controls/EditPhone.js" />
+		<jsScript file="controls/EditEmail.js" />
+		<jsScript file="controls/EditPercent.js" />
+		<jsScript file="controls/EditDate.js" />
+		<jsScript file="controls/EditDateTime.js" />
+		<jsScript file="controls/EditTime.js" />
+		<jsScript file="controls/EditPassword.js" />
+		<jsScript file="controls/EditCheckBox.js" />
+		<jsScript file="controls/EditContainer.js" />
+		<jsScript file="controls/rs/EditContainer.rs_ru.js" resource="ru" />
+		<jsScript file="controls/EditRadioGroup.js" />
+		<jsScript file="controls/EditRadio.js" />
+		<jsScript file="controls/EditSelect.js" />
+		<jsScript file="controls/EditSelectRef.js" />
+		<jsScript file="controls/rs/EditSelectRef.rs_ru.js" resource="ru" />
+		<jsScript file="controls/EditSelectOption.js" />
+		<jsScript file="controls/EditSelectOptionRef.js" />
+		<jsScript file="controls/EditRadioGroupRef.js" />
+		<jsScript file="controls/rs/EditRadioGroupRef.rs_ru.js" resource="ru" />
+		<jsScript file="controls/PrintObj.js" />
+		<jsScript file="controls/ControlForm.js" />
+		<jsScript file="controls/HiddenKey.js" />
+		<jsScript file="controls/EditJSON.js" />
+		<jsScript file="controls/EditBankAcc.js" />
+		<jsScript file="controls/EditModalDialog.js" />
+		<jsScript file="controls/rs/EditModalDialog.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridColumn.js" />
+		<jsScript file="controls/GridColumnBool.js" />
+		<jsScript file="controls/GridColumnPhone.js" />
+		<jsScript file="controls/GridColumnFloat.js" />
+		<jsScript file="controls/GridColumnByte.js" />
+		<jsScript file="controls/GridColumnDate.js" />
+		<jsScript file="controls/GridColumnDateTime.js" />
+		<jsScript file="controls/GridColumnEnum.js" />
+		<jsScript file="controls/GridColumnRef.js" />
+		<jsScript file="controls/GridCell.js" />
+		<jsScript file="controls/GridCellHead.js" />
+		<jsScript file="controls/GridCellFoot.js" />
+		<jsScript file="controls/GridHead.js" />
+		<jsScript file="controls/GridRow.js" />
+		<jsScript file="controls/GridFoot.js" />
+		<jsScript file="controls/GridBody.js" />
+		<jsScript file="controls/Grid.js" />
+		<jsScript file="controls/rs/Grid.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCommands.js" />
+		<jsScript file="controls/GridCmd.js" />
+		<jsScript file="controls/GridCmdContainer.js" />
+		<jsScript file="controls/rs/GridCmdContainer.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdContainerAjx.js" />
+		<jsScript file="controls/GridCmdContainerDOC.js" />
+		<jsScript file="controls/GridCmdInsert.js" />
+		<jsScript file="controls/rs/GridCmdInsert.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdEdit.js" />
+		<jsScript file="controls/rs/GridCmdEdit.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdCopy.js" />
+		<jsScript file="controls/rs/GridCmdCopy.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdDelete.js" />
+		<jsScript file="controls/rs/GridCmdDelete.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdColManager.js" />
+		<jsScript file="controls/rs/GridCmdColManager.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdPrint.js" />
+		<jsScript file="controls/rs/GridCmdPrint.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdRefresh.js" />
+		<jsScript file="controls/rs/GridCmdRefresh.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdPrintObj.js" />
+		<jsScript file="controls/GridCmdSearch.js" />
+		<jsScript file="controls/rs/GridCmdSearch.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdExport.js" />
+		<jsScript file="controls/rs/GridCmdExport.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdAllCommands.js" />
+		<jsScript file="controls/rs/GridCmdAllCommands.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdDOCUnprocess.js" />
+		<jsScript file="controls/rs/GridCmdDOCUnprocess.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdDOCShowActs.js" />
+		<jsScript file="controls/rs/GridCmdDOCShowActs.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdRowUp.js" />
+		<jsScript file="controls/rs/GridCmdRowUp.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdRowDown.js" />
+		<jsScript file="controls/rs/GridCmdRowDown.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdFilter.js" />
+		<jsScript file="controls/rs/GridCmdFilter.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdFilterView.js" />
+		<jsScript file="controls/rs/GridCmdFilterView.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdFilterSave.js" />
+		<jsScript file="controls/rs/GridCmdFilterSave.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCmdFilterOpen.js" />
+		<jsScript file="controls/rs/GridCmdFilterOpen.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ViewGridColManager.js" />
+		<jsScript file="controls/rs/ViewGridColManager.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ViewGridColParam.js" />
+		<jsScript file="controls/rs/ViewGridColParam.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ViewGridColVisibility.js" />
+		<jsScript file="controls/rs/ViewGridColVisibility.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ViewGridColOrder.js" />
+		<jsScript file="controls/rs/ViewGridColOrder.rs_ru.js" resource="ru" />
+		<jsScript file="controls/VariantStorageSaveView.js" />
+		<jsScript file="controls/rs/VariantStorageSaveView.rs_ru.js" resource="ru" />
+		<jsScript file="controls/VariantStorageOpenView.js" />
+		<jsScript file="controls/rs/VariantStorageOpenView.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridAjx.js" />
+		<jsScript file="controls/rs/GridAjx.rs_ru.js" resource="ru" />
+		<jsScript file="controls/TreeAjx.js" />
+		<jsScript file="controls/GridAjxDOCT.js" />
+		<jsScript file="controls/GridAjxMaster.js" />
+		<jsScript file="controls/GridCommandsAjx.js" />
+		<jsScript file="controls/rs/GridCommandsAjx.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridCommandsDOC.js" />
+		<jsScript file="controls/rs/GridCommandsDOC.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridPagination.js" />
+		<jsScript file="controls/rs/GridPagination.rs_ru.js" resource="ru" />
+		<jsScript file="controls/GridFilter.js" />
+		<jsScript file="controls/rs/GridFilter.rs_ru.js" resource="ru" />
+		<jsScript file="controls/EditPeriodDate.js" />
+		<jsScript file="controls/rs/EditPeriodDate.rs_ru.js" resource="ru" />
+		<jsScript file="controls/EditPeriodDateTime.js" />
+		<jsScript file="controls/ConstantGrid.js" />
+		<jsScript file="controls/rs/ConstantGrid.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonOK.js" />
+		<jsScript file="controls/rs/ButtonOK.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonSave.js" />
+		<jsScript file="controls/rs/ButtonSave.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ButtonCancel.js" />
+		<jsScript file="controls/rs/ButtonCancel.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ViewObjectAjx.js" />
+		<jsScript file="controls/rs/ViewObjectAjx.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ViewGridEditInlineAjx.js" />
+		<jsScript file="controls/rs/ViewGridEditInlineAjx.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ViewDOC.js" />
+		<jsScript file="controls/rs/ViewDOC.rs_ru.js" resource="ru" />
+		<jsScript file="controls/WindowPrint.js" />
+		<jsScript file="controls/rs/WindowPrint.rs_ru.js" resource="ru" />
+		<jsScript file="controls/WindowQuestion.js" />
+		<jsScript file="controls/rs/WindowQuestion.rs_ru.js" resource="ru" />
+		<jsScript file="controls/WindowSearch.js" />
+		<jsScript file="controls/rs/WindowSearch.rs_ru.js" resource="ru" />
+		<jsScript file="controls/WindowForm.js" />
+		<jsScript file="controls/rs/WindowForm.rs_ru.js" resource="ru" />
+		<jsScript file="controls/WindowFormObject.js" />
+		<jsScript file="controls/rs/WindowFormObject.rs_ru.js" resource="ru" />
+		<jsScript file="controls/WindowFormModalBS.js" />
+		<jsScript file="controls/rs/WindowFormModalBS.rs_ru.js" resource="ru" />
+		<jsScript file="controls/WindowMessage.js" />
+		<jsScript file="controls/GridCellHeadDOCProcessed.js" />
+		<jsScript file="controls/GridCellHeadDOCDate.js" />
+		<jsScript file="controls/GridCellHeadDOCNumber.js" />
+		<jsScript file="controls/actb.js" />
+		<jsScript file="controls/rs/actb.rs_ru.js" resource="ru" />
+		<jsScript file="controls/RepCommands.js" />
+		<jsScript file="controls/rs/RepCommands.rs_ru.js" resource="ru" />
+		<jsScript file="controls/ViewReport.js" />
+		<jsScript file="controls/rs/ViewReport.rs_ru.js" resource="ru" />
+		<jsScript file="controls/PopUpMenu.js" />
+		<jsScript file="controls/PopOver.js" />
+		<jsScript file="controls/PeriodSelect.js" />
+		<jsScript file="controls/rs/PeriodSelect.rs_ru.js" resource="ru" />
+		<jsScript file="controls/WindowAbout.js" />
+		<jsScript file="controls/rs/WindowAbout.rs_ru.js" resource="ru" />
+		<jsScript file="controls/MainMenuTree.js" />
+		<jsScript file="controls/rs/MainMenuTree.rs_ru.js" resource="ru" />
+		<jsScript file="controls/BigFileUploader.js" />
+		<jsScript file="controls/rs/BigFileUploader.rs_ru.js" resource="ru" />
+		<!--
+		<jsScript file="controls/BreadCrum.js"/>		
+		<jsScript file="controls/rs/BreadCrum.rs_ru.js" resource="ru"/>
+		-->
+		<!--
+		<jsScript file="controls/ButtonOrgSearch.js"/>	  
+		-->
+		<!-- **** Forms *** -->
+		<jsScript file="forms/ViewList_Form.js" />
+		<jsScript file="forms/MainMenuConstructor_Form.js" />
+		<jsScript file="forms/User_Form.js" />
+		<jsScript file="forms/UserList_Form.js" />
+		<!-- **** Controllers && Models *** -->
+		<jsScript file="controllers/User_Controller.js" />
+		<!-- **** Views *** -->
+		<jsScript file="views/Login_View.js" />
+		<jsScript file="views/MainMenuConstructorList_View.js" />
+		<jsScript file="views/MainMenuConstructor_View.js" />
+		<jsScript file="views/ViewList_View.js" />
+		<jsScript file="views/About_View.js" />
+		<jsScript file="views/ConstantList_View.js" />
+		<jsScript file="views/UserList_View.js" />
+		<jsScript file="views/UserDialog_View.js" />
+		<jsScript file="views/UserProfile_View.js" />
+		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE" />
+		<jsScript file="custom_controls/Appbeton.js" />
+		<jsScript file="custom_controls/AppCustom.js" />
+		<jsScript file="custom_controls/ViewSectionSelect.js" />
+		<jsScript file="custom_controls/ViewEditRef.js" />
+		<jsScript file="custom_controls/DOCCommands.js" />
+		<jsScript file="custom_controls/DOCNumberEdit.js" />
+		<jsScript file="custom_controls/DOCDateEdit.js" />
+		<jsScript file="custom_controls/UserNameEdit.js" />
+		<jsScript file="custom_controls/UserEditRef.js" />
+		<jsScript file="custom_controls/rs_common_ru.js" />
+		<jsScript file="custom_controls/rs_ru.js" resource="ru" />
+		<jsScript file="views/rs_ru.js" />
+		<jsScript file="views/rs_common_ru.js" resource="ru" />
+	</jsScripts>
+	<cssScripts>
+		<cssScript file="ext/bootstrap-datepicker/bootstrap-datepicker.standalone.min.css" compressed="TRUE" standalone="TRUE" />
+		<cssScript file="ext/startbootstrap-sb-admin-2-1.0.8/bower_components/bootstrap/dist/css/bootstrap.min.css" compressed="TRUE" standalone="TRUE" />
+		<cssScript file="ext/startbootstrap-sb-admin-2-1.0.8/bower_components/metisMenu/dist/metisMenu.min.css" standalone="TRUE" />
+		<cssScript file="ext/startbootstrap-sb-admin-2-1.0.8/dist/css/timeline.css" standalone="TRUE" />
+		<cssScript file="ext/startbootstrap-sb-admin-2-1.0.8/dist/css/sb-admin-2.css" standalone="TRUE" />
+		<cssScript file="ext/startbootstrap-sb-admin-2-1.0.8/bower_components/morrisjs/morris.css" standalone="TRUE" />
+		<cssScript file="ext/startbootstrap-sb-admin-2-1.0.8/bower_components/font-awesome/css/font-awesome.min.css" compressed="TRUE" standalone="TRUE" />
+		<cssScript file="custom-css/style.css" standalone="TRUE" />
+	</cssScripts>
+</metadata>

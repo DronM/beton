@@ -1,0 +1,66 @@
+/**	
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+
+ * @extends ViewAjx
+ * @requires core/extend.js
+ * @requires controls/ViewAjx.js    
+
+ * @class
+ * @classdesc
+ 
+ * @param {string} id - Object identifier
+ * @param {object} options
+ */
+function _View(id,options){
+	options = options || {};	
+	
+	_View.superclass.constructor.call(this,id,options);
+	
+	var model = options.models._Model;
+	var contr = new _Controller();
+	
+	var constants = {"doc_per_page_count":null};
+	window.getApp().getConstantManager().get(constants);
+	
+	var filters = {};
+	
+	var popup_menu = new PopUpMenu();
+	
+	this.addElement(new GridAjx(id+":grid",{
+		"model":model,
+		"keyIds":[],
+		"controller":contr,
+		"editInline":,
+		"editWinClass":,
+		"popUpMenu":popup_menu,
+		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"filters":filters
+		}),
+		"head":new GridHead(id+":grid:head",{
+			"elements":[
+				new GridRow(id+":grid:head:row0",{					
+					"elements":[
+				})
+			]
+		}),
+		"pagination":new GridPagination(id+":grid:page",
+			{"countPerPage":constants.doc_per_page_count.getValue()}),		
+		
+		"autoRefresh":false,
+		"refreshInterval":0,
+		"rowSelect":false,
+		"focus":true
+	}));		
+}
+extend(_View,ViewAjx);
+
+/* Constants */
+
+
+/* private members */
+
+/* protected*/
+
+
+/* public methods */
+

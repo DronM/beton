@@ -1,0 +1,25 @@
+/** Copyright (c) 2017 
+ *	Andrey Mikhalevich, Katren ltd.
+ */
+function _Form(options){
+	options = options || {};	
+	
+	options.formName = "";
+	options.controller = "_Controller";
+	options.method = "";
+	
+	_Form.superclass.constructor.call(this,options);
+	
+}
+extend(_Form,WindowFormObject);
+
+/* Constants */
+
+
+/* private members */
+
+/* protected*/
+
+
+/* public methods */
+

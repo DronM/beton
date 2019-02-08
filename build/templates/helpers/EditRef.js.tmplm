@@ -1,0 +1,42 @@
+/* Copyright (c) 2017 
+ *	Andrey Mikhalevich, Katren ltd.
+ */
+function EditRef(id,options){
+	options = options || {};	
+	if (options.labelCaption!=""){
+		options.labelCaption = options.labelCaption || ":";
+	}
+	options.cmdInsert = (options.cmdInsert!=undefined)? options.cmdInsert:false;
+	
+	options.keyIds = options.keyIds || ["id"];
+	
+	//форма выбора из списка
+	options.selectWinClass = ;
+	options.selectDescrIds = options.selectDescrIds || ["name"];
+	
+	//форма редактирования элемента
+	options.editWinClass = ;
+	
+	options.acMinLengthForQuery = 1;
+	options.acController = new _Controller(options.app);
+	options.acModel = new List_Model();
+	options.acPatternFieldId = options.acPatternFieldId || "name";
+	options.acKeyFields = options.acKeyFields || [options.acModel.getField("id")];
+	options.acDescrFields = options.acDescrFields || [options.acModel.getField("name")];
+	options.acICase = options.acICase || "1";
+	options.acMid = options.acMid || "1";
+	
+	EditRef.superclass.constructor.call(this,id,options);
+}
+extend(EditRef,EditRef);
+
+/* Constants */
+
+
+/* private members */
+
+/* protected*/
+
+
+/* public methods */
+

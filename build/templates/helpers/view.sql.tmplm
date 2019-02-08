@@ -1,0 +1,12 @@
+-- VIEW: 
+
+--DROP VIEW public.;
+
+CREATE OR REPLACE VIEW public. AS
+	SELECT
+		t.*
+	FROM public. AS t
+	ORDER BY
+	;
+	
+ALTER VIEW  OWNER TO beton;
