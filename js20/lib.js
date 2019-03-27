@@ -4260,10 +4260,10 @@ function AstUnknownCall_View(id,options){options=options||{};AstUnknownCall_View
 extend(AstUnknownCall_View,ViewObjectAjx); 
 function AstOldClientCall_View(id,options){options=options||{};AstOldClientCall_View.superclass.constructor.call(this,id,options);}
 extend(AstOldClientCall_View,ViewObjectAjx); 
-function AstIncomeCall_View(id,options){options=options||{};if(options.models&&options.models.active_call){}
-if(options.models&&options.models.active_call&&(options.models.active_call.getRowIndex()>=0||options.models.active_call.getNextRow())){var call_view_class;if(options.models.active_call.getFieldValue("client_id")){call_view_class=new AstUnknownCall_View;}
+function AstIncomeCall_View(id,options){options=options||{};if(options.models&&options.models.active_call&&(options.models.active_call.getRowIndex()>=0||options.models.active_call.getNextRow())){var call_view_class;if(options.models.active_call.getFieldValue("client_id")){call_view_class=new AstUnknownCall_View;}
 else{call_view_class=new AstOldClientCall_View_View;}
-var call_view=new call_view_class(id+":client",{"models":options.models});AstIncomeCall_View.superclass.constructor.call(this,id,options);}
+var call_view=new call_view_class(id+":client",{"models":options.models});}
+AstIncomeCall_View.superclass.constructor.call(this,id,options);}
 extend(AstIncomeCall_View,ViewObjectAjx); 
 function ViewList_Form(options){options=options||{};options.formName="ViewList";options.controller="View_Controller";options.method="get_list";ViewList_Form.superclass.constructor.call(this,options);}
 extend(ViewList_Form,WindowFormObject); 

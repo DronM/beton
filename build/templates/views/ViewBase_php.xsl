@@ -71,6 +71,7 @@ class ViewBase extends ViewHTMLXSLT {
 		parent::__construct($name);
 		<xsl:apply-templates select="metadata/cssScripts"/>
 		if (!DEBUG){
+			<xsl:apply-templates select="metadata/jsScripts/jsScript[@standalone='TRUE']"/>
 			$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'lib.js'));
 			$script_id = VERSION;
 		}

@@ -14,10 +14,7 @@
 function AstIncomeCall_View(id,options){
 	options = options || {};	
 	
-	if (options.models && options.models.active_call){
-		
-	}
-	if (options.models && options.models.active_call && (options.models.active_call.getRowIndex()>=0 || options.models.active_call.getNextRow()) ){			
+	if (options.models && options.models.active_call && (options.models.active_call.getRowIndex()>=0 || options.models.active_call.getNextRow()) ){
 		var call_view_class;
 		if(options.models.active_call.getFieldValue("client_id")){
 			call_view_class = new AstUnknownCall_View;
@@ -30,7 +27,7 @@ function AstIncomeCall_View(id,options){
 			"models":options.models
 		});
 		
-	
+	}	
 	AstIncomeCall_View.superclass.constructor.call(this,id,options);
 }
 //ViewObjectAjx,ViewAjxList
