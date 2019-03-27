@@ -1,6 +1,5 @@
-/*
- * Copyright (c) 2016 
- * Andrey Mikhalevich, Katren ltd.
+/* Copyright (c) 2017
+ *	Andrey Mikhalevich, Katren ltd.
  */
 function UserList_Form(options){
 	options = options || {};	

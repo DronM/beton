@@ -9,8 +9,6 @@
 	<head>
 		<xsl:call-template name="initHead"/>		
 		
-		<title>beton</title>
-		
 		<script>		
 			function pageLoad(){
 			
@@ -22,29 +20,101 @@
 		</script>		
 		
 	</head>
-	<body onload="pageLoad();">
+	<body onload="pageLoad();" class="login-container">
 
-		    <div id ="Login" class="container">
-			<div class="row">
-			    <div class="col-md-4 col-md-offset-4">
-				<div class="login-panel panel panel-default">
-				    <div class="panel-heading">
-				        <h3 class="panel-title">beton</h3>
-				    </div>
-				    <div class="panel-body">				    	
-				        <form role="form">
-				        	<div id="Login:error"></div>
-						<fieldset>
-							<div id="Login:user"/>
-							<div id="Login:pwd"/>
-					                <div id="Login:submit_login">Enter</div>
-						</fieldset>
-				        </form>
-				    </div>
+	<xsl:call-template name="page_header"/>
+
+	<!-- Page container -->
+	<div class="page-container">
+
+		<!-- Page content -->
+		<div class="page-content">
+
+			<!-- Main content -->
+			<div class="content-wrapper">
+
+				<!-- Content area -->
+				<div class="content">
+
+					<!-- Advanced login -->
+					<form id="Login">
+						<div class="panel panel-body login-form">
+							<div class="form-group has-feedback has-feedback-left">
+								<input id="Login:user" type="text" class="form-control" placeholder="Фамилия Имя Отчество"/>
+								<div class="form-control-feedback">
+									<i class="icon-user text-muted"></i>
+								</div>
+								<div id="Login:user:error"/>
+							</div>
+
+							<div class="form-group has-feedback has-feedback-left">
+								<input id="Login:pwd" type="password" class="form-control" placeholder="Пароль"/>
+								<div class="form-control-feedback">
+									<i class="icon-lock2 text-muted"></i>
+								</div>
+								<div id="Login:pwd:error"/>
+							</div>
+
+							<div class="col-sm-12">
+								<div id="Login:error"></div>
+							</div>
+
+							<div class="form-group login-options">
+								<div class="row">
+									<!--
+									<div class="col-sm-6">
+										<label class="checkbox-inline">
+										<input id="Login:rememberMe" type="checkbox" class="styled" checked="checked"/>
+										Запомнить</label>
+									</div>
+									-->
+									<div class="col-sm-6 text-right">
+										<a href="index.php?v=PasswordRecovery">Забыли пароль?</a>
+									</div>
+								</div>
+							</div>
+							
+							<!-- IE8 condition -->
+							<xsl:comment><![CDATA[[if IE 8]>
+							<div class="alert alert-danger alert-styled-left alert-bordered">К сожалению, работа в личном кабинете с данным браузером невозможна!
+							</div>
+							<![endif]]]></xsl:comment>
+							
+							<div class="form-group">
+								<div id="Login:submit_login" class="btn bg-{$COLOR_PALETTE} btn-block">Войти <i class="icon-arrow-right14 position-right"></i></div>
+							</div>
+
+							<!--
+							<div class="content-divider text-muted form-group"><span>или авторизуйтесь через</span></div>
+							<ul class="list-inline form-group list-inline-condensed text-center">
+								<li><a href="#" class="btn border-indigo text-indigo btn-flat btn-icon btn-rounded"><i class="icon-facebook"></i></a></li>
+								<li><a href="#" class="btn border-pink-300 text-pink-300 btn-flat btn-icon btn-rounded"><i class="icon-dribbble3"></i></a></li>
+								<li><a href="#" class="btn border-slate-600 text-slate-600 btn-flat btn-icon btn-rounded"><i class="icon-github"></i></a></li>
+								<li><a href="#" class="btn border-info text-info btn-flat btn-icon btn-rounded"><i class="icon-twitter"></i></a></li>
+							</ul>
+							-->
+						</div>
+					</form>
+					<!-- /advanced login -->
+
+
+					<!-- Footer -->
+					<div class="footer text-muted text-center">
+						2018 г. <a href="#">Катрэн+</a>
+					</div>
+					<!-- /footer -->
+
 				</div>
-			    </div>
+				<!-- /content area -->
+
 			</div>
-		    </div>
+			<!-- /main content -->
+
+		</div>
+		<!-- /page content -->
+
+	</div>
+	<!-- /page container -->
 		
 	<script>
 			var n = document.getElementById("Login:user");

@@ -1,0 +1,62 @@
+<div id="{{id}}">
+	<div class="{{bsCol}}9">
+		<img id="{{id}}:plant_load_graph" style="min-height:50px;width:100%;">
+		</img>
+		
+		<div id="totContainer">
+			<label class="lbl" id="totOrdered_l" for="totOrdered">Звл.:</label>
+			<input id="totOrdered" disabled="disabled" class="" type="text" size="4">
+			</input>
+			<span id="totOrdered_m" class="">м3</span>
+			
+			<label class="lbl" id="totShipped_l" for="totShipped">Отг.:</label>
+			<input id="totShipped" disabled="disabled" class="" type="text" size="4">
+			</input>
+			<span id="totShipped_m" class="">м3</span>
+			
+			<label class="lbl" id="totBalance_l" for="totShipped">Ост.:</label>
+			<input id="totBalance" disabled="disabled" class="" type="text" size="4">
+			</input>
+			<span id="totBalance_m" class="">м3</span>
+			
+			<label class="lbl" id="totEfficiency_l" for="totEfficiency">Сост.:</label>
+			<input id="totEfficiency" disabled="disabled" class="" type="text" size="4" value="0">
+			</input>
+			<span id="totEfficiency_m" class="">м3</span>
+			
+			<label class="lbl" id="totDayVelocity_l" for="totDayVelocity">Скор.д:</label>
+			<input id="totDayVelocity" disabled="disabled" class="" type="text" size="2">
+			</input>
+			<span id="totDayVelocity_m" class="">м3/ч</span>
+			
+			<label class="lbl" id="totCurVelocity_l" for="totCurVelocity">Скор.т:</label>
+			<input id="totCurVelocity" disabled="disabled" class="" type="text" size="2">
+			</input>
+			<span id="totCurVelocity_m" class="">м3/ч</span>
+			
+			<label class="lbl" id="totOrderedDay_l" for="totOrderedDay">Звл.({{workHours}}):</label>
+			<input id="totOrderedDay" disabled="disabled" class="" type="text" size="4">
+			</input>
+			<span id="totOrderedDay_m" class="">м3</span>
+		</div>	
+		<div id="{{id}}:order_make_filter">
+		</div>	
+		<div id="{{id}}:order_make_grid">
+		</div>	
+	</div>	
+	
+	<div class="{{bsCol}}3">
+		<div id="{{id}}:mat_totals_grid">
+		</div>	
+		
+		<div id="{{id}}:veh_schedule_grid">
+		</div>	
+		
+		<div id="{{id}}:features_grid">
+		</div>	
+		
+		<i id="{{id}}:statistics" class="icon-plus3" title="Показать/скрыть статистику"> Статистика
+		</i>	
+	</div>	
+	
+</div>

@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2016
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
  
  * @class
  * @classdesc
@@ -25,27 +25,28 @@ function Login_View(id,options){
 	};
 					
 	this.addElement(new EditString(id+":user",{				
-		"placeholder":this.CTRL_USER_LAB,
-		"editContClassName":"form-group",
+		"html":"<input/>",
 		"focus":true,
+		"maxlength":"100",
 		"cmdClear":false,
+		"required":true,
+		"errorControl":new ErrorControl(id+":user:error"),
 		"events":{"keydown":check_for_enter}
 	}));	
 	
 	this.addElement(new EditPassword(id+":pwd",{
-		"placeholder":this.CTRL_PWD_LAB,
-		"editContClassName":"form-group",
+		"html":"<input/>",
+		"maxlength":"50",
+		"required":true,
+		"errorControl":new ErrorControl(id+":pwd:error"),
 		"events":{"keydown":check_for_enter}
 	}));	
-
-	/*
+/*
 	this.addElement(new EditCheckBox(id+":rememberMe",{
 		"html":"<input/>"
 	}));	
-	*/
-	
+*/
 	this.addElement(new Button(id+":submit_login",{
-		"caption":this.CTRL_SBM_CAP,
 		"onClick":function(){
 			self.login();
 		}
@@ -60,9 +61,9 @@ function Login_View(id,options){
 		"control":this.getElement("submit_login"),
 		"async":false,
 		"bindings":[
-			new DataBinding({"field":pm.getField("name"),"control":this.getElement("user")}),
-			new DataBinding({"field":pm.getField("pwd"),"control":this.getElement("pwd")})
-			//,new DataBinding({"field":pm.getField("rememberMe"),"control":this.getElement("rememberMe")})
+			new DataBinding({"field":pm.getField("name"),"control":this.getElement("user")})
+			,new DataBinding({"field":pm.getField("pwd"),"control":this.getElement("pwd")})
+			//new DataBinding({"field":pm.getField("rememberMe"),"control":this.getElement("rememberMe")})
 		]		
 	}));
 
@@ -77,7 +78,16 @@ Login_View.prototype.login = function(){
 	var self = this;
 	this.execCommand("login",
 		function(){
-			document.location.href = window.getApp().getHost();
+			var REDIR_PAR = "?redir=";
+			var p = window.location.href.indexOf(REDIR_PAR);
+			var redir;
+			if(p>=0){
+				redir = "?"+CommonHelper.unserialize(decodeURI(window.location.href.substr(p+REDIR_PAR.length))).ref;
+			}
+			else{
+				redir = window.location.href;
+			}
+			document.location.href = redir;//window.getApp().getHost();
 		},
 		function(resp,errCode,errStr){
 			if (errCode==100){

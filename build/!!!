@@ -1,0 +1,51 @@
+http://localhost/beton_new/index.php?c=Order_Controller&f=get_make_orders_form&t=OrderMakeList&v=Child#
+
+http://localhost/beton_new/index.php?c=Shipment_Controller&f=get_operator_list&t=OperatorList&v=Child
+
+
+=========================
+Используют константы coast!!!
+calc_demurrage_cost
+calc_ship_cost
+=============================
+
+
+Переделать параметры настройки в константы
+	PHONES_FOR_NEW_PUMP_ORDER
+	
+	
+view vehicle_states_all	
+func vehicle_last_states(date)
+
+view pump_veh_list
+
+XX view clients_list
+view clients_dialog
+
+view destinations_dialog
+
+order_pumps_list_view
+
+vehicles_dialog
+
+shipments_list
+shipments_dialog
+
+XX vehicle_schedules_list
+
+func available_spots_for_order()
+func available_spots_for_order_dif_speed()
+
+func calc_ship_cost
+func calc_demurrage_cost
+
+
+vehicle_feature_count.sql
+
+vehicle_schedule_complete_view.sql
+
+
+func order_process
+
+func shipment_process()
+

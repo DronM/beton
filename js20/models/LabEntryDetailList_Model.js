@@ -1,0 +1,155 @@
+/**	
+ *
+ * THIS FILE IS GENERATED FROM TEMPLATE build/templates/models/Model_js.xsl
+ * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
+ *
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @class
+ * @classdesc Model class. Created from template build/templates/models/Model_js.xsl. !!!DO NOT MODEFY!!!
+ 
+ * @extends ModelXML
+ 
+ * @requires core/extend.js
+ * @requires core/ModelXML.js
+ 
+ * @param {string} id 
+ * @param {Object} options
+ */
+
+function LabEntryDetailList_Model(options){
+	var id = 'LabEntryDetailList_Model';
+	options = options || {};
+	
+	options.fields = {};
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.shipment_id = new FieldInt("shipment_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.id = new FieldInt("id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.code = new FieldString("code",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата';
+	filed_options.autoInc = false;	
+	
+	options.fields.ship_date_time_descr = new FieldString("ship_date_time_descr",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Марка';
+	filed_options.autoInc = false;	
+	
+	options.fields.concrete_type_descr = new FieldString("concrete_type_descr",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'ОК';
+	filed_options.autoInc = false;	
+	
+	options.fields.ok = new FieldInt("ok",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Масса';
+	filed_options.autoInc = false;	
+	
+	options.fields.weight = new FieldInt("weight",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'П7%';
+	filed_options.autoInc = false;	
+	
+	options.fields.p7 = new FieldInt("p7",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'П28%';
+	filed_options.autoInc = false;	
+	
+	options.fields.p28 = new FieldInt("p28",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата';
+	filed_options.autoInc = false;	
+	
+	options.fields.p_date_descr = new FieldString("p_date_descr",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.kn = new FieldInt("kn",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.mpa = new FieldInt("mpa",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.mpa_avg = new FieldString("mpa_avg",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pres_norm = new FieldString("pres_norm",filed_options);
+	
+			
+		LabEntryDetailList_Model.superclass.constructor.call(this,id,options);
+}
+extend(LabEntryDetailList_Model,ModelXML);
+

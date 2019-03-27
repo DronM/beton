@@ -24,36 +24,47 @@ function UserDialog_View(id,options){
 		"labelCaption":"Моб.телефон:"
 	}));
 
+	this.addElement(new EditInt(id+":tel_ext",{
+		"labelCaption":"Внутр.номер:",
+		"maxLength":5
+	}));
+
+	this.addElement(new EditCheckBox(id+":banned",{
+		"labelCaption":"Доступ запрещен:",
+	}));
+
+	//mac grid
+	var mac_grid = new UserMacAddressList_View(id+":UserMacAddressList");
+	this.addElement(mac_grid);
+
 	//****************************************************	
 	
 	//read
 	var r_bd = [
-		new DataBinding({"control":this.getElement("name")}),
-		new DataBinding({"control":this.getElement("role"),"field":this.m_model.getField("role_id")}),
-		new DataBinding({"control":this.getElement("email")})
+		new DataBinding({"control":this.getElement("name")})
+		,new DataBinding({"control":this.getElement("role"),"field":this.m_model.getField("role_id")})
+		,new DataBinding({"control":this.getElement("email")})
+		,new DataBinding({"control":this.getElement("tel_ext")})
+		,new DataBinding({"control":this.getElement("phone_cel")})
+		,new DataBinding({"control":this.getElement("banned")})
 	];
 	this.setDataBindings(r_bd);
 	
 	//write
 	this.setWriteBindings([
-		new CommandBinding({"control":this.getElement("name")}),
-		new CommandBinding({"control":this.getElement("role"),"fieldId":"role_id"}),
-		new CommandBinding({"control":this.getElement("email")})
+		new CommandBinding({"control":this.getElement("name")})
+		,new CommandBinding({"control":this.getElement("role"),"fieldId":"role_id"})
+		,new CommandBinding({"control":this.getElement("email")})
+		,new CommandBinding({"control":this.getElement("phone_cel")})
+		,new CommandBinding({"control":this.getElement("tel_ext")})
+		,new CommandBinding({"control":this.getElement("banned")})
 	]);
 	
 	this.addDetailDataSet({
-		"control":mac_grid.getElement("mac-grid"),
+		"control":mac_grid.getElement("grid"),
 		"controlFieldId":"user_id",
 		"field":this.m_model.getField("id")
 	});
-	
-	this.addDetailDataSet({
-		"control":config_grid.getElement("config-grid"),
-		"controlFieldId":"user_id",
-		"field":this.m_model.getField("id")
-	});
-	
-	var self = this;
 	
 }
 extend(UserDialog_View,ViewObjectAjx);

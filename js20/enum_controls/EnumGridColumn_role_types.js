@@ -1,0 +1,72 @@
+/**
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @class
+ * @classdesc Grid column Enumerator class. Created from template build/templates/js/EnumGridColumn_js.xsl. !!!DO NOT MODIFY!!!
+ 
+ * @extends GridColumnEnum
+ 
+ * @requires core/extend.js
+ * @requires controls/GridColumnEnum.js
+ 
+ * @param {object} options
+ */
+
+function EnumGridColumn_role_types(options){
+	options = options || {};
+	
+	options.multyLangValues = {};
+	
+	options.multyLangValues["ru"] = {};
+
+	options.multyLangValues["ru"]["admin"] = "Администратор";
+EnumGridColumn_role_types.superclass.constructor.call(this,options);
+	
+}
+extend(EnumGridColumn_role_types,GridColumnEnum);
+
+/**
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @class
+ * @classdesc Grid column Enumerator class. Created from template build/templates/js/EnumGridColumn_js.xsl. !!!DO NOT MODIFY!!!
+ 
+ * @extends GridColumnEnum
+ 
+ * @requires core/extend.js
+ * @requires controls/GridColumnEnum.js
+ 
+ * @param {object} options
+ */
+
+function EnumGridColumn_role_types(options){
+	options = options || {};
+	
+	options.multyLangValues = {};
+	
+	options.multyLangValues["ru"] = {};
+
+	options.multyLangValues["ru"]["owner"] = "Администратор";
+
+	options.multyLangValues["ru"]["boss"] = "Руководитель";
+
+	options.multyLangValues["ru"]["operator"] = "Оператор";
+
+	options.multyLangValues["ru"]["manager"] = "Менеджер";
+
+	options.multyLangValues["ru"]["dispatcher"] = "Диспетчер";
+
+	options.multyLangValues["ru"]["accountant"] = "Бухгалтер";
+
+	options.multyLangValues["ru"]["lab_worker"] = "Лаборант";
+
+	options.multyLangValues["ru"]["supplies"] = "Снабжение";
+
+	options.multyLangValues["ru"]["sales"] = "Реализация";
+
+	options.multyLangValues["ru"]["plant_director"] = "Нач.базы";
+
+	options.multyLangValues["ru"]["supervisor"] = "Смотрящий";
+EnumGridColumn_role_types.superclass.constructor.call(this,options);
+	
+}
+extend(EnumGridColumn_role_types,GridColumnEnum);
+

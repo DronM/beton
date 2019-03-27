@@ -18,7 +18,7 @@ function UserEditRef(id,options){
 	options.editWinClass = User_Form;
 	
 	options.acMinLengthForQuery = 1;
-	options.acController = new User_Controller(options.app);
+	options.acController = new User_Controller();
 	options.acModel = new UserList_Model();
 	options.acPatternFieldId = options.acPatternFieldId || "name";
 	options.acKeyFields = options.acKeyFields || [options.acModel.getField("id")];

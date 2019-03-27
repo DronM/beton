@@ -37,6 +37,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	const ER_LOGIN_TAKEN = "Имя пользователя занято.";
 	const ER_EMAIL_TAKEN = "Есть такой адрес электронной почты.";
 
+	const ER_BANNED = "Доступ запрещен!@1005";
+
 	public function __construct($dbLinkMaster=NULL){
 		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
 	}
@@ -80,7 +82,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	
 	private function setLogged($logged){
 		if ($logged){			
-			$_SESSION['LOGGED'] = true;			
+			$_SESSION['LOGGED'] = TRUE;			
 		}
 		else{
 			session_destroy();
@@ -104,14 +106,15 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$_SESSION['user_name']		= $ar['name'];
 		$_SESSION['role_id']		= $ar['role_id'];
 		$_SESSION['locale_id'] 		= $ar['locale_id'];
-		$_SESSION['user_time_locale'] 	= $ar['user_time_locale'];		
+		$_SESSION['user_time_locale'] 	= $ar['user_time_locale'];
+		$_SESSION['tel_ext'] 		= $ar['tel_ext'];
 		
 		//global filters				
 		
 		$log_ar = $this->getDbLinkMaster()->query_first(
 			sprintf("SELECT pub_key FROM logins
-			WHERE session_id='%s' AND user_id ='%s' AND date_time_out IS NULL",
-			session_id(),$ar['id'])
+			WHERE session_id=md5('%s') AND user_id =%d AND date_time_out IS NULL",
+			session_id(),intval($ar['id']))
 		);
 		if (!$log_ar['pub_key']){
 			//no user login
@@ -122,7 +125,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				sprintf("UPDATE logins SET 
 					user_id = '%s',
 					pub_key = '%s'
-				WHERE session_id='%s' AND user_id IS NULL
+				WHERE session_id=md5('%s') AND user_id IS NULL
 				RETURNING id",
 				$ar['id'],$this->pub_key,session_id())
 			);				
@@ -131,9 +134,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$log_ar = $this->getDbLinkMaster()->query_first(
 					sprintf("INSERT INTO logins
 					(date_time_in,ip,session_id,pub_key,user_id)
-					VALUES('%s','%s','%s','%s','%s')
+					VALUES(now(),'%s',md5('%s'),'%s',%d)
 					RETURNING id",
-					date('Y-m-d H:i:s'),$_SERVER["REMOTE_ADDR"],
+					$_SERVER["REMOTE_ADDR"],
 					session_id(),$this->pub_key,$ar['id'])
 				);								
 			}
@@ -151,7 +154,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			sprintf(
 			"SELECT 
 				u.*
-			FROM user_view AS u
+			FROM users_dialog AS u
 			WHERE (u.name=%s OR u.email=%s) AND u.pwd=md5(%s)",
 			$this->getExtDbVal($pm,'name'),
 			$this->getExtDbVal($pm,'name'),
@@ -161,6 +164,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		if (!is_array($ar) || !count($ar)){
 			throw new Exception(ERR_AUTH);
 		}
+		else if ($ar['banned']=='t'){
+			throw new Exception(self::ER_BANNED);
+		}
+		
 		else{
 			$this->set_logged($ar);
 			
@@ -249,13 +256,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$link->query('BEGIN');									
 			$link->query(sprintf(
 			"UPDATE sessions
-				SET id='%s'
-			WHERE id='%s'",$new_sess_id,$old_sess_id));
+				SET id=md5('%s')
+			WHERE id=md5('%s')",$new_sess_id,$old_sess_id));
 			
 			$link->query(sprintf(
 			"UPDATE logins
 				SET set_date_time=now()::timestamp,
-					session_id='%s',
+					session_id=md5('%s'),
 					pub_key='%s'
 			WHERE id=%d",$new_sess_id,$pub_key,$ar['id']));
 			
@@ -405,7 +412,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				sprintf(
 				"SELECT 
 					u.*
-				FROM user_view AS u
+				FROM users_dialog AS u
 				WHERE u.id=%d",
 				$inserted_id_ar['id']
 				));
