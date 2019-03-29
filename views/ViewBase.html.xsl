@@ -528,7 +528,7 @@ throw Error(CommonHelper.longString(function () {/*
 				<!-- USER DATA -->
 				<li class="dropdown dropdown-user">
 					<a class="dropdown-toggle" data-toggle="dropdown">
-						<img src="assets/images/placeholder.jpg" alt=""/>
+						<img src="js20/assets/images/placeholder.jpg" alt=""/>
 						<span>
 						<xsl:choose>
 						<xsl:when test="/document/model[@id='ModelVars']/row/user_name_full!=''">

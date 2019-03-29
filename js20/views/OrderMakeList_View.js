@@ -455,16 +455,17 @@ OrderMakeList_View.prototype.showVehCurrentPosition = function(vehicleScheduleId
 	
 	var self = this;
 	
-	var h = $( window ).width()/3*2;
-	var left = $( window ).width()/2;
-	var w = left - 20;
+	var win_w = $( window ).width();
+	var h = $( window ).height()-20;//win_w/3*2;
+	var left = win_w/3;
+	var w = win_w/3*2;//left - 20;
 	
 	this.m_mapForm = new WindowForm({
 		"id":"MapForm",
 		"height":h,
 		"width":w,
 		"left":left,
-		"top":0,
+		"top":10,
 		"URLParams":"t=Map&v=Child",
 		"name":"Map",
 		"params":{
@@ -487,9 +488,9 @@ OrderMakeList_View.prototype.toDOM = function(p){
 	this.showTotals();
 	
 	var self = this;
-	/*this.m_timer = setInterval(function(){
+	this.m_timer = setInterval(function(){
 		self.refresh();
-	}, this.m_refreshInterval);*/
+	}, this.m_refreshInterval);
 }
 
 OrderMakeList_View.prototype.delDOM = function(){

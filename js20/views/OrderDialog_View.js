@@ -103,7 +103,10 @@ function OrderDialog_View(id,options){
 				self.onSelectClient(f);
 			},
 			"focused":true,
-			"required":true
+			"required":true,
+			"onClear":function(){
+				self.getElement("client").getErrorControl().setValue("","info");
+			}			
 		});
 		this.m_clientResetKeys = client_ctrl.resetKeys;
 		client_ctrl.resetKeys = function(){
@@ -119,6 +122,9 @@ function OrderDialog_View(id,options){
 			"acMinLengthForQuery":0,
 			"onSelect":function(f){
 				self.onSelectDestination(f);
+			},
+			"onClear":function(){
+				self.getElement("destination").getErrorControl().setValue("","info");
 			}
 		}));	
 	
@@ -213,7 +219,10 @@ function OrderDialog_View(id,options){
 			"acEnabled":false,			
 			"onSelect":function(f){
 				self.onSelectDescr(f);
-			}
+			},
+			"onClear":function(){
+				self.getElement("phone_cel").reset();
+			}						
 			
 		}));
 
@@ -396,12 +405,13 @@ OrderDialog_View.prototype.onSelectDestinationCont = function(price,distance,tim
 //console.log("OrderDialog_View.prototype.onSelectDestination")
 	this.m_destinationPrice = parseFloat(price);
 	
-	this.getElement("destination").getErrorControl().setValue(
-		"Расстояние.:"+distance+" км."+
-		",время:"+DateHelper.format(timeRout,"H:i")+
-		",цена:"+(this.m_destinationPrice.toFixed(2))+"руб.",
-		"info"
-	);
+	var dest_inf = "";
+	if (!this.getElement("destination").isNull()){
+		dest_inf = "Расстояние.:"+distance+" км."+
+			",время:"+DateHelper.format(timeRout,"H:i")+
+			",цена:"+(this.m_destinationPrice.toFixed(2))+"руб.";
+	}	
+	this.getElement("destination").getErrorControl().setValue(dest_inf,"info");
 	
 	if(this.getElement("pay_cash").getValue()){
 		this.getElement("destination_price").setValue(this.m_destinationPrice);

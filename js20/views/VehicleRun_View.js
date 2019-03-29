@@ -170,16 +170,17 @@ VehicleRun_View.prototype.showVehCurrentPosition = function(vehicleId){
 		}
 	}
 	
-	var h = $( window ).width()/3*2;
-	var left = $( window ).width()/2;
-	var w = left - 20;
+	var win_w = $( window ).width();
+	var h = $( window ).height()-20;//win_w/3*2;
+	var left = win_w/3;
+	var w = win_w/3*2;//left - 20;
 	
 	this.m_mapForm = new WindowForm({
 		"id":"MapForm",
 		"height":h,
 		"width":w,
 		"left":left,
-		"top":0,
+		"top":10,
 		"URLParams":"t=Map&v=Child",
 		"name":"Map",
 		"params":{
