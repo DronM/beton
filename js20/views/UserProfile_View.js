@@ -1,5 +1,5 @@
-/** Copyright (c) 2017
-	Andrey Mikhalevich, Katren ltd.
+/** Copyright (c) 2017,2019
+ *	Andrey Mikhalevich, Katren ltd.
  */
 function UserProfile_View(id,options){	
 
@@ -59,7 +59,7 @@ function UserProfile_View(id,options){
 			}
 		}		
 	}));	
-
+/*
 	this.addElement(new EditColorPalette(id+":color_palette",{
 		"labelCaption":"Цветовая схема:",
 		"events":{
@@ -68,18 +68,7 @@ function UserProfile_View(id,options){
 			}
 		}				
 	}));	
-
-	this.addElement(new EditInt(id+":cades_load_timeout",{
-		"labelCaption":"Время загрузки плагина, (мс.)"
-	}));								
-	this.addElement(new EditInt(id+":cades_chunk_size",{
-		"labelCaption":"Размер части файла при подписании, байт"
-	}));								
-
-	this.addElement(new EditCheckBox(id+":reminders_to_email",{
-		"labelCaption":"Дублировать напоминания на электронную почту"
-	}));								
-
+*/
 	//****************************************************
 	var contr = new User_Controller();
 	
@@ -90,13 +79,9 @@ function UserProfile_View(id,options){
 	this.setDataBindings([
 		new DataBinding({"control":this.getElement("id"),"model":this.m_model}),
 		new DataBinding({"control":this.getElement("name"),"model":this.m_model}),
-		new DataBinding({"control":this.getElement("name_full"),"model":this.m_model}),
 		new DataBinding({"control":this.getElement("email"),"model":this.m_model}),
 		new DataBinding({"control":this.getElement("phone_cel"),"model":this.m_model}),
-		new DataBinding({"control":this.getElement("color_palette")}),
-		new DataBinding({"control":this.getElement("cades_load_timeout")}),
-		new DataBinding({"control":this.getElement("cades_chunk_size")}),
-		new DataBinding({"control":this.getElement("reminders_to_email")})
+		//new DataBinding({"control":this.getElement("color_palette")}),
 	]);
 	
 	//write
@@ -104,14 +89,10 @@ function UserProfile_View(id,options){
 	this.getCommand(this.CMD_OK).setBindings([
 		new CommandBinding({"control":this.getElement("id")}),
 		new CommandBinding({"control":this.getElement("name")}),
-		new CommandBinding({"control":this.getElement("name_full")}),
 		new CommandBinding({"control":this.getElement("email")}),
 		new CommandBinding({"control":this.getElement("phone_cel")}),
 		new CommandBinding({"control":this.getElement("pwd")}),
-		new CommandBinding({"control":this.getElement("color_palette")}),
-		new CommandBinding({"control":this.getElement("cades_load_timeout")}),
-		new CommandBinding({"control":this.getElement("cades_chunk_size")}),
-		new CommandBinding({"control":this.getElement("reminders_to_email")})
+		//new CommandBinding({"control":this.getElement("color_palette")}),
 	]);
 	
 	this.getControlSave().setEnabled(false);

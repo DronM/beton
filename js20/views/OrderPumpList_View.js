@@ -1,6 +1,6 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function OrderPumpList_View(id,options){	
 
 	OrderPumpList_View.superclass.constructor.call(this,id,options);
@@ -94,9 +94,10 @@ function OrderPumpList_View(id,options){
 		"editInline":false,
 		"editWinClass":OrderDialog_Form,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
-			"cmdInsert":false,
-			"cmdDelete":false,
-			"cmdCopy":false,
+			"cmdInsert":true,
+			"cmdDelete":true,
+			"cmdCopy":true,
+			"cmdEdit":true,
 			"cmdFilter":true,
 			"filters":filters,
 			"variantStorage":options.variantStorage

@@ -28,45 +28,52 @@ CREATE OR REPLACE VIEW shipment_times_list AS
 		sh.production_site_id,
 		production_sites.name AS production_site_descr,
 		
-		CASE
-		WHEN round(
-			(date_part('epoch'::text, COALESCE(vh.assign_date_time - (
-			( SELECT t2.date_time
-			FROM shipments t1
-			LEFT JOIN vehicle_schedule_states t2 ON t2.shipment_id = t1.id AND t2.state = 'busy'::vehicle_states
-			WHERE t1.date_time < sh.date_time AND get_shift_start(t1.date_time) = get_shift_start(sh.date_time)
-			ORDER BY t1.date_time DESC
-			LIMIT 1)
-			), '00:00:00'::interval)) / 60::double precision)::numeric, 0) > 0::numeric
-			THEN
-				round((date_part('epoch'::text, COALESCE(vh.assign_date_time - (
-				( SELECT t2.date_time
-				FROM shipments t1
-				LEFT JOIN vehicle_schedule_states t2 ON t2.shipment_id = t1.id AND t2.state = 'busy'::vehicle_states
-				WHERE t1.date_time < sh.date_time AND get_shift_start(t1.date_time) = get_shift_start(sh.date_time)
-				ORDER BY t1.date_time DESC
-				LIMIT 1)
-		), '00:00:00'::interval)) / 60::double precision)::numeric, 0)
 		
-		ELSE 0::numeric
-		END AS dispatcher_fail_min,
-		
+		greatest(
+			round(
+				(date_part('epoch'::text,
+					coalesce(vh.assign_date_time - 
+						--any previous ship of the same shift
+						(SELECT t_sh.ship_date_time
+						FROM shipments AS t_sh
+						WHERE t_sh.ship_date_time<vh.assign_date_time
+							AND t_sh.ship_date_time>=get_shift_start(vh.assign_date_time)
+						ORDER BY t_sh.ship_date_time DESC
+						LIMIT 1
+						)
+					,'00:00:00'::interval)
+					) / 60::double precision
+				)::numeric
+			,0)
+		,0)
+		AS dispatcher_fail_min,
+				
 		shipment_time_norm(sh.quant::numeric) AS ship_time_norm,
-		round((date_part('epoch'::text, sh.ship_date_time - vh.assign_date_time) / 60::double precision)::numeric, 0) - shipment_time_norm(sh.quant::numeric)::numeric AS operator_fail_min,
-		CASE
-		WHEN round((date_part('epoch'::text, COALESCE(vh.assign_date_time - (( SELECT t2.date_time
-		FROM shipments t1
-		LEFT JOIN vehicle_schedule_states t2 ON t2.shipment_id = t1.id AND t2.state = 'busy'::vehicle_states
-		WHERE t1.date_time < sh.date_time AND get_shift_start(t1.date_time) = get_shift_start(sh.date_time)
-		ORDER BY t1.date_time DESC
-		LIMIT 1)), '00:00:00'::interval)) / 60::double precision)::numeric, 0) > 0::numeric THEN round((date_part('epoch'::text, COALESCE(vh.assign_date_time - (( SELECT t2.date_time
-		FROM shipments t1
-		LEFT JOIN vehicle_schedule_states t2 ON t2.shipment_id = t1.id AND t2.state = 'busy'::vehicle_states
-		WHERE t1.date_time < sh.date_time AND get_shift_start(t1.date_time) = get_shift_start(sh.date_time)
-		ORDER BY t1.date_time DESC
-		LIMIT 1)), '00:00:00'::interval)) / 60::double precision)::numeric, 0)
-		ELSE 0::numeric
-		END + (round((date_part('epoch'::text, sh.ship_date_time - vh.assign_date_time) / 60::double precision)::numeric, 0) - shipment_time_norm(sh.quant::numeric)::numeric) AS total_fail_min
+		
+		round((date_part('epoch'::text, sh.ship_date_time - vh.assign_date_time) / 60::double precision)::numeric,0)
+		- shipment_time_norm(sh.quant::numeric)::numeric
+		AS operator_fail_min,
+		
+		--together
+		greatest(
+			round(
+				(date_part('epoch'::text,
+					coalesce(vh.assign_date_time - 
+						--any previous ship of the same shift
+						(SELECT t_sh.ship_date_time
+						FROM shipments AS t_sh
+						WHERE t_sh.ship_date_time<vh.assign_date_time
+							AND t_sh.ship_date_time>=get_shift_start(vh.assign_date_time)
+						ORDER BY t_sh.ship_date_time DESC
+						LIMIT 1
+						)
+					,'00:00:00'::interval)
+					) / 60::double precision
+				)::numeric
+			,0)
+		,0)		
+		+ (round((date_part('epoch'::text, sh.ship_date_time - vh.assign_date_time) / 60::double precision)::numeric, 0) - shipment_time_norm(sh.quant::numeric)::numeric)
+		AS total_fail_min
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id

@@ -473,7 +473,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		if (!$_SESSION['user_id']){
 			throw new Exception(self::ER_USER_NOT_DEFIND);	
 		}
-		$m = new UserDialog_Model($this->getDbLink());		
+		$m = new UserProfile_Model($this->getDbLink());		
 		$f = $m->getFieldById('id');
 		$f->setValue($_SESSION['user_id']);		
 		$where = new ModelWhereSQL();

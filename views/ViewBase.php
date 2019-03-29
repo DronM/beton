@@ -5,6 +5,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelJavaScript.php');
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelTemplate.php');
 require_once(USER_CONTROLLERS_PATH.'Constant_Controller.php');
+require_once(USER_CONTROLLERS_PATH.'MainMenuConstructor_Controller.php');
 
 
 			
@@ -1300,6 +1301,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MaterialSelect.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RAMaterialConsumptionDateGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PeriodSelectBeton.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditColorPalette.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		

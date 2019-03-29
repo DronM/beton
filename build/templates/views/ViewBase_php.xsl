@@ -12,6 +12,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelJavaScript.php');
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelTemplate.php');
 require_once(USER_CONTROLLERS_PATH.'Constant_Controller.php');
+require_once(USER_CONTROLLERS_PATH.'MainMenuConstructor_Controller.php');
 
 <xsl:apply-templates select="metadata/enums/enum[@id='role_types']"/>
 class ViewBase extends ViewHTMLXSLT {	
