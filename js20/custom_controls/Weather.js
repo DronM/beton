@@ -20,7 +20,14 @@ function Weather(id,options){
 	var self = this;
 	options.events = {
 		"onclick":function(){
-			alert(self.m_contentDetails)
+			var cont = new Control("WeatherDetails:cont","DIV");
+			cont.getNode().innerHTML = self.m_contentDetails;
+			(new WindowFormModalBS("WeatherDetails",{
+				"contentHead":"Подробности погоды",
+				"content":cont,
+				"cmdCancel":true
+				})
+			).open();			
 		}
 	}
 	

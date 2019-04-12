@@ -142,9 +142,10 @@
 	</xsl:if>
 	
 	<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='')">
-	application.m_weather = new Weather("weather",{"refreshInterval":600});
-	application.m_weather.toDOM();
-	
+	if (document.getElementById("weather")){
+		application.m_weather = new Weather("weather",{"refreshInterval":600});
+		application.m_weather.toDOM();
+	}	
 	<xsl:if test="count(/document/model[@id='AstCallCurrent_Model']/row) &gt;0">
 	//ВХОДЯЩИЙ ЗВОНОК!
 	var view_opts = {};

@@ -4,11 +4,12 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-04-12 09:48:20</lastBuild></version>
+		<lastBuild>2019-04-12 10:51:49</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
 		<version dateOpen="2019-04-06 05:04:56" dateClose="2019-04-12 09:04:48">1.005</version>
+		<version dateOpen="2019-04-12 10:04:51" dateClose="2019-04-12 10:04:51">1.006</version>
 	</versions>
 	<enums>
 		<enum id="locales">

@@ -35,17 +35,14 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 -->
 <xsl:template name="extra_methods">
 	private function active_call_query($extraCond='',$commonExt=FALSE){		
-		return "SELECT t.* FROM ast_calls_current t LIMIT 1";
+		//return "SELECT t.* FROM ast_calls_current t LIMIT 1";
 	
-		/*
 		return sprintf("SELECT t.* FROM ast_calls_current t
 		WHERE t.ext='%s'
-			--t.unique_id='1426583500.22777'
 			%s LIMIT 1",
 			($commonExt)? COMMON_EXT:$_SESSION['tel_ext'],
 			$extraCond
 		);
-		*/
 	}
 
 	public function active_call_inform($pm){		

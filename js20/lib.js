@@ -4639,7 +4639,7 @@ else{var p=detail_keys[det_h].masterNode.parentNode;var n_r=detail_keys[det_h].m
 else{det_row=p.appendChild(detail_keys[det_h].node);}
 if(detail_keys[det_h].masterCell){var tg=detail_keys[det_h].masterCell.getDetailToggle();if(tg){tg.setDetailRow(det_row);tg.setDetailVisible(true);}}}}}}
 if(this.m_navigate||this.m_navigateClick){this.setSelection();}} 
-function Weather(id,options){options=options||{};this.m_refreshInterval=(options.refreshInterval||this.DEF_REFRESH)*1000;this.m_collapsed=true;var self=this;options.events={"onclick":function(){alert(self.m_contentDetails)}}
+function Weather(id,options){options=options||{};this.m_refreshInterval=(options.refreshInterval||this.DEF_REFRESH)*1000;this.m_collapsed=true;var self=this;options.events={"onclick":function(){var cont=new Control("WeatherDetails:cont","DIV");cont.getNode().innerHTML=self.m_contentDetails;(new WindowFormModalBS("WeatherDetails",{"contentHead":"Подробности погоды","content":cont,"cmdCancel":true})).open();}}
 Weather.superclass.constructor.call(this,id,"A",options);if(options.model)
 this.setData(options.model);}
 extend(Weather,Control);Weather.prototype.m_collapsed;Weather.prototype.CLASS_COLLAPSED="icon-plus3";Weather.prototype.CLASS_EXPANDED="icon-minus3";Weather.prototype.DEF_REFRESH=10*60;Weather.prototype.toDOM=function(p){Weather.superclass.toDOM.call(this,p);var self=this;this.m_timer=setInterval(function(){self.refresh();},this.m_refreshInterval);this.refresh();}
