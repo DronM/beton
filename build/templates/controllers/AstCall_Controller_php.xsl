@@ -35,14 +35,17 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 -->
 <xsl:template name="extra_methods">
 	private function active_call_query($extraCond='',$commonExt=FALSE){		
-		return sprintf("SELECT t.* FROM ast_calls_active t
+		return "SELECT t.* FROM ast_calls_current t LIMIT 1";
+	
+		/*
+		return sprintf("SELECT t.* FROM ast_calls_current t
 		WHERE t.ext='%s'
 			--t.unique_id='1426583500.22777'
 			%s LIMIT 1",
 			($commonExt)? COMMON_EXT:$_SESSION['tel_ext'],
 			$extraCond
 		);
-	
+		*/
 	}
 
 	public function active_call_inform($pm){		
@@ -77,37 +80,57 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		if ($_SESSION['tel_ext']){
 			$q = $this->active_call_query();
 			$ar = $this->getDbLink()->query_first($q);
-			$this->addNewModel($q,'active_call');
+			$this->addNewModel($q,'AstCallCurrent_Model');
 			
 			if (is_array($ar)&amp;&amp;count($ar)&gt;0){
-				if (!$ar['client_id']){
-					$this->addNewModel("SELECT * FROM client_types
-					ORDER BY id",
-					'client_types');
-					$this->addNewModel("SELECT * FROM client_come_from
-					ORDER BY id",
-					'client_come_from');
+				if ($ar['client_id']){
+					$this->add_client_call_hist($ar['client_id']);
+					$this->add_client_ship_hist($ar['client_id']);				
 				}
 				return $ar['client_id'];
 			}			
 		}		
 	}
 	
-	public function client_call_hist($pm){		
+	protected function add_client_call_hist($clientId){		
 		$this->addNewModel(sprintf(
-		"SELECT * FROM ast_calls_client_call_hist_list
-		WHERE client_id=(SELECT t.client_id FROM (%s) t)
+		"SELECT * FROM ast_calls_client_call_history_list
+		WHERE client_id=%s
+		ORDER BY dt DESC
 		LIMIT 10",
-		$this->active_call_query()));
+		$clientId),
+		'AstCallClientCallHistoryList_Model');
 	}
-	public function client_ship_hist($pm){			
-		$this->addNewModel(sprintf(
-		"SELECT * FROM ast_calls_client_ship_hist_list
-		WHERE client_id=(SELECT t.client_id FROM (%s) t)
-		LIMIT 10",
-		$this->active_call_query()));
 	
-	}	
+	public function client_call_hist($pm){		
+		$this->add_client_call_hist(
+			sprintf(
+				'(SELECT t.client_id FROM (%s) t)'
+				,$this->active_call_query()
+			)
+		);
+	}
+	
+	public function add_client_ship_hist($clientId){			
+		$this->addNewModel(sprintf(
+		"SELECT * FROM ast_calls_client_ship_history_list
+		WHERE client_id=%s
+		ORDER BY date_time DESC
+		LIMIT 10",
+		$clientId),
+		'AstCallClientShipHistoryList_Model');
+	
+	}
+	
+	public function client_ship_hist($pm){			
+		$this->add_client_ship_hist(
+			sprintf(
+				'(SELECT t.client_id FROM (%s) t)'
+				,$this->active_call_query()
+			)
+		);	
+	}
+		
 	public function update($pm){
 		if ($pm->getParamValue('client_id')){
 			//дополнительные данные
@@ -116,20 +139,27 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$l->query("BEGIN");
 			try{				
 				$p = new ParamsSQL($pm,$this->getDbLink());
-				$p->add('client_id',DT_INT,$pm->getParamValue('client_id'));
-				$p->add('client_name',DT_STRING,$pm->getParamValue('client_name'));
 				$p->add('contact_name',DT_STRING,$pm->getParamValue('contact_name'));
 				$p->add('contact_tel',DT_STRING,$pm->getParamValue('contact_tel'));
+				$p->add('client_id',DT_INT,$pm->getParamValue('client_id'));
+				$p->add('client_name',DT_STRING,$pm->getParamValue('client_name'));				
+				$p->add('client_come_from_id',DT_INT,$pm->getParamValue('client_come_from_id'));
+				$p->add('client_type_id',DT_INT,$pm->getParamValue('client_type_id'));
+				$p->add('client_kind',DT_STRING,$pm->getParamValue('client_kind'));
+				$p->add('manager_comment',DT_STRING,$pm->getParamValue('manager_comment'));
+				$p->add('unique_id',DT_STRING,$pm->getParamValue('unique_id'));
 			
-				/*сверим имя клиента
-				и имя контакта с базой
-				- если надо обновим
-				*/
+				/** сверим имя клиента
+				 * и имя контакта с базой - если надо обновим
+				 */
 				$ar = $l->query_first(sprintf(
 				"SELECT
 					cl.name AS client_name,
 					clt.name AS contact_name,
-					clt.tel AS contact_tel
+					clt.tel AS contact_tel,
+					cl.client_kind AS client_kind,
+					cl.client_come_from_id,
+					cl.client_type_id
 				FROM clients AS cl
 				LEFT JOIN client_tels AS clt
 					ON clt.client_id=cl.id
@@ -140,17 +170,36 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				));
 				
 				if (is_array($ar)&amp;&amp;count($ar)){
-					if (strlen($pm->getParamValue('client_name'))
-					&amp;&amp;$ar['client_name']!=$pm->getParamValue('client_name')){
-						//обноляем имя клиента
+					//ПОЛЯ КЛИЕНТА
+					$client_upd_fields = '';
+					if (strlen($pm->getParamValue('client_name'))&amp;&amp;$ar['client_name']!=$pm->getParamValue('client_name')){
+						$client_upd_fields.= ($client_upd_fields=='')? '':',';
+						$client_upd_fields.= sprinbtf('name=%s',$p->getParamById('client_name'));
+					}
+					if (strlen($pm->getParamValue('client_type_id'))&amp;&amp;$ar['client_type_id']!=$pm->getParamValue('client_type_id')){
+						$client_upd_fields.= ($client_upd_fields=='')? '':',';
+						$client_upd_fields.= sprinbtf('client_type_id=%d',$p->getParamById('client_type_id'));
+					}
+					if (strlen($pm->getParamValue('client_come_from_id'))&amp;&amp;$ar['client_come_from_id']!=$pm->getParamValue('client_come_from_id')){
+						$client_upd_fields.= ($client_upd_fields=='')? '':',';
+						$client_upd_fields.= sprinbtf('client_come_from_id=%d',$p->getParamById('client_come_from_id'));
+					}
+					if (strlen($pm->getParamValue('client_kind'))&amp;&amp;$ar['client_kind']!=$pm->getParamValue('client_kind')){
+						$client_upd_fields.= ($client_upd_fields=='')? '':',';
+						$client_upd_fields.= sprinbtf('client_kind=%s',$p->getParamById('client_kind'));
+					}
+					
+					if (strlen($client_upd_fields)){						
 						$l->query(sprintf(
 						"UPDATE clients
-						SET name=%s
+						SET %s
 						WHERE id=%d",
-						$p->getParamById('client_name'),
+						$client_upd_fields,
 						$p->getParamById('client_id')
 						));
 					}
+					
+					//КОНТАКТ
 					if ($ar['contact_tel']
 					&amp;&amp;strlen($pm->getParamValue('contact_name'))
 					&amp;&amp;$ar['contact_name']!=$pm->getParamValue('contact_name')){
@@ -174,8 +223,20 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 						$p->getParamById('contact_tel'),
 						$p->getParamById('contact_name')
 						));
-					}
+					}					
 				}
+				
+				//КОММЕНТАРИЙ МЕНЕДЖЕРА
+				if (strlen($pm->getParamValue('manager_comment'))&amp;&amp;strlen($pm->getParamValue('unique_id'))){
+					$l->query(sprintf(
+					"UPDATE ast_calls
+					SET manager_comment=%s
+					WHERE unique_id=%s",
+					$p->getParamById('manager_comment'),
+					$p->getParamById('unique_id')
+					));											
+				}
+				
 				$l->query("COMMIT");
 			}
 			catch (Exception $e){

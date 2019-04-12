@@ -33,6 +33,9 @@ function UserDialog_View(id,options){
 		"labelCaption":"Доступ запрещен:",
 	}));
 
+	this.addElement(new ProductionSiteEdit(id+":production_sites_ref",{
+	}));
+
 	//mac grid
 	var mac_grid = new UserMacAddressList_View(id+":UserMacAddressList");
 	this.addElement(mac_grid);
@@ -47,6 +50,7 @@ function UserDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("tel_ext")})
 		,new DataBinding({"control":this.getElement("phone_cel")})
 		,new DataBinding({"control":this.getElement("banned")})
+		,new DataBinding({"control":this.getElement("production_sites_ref")})
 	];
 	this.setDataBindings(r_bd);
 	
@@ -58,6 +62,7 @@ function UserDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("phone_cel")})
 		,new CommandBinding({"control":this.getElement("tel_ext")})
 		,new CommandBinding({"control":this.getElement("banned")})
+		,new CommandBinding({"control":this.getElement("production_sites_ref"),"fieldId":"production_site_id"})
 	]);
 	
 	this.addDetailDataSet({

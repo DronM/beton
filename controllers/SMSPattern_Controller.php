@@ -33,7 +33,7 @@ class SMSPattern_Controller extends ControllerSQL{
 			));
 		$pm->addParam($param);
 		
-				$param = new FieldExtEnum('sms_type',',','order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank'
+				$param = new FieldExtEnum('sms_type',',','order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank,vehicle_zone_violation,vehicle_tracker_malfunction,efficiency_warn,material_balance'
 				,array('required'=>TRUE,
 				'alias'=>'Тип SMS'
 			));
@@ -70,7 +70,7 @@ class SMSPattern_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-				$param = new FieldExtEnum('sms_type',',','order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank'
+				$param = new FieldExtEnum('sms_type',',','order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank,vehicle_zone_violation,vehicle_tracker_malfunction,efficiency_warn,material_balance'
 				,array(
 			
 				'alias'=>'Тип SMS'

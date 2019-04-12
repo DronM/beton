@@ -5,7 +5,7 @@ function OrderDialog_View(id,options){
 
 	options = options || {};
 	options.controller = new Order_Controller();
-	options.model = options.models.OrderDialog_Model;
+	options.model = (options.models&&options.models.OrderDialog_Model)? options.models.OrderDialog_Model: new OrderDialog_Model();
 
 	var app = window.getApp();
 	var constants = {"def_order_unload_speed":null,"def_lang":null};
@@ -13,6 +13,7 @@ function OrderDialog_View(id,options){
 	
 	var role_id = app.getServVar("role_id");
 	var bool_bs_cl = "control-label "+window.getBsCol(4);
+	var obj_bs_cl = ("control-label "+window.getBsCol(2));
 	
 	var self = this;
 	
@@ -50,17 +51,6 @@ function OrderDialog_View(id,options){
 				}
 			}
 		});	
-		/*
-		this.m_dateTimeGetValue = date_time_ctrl.getValue;
-		date_time_ctrl.getValue = function(){
-			var v = self.m_dateTimeGetValue.call(this);
-			if(v){
-				var offset = new Date().getTimezoneOffset();
-				v = new Date(v.getFullYear(), v.getMonth(), v.getDate(), 0, 0,0,self.getElement("date_time_time").getValue()+offset*1000);
-			}
-			return v;
-		}
-		*/
 		this.addElement(date_time_ctrl);
 		
 		this.addElement(new OrderTimeSelect(id+":date_time_time",{
@@ -96,7 +86,7 @@ function OrderDialog_View(id,options){
 		//*****************
 		var client_ctrl = new ClientEdit(id+":client",{
 			"cmdInsert":true,
-			"labelClassName":("control-label "+window.getBsCol(2)),
+			"labelClassName":obj_bs_cl,
 			"acPublicMethodId":"complete_for_order",
 			"acModel":new OrderClient_Model(),
 			"onSelect":function(f){
@@ -117,7 +107,7 @@ function OrderDialog_View(id,options){
 		
 		
 		this.addElement(new DestinationEdit(id+":destination",{
-			"labelClassName":("control-label "+window.getBsCol(2)),
+			"labelClassName":obj_bs_cl,
 			"required":true,
 			"acMinLengthForQuery":0,
 			"onSelect":function(f){
@@ -130,8 +120,8 @@ function OrderDialog_View(id,options){
 	
 		this.addElement(new EditInt(id+":quant",{
 			"labelCaption":"Количество:",
-			"labelClassName":("control-label "+window.getBsCol(5)),
-			"editContClassName":("input-group "+window.getBsCol(7)),
+			"labelClassName":obj_bs_cl,
+			//"editContClassName":("input-group "+window.getBsCol(7)),
 			"events":{
 				"onchange":function(){
 					self.recalcTotal();						
@@ -147,8 +137,8 @@ function OrderDialog_View(id,options){
 		this.addElement(new EditFloat(id+":unload_speed",{
 			"labelCaption":"Скорость разгрузки:",
 			"value":constants.def_order_unload_speed.getValue(),
-			"labelClassName":("control-label "+window.getBsCol(5)),
-			"editContClassName":("input-group "+window.getBsCol(7)),
+			"labelClassName":obj_bs_cl,
+			//"editContClassName":("input-group "+window.getBsCol(7)),
 			"events":{
 				"onchange":function(){
 					self.recalcTotal();						
@@ -162,8 +152,8 @@ function OrderDialog_View(id,options){
 		}));
 
 		this.addElement(new ConcreteTypeEdit(id+":concrete_type",{			
-			"labelClassName":("control-label "+window.getBsCol(5)),
-			"editContClassName":("input-group "+window.getBsCol(7)),
+			"labelClassName":obj_bs_cl,
+			//"editContClassName":("input-group "+window.getBsCol(7)),
 			"onSelect":function(f){
 				self.onSelectConcrete(f);
 			},
@@ -172,8 +162,8 @@ function OrderDialog_View(id,options){
 
 		this.addElement(new Enum_unload_types(id+":unload_type",{
 			"labelCaption":"Вид насоса:",
-			"labelClassName":("control-label "+window.getBsCol(5)),
-			"editContClassName":("input-group "+window.getBsCol(7)),			
+			"labelClassName":obj_bs_cl,
+			//"editContClassName":("input-group "+window.getBsCol(7)),			
 			"defaultValue":"none",
 			"addNotSelected":false,
 			"events":{
@@ -185,8 +175,8 @@ function OrderDialog_View(id,options){
 
 		this.addElement(new PumpVehicleEdit(id+":pump_vehicle",{
 			//"enabled":false,
-			"labelClassName":("control-label "+window.getBsCol(5)),
-			"editContClassName":("input-group "+window.getBsCol(7)),
+			"labelClassName":obj_bs_cl,
+			//"editContClassName":("input-group "+window.getBsCol(7)),
 			"onSelect":function(f){
 				self.onSelectPumpVehicle(f);
 			}
@@ -205,6 +195,7 @@ function OrderDialog_View(id,options){
 		
 		this.addElement(new EditString(id+":descr",{
 			"labelCaption":"Прораб:",
+			"labelClassName":obj_bs_cl,
 			"maxLength":500,
 			"cmdAutoComplete":true,
 			"acMinLengthForQuery":0,
@@ -227,27 +218,31 @@ function OrderDialog_View(id,options){
 		}));
 
 		this.addElement(new EditPhone(id+":phone_cel",{
+			"labelClassName":obj_bs_cl,
 			"labelCaption":"Телефон:",
 		}));
 
 		this.addElement(new LangEditRef(id+":lang",{
+			"labelClassName":obj_bs_cl,
 			"value":constants.def_lang.getValue()
 		}));	
 
 		this.addElement(new UserEditRef(id+":user",{
+			"labelClassName":obj_bs_cl,
 			"labelCaption":"Автор документа:",
 			"enabled":(role_id=="owner"),
-			"value":new RefType({"keys":{"id":app.getServVar("user_id")},"descr":app.getServVar("user_name"),"dataType":"users"}),
-			"labelClassName":("control-label "+window.getBsCol(2))
+			"value":new RefType({"keys":{"id":app.getServVar("user_id")},"descr":app.getServVar("user_name"),"dataType":"users"})
 		}));
 			
 		this.addElement(new EditString(id+":comment_text",{
+			"labelClassName":obj_bs_cl,			
 			"labelCaption":"Комментарий:",
-			"maxLength":500,
-			"labelClassName":("control-label "+window.getBsCol(2))
+			"maxLength":500
 		}));
 
 		this.addElement(new EditMoney(id+":destination_price",{
+			"labelClassName":obj_bs_cl+" orderMoneyFieldLab",
+			"className":"form-control orderMoneyField",
 			"labelCaption":"Доставка:",
 			"value":0,
 			"events":{
@@ -257,6 +252,8 @@ function OrderDialog_View(id,options){
 			}			
 		}));
 		this.addElement(new EditMoney(id+":unload_price",{
+			"labelClassName":obj_bs_cl+" orderMoneyFieldLab",
+			"className":"form-control orderMoneyField",
 			"labelCaption":"Насос:",
 			"value":0,
 			"enabled":false,
@@ -267,6 +264,8 @@ function OrderDialog_View(id,options){
 			}			
 		}));
 		this.addElement(new EditMoneyEditable(id+":total",{
+			"labelClassName":obj_bs_cl+" orderMoneyFieldLab",
+			"className":"form-control orderMoneyField",
 			"labelCaption":"Всего:",
 			"value":0,
 			"enabled":false

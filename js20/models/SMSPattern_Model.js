@@ -52,7 +52,7 @@ function SMSPattern_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.sms_type = new FieldEnum("sms_type",filed_options);
-	filed_options.enumValues = 'order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank';
+	filed_options.enumValues = 'order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank,vehicle_zone_violation,vehicle_tracker_malfunction,efficiency_warn,material_balance';
 	options.fields.sms_type.getValidator().setRequired(true);
 	
 				

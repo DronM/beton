@@ -126,6 +126,15 @@ function User_Model(options){
 	
 	options.fields.time_zone_locale_id = new FieldInt("time_zone_locale_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
+	
 			
 		User_Model.superclass.constructor.call(this,id,options);
 }

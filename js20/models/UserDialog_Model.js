@@ -94,6 +94,15 @@ function UserDialog_Model(options){
 	
 	options.fields.user_time_locale = new FieldInt("user_time_locale",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
+	
 		UserDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(UserDialog_Model,ModelXML);

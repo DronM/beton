@@ -100,6 +100,14 @@ class SMSForSending_Model extends ModelSQLBeton{
 		$f_sms_type=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_type",$f_opts);
 		$this->addField($f_sms_type);
 		//********************
+		
+		//*** Field sms_id ***
+		$f_opts = array();
+		$f_opts['id']="sms_id";
+				
+		$f_sms_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_id",$f_opts);
+		$this->addField($f_sms_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

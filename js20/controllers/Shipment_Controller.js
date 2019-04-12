@@ -32,6 +32,7 @@ function Shipment_Controller(options){
 	this.add_get_pump_list();
 	this.add_get_shipment_date_list();
 	this.addGetObject();
+	this.add_get_assigned_vehicle_list();
 	this.add_get_operator_list();
 	this.add_set_shipped();
 	this.add_unset_shipped();
@@ -342,6 +343,13 @@ extend(Shipment_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("id",f_opts));
 	
 	pm.addField(new FieldString("mode"));
+}
+
+			Shipment_Controller.prototype.add_get_assigned_vehicle_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_assigned_vehicle_list',opts);
+	
+	this.addPublicMethod(pm);
 }
 
 			Shipment_Controller.prototype.add_get_operator_list = function(){

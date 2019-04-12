@@ -4,10 +4,11 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-03-29 09:29:40</lastBuild></version>
+		<lastBuild>2019-04-12 09:48:20</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
+		<version dateOpen="2019-04-06 05:04:56" dateClose="2019-04-12 09:04:48">1.005</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -130,6 +131,18 @@
 			</value>
 			<value id="client_thank">
 				<ru descr="благодарность клиенту"/>
+			</value>
+			<value id="vehicle_zone_violation">
+				<ru descr="Въезд в запрещенную зону"/>
+			</value>
+			<value id="vehicle_tracker_malfunction">
+				<ru descr="Нерабочий трекер"/>
+			</value>
+			<value id="efficiency_warn">
+				<ru descr="Низская эффективность"/>
+			</value>
+			<value id="material_balance">
+				<ru descr="Остатки материалов"/>
 			</value>
 		</enum>
 		<enum id="email_types">
@@ -317,6 +330,7 @@
 			<field id="create_dt" dataType="DateTimeTZ" alias="Дата создания" defaultValue="CURRENT_TIMESTAMP"/>
 			<field id="banned" dataType="Bool" defaultValue="FALSE"/>
 			<field id="time_zone_locale_id" dataType="Int" refTable="time_zone_locales" refField="id"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
 			<index id="users_name_index">
 				<field id="name" unique="TRUE"/>
 			</index>
@@ -338,6 +352,7 @@
 			<field id="tel_ext" dataType="String"/>
 			<field id="banned" dataType="Bool"/>
 			<field id="user_time_locale" dataType="Int"/>
+			<field id="production_sites_ref" dataType="JSON"/>
 		</model>
 		<model id="UserProfile" parent="ModelSQLBeton" dataTable="users_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
@@ -745,6 +760,9 @@
 			<field id="pump_prices_ref" dataType="JSON"/>
 		</model>
 		<model id="ProductionSite" parent="ModelSQLBeton" dataTable="production_sites" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="name" dataType="String" length="100" primaryKey="TRUE"/>
 		</model>
@@ -830,12 +848,22 @@
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
 			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
 			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
 			<field id="shipped" dataType="Bool" alias="Отгружен"/>
 			<field id="ship_norm_min" dataType="Int" alias="Норма отгр."/>
 			<field id="ship_fact_min" dataType="Int" alias="Норма факт."/>
 			<field id="ship_bal_min" dataType="Int" alias="Остаток"/>
+		</model>
+		<model id="AssignedVehicleList" parent="ModelSQLBeton" dataTable="assigned_vehicles_list" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" alias="Назначен"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
+			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
 		</model>
 		<model id="ShipmentPumpList" parent="ModelSQLBeton" dataTable="shipments_pumps_list" virtual="TRUE">
 			<field id="ship_date_time" dataType="DateTime"/>
@@ -1238,13 +1266,27 @@
 				<field id="lang_id"/>
 			</index>
 		</model>
-		<model id="SMSPatternList" parent="ModelSQLBeton" dataTable="sms_patterns_list_view" virtual="TRUE">
+		<model id="SMSPatternUserPhone" parent="ModelSQLBeton" dataTable="sms_pattern_user_phones" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="sms_pattern_id" dataType="Int" refTable="sms_patterns" refField="id" required="TRUE"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" required="TRUE"/>
+			<index id="sms_pattern_user_phones_pattern_idx" unique="TRUE">
+				<field id="sms_pattern_id"/>
+				<field id="user_id"/>
+			</index>
+		</model>
+		<model id="SMSPatternUserPhoneList" parent="ModelSQLBeton" dataTable="sms_pattern_user_phones_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="sms_pattern_id" dataType="Int" refTable="sms_patterns" refField="id" required="TRUE"/>
+			<field id="users_ref" dataType="JSON"/>
+			<field id="user_tel" dataType="String"/>
+		</model>
+		<model id="SMSPatternList" parent="ModelSQLBeton" dataTable="sms_patterns_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="sms_type" dataType="String"/>
-			<field id="sms_type_descr" dataType="String"/>
-			<field id="lang_descr" dataType="String"/>
-			<field id="lang_id" dataType="Int"/>
+			<field id="langs_ref" dataType="JSON"/>
 			<field id="pattern" dataType="Text"/>
+			<field id="user_list" dataType="String"/>
 		</model>
 		<model id="VehicleFeatureList" parent="ModelSQLBeton" dataTable="vehicle_feature_list_view" virtual="TRUE">
 			<field id="feature" dataType="String"/>
@@ -1450,6 +1492,24 @@
 			<field id="informed" dataType="Bool"/>
 			<field id="create_date" dataType="String"/>
 		</model>
+		<model id="AstCallCurrent" parent="ModelSQLBeton" dataTable="ast_calls_current" virtual="TRUE">
+			<field id="unique_id" dataType="Text" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="ext" dataType="String"/>
+			<field id="contact_tel" dataType="String"/>
+			<field id="ring_time" dataType="DateTime"/>
+			<field id="answer_time" dataType="DateTime"/>
+			<field id="hangup_time" dataType="DateTime"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="clients_ref" dataType="JSON"/>
+			<field id="client_kind" dataType="String"/>
+			<field id="manager_comment" dataType="Text"/>
+			<field id="informed" dataType="Bool"/>
+			<field id="contact_name" dataType="String"/>
+			<field id="debt" dataType="Float"/>
+			<field id="client_manager_descr" dataType="String"/>
+			<field id="client_types_ref" dataType="JSON"/>
+			<field id="client_come_from_ref" dataType="JSON"/>
+		</model>
 		<model id="AstCallList" parent="ModelSQLBeton" dataTable="ast_calls_new_list" virtual="TRUE">
 			<defaultOrder>
 				<field id="start_time" sortDirect="DESC"/>
@@ -1479,15 +1539,21 @@
 			<field id="offer_total" dataType="Float"/>
 			<field id="offer_result" dataType="String"/>
 		</model>
-		<model id="AstCallClientHistList" parent="ModelSQLBeton" dataTable="ast_calls_client_hist_list" virtual="TRUE">
+		<model id="AstCallClientCallHistoryList" parent="ModelSQLBeton" dataTable="ast_calls_client_history_list" virtual="TRUE">
 			<field id="unique_id" dataType="Text" primaryKey="TRUE" sysCol="TRUE"/>
-			<field id="dt_descr" dataType="String" alias="Время"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="dt" dataType="DateTime" alias="Время"/>
 			<field id="manager_comment" dataType="Text" alias="Комментарий"/>
 		</model>
-		<model id="AstCallClientShipHistList" parent="ModelSQLBeton" dataTable="ast_calls_client_hist_list" virtual="TRUE">
+		<model id="AstCallClientShipHistoryList" parent="ModelSQLBeton" dataTable="ast_calls_client_ship_history_list" virtual="TRUE">
 			<field id="unique_id" dataType="Text" primaryKey="TRUE" sysCol="TRUE"/>
-			<field id="dt_descr" dataType="String" alias="Время"/>
-			<field id="manager_comment" dataType="Text" alias="Комментарий"/>
+			<field id="client_id" dataType="Text"/>
+			<field id="number" dataType="String"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="orders_ref" dataType="JSON"/>
+			<field id="quant" dataType="Float"/>
+			<field id="concrete_types_ref" dataType="JSON"/>
+			<field id="destinations_ref" dataType="JSON"/>
 		</model>
 		<model id="UserMacAddress" parent="ModelSQLBeton" dataTable="user_mac_addresses" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
@@ -1737,9 +1803,13 @@
 			<field id="delivered" dataType="Bool" defaultValue="false"/>
 			<field id="delivered_date_time" dataType="DateTime"/>
 			<field id="sms_type" dataType="Enum" enumId="sms_types"/>
+			<field id="sms_id" dataType="Text"/>
 			<index id="sms_for_sending_sent_index" unique="FALSE">
 				<field id="sent"/>
 				<field id="delivered"/>
+			</index>
+			<index id="sms_for_sending_date_time_idx">
+				<field id="date_time"/>
 			</index>
 		</model>
 		<model id="EmailTemplate" parent="ModelSQLBeton" dataTable="email_templates" virtual="FALSE">
@@ -1862,6 +1932,22 @@
 			<field id="shift_to_descr" dataType="String"/>
 			<field id="concrete_quant" dataType="Float"/>
 		</model>
+		<model id="TrackerZoneControl" parent="ModelSQLBeton" dataTable="tracker_zone_controls" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="destination_id" dataType="Int" refTable="destinations" refField="id"/>
+			<index id="tracker_zone_controls_destination_idx" unique="TRUE">
+				<field id="destination_id"/>
+			</index>
+		</model>
+		<model id="TrackerZoneControlList" parent="ModelSQLBeton" dataTable="tracker_zone_controls_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="destinations_ref" dataType="JSON"/>
+		</model>
+		<model id="Weather" parent="ModelSQLBeton" dataTable="weather" virtual="FALSE">
+			<field id="update_dt" dataType="DateTime" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="content" dataType="Text"/>
+			<field id="content_details" dataType="Text"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -1895,7 +1981,6 @@
 		<constant id="shift_length_time" name="Длительность смены для заявок" descr="Продолжительность смены" dataType="Time" defaultValue="24:00"/>
 		<constant id="ship_coast_for_self_ship_destination" name="Стоимость доставки (руб.) для объекта самовывоз" descr="" dataType="Float" length="15" precision="2" defaultValue="3500"/>
 		<constant id="speed_change_for_order_autolocate" name="Уровень изменения скорости (%) при автоматическом подборе времени для заявки" descr="" dataType="Int" defaultValue="10"/>
-		<constant id="tracker_service_cel_phone" name="Телефон для отправки сообщений при неисправных терминалах" descr="" dataType="String" length="15" defaultValue="8-900-000-00-00"/>
 		<constant id="vehicle_unload_time" name="Время разгрузки автомобиля" descr="Используется для расчета времени возврата автомобиля" dataType="Time" defaultValue="01:00"/>
 		<constant id="avg_mat_cons_dev_day_count" name="Количество дней для расчета среднего отлонения расхода материалов от нормы" descr="Среднее отклонение расхода материалов от нормы расчитывается автоматически за данное количество дней." dataType="Int" defaultValue="10"/>
 		<constant id="days_for_plan_procur" name="Количество дней для расчета плановых остатков" descr="Данное количество дней используется при расчете средних показателей (отгрузка бетона,расход материалов) при планировании закупок" dataType="Int" defaultValue="10"/>
@@ -1903,6 +1988,9 @@
 		<constant id="lab_days_for_avg" name="Количество дней для выборки для рассчета средних значений" descr="Используется в главной форме лаборанта для расчета средних значений" dataType="Int" defaultValue="28"/>
 		<constant id="city_ext" name="Код города" descr="Используется для исходящих звонков" dataType="String" length="8" defaultValue="3452"/>
 		<constant id="def_lang" name="Язык по умолчанию" descr="Основной язык для подстановки в заявку" dataType="JSON" autoload="TRUE"/>
+		<constant id="efficiency_warn_k" name="Значение состояния ниже которого отправляется сообщение" descr="" dataType="Int" defaultValue="-60"/>
+		<constant id="zone_violation_alarm_interval" name="Интервал оповещения о въезде в запрещенную зону" descr="" dataType="Time" defaultValue="01:00"/>
+		<constant id="weather_update_interval_sec" name="Интервал в секундах обновления данных о погоде" descr="" dataType="Time" defaultValue="00:30"/>
 	</constants>
 	<controllers>
 		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -2170,6 +2258,7 @@
 			<publicMethod id="get_pump_list" modelId="ShipmentPumpList" condFields="TRUE"/>
 			<publicMethod id="get_shipment_date_list" modelId="ShipmentDateList" condFields="TRUE"/>
 			<publicMethod id="get_object" modelId="ShipmentDialog"/>
+			<publicMethod id="get_assigned_vehicle_list" modelId="AssignedVehicleList"/>
 			<publicMethod id="get_operator_list" modelId="ShipmentOperator">
 				<field id="date" dataType="Date"/>
 			</publicMethod>
@@ -2416,6 +2505,13 @@
 			<publicMethod id="get_list" modelId="SMSPatternList"/>
 			<publicMethod id="get_object" modelId="SMSPatternList"/>
 		</controller>
+		<controller id="SMSPatternUserPhone" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="SMSPatternUserPhone"/>
+			<publicMethod id="update" modelId="SMSPatternUserPhone"/>
+			<publicMethod id="delete" modelId="SMSPatternUserPhone"/>
+			<publicMethod id="get_list" modelId="SMSPatternUserPhoneList"/>
+			<publicMethod id="get_object" modelId="SMSPatternUserPhoneList"/>
+		</controller>
 		<controller id="LabData" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="LabData"/>
 			<publicMethod id="update" modelId="LabData"/>
@@ -2508,9 +2604,13 @@
 		</controller>
 		<controller id="AstCall" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="update" modelId="AstCall">
-				<field id="client_name" dataType="String"/>
 				<field id="contact_name" dataType="String"/>
 				<field id="contact_tel" dataType="String"/>
+				<field id="client_name" dataType="String"/>
+				<field id="client_kind" dataType="Enum" enumId="client_kinds"/>
+				<field id="client_come_from_id" dataType="Int"/>
+				<field id="client_type_id" dataType="Int"/>
+				<field id="manager_comment" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_list" modelId="AstCallList">
 				<field id="new_clients" dataType="String"/>
@@ -2690,6 +2790,19 @@
 			<publicMethod id="get_list" modelId="ShipQuantForCostGrade"/>
 			<publicMethod id="get_object" modelId="ShipQuantForCostGrade"/>
 		</controller>
+		<controller id="SMSForSending" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="get_list" modelId="SMSForSending"/>
+		</controller>
+		<controller id="TrackerZoneControl" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="TrackerZoneControl"/>
+			<publicMethod id="update" modelId="TrackerZoneControl"/>
+			<publicMethod id="delete" modelId="TrackerZoneControl"/>
+			<publicMethod id="get_list" modelId="TrackerZoneControlList"/>
+			<publicMethod id="get_object" modelId="TrackerZoneControlList"/>
+		</controller>
+		<controller id="Weather" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="get_current" modelId="Weather"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -2733,6 +2846,8 @@
 		<view id="10018" c="ProductionSite_Controller" t="ProductionSiteList" f="get_list" section="Справочники" descr="Заводы"/>
 		<view id="10019" c="ShipQuantForCostGrade_Controller" t="ShipQuantForCostGradeList" f="get_list" section="Справочники" descr="Минимальные объемы для расчета стоимости доставки"/>
 		<view id="10020" c="RawMaterialConsRateDate_Controller" t="RawMaterialConsRateDateList" f="get_list" section="Справочники" descr="Нормы расхода материалов"/>
+		<view id="10021" c="SMSPattern_Controller" t="SMSPatternList" f="get_list" section="Справочники" descr="Шаблоны СМС сообщений"/>
+		<view id="10022" c="TrackerZoneControl_Controller" t="TrackerZoneControlList" f="get_list" section="Справочники" descr="Запретные зоны"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -2742,10 +2857,12 @@
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
-		<view id="30004" c="Shipment_Controller" t="OperatorList" f="get_operator_list_admin" section="Формы" descr="Отгрузки (оператор)"/>
+		<view id="30004" c="Shipment_Controller" t="OperatorList" f="get_operator_list" section="Формы" descr="Отгрузки (оператор)"/>
 		<view id="30005" c="User_Controller" t="UserProfile" f="get_profile" section="Формы" descr="Профиль пользователя"/>
 		<view id="30006" c="AstCall_Controller" t="AstCallList" f="get_list" section="Формы" descr="Звонки"/>
 		<view id="30007" c="RawMaterialProcurUpload_Controller" t="RawMaterialProcurUploadList" f="get_list" section="Формы" descr="Лог загрузки приходов"/>
+		<view id="30008" c="SMSForSending_Controller" t="SMSForSendingList" f="get_list" section="Формы" descr="Отправка СМС"/>
+		<view id="30009" c="Shipment_Controller" t="AssignedVehicleList" f="get_assigned_vehicle_list" section="Формы" descr="Текущие назначения"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС на карте"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -2804,6 +2921,12 @@
 		<serverTemplate id="SupplierOrderList"/>
 		<serverTemplate id="RawMaterialProcurUploadList"/>
 		<serverTemplate id="RAMaterialConsumptionDateList"/>
+		<serverTemplate id="RAMaterialConsumptionDateList"/>
+		<serverTemplate id="SMSForSendingList"/>
+		<serverTemplate id="SMSPatternList"/>
+		<serverTemplate id="TrackerZoneControlList"/>
+		<serverTemplate id="AstCallClientCallHistoryList"/>
+		<serverTemplate id="AstCallClientShipHistoryList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -2830,6 +2953,9 @@
 		<jsTemplate id="FieldGroup" file="tmpl/FieldGroup.html"/>
 		<jsTemplate id="EditPeriodShift" file="tmpl/EditPeriodShift.html"/>
 		<jsTemplate id="ZoneDrawingControl" file="tmpl/ZoneDrawingControl.html"/>
+		<jsTemplate id="OrderDialog_View" file="tmpl/OrderDialog_View.html"/>
+		<jsTemplate id="AssignedVehicleList_View" file="tmpl/AssignedVehicleList_View.html"/>
+		<jsTemplate id="AstIncomeCall_View" file="tmpl/AstIncomeCall_View.html"/>
 	</jsTemplates>
 	<jsScripts>
 		<!-- Core JS files -->
@@ -2992,8 +3118,6 @@
 		<jsScript file="controls/EditRadio.js"/>
 		<jsScript file="controls/EditSelect.js"/>
 		<jsScript file="controls/EditSelectRef.js"/>
-		<!-- Cades Certificate box -->
-		<jsScript file="ext/cadesplugin/EditCertificateSelect.js"/>
 		<jsScript file="controls/rs/EditSelectRef.rs_ru.js" resource="ru"/>
 		<jsScript file="controls/EditSelectOption.js"/>
 		<jsScript file="controls/EditSelectOptionRef.js"/>
@@ -3138,6 +3262,9 @@
 		<jsScript file="controls/rs/WindowFormObject.rs_ru.js" resource="ru"/>
 		<jsScript file="controls/WindowFormModalBS.js"/>
 		<jsScript file="controls/rs/WindowFormModalBS.rs_ru.js" resource="ru"/>
+		<!--<jsScript file="ext/dhtml/dhtmlwindowBS.js"/>
+		<jsScript file="controls/WindowFormDD.js" />
+		-->
 		<jsScript file="controls/WindowMessage.js"/>
 		<jsScript file="controls/GridCellHeadDOCProcessed.js"/>
 		<jsScript file="controls/GridCellHeadDOCDate.js"/>
@@ -3280,9 +3407,15 @@
 		<jsScript file="views/SupplierOrderList_View.js"/>
 		<jsScript file="views/RawMaterialProcurUploadList_View.js"/>
 		<jsScript file="views/RAMaterialConsumptionDateList_View.js"/>
-		<jsScript file="views/AstUnknownCall_View.js"/>
-		<jsScript file="views/AstOldClientCall_View.js"/>
 		<jsScript file="views/AstIncomeCall_View.js"/>
+		<jsScript file="views/SMSForSendingList_View.js"/>
+		<jsScript file="views/SMSPatternList_View.js"/>
+		<jsScript file="views/SMSPatternDialog_View.js"/>
+		<jsScript file="views/SMSPatternUserPhoneList_View.js"/>
+		<jsScript file="views/TrackerZoneControlList_View.js"/>
+		<jsScript file="views/AssignedVehicleList_View.js"/>
+		<jsScript file="views/AstCallClientCallHistoryList_View.js"/>
+		<jsScript file="views/AstCallClientShipHistoryList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -3303,6 +3436,7 @@
 		<jsScript file="forms/Vehicle_Form.js"/>
 		<jsScript file="forms/VehicleScheduleMakeOrderList_Form.js"/>
 		<jsScript file="forms/SupplierList_Form.js"/>
+		<jsScript file="forms/SMSPatternDialog_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="custom_controls/App.enums.js"/>
@@ -3343,12 +3477,14 @@
 		<jsScript file="custom_controls/SupplierEdit.js"/>
 		<jsScript file="custom_controls/VehicleScheduleGridCmdSetFree.js"/>
 		<jsScript file="custom_controls/VehicleScheduleGridCmdSetOut.js"/>
+		<jsScript file="custom_controls/VehicleScheduleGridCmdShowPosition.js"/>
 		<jsScript file="custom_controls/PrintInvoiceBtn.js"/>
 		<jsScript file="custom_controls/ShipmentGridCmdPrintInvoice.js"/>
 		<jsScript file="custom_controls/RawMaterialConsRateCalcBtn.js"/>
 		<jsScript file="custom_controls/RawMaterialConsRateDateGridCmd.js"/>
 		<jsScript file="custom_controls/RawMaterialConsRateGrid.js"/>
 		<jsScript file="custom_controls/Statistics_View.js"/>
+		<jsScript file="custom_controls/VehicleRunGridCmdShowMap.js"/>
 		<jsScript file="custom_controls/EditMoneyEditable.js"/>
 		<jsScript file="custom_controls/OrderMakeGrid.js"/>
 		<jsScript file="custom_controls/ProductionSiteEdit.js"/>
@@ -3357,10 +3493,14 @@
 		<jsScript file="custom_controls/RAMaterialConsumptionDateGrid.js"/>
 		<jsScript file="custom_controls/PeriodSelectBeton.js"/>
 		<jsScript file="custom_controls/EditColorPalette.js"/>
+		<jsScript file="custom_controls/AssignedVehicleGrid.js"/>
+		<jsScript file="custom_controls/Weather.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
 		<jsScript file="ext/OpenLayers/OpenLayers.js" compressed="TRUE" standalone="TRUE"/>
+		<!--chartjs-->
+		<jsScript file="ext/chart.js-2.8.0/Chart.min.js" compressed="TRUE" standalone="TRUE"/>
 		<jsScript file="custom_controls/TrackConstants.js"/>
 		<jsScript file="custom_controls/ObjMapLayer.js"/>
 		<jsScript file="custom_controls/GeoZones.js"/>
@@ -3541,6 +3681,21 @@
 		<jsScript file="controllers/ShipQuantForCostGrade_Controller.js"/>
 		<jsScript file="models/DOCMaterialProcurementShiftList_Model.js"/>
 		<jsScript file="models/RAMaterialConsumptionDateList_Model.js"/>
+		<jsScript file="controllers/SMSForSending_Controller.js"/>
+		<jsScript file="models/SMSForSendingList_Model.js"/>
+		<jsScript file="models/SMSPatternUserPhone_Model.js"/>
+		<jsScript file="controllers/SMSPatternUserPhone_Controller.js"/>
+		<jsScript file="models/SMSPatternUserPhoneList_Model.js"/>
+		<jsScript file="controllers/TrackerZoneControl_Controller.js"/>
+		<jsScript file="models/TrackerZoneControl_Model.js"/>
+		<jsScript file="models/TrackerZoneControlList_Model.js"/>
+		<jsScript file="models/AssignedVehicleList_Model.js"/>
+		<jsScript file="models/Weather_Model.js"/>
+		<jsScript file="controllers/Weather_Controller.js"/>
+		<jsScript file="models/AstCallActiveList_Model.js"/>
+		<jsScript file="models/AstCallClientCallHistoryList_Model.js"/>
+		<jsScript file="models/AstCallClientShipHistoryList_Model.js"/>
+		<jsScript file="models/AstCallCurrent_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>
@@ -3551,6 +3706,7 @@
 		<cssScript file="assets/css/icons/fontawesome/styles.min.css" compressed="TRUE" standalone="TRUE"/>
 		<cssScript file="custom-css/easyTree.css" compressed="FALSE" standalone="TRUE"/>
 		<cssScript file="ext/bootstrap-datepicker/bootstrap-datepicker.standalone.min.css" compressed="TRUE" standalone="TRUE"/>
+		<cssScript file="ext/chart.js-2.8.0/Chart.min.js" compressed="TRUE" standalone="TRUE"/>
 		<cssScript file="custom-css/style.css" standalone="TRUE"/>
 		<cssScript file="custom-css/print.css" standalone="TRUE"/>
 	</cssScripts>

@@ -114,6 +114,14 @@ class User_Model extends ModelSQLBeton{
 		$f_time_zone_locale_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"time_zone_locale_id",$f_opts);
 		$this->addField($f_time_zone_locale_id);
 		//********************
+		
+		//*** Field production_site_id ***
+		$f_opts = array();
+		$f_opts['id']="production_site_id";
+				
+		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
+		$this->addField($f_production_site_id);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

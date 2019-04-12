@@ -112,6 +112,12 @@ extend(User_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldInt("production_site_id",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -185,6 +191,12 @@ extend(User_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldInt("time_zone_locale_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("production_site_id",options);
 	
 	pm.addField(field);
 	

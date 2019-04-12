@@ -27,13 +27,21 @@ function OrderMakeGrid(id,options){
 		"className":OrderMakeList_View.prototype.TABLE_CLASS,
 		"attrs":{"style":"width:100%;"},
 		"editInline":false,
-		"editWinClass":OrderDialog_Form,
+		//"editWinClass":OrderDialog_Form,
+		"editViewClass":OrderDialog_View,
 		"commands":new GridCmdContainerAjx(id+":order_make_grid:cmd",{
 			"cmdSearch":false,
 			"cmdExport":false
 		}),
+		"editViewOptions":{
+			"template":window.getApp().getTemplate("OrderDialogView")
+		},
 		"insertViewOptions":function(){
-		
+			return {
+				"template":window.getApp().getTemplate("OrderDialogView"),
+				"dateTime_time":self.m_dateTime_time,
+				"dateTime_date":self.dateTime_date
+			}
 		},
 		"onEventSetRowOptions":function(opts){
 			opts.className = opts.className||"";
@@ -357,12 +365,16 @@ OrderMakeGrid.prototype.onGetData = function(){
 		var now = DateHelper.time();
 		var now_shift_start = DateHelper.getStartOfShift();
 		var prev_time_m,init_time_m;
+		var future_shift;
+		var now_m = now.getHours()*60 + now.getMinutes();
 		if(now.getTime() < shift_start_time.getTime()){
-			//feature shift
+			//future shift
+			future_shift = true;
 			prev_time_m = shift_start_time.getHours()*60 + shift_start_time.getMinutes();
 		}
 		else{
 			//round now to stepMin
+			future_shift = false;
 			now.setMinutes(Math.ceil(now.getMinutes() / this.m_stepMin) * this.m_stepMin);
 			prev_time_m = now.getHours()*60 + now.getMinutes();
 		}
@@ -382,7 +394,7 @@ OrderMakeGrid.prototype.onGetData = function(){
 				
 			var dt_m = dt.getHours()*60 + dt.getMinutes();
 			var comp_time_m = (init_time_m>prev_time_m)? init_time_m:prev_time_m;
-			if(!closed_shift && dt_m>comp_time_m){
+			if(!closed_shift && dt_m>comp_time_m && (future_shift || now_m<dt_m) ){
 				row_cnt = this.addEmptyRows(comp_time_m,dt_m,columns,row_cnt);				
 			}
 			prev_time_m = dt_m + this.m_stepMin;
@@ -452,7 +464,7 @@ OrderMakeGrid.prototype.onGetData = function(){
 		
 		//ADDED
 		var h = 24*60;
-		if(!closed_shift && prev_time_m<h){
+		if(!closed_shift && prev_time_m<h && (future_shift || now_m<prev_time_m) ){
 			this.addEmptyRows(prev_time_m,h,columns,row_cnt);
 		}			
 		//ADDED
@@ -555,13 +567,13 @@ OrderMakeGrid.prototype.addEmptyRows = function(fromMin,toMin,columns,rowCnt){
 	var row;
 	var self = this;
 	var row_pref = this.getId()+":"+this.getBody().getName()+":";
-	this.m_emptyClicks = {};
+	//this.m_emptyClicks = {};
 	for (var m=fromMin;m<toMin;m+=this.m_stepMin){
 	
 		var h = Math.floor(m/60);
 		var mm = m - h*60;
 		var value = ((h<10)? "0":"")+h+":"+((mm<10)? "0":"")+mm;
-
+		/*
 		this.m_emptyClicks[row_pref+rowCnt] = function(time,d){
 			var win_id = CommonHelper.uniqid();
 			var win_params = {
@@ -586,6 +598,7 @@ OrderMakeGrid.prototype.addEmptyRows = function(fromMin,toMin,columns,rowCnt){
 			self.m_editWinObjList[win_id].open();
 		
 		}
+		*/
 		row  = new GridRow(row_pref+rowCnt,{
 			"className":"emptyRow",
 			"attrs":{
@@ -623,6 +636,7 @@ OrderMakeGrid.prototype.onEditSelect = function(event){
 	var tr = DOMHelper.getParentByTagName(event.target,"TR");
 	if(tr&&DOMHelper.hasClass(tr,"emptyRow")){
 		var self = this;
+		/*
 		var win_id = CommonHelper.uniqid();
 		var win_params = {
 				"id":win_id,
@@ -646,9 +660,85 @@ OrderMakeGrid.prototype.onEditSelect = function(event){
 		self.m_editWinObjList[win_id].open();
 	
 		//this.m_emptyClicks[tr.id].call(this,tr.getAttribute("time"),this.m_periodSelect.getDateFrom());
+		*/
+		this.m_dateTime_time = tr.getAttribute("time");
+		this.dateTime_date = this.m_periodSelect.getDateFrom();
+		
+		var parent = this.getNode().parentNode.parentNode;
+		this.m_oldParent = this.getNode().parentNode.parentNode;
+		this.initEditView(parent, null,"insert");	
+		this.delDOM();
+		this.editViewToDOM(parent,null,"insert");
+		this.fillEditView("insert");		
 	}
 	else{
 		return OrderMakeGrid.superclass.onEditSelect.call(this,event);
 	}
 }
 
+OrderMakeGrid.prototype.keysToPublicMethod = function(pm){
+	var pm_fields = pm.getFields();
+	var fields = this.m_model.getFields();
+	for (id in pm_fields){
+		if (fields[id] && fields[id].getPrimaryKey()){
+			var v = fields[id].getValue();
+			pm_fields[id].setValue(v);
+		}
+		else if (pm_fields[id].getPrimaryKey()){
+			pm_fields[id].resetValue();
+		}
+	}
+}
+
+/* Completely overridden function */
+OrderMakeGrid.prototype.delRow = function(rowNode){
+	var pm = (new Order_Controller()).getPublicMethod("delete");
+
+	this.setEnabled(false);
+	
+	this.setModelToCurrentRow();	
+	this.keysToPublicMethod(pm);
+	var self = this;
+	pm.run({
+		"async":false,
+		"ok":function(){
+			self.afterServerDelRow();
+		},
+		"fail":function(resp,erCode,erStr){
+			self.setEnabled(true);
+			self.onError(resp,erCode,erStr);
+		}
+	});	
+}
+
+OrderMakeGrid.prototype.fillEditView = function(cmd){
+	if (cmd!="insert"){
+		this.keysToPublicMethod(this.m_editViewObj.getReadPublicMethod());
+	}
+	
+	OrderMakeGrid.superclass.fillEditView.call(this,cmd);
+}
+
+OrderMakeGrid.prototype.afterServerDelRow = function(){
+	this.deleteRowNode();
+	this.setEnabled(true);			
+	var self = this;
+	/*window.showNote(this.NT_REC_DELETED,function(){
+		self.focus();
+		if (self.getRefreshAfterDelRow()){
+			self.onRefresh();
+		}		
+	},2000);			
+	*/
+}
+/*
+OrderMakeGrid.prototype.delDOM = function(){
+	if(this.m_periodSelect)this.m_periodSelect.delDOM();
+	OrderMakeGrid.superclass.delDOM.call(this);
+}
+
+OrderMakeGrid.prototype.toDOM = function(p){
+	if(this.m_periodSelect)this.m_periodSelect.toDOM(document.getElementById("OrderMakeList:colLeft"));
+	OrderMakeGrid.superclass.toDOM.call(this,p);
+}
+*/

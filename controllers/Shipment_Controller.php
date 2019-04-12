@@ -265,6 +265,11 @@ class Shipment_Controller extends ControllerSQL{
 		$this->setObjectModelId('ShipmentDialog_Model');		
 
 			
+		$pm = new PublicMethod('get_assigned_vehicle_list');
+		
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_operator_list');
 		
 				
@@ -553,8 +558,12 @@ class Shipment_Controller extends ControllerSQL{
 		$date_from_db = "'".date('Y-m-d H:i:s',$date_from)."'";
 		$date_to_db = "'".date('Y-m-d H:i:s',$date_to)."'";
 	
+		$operator_cond = '';
 		$extra_cols_str = '';
-		if($_SESSION['role_id']!='operator'){
+		if($_SESSION['role_id']=='operator' && isset($_SESSION['production_site_id']) ){
+			$operator_cond = sprintf(' AND sh.production_site_id=%d',$_SESSION['production_site_id']);
+		}
+		else{
 			$extra_cols_str =
 			",shipment_time_norm(sh.quant::numeric) AS ship_norm_min
 			,(CASE
@@ -598,7 +607,9 @@ class Shipment_Controller extends ControllerSQL{
 			sh.date_time,
 			sh.quant,
 			sh.shipped,
-			sh.ship_date_time
+			sh.ship_date_time,
+			o.comment_text,
+			sh.production_site_id
 			%s
 		FROM shipments AS sh
 		LEFT JOIN orders o ON o.id = sh.order_id
@@ -608,21 +619,21 @@ class Shipment_Controller extends ControllerSQL{
 		LEFT JOIN vehicles v ON v.id = vs.vehicle_id
 		LEFT JOIN destinations dest ON dest.id = o.destination_id
 		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
-		WHERE sh.shipped = FALSE OR (sh.ship_date_time BETWEEN %s AND %s)
+		WHERE (sh.shipped = FALSE OR (sh.ship_date_time BETWEEN %s AND %s))".$operator_cond."
 		)
 		--Все неотгруженные
-		(SELECT *
-		FROM ships
-		WHERE shipped = FALSE
-		ORDER BY date_time)
+		(SELECT sh.*
+		FROM ships AS sh
+		WHERE (sh.shipped = FALSE)".$operator_cond."
+		ORDER BY sh.date_time)
 	
 		UNION ALL
 	
 		--Все отгруженные за сегодня
-		(SELECT *
-		FROM ships
-		WHERE shipped = TRUE
-		ORDER BY ship_date_time DESC)",
+		(SELECT sh.*
+		FROM ships AS sh
+		WHERE (sh.shipped = TRUE)".$operator_cond."
+		ORDER BY sh.ship_date_time DESC)",
 		$extra_cols_str,
 		$date_from_db,
 		$date_to_db
@@ -784,6 +795,15 @@ class Shipment_Controller extends ControllerSQL{
 		*/
 		$this->modelGetList(new ShipmentTimeList_Model($this->getDbLink()),$pm);
 	}
+	public static function getAssigningModel($dbLink){
+		$model = new ModelSQL($dbLink,array('id'=>'AssignedVehicleList_Model'));
+		$model->query("SELECT * FROM assigned_vehicles_list",TRUE);
+		return $model;	
 	
+	}
+	
+	public function get_assigned_vehicle_list($pm){
+		$this->addModel(self::getAssigningModel($this->getDbLink()));
+	}
 }
 ?>

@@ -78,6 +78,9 @@ class User_Controller extends ControllerSQL{
 		$param = new FieldExtInt('time_zone_locale_id'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtInt('production_site_id'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -132,6 +135,10 @@ class User_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtInt('time_zone_locale_id'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('production_site_id'
 				,array(
 			));
 			$pm->addParam($param);
@@ -407,6 +414,10 @@ class User_Controller extends ControllerSQL{
 		$_SESSION['locale_id'] 		= $ar['locale_id'];
 		$_SESSION['user_time_locale'] 	= $ar['user_time_locale'];
 		$_SESSION['tel_ext'] 		= $ar['tel_ext'];
+		if(isset($ar['production_sites_ref'])){
+			$production_site_id = intval(json_decode($ar['production_sites_ref'])->keys->id);
+		}
+		$_SESSION['production_site_id']	= $production_site_id;
 		
 		//global filters				
 		

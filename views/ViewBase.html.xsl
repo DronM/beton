@@ -27,8 +27,6 @@
 			<xsl:call-template name="modelFromTemplate"/>
 			function pageLoad(){							
 				<xsl:call-template name="initApp"/>
-				<xsl:call-template name="initReminder"/>
-				<xsl:call-template name="emailConfNote"/>
 				
 				<xsl:call-template name="checkForError"/>
 								
@@ -142,52 +140,41 @@
 		application.showMenuItem(iRef,'<xsl:value-of select="$def_menu_item/@c"/>','<xsl:value-of select="$def_menu_item/@f"/>','<xsl:value-of select="$def_menu_item/@t"/>',null,'<xsl:value-of select="$def_menu_item/@viewdescr"/>');
 	}
 	</xsl:if>
+	
+	<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='')">
+	application.m_weather = new Weather("weather",{"refreshInterval":600});
+	application.m_weather.toDOM();
+	
+	<xsl:if test="count(/document/model[@id='AstCallCurrent_Model']/row) &gt;0">
+	//ВХОДЯЩИЙ ЗВОНОК!
+	var view_opts = {};
+	view_opts.models = {};
+	view_opts.models.AstCallCurrent_Model = new AstCallCurrent_Model({"data":CommonHelper.longString(function () {/*
+			<xsl:copy-of select="/document/model[@id='AstCallCurrent_Model']"/>
+	*/})});
+	<xsl:if test="count(/document/model[@id='AstCallClientCallHistoryList_Model']/row) &gt;0">
+	view_opts.models.AstCallClientCallHistoryList_Model = new AstCallClientCallHistoryList_Model({"data":CommonHelper.longString(function () {/*
+			<xsl:copy-of select="/document/model[@id='AstCallClientCallHistoryList_Model']"/>
+	*/})});	
+	</xsl:if>
+	<xsl:if test="count(/document/model[@id='AstCallClientShipHistoryList_Model']/row) &gt;0">
+	view_opts.models.AstCallClientShipHistoryList_Model = new AstCallClientShipHistoryList_Model({"data":CommonHelper.longString(function () {/*
+			<xsl:copy-of select="/document/model[@id='AstCallClientShipHistoryList_Model']"/>
+	*/})});	
+	</xsl:if>
+	
+	var form = new WindowFormModalBS({
+		"id":"CallForm",
+		"contentHead":"Входящий звонок",
+		"content":new AstIncomeCall_View("CallView",view_opts),
+		"cmdClose":true
+		}
+	);
+	form.open();
+	</xsl:if>
+	
+	</xsl:if>
 		
-</xsl:template>
-
-<xsl:template name="initReminder">
-	<xsl:variable name="role_id" select="/document/model[@id='ModelVars']/row/role_id"/>
-	<!--
-	<xsl:if test="$role_id != 'client' and $role_id != ''">
-		var constants = {"reminder_refresh_interval":null};
-		application.getConstantManager().get(constants);
-		application.shortMessage = new ShortMessage();
-		application.reminder = new Reminder(constants.reminder_refresh_interval.getValue(),application.shortMessage);
-		<xsl:if test="/document/model[@id='DocFlowTaskShortList_Model']">
-		var t_model = new DocFlowTaskShortList_Model({"data":CommonHelper.longString(function () {/*
-			<xsl:copy-of select="/document/model[@id='DocFlowTaskShortList_Model']"/>
-		*/})
-		});
-		application.reminder.updateTaskList(t_model);
-		</xsl:if>
-		application.reminder.start();
-	</xsl:if>
-	-->
-</xsl:template>
-
-<xsl:template name="emailConfNote">
-	<!--
-	<xsl:if test="not(/document/model[@id='ModelVars']/row/user_email_confirmed='t')">	
-	if (!window.getApp().getDoNotNotifyOnEmailConfirmation()){
-		var email_conf_on_close = function(){
-			email_conf_view.delDOM();
-			email_conf_form.close();
-		};	
-		var email_conf_view = new UserEmailConfirmation_View("emailConf:body:view",{"onClose":email_conf_on_close});
-		var email_conf_form = new WindowFormModalBS("emailConf",{
-			"cmdCancel":true,
-			"controlCancelCaption":"Закрыть",
-			"controlCancelTitle":"Закрыть",
-			"cmdOk":false,
-			"onClickCancel":email_conf_on_close,	
-			"content":email_conf_view,
-			"contentHead":"Подтверждение электронной почты"
-		});
-
-		email_conf_form.open();
-	}	
-	</xsl:if>
-	-->
 </xsl:template>
 
 <!--************* Window instance ******************** -->
@@ -374,8 +361,6 @@
 		editViewOptions.cmd = editViewOptions.cmd || "edit";
 		editViewOptions.models = editViewOptions.models || {};
 		
-		<xsl:variable name="chart_img" select="/document/model[@id='Graph_Model']/row/pic"/>
-		
 		<xsl:for-each select="model[not(@sysModel='1')]">
 		<xsl:variable name="m_id" select="@id"/>
 		var m_data = CommonHelper.longString(function () {/*
@@ -523,8 +508,13 @@ throw Error(CommonHelper.longString(function () {/*
 				
 			
 			<xsl:call-template name="initMenu"/>	
+			<ul class="nav navbar-nav navbar-right">			
 			
-			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a id="weather">
+					</a>
+				</li>			
+			
 				<!-- USER DATA -->
 				<li class="dropdown dropdown-user">
 					<a class="dropdown-toggle" data-toggle="dropdown">

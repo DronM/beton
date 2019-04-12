@@ -22,6 +22,8 @@
 require_once(USER_CONTROLLERS_PATH.'Graph_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'RawMaterial_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'VehicleSchedule_Controller.php');
+require_once(USER_CONTROLLERS_PATH.'Shipment_Controller.php');
+require_once(USER_CONTROLLERS_PATH.'Weather_Controller.php');
 
 require_once(USER_MODELS_PATH.'OrderMakeList_Model.php');
 require_once(USER_MODELS_PATH.'ConcreteType_Model.php');
@@ -408,12 +410,18 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		//mat_totals
 		$this->addModel(RawMaterial_Controller::getTotalsModel($db_link,$date_for_db));
+
+		//Assigning		
+		$this->addModel(Shipment_Controller::getAssigningModel($db_link));
 		
 		//Vehicles		
 		$this->addModel(VehicleSchedule_Controller::getMakeListModel($db_link,$date_for_db));
 		
 		//features
 		$this->addModel(VehicleSchedule_Controller::getFeatureListModel($db_link,$date_for_db));
+		
+		//weather
+		//$this->addModel(Weather_Controller::getCurrentModel($db_link,$this->getDbLinkMaster()));
 		
 		//init date
 		$this->addModel(new ModelVars(

@@ -1,7 +1,11 @@
 <div id="{{id}}">
-	<div class="{{bsCol}}9">
+	<div id="{{id}}:colLeft" class="{{bsCol}}9">
+		<!--
 		<img id="{{id}}:plant_load_graph" style="min-height:50px;width:100%;">
 		</img>
+		-->
+		<canvas id="{{id}}:plant_load_graph">
+		</canvas>
 		
 		<div id="totContainer">
 			<label class="lbl" id="totOrdered_l" for="totOrdered">Звл.:</label>
@@ -46,13 +50,24 @@
 	</div>	
 	
 	<div class="{{bsCol}}3">
-		<div id="{{id}}:mat_totals_grid">
+		<div class="row order-l-grid">
+			<div id="{{id}}:mat_totals_grid">
+			</div>
+		</div>	
+				
+		<div class="row order-l-grid">		
+			<div id="{{id}}:veh_assigning" class="row">
+			</div>	
 		</div>	
 		
-		<div id="{{id}}:veh_schedule_grid">
+		<div class="row order-l-grid">
+			<div id="{{id}}:veh_schedule_grid">
+			</div>	
 		</div>	
 		
-		<div id="{{id}}:features_grid">
+		<div class="row order-l-grid">
+			<div id="{{id}}:features_grid">
+			</div>	
 		</div>	
 		
 		<i id="{{id}}:statistics" class="icon-plus3" title="Показать/скрыть статистику"> Статистика

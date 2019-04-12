@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
  
 class ProductionSite_Model extends ModelSQLBeton{
 	
@@ -38,7 +39,12 @@ class ProductionSite_Model extends ModelSQLBeton{
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
-	$this->setLimitConstant('doc_per_page_count');
+	
+		$order = new ModelOrderSQL();		
+		$this->setDefaultModelOrder($order);		
+		$direct = 'ASC';
+		$order->addField($f_name,$direct);
+$this->setLimitConstant('doc_per_page_count');
 	}
 
 }

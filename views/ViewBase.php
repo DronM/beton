@@ -122,11 +122,12 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'assets/css/icons/fontawesome/styles.min.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'custom-css/easyTree.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'ext/bootstrap-datepicker/bootstrap-datepicker.standalone.min.css'));
+		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'ext/chart.js-2.8.0/Chart.min.js'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'custom-css/style.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'custom-css/print.css'));
 	
 		if (!DEBUG){
-			$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'assets/js/core/libraries/jquery.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'assets/js/core/libraries/bootstrap.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'assets/js/plugins/loaders/blockui.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'assets/js/core/app.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/bootstrap-datepicker/bootstrap-datepicker.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/bootstrap-datepicker/bootstrap-datepicker.ru.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/mustache/mustache.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/jshash-2.2/md5-min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/OpenLayers/OpenLayers.js'));
+			$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'assets/js/core/libraries/jquery.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'assets/js/core/libraries/bootstrap.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'assets/js/plugins/loaders/blockui.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'assets/js/core/app.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/bootstrap-datepicker/bootstrap-datepicker.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/bootstrap-datepicker/bootstrap-datepicker.ru.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/mustache/mustache.min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/jshash-2.2/md5-min.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/OpenLayers/OpenLayers.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/chart.js-2.8.0/Chart.min.js'));
 			$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'lib.js'));
 			$script_id = VERSION;
 		}
@@ -468,8 +469,6 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditRadio.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditSelect.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditSelectRef.js'));
-		
-		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/cadesplugin/EditCertificateSelect.js'));
 		
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
@@ -1019,6 +1018,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/rs/WindowFormModalBS.rs_ru.js'));
 	}
 
+		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowMessage.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHeadDOCProcessed.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHeadDOCDate.js'));
@@ -1225,9 +1225,15 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SupplierOrderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialProcurUploadList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RAMaterialConsumptionDateList_View.js'));
-		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstUnknownCall_View.js'));
-		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstOldClientCall_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstIncomeCall_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSForSendingList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSPatternList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSPatternDialog_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSPatternUserPhoneList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/TrackerZoneControlList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AssignedVehicleList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallClientCallHistoryList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallClientShipHistoryList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1248,6 +1254,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/Vehicle_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/VehicleScheduleMakeOrderList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/SupplierList_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/SMSPatternDialog_Form.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));
@@ -1288,12 +1295,14 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/SupplierEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleGridCmdSetFree.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleGridCmdSetOut.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleGridCmdShowPosition.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PrintInvoiceBtn.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentGridCmdPrintInvoice.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateCalcBtn.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateDateGridCmd.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/Statistics_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleRunGridCmdShowMap.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditMoneyEditable.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OrderMakeGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ProductionSiteEdit.js'));
@@ -1302,10 +1311,14 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RAMaterialConsumptionDateGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PeriodSelectBeton.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditColorPalette.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/AssignedVehicleGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/Weather.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/OpenLayers/OpenLayers.js'));
+		
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/chart.js-2.8.0/Chart.min.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/TrackConstants.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ObjMapLayer.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/GeoZones.js'));
@@ -1486,6 +1499,21 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ShipQuantForCostGrade_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/DOCMaterialProcurementShiftList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RAMaterialConsumptionDateList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/SMSForSending_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/SMSForSendingList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/SMSPatternUserPhone_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/SMSPatternUserPhone_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/SMSPatternUserPhoneList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/TrackerZoneControl_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/TrackerZoneControl_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/TrackerZoneControlList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/AssignedVehicleList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/Weather_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/Weather_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/AstCallActiveList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/AstCallClientCallHistoryList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/AstCallClientShipHistoryList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/AstCallCurrent_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

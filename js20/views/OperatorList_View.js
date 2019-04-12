@@ -1,6 +1,6 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function OperatorList_View(id,options){	
 
 	OperatorList_View.superclass.constructor.call(this,id,options);
@@ -48,6 +48,14 @@ function OperatorList_View(id,options){
 				})
 			]
 		})
+		,new GridCellHead(id+":grid:head:comment_text",{
+			"value":"Комментарий",
+			"columns":[
+				new GridColumn({
+					"field":model.getField("comment_text")
+				})
+			]
+		})		
 		,new GridCellHead(id+":grid:head:quant",{
 			"value":"Кол-во",
 			"colAttrs":{"align":"right"},
@@ -84,7 +92,7 @@ function OperatorList_View(id,options){
 	];
 	var foot_elements = [
 		new GridCell(id+":grid:foot:sp1",{
-			"colSpan":"4"
+			"colSpan":"5"
 		})												
 		,new GridCellFoot(id+":features_grid:foot:tot_quant",{
 			"attrs":{"align":"right"},

@@ -47,25 +47,7 @@ function SMSPatternList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.sms_type_descr = new FieldString("sms_type_descr",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.lang_descr = new FieldString("lang_descr",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.lang_id = new FieldInt("lang_id",filed_options);
+	options.fields.langs_ref = new FieldJSON("langs_ref",filed_options);
 	
 				
 	
@@ -75,6 +57,15 @@ function SMSPatternList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.pattern = new FieldText("pattern",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.user_list = new FieldString("user_list",filed_options);
 	
 		SMSPatternList_Model.superclass.constructor.call(this,id,options);
 }

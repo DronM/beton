@@ -24,6 +24,10 @@ function Enum_sms_types(id,options){
 ,"ru_order_for_pump_del":"заявка для насоса (удалена)"
 ,"ru_remind_for_pump":"напоминание для насоса"
 ,"ru_client_thank":"благодарность клиенту"
+,"ru_vehicle_zone_violation":"Въезд в запрещенную зону"
+,"ru_vehicle_tracker_malfunction":"Нерабочий трекер"
+,"ru_efficiency_warn":"Низская эффективность"
+,"ru_material_balance":"Остатки материалов"
 };
 	options.options = [{"value":"order",
 "descr":multy_lang_values[window.getApp().getLocale()+"_"+"order"],
@@ -52,6 +56,18 @@ checked:(options.defaultValue&&options.defaultValue=="remind_for_pump")}
 ,{"value":"client_thank",
 "descr":multy_lang_values[window.getApp().getLocale()+"_"+"client_thank"],
 checked:(options.defaultValue&&options.defaultValue=="client_thank")}
+,{"value":"vehicle_zone_violation",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"vehicle_zone_violation"],
+checked:(options.defaultValue&&options.defaultValue=="vehicle_zone_violation")}
+,{"value":"vehicle_tracker_malfunction",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"vehicle_tracker_malfunction"],
+checked:(options.defaultValue&&options.defaultValue=="vehicle_tracker_malfunction")}
+,{"value":"efficiency_warn",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"efficiency_warn"],
+checked:(options.defaultValue&&options.defaultValue=="efficiency_warn")}
+,{"value":"material_balance",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"material_balance"],
+checked:(options.defaultValue&&options.defaultValue=="material_balance")}
 ];
 	
 	Enum_sms_types.superclass.constructor.call(this,id,options);

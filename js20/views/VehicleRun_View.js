@@ -40,7 +40,12 @@ function VehicleRun_View(id,options){
 			"cmdAllCommands":false,
 			"cmdInsert":false,
 			"cmdEdit":false,
-			"cmdDelete":false
+			"cmdDelete":false/*,
+			БУДЕТ ВМЕСТО onEventSetRowOptions НО там появляется popUpMenu от главной таблицы
+			"addCustomCommandsAfter":function(commands){
+				commands.push(new VehicleRunGridCmdShowMap(id+":grid:cmd:showMap",{"showCmdControl":false}));
+			}		
+			*/	
 		}),
 		"onEventSetRowOptions":function(opts){
 			opts.attrs = opts.attrs||{};
@@ -53,7 +58,7 @@ function VehicleRun_View(id,options){
 					self.showVehCurrentPosition(CommonHelper.unserialize(this.getAttr("keys")).veh_id);
 				}
 			}
-		},		
+		},
 		"popUpMenu":null,
 		"filters":(options.detailFilters&&options.detailFilters.VehicleRun_Model)? options.detailFilters.VehicleRun_Model:null,
 		"head":new GridHead(id+":grid:head",{

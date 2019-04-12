@@ -49,7 +49,7 @@ class Graph_Controller extends Controller{
 	private static function clearCache($date_from,$date_to,$on_slave=FALSE){
 		$link_master = Graph_Controller::get_db_con_master();
 		$link_master->query(sprintf(
-		"UPDATE load_charts SET state=0 WHERE id='%s'",
+		"UPDATE plant_load_charts SET state=0 WHERE id='%s'",
 		date('Y-m-d',$date_from)));
 	}
 	private static function get_db_con(){
@@ -71,7 +71,7 @@ class Graph_Controller extends Controller{
 		return $dbLink;
 	}
 	
-	private static function make_load_graph($dbLink,$date_from,$date_to){
+	private static function make_load_graph($dbLink,$date_from,$date_to,&$chartData){
 		$dt1 = date('Y-m-d H:i:s',$date_from);
 		$dt2 = date('Y-m-d H:i:s',$date_to);
 		
@@ -156,61 +156,13 @@ class Graph_Controller extends Controller{
 			array_push($orders,$d["orders"]);
 			array_push($shipments,$d["shipments"]);
 		}
+		$chartData = array(
+			'shipments' => $shipments,
+			'norm' => $norm,
+			'orders' => $orders,
+			'times' => $times
+		);
 		
-		/* Create and populate the pData object */
-		$MyData = new pData();  
-		$MyData->addPoints($norm,"Макс.загрузка");
-		$MyData->addPoints($orders,"Заявки");
-		$MyData->addPoints($shipments,"Отгрузки");
-		$MyData->setSerieWeight("Отгрузки",2); 
-		$MyData->setSerieWeight("Заявки",2); 
-		//$MyData->setSerieWeight("Макс.загрузка",2); 
-		$MyData->setAxisName(0,"объем");		
-		$MyData->setSerieTicks("Макс.загрузка",3);
-		$MyData->addPoints($times,"Timestamp");
-		$MyData->setAbscissa("Timestamp");
-		$MyData->setXAxisName("время");
-		//$MyData->setXAxisDisplay(AXIS_FORMAT_TIME,"H:i");
-
-		/* Create the pChart object */
-		$myPicture = new pImage(1099,214,$MyData);//899
-
-		/* Turn of AAliasing */
-		$myPicture->Antialias = TRUE;
-		/* Draw the border */
-		$myPicture->drawRectangle(0,0,1100,213,array("R"=>0,"G"=>0,"B"=>0));
-		//900
-
-		$myPicture->setFontProperties(array("FontName"=>FONT_FILE,"FontSize"=>6));
-		
-		$myPicture->drawText(30,20,
-			date('d/m',$date_from).'-'.date('d/m',$date_to),
-			array("FontSize"=>12));
-
-		/* Define the chart area */
-		$myPicture->setGraphArea(25,15,1180,170);//980
-		/* Draw the scale */
-		//$scaleSettings = array("XMargin"=>0,"YMargin"=>0,"Floating"=>TRUE,"GridR"=>200,"GridG"=>200,"GridB"=>200,"DrawSubTicks"=>TRUE,"CycleBackground"=>TRUE);
-		//$myPicture->drawScale($scaleSettings);
-		$AxisBoundaries = array(0=>array("Min"=>0,"Max"=>$consts['max_h_load']*2));
-		$ScaleSettings  = array("Mode"=>SCALE_MODE_MANUAL,
-			"ManualScale"=>$AxisBoundaries,
-			"DrawSubTicks"=>TRUE,"DrawArrows"=>TRUE,
-			"ArrowSize"=>6
-			);//"LabelSkip"=>1
-		$myPicture->drawScale($ScaleSettings); 		
-
-		/* Draw the step chart */
-		//$myPicture->drawStepChart();
-		$Config = array("BreakVoid"=>FALSE);
-		$myPicture->drawLineChart($Config);
-		//array("DisplayColor"=>DISPLAY_MANUAL,"DisplayR"=>0,"DisplayG"=>0,"DisplayB"=>0)
-
-		/* Write the chart legend */
-		$myPicture->drawLegend(590,17,array("Style"=>LEGEND_NOBORDER,"Mode"=>LEGEND_HORIZONTAL));
-
-		/* Render the picture (choose the best way) */
-		$myPicture->stroke();
 	}
 	
 	public function get_plant_load($pm){
@@ -226,20 +178,22 @@ class Graph_Controller extends Controller{
 	 * returns model
 	 */
 	public static function getPlantLoadModel($dbLink,$dbLinkMaster,$dateFrom,$dateTo){
-		$contents = null;
+		$chart_data_s = '';
 		$tries = 2;
 		$sleep_interv = 5;
 		
 		while ($tries){
 			$ar = $dbLink->query_first(
-				sprintf("SELECT state,image
-				FROM load_charts WHERE id='%s'::date",
+				sprintf("SELECT
+					state,
+					chart_data
+				FROM plant_load_charts WHERE id='%s'::date",
 				date("Y-m-d",$dateFrom))
 				);
 			
 			if (is_array($ar) && count($ar) && $ar['state']){
 				if ($ar['state']=='2'){
-					$contents = pg_unescape_bytea($ar['image']);
+					$chart_data_s = $ar['chart_data'];
 					break;
 				}
 				else if ($ar['state']=='0'){
@@ -253,32 +207,28 @@ class Graph_Controller extends Controller{
 			$tries--;				
 		}
 		
-		if (is_null($contents)){
+		if (!strlen($chart_data_s)){
 			//new chart
 			$dbLinkMaster->query(sprintf(
-				"SELECT load_charts_update('%s'::date,'',1)",
+				"SELECT plant_load_charts_update('%s'::date,1,'')",
 				date("Y-m-d",$dateFrom)
 			));
-			ob_start();
-			self::make_load_graph($dbLink,$dateFrom,$dateTo);
-			$contents = ob_get_contents();
-			ob_end_clean();				
+			$chart_data = NULL;
+			self::make_load_graph($dbLink,$dateFrom,$dateTo,$chart_data);
+			
+			$chart_data_s = json_encode($chart_data);
 			$dbLinkMaster->query(sprintf(
-				"SELECT load_charts_update('%s'::date,'%s',2)",
+				"SELECT plant_load_charts_update('%s'::date,2,'%s')",
 				date("Y-m-d",$dateFrom),
-				pg_escape_bytea($contents)
-			));
+				$chart_data_s
+			));			
 		}
-		
-		$contents = (!isset($contents))? "":trim($contents);
-		//echo $contents;
 		
 		return new ModelVars(
 			array('name'=>'Vars',
 				'id'=>'Graph_Model',
 				'values'=>array(
-					new Field('pic',DT_STRING,
-						array('value'=>base64_encode($contents)))
+					new Field('chart_data',DT_STRING,array('value'=>$chart_data_s))
 				)
 			)
 		);	
@@ -287,29 +237,24 @@ class Graph_Controller extends Controller{
 	public function make_plant_load($pm){
 		$date_from = $pm->getParamValue('date_time_from');
 		$date_to = $pm->getParamValue('date_time_to');
-		//$date = mktime();
-		//$dt = getdate($date);
-		//$date = mktime(0,0,0,$dt['mon'],$dt['mday'],$dt['year']);
-		
-		//
-		//$this->make_load_graph($date,$cache);
-		//exit;
 		
 		$dbLinkMaster = Graph_Controller::get_db_con_master();
 		$dbLinkMaster->query(sprintf(
-		"SELECT load_charts_update('%s'::date,'',1)",
-		date("Y-m-d",$date_from)));
+		"SELECT plant_load_charts_update('%s'::date,1,'')",
+		date("Y-m-d",$date_from)
+		));
 		
 		//make new graph
-		ob_start();
-		$this->make_load_graph($this->getDbLink(),$date_from,$date_to);
-		$contents = ob_get_contents();
-		ob_end_clean();
+		$chart_data = array();
+		$this->make_load_graph($this->getDbLink(),$date_from,$date_to,$chart_data);
 		$dbLinkMaster = Graph_Controller::get_db_con_master();
 		$dbLinkMaster->query(sprintf(
-		"SELECT load_charts_update('%s'::date,'%s',2)",
-		date("Y-m-d",$date_from),pg_escape_bytea($contents)));
+			"SELECT plant_load_charts_update('%s'::date,2,'%s')",
+			date("Y-m-d",$date_from),
+			json_encode($chart_data)
+		));
 	}
+	
 	/*
 	public static function getShiftBounds($dbLink,$dateTime,&$from,&$to){
 		$ar = $dbLink->query_first(
@@ -321,14 +266,11 @@ class Graph_Controller extends Controller{
 		$to = strtotime($ar['d2']);
 	}
 	*/
+	
 	public static function clearCacheOnDate($dbLink,$dateTime){
 		$shift_from = Beton::shiftStart($dateTime);
 		$shift_to = Beton::shiftEnd($shift_from);
 
-		/*$shift_from = null;
-		$shift_to = null;
-		Graph_Controller::getShiftBounds($dbLink,$dateTime,$shift_from,$shift_to);
-		*/
 		Graph_Controller::clearCache($shift_from,$shift_to);	
 	}	
 	public static function clearCacheOnOrderId($dbLink,$orderId){
@@ -354,8 +296,7 @@ class Graph_Controller extends Controller{
 				$shipId)
 			);
 		if (is_array($ar)){
-			Graph_Controller::clearCache(strtotime($ar["d1"]),
-				strtotime($ar["d2"]));
+			Graph_Controller::clearCache(strtotime($ar["d1"]),strtotime($ar["d2"]));
 		}	
 	}		
 	public function clear_cache($pm){

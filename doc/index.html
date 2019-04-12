@@ -55,7 +55,9 @@
 <li><a href="#RawMaterialProcurRate_Controller">RawMaterialProcurRate_Controller</a></li>
 <li><a href="#RawMaterialProcurUpload_Controller">RawMaterialProcurUpload_Controller</a></li>
 <li><a href="#RawMaterialStoreUserData_Controller">RawMaterialStoreUserData_Controller</a></li>
+<li><a href="#SMSForSending_Controller">SMSForSending_Controller</a></li>
 <li><a href="#SMSPattern_Controller">SMSPattern_Controller</a></li>
+<li><a href="#SMSPatternUserPhone_Controller">SMSPatternUserPhone_Controller</a></li>
 <li><a href="#SandQuarryVal_Controller">SandQuarryVal_Controller</a></li>
 <li><a href="#Shift_Controller">Shift_Controller</a></li>
 <li><a href="#ShipQuantForCostGrade_Controller">ShipQuantForCostGrade_Controller</a></li>
@@ -65,12 +67,14 @@
 <li><a href="#SpecialistRequest_Controller">SpecialistRequest_Controller</a></li>
 <li><a href="#StoneQuarryVal_Controller">StoneQuarryVal_Controller</a></li>
 <li><a href="#Supplier_Controller">Supplier_Controller</a></li>
+<li><a href="#TrackerZoneControl_Controller">TrackerZoneControl_Controller</a></li>
 <li><a href="#User_Controller">User_Controller</a></li>
 <li><a href="#UserMacAddress_Controller">UserMacAddress_Controller</a></li>
 <li><a href="#VariantStorage_Controller">VariantStorage_Controller</a></li>
 <li><a href="#Vehicle_Controller">Vehicle_Controller</a></li>
 <li><a href="#VehicleSchedule_Controller">VehicleSchedule_Controller</a></li>
 <li><a href="#View_Controller">View_Controller</a></li>
+<li><a href="#Weather_Controller">Weather_Controller</a></li>
 </ul>
 <div class="section-title">Models</div>
 <ul>
@@ -126,6 +130,7 @@
 <li><a href="#ShipmentDialog_Model">ShipmentDialog_Model</a></li>
 <li><a href="#ShipmentForOrderList_Model">ShipmentForOrderList_Model</a></li>
 <li><a href="#OperatorList_Model">OperatorList_Model</a></li>
+<li><a href="#AssignedVehicleList_Model">AssignedVehicleList_Model</a></li>
 <li><a href="#ShipmentPumpList_Model">ShipmentPumpList_Model</a></li>
 <li><a href="#ShipmentDateList_Model">ShipmentDateList_Model</a></li>
 <li><a href="#ShipmentTimeList_Model">ShipmentTimeList_Model</a></li>
@@ -154,6 +159,8 @@
 <li><a href="#Shift_Model">Shift_Model</a></li>
 <li><a href="#Lang_Model">Lang_Model</a></li>
 <li><a href="#SMSPattern_Model">SMSPattern_Model</a></li>
+<li><a href="#SMSPatternUserPhone_Model">SMSPatternUserPhone_Model</a></li>
+<li><a href="#SMSPatternUserPhoneList_Model">SMSPatternUserPhoneList_Model</a></li>
 <li><a href="#SMSPatternList_Model">SMSPatternList_Model</a></li>
 <li><a href="#VehicleFeatureList_Model">VehicleFeatureList_Model</a></li>
 <li><a href="#VehicleMakeList_Model">VehicleMakeList_Model</a></li>
@@ -173,9 +180,10 @@
 <li><a href="#EmployeeWorkTimeSchedule_Model">EmployeeWorkTimeSchedule_Model</a></li>
 <li><a href="#EmployeeWorkTimeScheduleList_Model">EmployeeWorkTimeScheduleList_Model</a></li>
 <li><a href="#AstCall_Model">AstCall_Model</a></li>
+<li><a href="#AstCallCurrent_Model">AstCallCurrent_Model</a></li>
 <li><a href="#AstCallList_Model">AstCallList_Model</a></li>
-<li><a href="#AstCallClientHistList_Model">AstCallClientHistList_Model</a></li>
-<li><a href="#AstCallClientShipHistList_Model">AstCallClientShipHistList_Model</a></li>
+<li><a href="#AstCallClientCallHistoryList_Model">AstCallClientCallHistoryList_Model</a></li>
+<li><a href="#AstCallClientShipHistoryList_Model">AstCallClientShipHistoryList_Model</a></li>
 <li><a href="#UserMacAddress_Model">UserMacAddress_Model</a></li>
 <li><a href="#UserMacAddressList_Model">UserMacAddressList_Model</a></li>
 <li><a href="#ClientTel_Model">ClientTel_Model</a></li>
@@ -211,6 +219,9 @@
 <li><a href="#VehicleRun_Model">VehicleRun_Model</a></li>
 <li><a href="#ShipQuantForCostGrade_Model">ShipQuantForCostGrade_Model</a></li>
 <li><a href="#RAMaterialConsumptionDateList_Model">RAMaterialConsumptionDateList_Model</a></li>
+<li><a href="#TrackerZoneControl_Model">TrackerZoneControl_Model</a></li>
+<li><a href="#TrackerZoneControlList_Model">TrackerZoneControlList_Model</a></li>
+<li><a href="#Weather_Model">Weather_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1738,6 +1749,15 @@
 <a href="#RawMaterialStoreUserDataList_Model">Model: RawMaterialStoreUserDataList_Model</a>
 </div>
 </div>
+<div id="SMSForSending_Controller" class="content_box">
+<h1>SMSForSending_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#SMSForSending_Model">Model: SMSForSending_Model</a>
+</div>
+</div>
 <div id="SMSPattern_Controller" class="content_box">
 <h1>SMSPattern_Controller</h1>
 <div class="content_item">
@@ -1749,6 +1769,19 @@
 <a href="#SMSPattern_Model">Model: SMSPattern_Model</a><h2>get_list</h2>
 <a href="#SMSPatternList_Model">Model: SMSPatternList_Model</a><h2>get_object</h2>
 <a href="#SMSPatternList_Model">Model: SMSPatternList_Model</a>
+</div>
+</div>
+<div id="SMSPatternUserPhone_Controller" class="content_box">
+<h1>SMSPatternUserPhone_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#SMSPatternUserPhone_Model">Model: SMSPatternUserPhone_Model</a><h2>update</h2>
+<a href="#SMSPatternUserPhone_Model">Model: SMSPatternUserPhone_Model</a><h2>delete</h2>
+<a href="#SMSPatternUserPhone_Model">Model: SMSPatternUserPhone_Model</a><h2>get_list</h2>
+<a href="#SMSPatternUserPhoneList_Model">Model: SMSPatternUserPhoneList_Model</a><h2>get_object</h2>
+<a href="#SMSPatternUserPhoneList_Model">Model: SMSPatternUserPhoneList_Model</a>
 </div>
 </div>
 <div id="SandQuarryVal_Controller" class="content_box">
@@ -1811,7 +1844,8 @@
 <a href="#ShipmentForOrderList_Model">Model: ShipmentForOrderList_Model</a><h2>get_pump_list</h2>
 <a href="#ShipmentPumpList_Model">Model: ShipmentPumpList_Model</a><h2>get_shipment_date_list</h2>
 <a href="#ShipmentDateList_Model">Model: ShipmentDateList_Model</a><h2>get_object</h2>
-<a href="#ShipmentDialog_Model">Model: ShipmentDialog_Model</a><h2>get_operator_list</h2>
+<a href="#ShipmentDialog_Model">Model: ShipmentDialog_Model</a><h2>get_assigned_vehicle_list</h2>
+<a href="#AssignedVehicleList_Model">Model: AssignedVehicleList_Model</a><h2>get_operator_list</h2>
 <a href="#ShipmentOperator_Model">Model: ShipmentOperator_Model</a><h2>set_shipped</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
@@ -1931,6 +1965,19 @@
 <a href="#SupplierList_Model">Model: SupplierList_Model</a><h2>get_object</h2>
 <a href="#Supplier_Model">Model: Supplier_Model</a><h2>complete</h2>
 <a href="#SupplierList_Model">Model: SupplierList_Model</a>
+</div>
+</div>
+<div id="TrackerZoneControl_Controller" class="content_box">
+<h1>TrackerZoneControl_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#TrackerZoneControl_Model">Model: TrackerZoneControl_Model</a><h2>update</h2>
+<a href="#TrackerZoneControl_Model">Model: TrackerZoneControl_Model</a><h2>delete</h2>
+<a href="#TrackerZoneControl_Model">Model: TrackerZoneControl_Model</a><h2>get_list</h2>
+<a href="#TrackerZoneControlList_Model">Model: TrackerZoneControlList_Model</a><h2>get_object</h2>
+<a href="#TrackerZoneControlList_Model">Model: TrackerZoneControlList_Model</a>
 </div>
 </div>
 <div id="User_Controller" class="content_box">
@@ -2391,6 +2438,15 @@
 <a href="#ViewSectionList_Model">Model: ViewSectionList_Model</a>
 </div>
 </div>
+<div id="Weather_Controller" class="content_box">
+<h1>Weather_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_current</h2>
+<a href="#Weather_Model">Model: Weather_Model</a>
+</div>
+</div>
 <div id="About_Model" class="content_box">
 <h1>About_Model</h1>
 <div class="content_item">
@@ -2427,6 +2483,54 @@
 <div>Precision:</div>
 <h2>db_name</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="AssignedVehicleList_Model" class="content_box">
+<h1>AssignedVehicleList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>drivers_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -2523,8 +2627,8 @@
 <div>Precision:</div>
 </div>
 </div>
-<div id="AstCallClientHistList_Model" class="content_box">
-<h1>AstCallClientHistList_Model</h1>
+<div id="AstCallClientCallHistoryList_Model" class="content_box">
+<h1>AstCallClientCallHistoryList_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
 <h2>unique_id</h2>
@@ -2533,8 +2637,14 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>dt_descr</h2>
-<div>Type:String</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>dt</h2>
+<div>Type:DateTime</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -2547,8 +2657,8 @@
 <div>Precision:</div>
 </div>
 </div>
-<div id="AstCallClientShipHistList_Model" class="content_box">
-<h1>AstCallClientShipHistList_Model</h1>
+<div id="AstCallClientShipHistoryList_Model" class="content_box">
+<h1>AstCallClientShipHistoryList_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
 <h2>unique_id</h2>
@@ -2557,7 +2667,103 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>dt_descr</h2>
+<h2>client_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>number</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>orders_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="AstCallCurrent_Model" class="content_box">
+<h1>AstCallCurrent_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>unique_id</h2>
+<div>Type:Text</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ext</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contact_tel</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ring_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>answer_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>hangup_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_kind</h2>
 <div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -2565,6 +2771,42 @@
 <div>Precision:</div>
 <h2>manager_comment</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>informed</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contact_name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>debt</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_manager_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_come_from_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -4933,6 +5175,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>concrete_types_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
@@ -6847,6 +7095,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>sms_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="SMSPattern_Model" class="content_box">
@@ -6895,26 +7149,74 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>sms_type_descr</h2>
-<div>Type:String</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>lang_descr</h2>
-<div>Type:String</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>lang_id</h2>
-<div>Type:Int</div>
+<h2>langs_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
 <h2>pattern</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_list</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="SMSPatternUserPhone_Model" class="content_box">
+<h1>SMSPatternUserPhone_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sms_pattern_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="SMSPatternUserPhoneList_Model" class="content_box">
+<h1>SMSPatternUserPhoneList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sms_pattern_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_tel</h2>
+<div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -8505,6 +8807,42 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="TrackerZoneControl_Model" class="content_box">
+<h1>TrackerZoneControl_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destination_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="TrackerZoneControlList_Model" class="content_box">
+<h1>TrackerZoneControlList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="User_Model" class="content_box">
 <h1>User_Model</h1>
 <div class="content_item">
@@ -8569,6 +8907,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="UserDialog_Model" class="content_box">
@@ -8619,6 +8963,12 @@
 <div>Precision:</div>
 <h2>user_time_locale</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -9453,6 +9803,30 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="Weather_Model" class="content_box">
+<h1>Weather_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>update_dt</h2>
+<div>Type:DateTime</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>content</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>content_details</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="call_types" class="content_box">
 <h1>call_types</h1>
 <div class="content_item">
@@ -9603,6 +9977,14 @@
 <h2>remind_for_pump</h2>
 <div>Description:</div>
 <h2>client_thank</h2>
+<div>Description:</div>
+<h2>vehicle_zone_violation</h2>
+<div>Description:</div>
+<h2>vehicle_tracker_malfunction</h2>
+<div>Description:</div>
+<h2>efficiency_warn</h2>
+<div>Description:</div>
+<h2>material_balance</h2>
 <div>Description:</div>
 </div>
 </div>

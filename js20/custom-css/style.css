@@ -465,16 +465,16 @@ table,tr,td.noBorder{
 	width:1700px;
 }
 
-#OrderDialog\:total\:label{
+.orderMoneyFieldLab{
 	font-weight:bold;
 	font-size:25px;
 }
-#OrderDialog\:total{
+.orderMoneyField{
 	font-weight:bold;
 	height:50px;
 	font-size:25px;
 }
-
+/*
 #OrderDialog\:unload_price\:label{
 	font-weight:bold;
 	font-size:20px;
@@ -491,6 +491,7 @@ table,tr,td.noBorder{
 	height:35px;
 	font-size:20px;
 }
+*/
 .dif_speed{
 	background-color:#ff5656;
 }
@@ -527,6 +528,10 @@ table,tr,td.noBorder{
 #OrderMakeList\:veh_total{
 	margin-bottom:15px;	
 }
+.order-l-grid{
+	margin-bottom:15px;	
+}
+
 #OrderMakeList\:order_make_grid tr{
 	cursor:pointer;
 }
@@ -641,4 +646,9 @@ table.table-make_order td{
 	line-height: 14px;
 	font-size:smaller;
 }
-
+.just_assigned{
+	background-color:#CCFF99 !important;
+}
+#CallForm_dial{
+	width:1200px;
+}

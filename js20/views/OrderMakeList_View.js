@@ -70,7 +70,6 @@ function OrderMakeList_View(id,options){
 			self.refresh();
 		}
 		
-		
 		//material totals
 		var model = options.models.MatTotals_Model;
 		this.addElement(new Grid(id+":mat_totals_grid",{
@@ -144,6 +143,13 @@ function OrderMakeList_View(id,options){
 			"navigate":false,
 			"navigateClick":false
 		}));
+		
+		//assigning
+		this.addElement(new AssignedVehicleList_View(id+":veh_assigning",{
+			"models":options.models,
+			"noAutoRefresh":true
+		}));
+		
 		//vehicles
 		var model = options.models.VehicleScheduleMakeOrderList_Model;	
 		//veh_popup.addButton();
@@ -169,6 +175,7 @@ function OrderMakeList_View(id,options){
 				"addCustomCommandsAfter":function(commands){
 					commands.push(new VehicleScheduleGridCmdSetFree(id+":grid:cmd:setFree",{"showCmdControl":false}));
 					commands.push(new VehicleScheduleGridCmdSetOut(id+":grid:cmd:setOut",{"showCmdControl":false}));
+					commands.push(new VehicleScheduleGridCmdShowPosition(id+":grid:cmd:showPos",{"showCmdControl":false}));
 				}
 			}),
 			"popUpMenu":new PopUpMenu(),
@@ -206,14 +213,14 @@ function OrderMakeList_View(id,options){
 					opts.className+=(opts.className.length? " ":"")+"veh_shift";
 				}
 				
-				opts.title = "Кликните для отображения местоположения ТС карте";
+				//opts.title = "Кликните для отображения местоположения ТС карте";
 				
-				opts.events = opts.events || {};
+				/*opts.events = opts.events || {};
 				opts.events.click = function(e){
 					if(e.target.tagName=="TD"){
 						self.showVehCurrentPosition(CommonHelper.unserialize(this.getAttr("keys")).id);
 					}
-				}
+				}*/
 			},
 			
 			"head":new GridHead(id+":veh_schedule_grid:head",{
@@ -407,15 +414,18 @@ OrderMakeList_View.prototype.refresh = function(){
 	this.m_refreshMethod.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
 	var self = this;
 	
-	this.resetTotals();
-	
 	this.m_refreshMethod.run({
 		"ok":function(resp){					
 			
 			//orders
+			//do nothing if locked
 			var grid = self.getElement("order_make_grid");
-			grid.getModel().setData(resp.getModelData("OrderMakeList_Model"));
-			grid.onGetData();
+			if(!grid.getLocked()){
+				self.resetTotals();
+				
+				grid.getModel().setData(resp.getModelData("OrderMakeList_Model"));
+				grid.onGetData();
+			}
 			
 			//chart
 			self.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
@@ -424,7 +434,10 @@ OrderMakeList_View.prototype.refresh = function(){
 			var grid = self.getElement("mat_totals_grid");
 			grid.getModel().setData(resp.getModelData("MatTotals_Model"));
 			grid.onGetData();
-
+			
+			//assigning
+			self.getElement("veh_assigning").setData(resp.getModelData("AssignedVehicleList_Model"));
+			
 			//vehicles
 			var grid = self.getElement("veh_schedule_grid");
 			grid.getModel().setData(resp.getModelData("VehicleScheduleMakeOrderList_Model"));
@@ -440,6 +453,7 @@ OrderMakeList_View.prototype.refresh = function(){
 		}
 	})
 }
+/*
 OrderMakeList_View.prototype.showVehCurrentPosition = function(vehicleScheduleId){
 	var m = this.getElement("veh_schedule_grid").getModel();
 	var veh_id;
@@ -481,7 +495,7 @@ OrderMakeList_View.prototype.showVehCurrentPosition = function(vehicleScheduleId
 	this.m_mapForm.open();
 
 }
-
+*/
 OrderMakeList_View.prototype.toDOM = function(p){
 	OrderMakeList_View.superclass.toDOM.call(this,p);
 	
@@ -491,6 +505,7 @@ OrderMakeList_View.prototype.toDOM = function(p){
 	this.m_timer = setInterval(function(){
 		self.refresh();
 	}, this.m_refreshInterval);
+	
 }
 
 OrderMakeList_View.prototype.delDOM = function(){

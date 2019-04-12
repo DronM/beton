@@ -35,6 +35,14 @@ function EnumGridColumn_sms_types(options){
 	options.multyLangValues["ru"]["remind_for_pump"] = "напоминание для насоса";
 
 	options.multyLangValues["ru"]["client_thank"] = "благодарность клиенту";
+
+	options.multyLangValues["ru"]["vehicle_zone_violation"] = "Въезд в запрещенную зону";
+
+	options.multyLangValues["ru"]["vehicle_tracker_malfunction"] = "Нерабочий трекер";
+
+	options.multyLangValues["ru"]["efficiency_warn"] = "Низская эффективность";
+
+	options.multyLangValues["ru"]["material_balance"] = "Остатки материалов";
 EnumGridColumn_sms_types.superclass.constructor.call(this,options);
 	
 }

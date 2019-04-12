@@ -114,6 +114,8 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldString("name",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
+	
 }
 
 			ProductionSite_Controller.prototype.addGetObject = function(){

@@ -252,6 +252,8 @@ $permissions = array();
 				
 					$permissions['Shipment_Controller_get_object']=TRUE;
 				
+					$permissions['Shipment_Controller_get_assigned_vehicle_list']=TRUE;
+				
 					$permissions['Shipment_Controller_get_operator_list']=TRUE;
 				
 					$permissions['Shipment_Controller_set_shipped']=TRUE;
@@ -457,6 +459,16 @@ $permissions = array();
 					$permissions['SMSPattern_Controller_get_list']=TRUE;
 				
 					$permissions['SMSPattern_Controller_get_object']=TRUE;
+				
+					$permissions['SMSPatternUserPhone_Controller_insert']=TRUE;
+				
+					$permissions['SMSPatternUserPhone_Controller_update']=TRUE;
+				
+					$permissions['SMSPatternUserPhone_Controller_delete']=TRUE;
+				
+					$permissions['SMSPatternUserPhone_Controller_get_list']=TRUE;
+				
+					$permissions['SMSPatternUserPhone_Controller_get_object']=TRUE;
 				
 					$permissions['LabData_Controller_insert']=TRUE;
 				
@@ -739,6 +751,20 @@ $permissions = array();
 					$permissions['ShipQuantForCostGrade_Controller_get_list']=TRUE;
 				
 					$permissions['ShipQuantForCostGrade_Controller_get_object']=TRUE;
+				
+					$permissions['SMSForSending_Controller_get_list']=TRUE;
+				
+					$permissions['TrackerZoneControl_Controller_insert']=TRUE;
+				
+					$permissions['TrackerZoneControl_Controller_update']=TRUE;
+				
+					$permissions['TrackerZoneControl_Controller_delete']=TRUE;
+				
+					$permissions['TrackerZoneControl_Controller_get_list']=TRUE;
+				
+					$permissions['TrackerZoneControl_Controller_get_object']=TRUE;
+				
+					$permissions['Weather_Controller_get_current']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

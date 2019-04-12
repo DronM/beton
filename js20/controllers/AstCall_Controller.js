@@ -134,15 +134,31 @@ extend(AstCall_Controller,ControllerObjServer);
 	
 		var options = {};
 				
-		pm.addField(new FieldString("client_name",options));
-	
-		var options = {};
-				
 		pm.addField(new FieldString("contact_name",options));
 	
 		var options = {};
 				
 		pm.addField(new FieldString("contact_tel",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldString("client_name",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldEnum("client_kind",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("client_come_from_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("client_type_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldString("manager_comment",options));
 	
 	
 }

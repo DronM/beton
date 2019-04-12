@@ -52,7 +52,7 @@ extend(SMSPattern_Controller,ControllerObjServer);
 	
 	var options = {};
 	options.alias = "Тип SMS";options.required = true;	
-	options.enumValues = 'order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank';
+	options.enumValues = 'order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank,vehicle_zone_violation,vehicle_tracker_malfunction,efficiency_warn,material_balance';
 	var field = new FieldEnum("sms_type",options);
 	
 	pm.addField(field);
@@ -89,7 +89,7 @@ extend(SMSPattern_Controller,ControllerObjServer);
 	
 	var options = {};
 	options.alias = "Тип SMS";	
-	options.enumValues = 'order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank';
+	options.enumValues = 'order,ship,remind,procur,order_for_pump_ins,order_for_pump_upd,order_for_pump_del,remind_for_pump,client_thank,vehicle_zone_violation,vehicle_tracker_malfunction,efficiency_warn,material_balance';
 	options.enumValues+= (options.enumValues=='')? '':',';
 	options.enumValues+= 'null';
 	
@@ -139,16 +139,13 @@ extend(SMSPattern_Controller,ControllerObjServer);
 	pm.addField(new FieldString("sms_type",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldString("sms_type_descr",f_opts));
-	var f_opts = {};
-	
-	pm.addField(new FieldString("lang_descr",f_opts));
-	var f_opts = {};
-	
-	pm.addField(new FieldInt("lang_id",f_opts));
+	pm.addField(new FieldJSON("langs_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldText("pattern",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldString("user_list",f_opts));
 }
 
 			SMSPattern_Controller.prototype.addGetObject = function(){

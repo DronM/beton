@@ -67,3 +67,9 @@ SupplierOrderList_View.prototype.HEAD_TITLE = "Заявки на поставк�
 RawMaterialProcurUploadList_View.prototype.HEAD_TITLE = "Лог загрузки приходов";
 
 RAMaterialConsumptionDateList_View.prototype.HEAD_TITLE = "Расход материалов";
+
+SMSForSendingList_View.prototype.HEAD_TITLE = "СМС сообщения";
+
+TrackerZoneControlList_View.prototype.HEAD_TITLE = "Запретные зоны";
+
+AssignedVehicleList_View.prototype.HEAD_TITLE = "Текущие назначения";

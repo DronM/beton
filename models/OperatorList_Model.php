@@ -8,6 +8,7 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
@@ -91,6 +92,16 @@ class OperatorList_Model extends ModelSQLBeton{
 				
 		$f_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicles_ref",$f_opts);
 		$this->addField($f_vehicles_ref);
+		//********************
+		
+		//*** Field comment_text ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Комментарий';
+		$f_opts['id']="comment_text";
+				
+		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
+		$this->addField($f_comment_text);
 		//********************
 		
 		//*** Field concrete_types_ref ***
