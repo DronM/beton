@@ -116,7 +116,7 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 		}
 	
 		if (!this.getHead())return;
-		debugger
+		
 		var columns = this.getHead().getColumns();
 		//var temp_input;
 		

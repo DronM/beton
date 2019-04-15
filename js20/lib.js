@@ -2249,13 +2249,14 @@ else{this.m_editViewObj.setReplacedNode(replacedNode);this.m_editViewObj.toDOM(p
 Grid.prototype.fillEditView=function(cmd){if(cmd!="insert"){this.m_editViewObj.read(cmd);}
 else if(this.m_model){}}
 Grid.prototype.closeEditView=function(res){if(this.m_editViewObj.getReplacedNode()){var nd=this.m_editViewObj.getReplacedNode();DOMHelper.addClass(nd,this.CONSTR_FADE_CLASS);this.m_editViewObj.getNode().parentNode.replaceChild(nd,this.m_editViewObj.getNode());}
-this.m_editViewObj.delDOM();delete this.m_editViewObj;this.bindPopUpMenu();this.refreshAfterEdit(res);}
+this.m_editViewObj.delDOM();delete this.m_editViewObj;if(CommonHelper.nd(this.getId())){this.bindPopUpMenu();}
+this.refreshAfterEdit(res);}
 Grid.prototype.refreshAfterEdit=function(res){if(CommonHelper.nd(this.getId())){if(this.m_oldParent){this.delDOM();this.toDOM(this.m_oldParent);}
 if(this.getLocked()){this.setLocked(false);}
 this.focus();if(res&&res.updated){if(res.newKeys){this.m_selectedRowKeys=CommonHelper.array2json(res.newKeys);}
 this.onRefresh();}}
 else if(this.m_oldParent){this.toDOM(this.m_oldParent);if(this.getLocked()){this.setLocked(false);}
-this.addEvents();}}
+this.addEvents();this.bindPopUpMenu();}}
 Grid.prototype.read=function(isCopy){}
 Grid.prototype.edit=function(cmd){if(this.m_model&&this.m_model.getLocked()){return 0;}
 var sel_n=this.getSelectedRow();this.setModelToCurrentRow(sel_n);this.m_oldParent=null;if(this.getEditInline()){var parent=this.getBody().m_node;this.initEditView(parent,sel_n,cmd);this.editViewToDOM(parent,sel_n,cmd);this.fillEditView(cmd);}
@@ -3537,7 +3538,7 @@ this.target=element;EventHelper.add(this.target,"contextmenu",this.m_evShow,true
 PopUpMenu.prototype.add=function(action){this.items.push(action);}
 PopUpMenu.prototype.addButton=function(btn){this.items.push({caption:btn.getCaption()||btn.getAttr("title"),glyph:(btn.getGlyphPopUp())?btn.getGlyphPopUp():btn.getGlyph(),onClick:btn.getOnClick()});}
 PopUpMenu.prototype.addSeparator=function(){this.items.push(PopUpMenu.SEPARATOR);}
-PopUpMenu.prototype.show=function(e,fixToElement){if(this.current&&this.current!=this)return;this.current=this;if(this.element){this.element.setPosition(e,fixToElement);this.element.setVisible(true);}else{this.element=this.createMenu(this.items);this.element.toDOM(e,fixToElement);}}
+PopUpMenu.prototype.show=function(e,fixToElement){if(this.current&&this.current!=this)return;this.current=this;if(this.element&&document.getElementById(this.element.getId())){this.element.setPosition(e,fixToElement);this.element.setVisible(true);}else{this.element=this.createMenu(this.items);this.element.toDOM(e,fixToElement);}}
 PopUpMenu.prototype.hide=function(){this.current=null;if(this.element)this.element.setVisible(false);}
 PopUpMenu.prototype.getVisible=function(){if(this.element)return this.element.getVisible();}
 PopUpMenu.prototype.createMenu=function(items){var self=this;var menu_cont=[];for(var i=0;i<items.length;i++){var item;if(items[i]==PopUpMenu.SEPARATOR){item=this.createSeparator();}else{item=this.createItem(items[i]);}
@@ -4637,8 +4638,7 @@ function AssignedVehicleGrid(id,options){options=options||{};options.className=O
 options.contClassName=window.getApp().getBsCol(5);options.keyIds=["id"];options.editInline=false;options.editWinClass=null;options.commands=null;options.popUpMenu=null;options.onEventSetRowOptions=function(opts){var m=this.getModel();var ass_time=m.getFieldValue("date_time");if(ass_time&&((DateHelper.time().getTime()-ass_time.getTime())/1000/60)<=2){opts.className=opts.className||"";opts.className+=(opts.className.length?" ":"")+"just_assigned";}};options.head=new GridHead(id+":head",{"elements":[new GridRow(id+":head:row0",{"elements":[new GridCellHead(id+":head:row0:header",{"value":options.prodSiteDescr,"colSpan":2})]}),new GridRow(id+":head:row1",{"elements":[new GridCellHead(id+":head:row1:driver",{"value":"Водитель","columns":[new GridColumn({"id":"driver","formatFunction":function(f){var res=(f&&f.drivers_ref&&!f.drivers_ref.isNull())?f.drivers_ref.getValue().getDescr():"";res+=(f&&f.vehicles_ref&&!f.vehicles_ref.isNull())?","+f.vehicles_ref.getValue().getDescr():"";return res;}})]}),new GridCellHead(id+":head:row1:destinations_ref",{"value":"Объект","columns":[new GridColumnRef({"field":options.model.getField("destinations_ref")})]})]})]});this.m_prodSiteId=options.prodSiteId;AssignedVehicleGrid.superclass.constructor.call(this,id,options);}
 extend(AssignedVehicleGrid,Grid);AssignedVehicleGrid.prototype.onGetData=function(){if(this.m_model){var self=this;var body=this.getBody();var foot=this.getFoot();body.delDOM();body.clear();var detail_keys={};var rows=body.getNode().getElementsByTagName(this.DEF_ROW_TAG_NAME);for(var i=0;i<rows.length;i++){if(rows[i].getAttribute("for_keys")!=null){detail_keys[hex_md5(rows[i].getAttribute("for_keys"))]={"for_keys":rows[i].getAttribute("for_keys"),"node":rows[i]};}}
 var details_expanded=(detail_keys&&!CommonHelper.isEmpty(detail_keys));var master_cell=null;if(foot&&foot.calcBegin){this.m_foot.calcBegin(this.m_model);}
-if(!this.getHead())return;debugger
-var columns=this.getHead().getColumns();var row_cnt=0,field_cnt;var row,row_keys;this.m_model.reset();var pag=this.getPagination();if(pag){pag.m_from=parseInt(this.m_model.getPageFrom());pag.setCountTotal(this.m_model.getTotCount());}
+if(!this.getHead())return;var columns=this.getHead().getColumns();var row_cnt=0,field_cnt;var row,row_keys;this.m_model.reset();var pag=this.getPagination();if(pag){pag.m_from=parseInt(this.m_model.getPageFrom());pag.setCountTotal(this.m_model.getTotCount());}
 var h_row_ind=0;var key_id_ar=this.getKeyIds();while(this.m_model.getNextRow()){var site_ref=this.m_model.getFieldValue("production_sites_ref");if(site_ref&&!site_ref.isNull()&&site_ref.getKey()!=this.m_prodSiteId){continue;}
 row=this.createNewRow(row_cnt,h_row_ind);row_keys={};for(var k=0;k<key_id_ar.length;k++){row_keys[key_id_ar[k]]=this.m_model.getFieldValue(key_id_ar[k]);}
 field_cnt=0;for(var col_id=0;col_id<columns.length;col_id++){columns[col_id].setGrid(this);if(columns[col_id].getField()&&columns[col_id].getField().getPrimaryKey()){row_keys[columns[col_id].getField().getId()]=columns[col_id].getField().getValue();}
