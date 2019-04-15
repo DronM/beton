@@ -21,12 +21,26 @@ function AssignedVehicleList_View(id,options){
 		refresh_interval = constants.grid_refresh_interval.getValue();
 	}
 	
+	var app = window.getApp();
+	if(!app.m_prodSite_Model){
+		(new ProductionSite_Controller()).getPublicMethod("get_list").run({
+			"async":false,
+			"ok":function(resp){
+				app.m_prodSite_Model = resp.getModel("ProductionSite_Model");
+			}
+		})
+	}
+	
 	options.addElement = function(){
 		var model = (options.models&&options.models.AssignedVehicleList_Model)? options.models.AssignedVehicleList_Model : new AssignedVehicleList_Model();
-		for(i=1;i<=this.PROD_SITE_COUNT;i++){
-			this.addElement(new AssignedVehicleGrid(id+":prodSite"+i,{
+		app.m_prodSite_Model.reset();
+		while(app.m_prodSite_Model.getNextRow()){
+		//for(i=1;i<=this.PROD_SITE_COUNT;i++){
+			var ps_id = app.m_prodSite_Model.getFieldValue("id");
+			this.addElement(new AssignedVehicleGrid(id+":prodSite"+ps_id,{
 				"model":model,
-				"prodSiteId":i,
+				"prodSiteId":ps_id,
+				"prodSiteDescr":app.m_prodSite_Model.getFieldValue("name"),
 				"refreshInterval":refresh_interval
 			}));
 		}

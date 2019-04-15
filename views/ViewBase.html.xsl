@@ -49,19 +49,16 @@
 
 					<!-- Content area -->
 					<div class="content">
-						<div class="row">
-							<div id="windowData" class="col-lg-12">
-								<xsl:apply-templates select="model[@htmlTemplate='TRUE']"/>
-							</div>
+						<div id="windowData">
+							<xsl:apply-templates select="model[@htmlTemplate='TRUE']"/>
+						</div>
 
-							<div class="windowMessage hidden">
-							</div>
-							<!--waiting  -->
-							<div id="waiting">
-								<div>Обработка...</div>
-								<img src="img/loading.gif"/>
-							</div>
-							
+						<div class="windowMessage hidden">
+						</div>
+						<!--waiting  -->
+						<div id="waiting">
+							<div>Обработка...</div>
+							<img src="img/loading.gif"/>
 						</div>
 						
 						<!-- Footer -->
@@ -92,7 +89,6 @@
 <xsl:template name="initJS">
 	<!-- bootstrap resolution-->
 	<div id="users-device-size">
-	  <div id="xs" class="visible-xs"></div>
 	  <div id="sm" class="visible-sm"></div>
 	  <div id="md" class="visible-md"></div>
 	  <div id="lg" class="visible-lg"></div>
@@ -179,9 +175,9 @@
 </xsl:template>
 
 <!--************* Window instance ******************** -->
-<xsl:template name="initAppWin">	
+<xsl:template name="initAppWin">
 	var applicationWin = new AppWin({
-		"bsCol":("col-"+$('#users-device-size').find('div:visible').first().attr('id')+"-"),
+		"widthType":$("#users-device-size").find("div:visible").first().attr("id"),
 		"app":application
 		<!--
 		<xsl:if test="not(/document/model[@id='ModelServResponse']/row/result='0')">
@@ -215,7 +211,6 @@
 		
 		return dd;
 	}
-	
 	</xsl:if>
 		
 </xsl:template>

@@ -1,8 +1,9 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function OrderMakeList_View(id,options){	
 
+	options.className = "row";
 	this.m_refreshMethod = (new Order_Controller()).getPublicMethod("get_make_orders_form");
 
 	var self = this;
@@ -75,6 +76,7 @@ function OrderMakeList_View(id,options){
 		this.addElement(new Grid(id+":mat_totals_grid",{
 			"model":model,
 			"className":this.TABLE_CLASS,
+			"attrs":{"style":"width:100%;"},
 			"keyIds":["material_id"],
 			"readPublicMethod":null,
 			"editInline":false,
@@ -156,6 +158,7 @@ function OrderMakeList_View(id,options){
 		this.addElement(new GridAjx(id+":veh_schedule_grid",{
 			"model":model,
 			"className":this.TABLE_CLASS,
+			"attrs":{"style":"width:100%;"},
 			"readPublicMethod":(new VehicleSchedule_Controller()).getPublicMethod("get_current_veh_list"),
 			"editInline":false,
 			"editWinClass":null,
@@ -321,6 +324,7 @@ function OrderMakeList_View(id,options){
 			"model":model,
 			"keyIds":["feature"],
 			"className":this.TABLE_CLASS,
+			"attrs":{"style":"width:100%;"},
 			"readPublicMethod":null,
 			"editInline":false,
 			"editWinClass":null,

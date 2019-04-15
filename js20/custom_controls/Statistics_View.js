@@ -42,11 +42,11 @@ Statistics_View.prototype.toggle = function(){
 		var model = new ModelXML("get_vehicle_statistics",{
 			"fields":["key","val"]
 		});
-		this.m_grid = new GridAjx(this.getId+":grid",{
+		this.m_grid = new GridAjx(this.getId()+":grid",{
 			"model":model,
 			"keyIds":["key"],
 			"className":OrderMakeList_View.prototype.TABLE_CLASS,
-			//"table-bordered table-responsive table-striped",
+			"attrs":{"style":"width:100%;"},
 			"readPublicMethod":(new Vehicle_Controller()).getPublicMethod("get_vehicle_statistics"),
 			"editInline":false,
 			"editWinClass":null,

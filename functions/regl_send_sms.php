@@ -29,7 +29,7 @@ if (SMS_ACTIVE){
 	"SELECT
 		id,sms_id
 	FROM sms_for_sending
-	WHERE sent=TRUE AND delivered=FALSE");
+	WHERE sent=TRUE AND delivered=FALSE AND sent_date_time BETWEEN now()::timestamp-'24 hours'::interval AND now()::timestamp");
 	
 	while ($ar=$dbLink->fetch_array($id)){
 		try{

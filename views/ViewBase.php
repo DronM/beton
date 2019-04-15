@@ -1020,6 +1020,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowMessage.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowTempMessage.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHeadDOCProcessed.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHeadDOCDate.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHeadDOCNumber.js'));

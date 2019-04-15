@@ -34,17 +34,17 @@ function AssignedVehicleGrid(id,options){
 	};
 	options.head = new GridHead(id+":head",{
 		"elements":[
-			/*new GridRow(id+":head:hrow",{
+			new GridRow(id+":head:row0",{
 				"elements":[
-					new GridCellHead(id+":head:header",{
-						"value":"Завод 1",
+					new GridCellHead(id+":head:row0:header",{
+						"value":options.prodSiteDescr,
 						"colSpan":2
 					})
 				]
 			})		
-			,*/new GridRow(id+":head:row0",{
+			,new GridRow(id+":head:row1",{
 				"elements":[
-					new GridCellHead(id+":head:driver",{
+					new GridCellHead(id+":head:row1:driver",{
 						"value":"Водитель",
 						"columns":[
 							new GridColumn({
@@ -57,7 +57,7 @@ function AssignedVehicleGrid(id,options){
 							})
 						]
 					})
-					,new GridCellHead(id+":head:destinations_ref",{
+					,new GridCellHead(id+":head:row1:destinations_ref",{
 						"value":"Объект",
 						"columns":[
 							new GridColumnRef({
@@ -116,7 +116,7 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 		}
 	
 		if (!this.getHead())return;
-		
+		debugger
 		var columns = this.getHead().getColumns();
 		//var temp_input;
 		
