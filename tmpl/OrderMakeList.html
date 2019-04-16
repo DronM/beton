@@ -1,12 +1,9 @@
 <div id="{{id}}">
 	<div id="{{id}}:colLeft" class="{{bsCol}}9">
-		<!--
-		<img id="{{id}}:plant_load_graph" style="min-height:50px;width:100%;">
-		</img>
-		-->
+		{{#showChart}}
 		<canvas id="{{id}}:plant_load_graph">
 		</canvas>
-		
+		{{/showChart}}
 		<div id="totContainer">
 			<label class="lbl" id="totOrdered_l" for="totOrdered">Звл.:</label>
 			<input id="totOrdered" disabled="disabled" class="" type="text" size="4">

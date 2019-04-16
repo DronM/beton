@@ -3,6 +3,10 @@
  */
 function OrderMakeList_View(id,options){	
 
+	this.m_lowResDevice = (window.getWidthType()=="sm");
+	options.templateOptions = options.templateOptions || {};	
+	options.templateOptions.showChart = !this.m_lowResDevice;
+	
 	options.className = "row";
 	this.m_refreshMethod = (new Order_Controller()).getPublicMethod("get_make_orders_form");
 
@@ -37,7 +41,7 @@ function OrderMakeList_View(id,options){
 	options.addElement = function(){
 	
 		//plant load control
-		if(window.getWidthType()!="sm"){
+		if(!this.m_lowResDevice){
 			this.addElement(new PlantLoadGraphControl(id+":plant_load_graph",{
 				"model":options.models.Graph_Model
 			}));
@@ -433,7 +437,7 @@ OrderMakeList_View.prototype.refresh = function(){
 			}
 			
 			//chart
-			if(window.getWidthType()!="sm"){
+			if(!this.m_lowResDevice){
 				self.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
 			}
 			//mat totals
