@@ -66,7 +66,7 @@ function OrderDialog_View(id,options){
 			"labelClassName":bool_bs_cl,
 			"events":{
 				"change":function(){
-					self.changeSumTotals();
+					self.getElement("calc").changeSumTotals();
 				}
 			}
 		}));	
@@ -106,34 +106,6 @@ function OrderDialog_View(id,options){
 		this.addElement(client_ctrl);		
 		
 		
-		this.addElement(new DestinationEdit(id+":destination",{
-			"labelClassName":obj_bs_cl,
-			"required":true,
-			"acMinLengthForQuery":0,
-			"onSelect":function(f){
-				self.onSelectDestination(f);
-			},
-			"onClear":function(){
-				self.getElement("destination").getErrorControl().setValue("","info");
-			}
-		}));	
-	
-		this.addElement(new EditInt(id+":quant",{
-			"labelCaption":"Количество:",
-			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),
-			"events":{
-				"onchange":function(){
-					self.recalcTotal();						
-					self.getAvailSpots();				
-				},
-				"onkeyup":function(e){
-					self.recalcTotal();						
-					self.getAvailSpots();
-				}
-			}			
-		}));
-
 		this.addElement(new EditFloat(id+":unload_speed",{
 			"labelCaption":"Скорость разгрузки:",
 			"value":constants.def_order_unload_speed.getValue(),
@@ -141,48 +113,16 @@ function OrderDialog_View(id,options){
 			//"editContClassName":("input-group "+window.getBsCol(7)),
 			"events":{
 				"onchange":function(){
-					self.recalcTotal();						
+					self.getElement("calc").recalcTotal();						
 					self.getAvailSpots();				
 				},
 				"onkeyup":function(e){
-					self.recalcTotal();						
+					self.getElement("calc").recalcTotal();						
 					self.getAvailSpots();
 				}
 			}			
 		}));
 
-		this.addElement(new ConcreteTypeEdit(id+":concrete_type",{			
-			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),
-			"onSelect":function(f){
-				self.onSelectConcrete(f);
-			},
-			"required":true
-		}));	
-
-		this.addElement(new Enum_unload_types(id+":unload_type",{
-			"labelCaption":"Вид насоса:",
-			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),			
-			"defaultValue":"none",
-			"addNotSelected":false,
-			"events":{
-				"change":function(){
-					self.changeUnloadType();
-				}
-			}
-		}));	
-
-		this.addElement(new PumpVehicleEdit(id+":pump_vehicle",{
-			//"enabled":false,
-			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),
-			"onSelect":function(f){
-				self.onSelectPumpVehicle(f);
-			}
-			
-		}));	
-		
 		var descr_ac_model = new ModelXML("OrderDescr_Model",{
 			"fields":{
 				"descr":new FieldString("descr"),
@@ -238,40 +178,18 @@ function OrderDialog_View(id,options){
 			"labelClassName":obj_bs_cl,			
 			"labelCaption":"Комментарий:",
 			"maxLength":500
-		}));
-
-		this.addElement(new EditMoney(id+":destination_price",{
-			"labelClassName":obj_bs_cl+" orderMoneyFieldLab",
-			"className":"form-control orderMoneyField",
-			"labelCaption":"Доставка:",
-			"value":0,
-			"events":{
-				"change":function(){
-					self.recalcTotal();
-				}
-			}			
-		}));
-		this.addElement(new EditMoney(id+":unload_price",{
-			"labelClassName":obj_bs_cl+" orderMoneyFieldLab",
-			"className":"form-control orderMoneyField",
-			"labelCaption":"Насос:",
-			"value":0,
-			"enabled":false,
-			"events":{
-				"change":function(){
-					self.recalcTotal();
-				}
-			}			
-		}));
-		this.addElement(new EditMoneyEditable(id+":total",{
-			"labelClassName":obj_bs_cl+" orderMoneyFieldLab",
-			"className":"form-control orderMoneyField",
-			"labelCaption":"Всего:",
-			"value":0,
-			"enabled":false
-		}));
-	
-	
+		}));	
+		
+		this.addElement(new OrderCalc_View(id+":calc",{
+			"calc":false,
+			"getAvailSpots":function(){
+				self.getAvailSpots();
+			},
+			"getPayCash":function(){
+				return self.getElement("pay_cash").getValue();
+			}
+		}));	
+		
 	}
 	
 	OrderDialog_View.superclass.constructor.call(this,id,options);
@@ -287,19 +205,19 @@ function OrderDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("under_control")})
 		,new DataBinding({"control":this.getElement("payed")})
 		,new DataBinding({"control":this.getElement("client"),"field":this.m_model.getField("clients_ref")})
-		,new DataBinding({"control":this.getElement("destination"),"field":this.m_model.getField("destinations_ref")})
-		,new DataBinding({"control":this.getElement("quant")})
+		,new DataBinding({"control":this.getElement("calc").getElement("destination"),"field":this.m_model.getField("destinations_ref")})
+		,new DataBinding({"control":this.getElement("calc").getElement("quant")})
 		,new DataBinding({"control":this.getElement("unload_speed")})
 		,new DataBinding({"control":this.getElement("comment_text")})
-		,new DataBinding({"control":this.getElement("concrete_type"),"field":this.m_model.getField("concrete_types_ref")})
-		,new DataBinding({"control":this.getElement("pump_vehicle"),"field":this.m_model.getField("pump_vehicles_ref")})
-		,new DataBinding({"control":this.getElement("unload_type")})
+		,new DataBinding({"control":this.getElement("calc").getElement("concrete_type"),"field":this.m_model.getField("concrete_types_ref")})
+		,new DataBinding({"control":this.getElement("calc").getElement("pump_vehicle"),"field":this.m_model.getField("pump_vehicles_ref")})
+		,new DataBinding({"control":this.getElement("calc").getElement("unload_type")})
 		,new DataBinding({"control":this.getElement("descr")})
 		,new DataBinding({"control":this.getElement("phone_cel")})
 		,new DataBinding({"control":this.getElement("lang"),"field":this.m_model.getField("langs_ref")})
 		,new DataBinding({"control":this.getElement("user"),"field":this.m_model.getField("users_ref")})
-		,new DataBinding({"control":this.getElement("destination_price")})
-		,new DataBinding({"control":this.getElement("total")})
+		,new DataBinding({"control":this.getElement("calc").getElement("destination_price")})
+		,new DataBinding({"control":this.getElement("calc").getElement("total")})
 		
 	];
 	this.setDataBindings(r_bd);
@@ -313,110 +231,24 @@ function OrderDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("under_control")})
 		,new CommandBinding({"control":this.getElement("payed")})
 		,new CommandBinding({"control":this.getElement("client"),"fieldId":"client_id"})
-		,new CommandBinding({"control":this.getElement("destination"),"fieldId":"destination_id"})
-		,new CommandBinding({"control":this.getElement("quant")})
+		,new CommandBinding({"control":this.getElement("calc").getElement("destination"),"fieldId":"destination_id"})
+		,new CommandBinding({"control":this.getElement("calc").getElement("quant")})
 		,new CommandBinding({"control":this.getElement("unload_speed")})
 		,new CommandBinding({"control":this.getElement("comment_text")})		
-		,new CommandBinding({"control":this.getElement("concrete_type"),"fieldId":"concrete_type_id"})
-		,new CommandBinding({"control":this.getElement("pump_vehicle"),"fieldId":"pump_vehicle_id"})
-		,new CommandBinding({"control":this.getElement("unload_type")})
+		,new CommandBinding({"control":this.getElement("calc").getElement("concrete_type"),"fieldId":"concrete_type_id"})
+		,new CommandBinding({"control":this.getElement("calc").getElement("pump_vehicle"),"fieldId":"pump_vehicle_id"})
+		,new CommandBinding({"control":this.getElement("calc").getElement("unload_type")})
 		,new CommandBinding({"control":this.getElement("descr")})
 		,new CommandBinding({"control":this.getElement("phone_cel")})
 		,new CommandBinding({"control":this.getElement("lang"),"fieldId":"lang_id"})
 		,new CommandBinding({"control":this.getElement("user"),"fieldId":"user_id"})
-		,new CommandBinding({"control":this.getElement("destination_price")})
-		,new CommandBinding({"control":this.getElement("total")})
+		,new CommandBinding({"control":this.getElement("calc").getElement("destination_price")})
+		,new CommandBinding({"control":this.getElement("calc").getElement("total")})
 	]);
 	
 }
 extend(OrderDialog_View,ViewObjectAjx);
 
-OrderDialog_View.prototype.m_shipQuantForCostGrade_Model;
-
-OrderDialog_View.prototype.changeUnloadType = function(){
-	var v = this.getElement("unload_type").getValue();
-	var ctrl = this.getElement("pump_vehicle");
-	var ctrl_pr = this.getElement("unload_price");
-	if(v=="band"||v=="pump"){
-		en = true;
-	}
-	else{
-		en = false;
-		ctrl.reset();
-		ctrl_pr.reset();
-	}
-	ctrl.setEnabled(en);
-	ctrl_pr.setEnabled(en);
-}
-
-OrderDialog_View.prototype.recalcUnloadCost = function(){
-//console.log("OrderDialog_View.prototype.recalcUnloadCost")
-	if(this.getElement("pay_cash").getValue()){
-		if(!this.getElement("pump_vehicle").isNull()
-		&&self.m_pumpPriceValue_Model
-		&&self.m_pumpPriceValue_Model.getRowCount()
-		){
-			var cost_ctrl = this.getElement("unload_price");
-			var quant = this.getElement("quant").getValue();
-			while(self.m_pumpPriceValue_Model.getNextRow()){
-				if(
-				self.m_pumpPriceValue_Model.getFieldValue("quant_from")>=quant&&
-				self.m_pumpPriceValue_Model.getFieldValue("quant_to")<=quant
-				){
-					var cost = self.m_pumpPriceValue_Model.getFieldValue("price_fixed");
-					cost = cost? cost : (self.m_pumpPriceValue_Model.getFieldValue("price_m")*quant);
-					cost_ctrl.setValue(cost);					
-					break;
-				}
-			}
-		}
-		this.recalcTotal();
-	}
-}
-
-OrderDialog_View.prototype.onSelectPumpVehicle = function(f){
-	//read all pump schema
-	if(this.getElement("pump_vehicle").isNull())return;
-	
-	if (f.pump_prices_ref.isNull()){
-		throw new Error("Не задана ценовая схема для насоса!")
-	}
-	var contr = new PumpPriceValue_Controller();
-	var pm = contr.getPublicMethod("get_list");
-	pm.setFieldValue(contr.PARAM_COND_FIELDS,"pump_price_id");
-	pm.setFieldValue(contr.PARAM_COND_VALS,f.pump_prices_ref.getValue().getKey());
-	pm.setFieldValue(contr.PARAM_COND_SGNS,contr.PARAM_SGN_EQUAL);
-	var self = this;
-	pm.run({
-		"ok":function(resp){
-			self.m_pumpPriceValue_Model = resp.getModel("PumpPriceValue_Model");
-			self.recalcUnloadCost();
-		}
-	});
-}
-
-OrderDialog_View.prototype.onSelectDestination = function(f){
-	if(f)
-		this.onSelectDestinationCont(f.price.getValue(),f.distance.getValue(),f.time_route.getValue());
-}
-
-OrderDialog_View.prototype.onSelectDestinationCont = function(price,distance,timeRout){
-//console.log("OrderDialog_View.prototype.onSelectDestination")
-	this.m_destinationPrice = parseFloat(price);
-	
-	var dest_inf = "";
-	if (!this.getElement("destination").isNull()){
-		dest_inf = "Расстояние.:"+distance+" км."+
-			",время:"+DateHelper.format(timeRout,"H:i")+
-			",цена:"+(this.m_destinationPrice.toFixed(2))+"руб.";
-	}	
-	this.getElement("destination").getErrorControl().setValue(dest_inf,"info");
-	
-	if(this.getElement("pay_cash").getValue()){
-		this.getElement("destination_price").setValue(this.m_destinationPrice);
-		this.recalcTotal();
-	}	
-}
 
 OrderDialog_View.prototype.onSelectDescr = function(f){
 	this.getElement("phone_cel").setValue(f.phone_cel.getValue());
@@ -434,8 +266,6 @@ OrderDialog_View.prototype.onSelectClient = function(f){
 		ctrl.setValue(f.phone_cel.getValue());
 	}
 	var inf;
-	//console.log("onSelectClient ")
-	//console.dir(f)
 	if(f.quant.getValue()){
 		inf = DateHelper.format(f.date_time.getValue(),"d/m/y")+","+f.destinations_ref.getValue().getDescr()+","+f.concrete_types_ref.getValue().getDescr()+","+f.quant.getValue()+"м3";
 	}
@@ -447,82 +277,11 @@ OrderDialog_View.prototype.onSelectClient = function(f){
 	this.setClientId(f.id.getValue());
 }
 
-OrderDialog_View.prototype.changeSumTotals = function(){
-	var field_set = document.getElementById(this.getId()+":sum_totals");
-	if(this.getElement("pay_cash").getValue()){
-		DOMHelper.delClass(field_set,"hidden");
-		this.getElement("destination_price").setValue(this.m_destinationPrice);
-		this.recalcUnloadCost();
-	}
-	else{
-		DOMHelper.addClass(field_set,"hidden");
-		this.getElement("total").reset();
-		this.getElement("destination_price").reset();
-		this.getElement("unload_price").reset();
-	}
-	
-	
-	
-}
-OrderDialog_View.prototype.onSelectConcrete = function(f){
-//console.log("OrderDialog_View.prototype.onSelectConcrete")
-	this.m_concretePrice = parseFloat(f.price.getValue());
-	var inf = this.m_concretePrice? ("Стоимость: "+(this.m_concretePrice).toFixed(2)+" руб/м3"):"";
-	this.getElement("concrete_type").getErrorControl().setValue(inf,"info");
-	
-	this.recalcTotal();
-}
-
-OrderDialog_View.prototype.recalcTotalCont = function(){		
-//console.log("OrderDialog_View.prototype.recalcTotal ")
-	if (!this.getElement("total").getEnabled()){
-		var quant = this.getElement("quant").getValue();
-		//min check
-		var quant_for_ship_cost = quant;
-		this.m_shipQuantForCostGrade_Model.reset();
-		while(this.m_shipQuantForCostGrade_Model.getNextRow()){
-			var q = this.m_shipQuantForCostGrade_Model.getFieldValue("quant");
-			if(quant<=q){
-				quant_for_ship_cost = q;
-				break;
-			}
-		}
-		
-/*console.log("this.m_concretePrice="+this.m_concretePrice)
-console.log("quant="+quant)
-console.log("QuantForDestination="+( (quant<dest_min_q)? dest_min_q:quant))								
-console.log("destination_price="+this.getElement("destination_price").getValue())
-console.log("dest_min_q="+dest_min_q)*/
-
-		this.getElement("total").setValue(
-			(this.m_concretePrice * quant +
-			quant_for_ship_cost * this.getElement("destination_price").getValue() +
-			this.getElement("unload_price").getValue()
-			)
-		);
-	}
-}
-
-OrderDialog_View.prototype.recalcTotal = function(){		
-	if(!this.m_shipQuantForCostGrade_Model){
-		var self = this;
-		var pm = (new ShipQuantForCostGrade_Controller()).getPublicMethod("get_list");
-		pm.run({
-			"ok":function(resp){
-				self.m_shipQuantForCostGrade_Model = resp.getModel("ShipQuantForCostGrade_Model");
-				self.recalcTotalCont();
-			}
-		})
-	}
-	else{
-		this.recalcTotalCont();	
-	}
-}
 
 OrderDialog_View.prototype.getAvailSpots = function(){
 	this.getElement("avail_time").refresh(
 		this.getElement("date_time_date").getValue(),
-		this.getElement("quant").getValue(),
+		this.getElement("calc").getElement("quant").getValue(),
 		this.getElement("unload_speed").getValue()
 	);
 }
@@ -540,7 +299,7 @@ OrderDialog_View.prototype.setPublicMethodDateTime = function(pm){
 }
 
 OrderDialog_View.prototype.setClientId = function(clientId){
-	var dest_ac = this.getElement("destination").getAutoComplete();
+	var dest_ac = this.getElement("calc").getElement("destination").getAutoComplete();
 	var descr_ac = this.getElement("descr").getAutoComplete();
 	if(clientId){
 		descr_ac.getPublicMethod().setFieldValue("client_id",clientId);
@@ -567,8 +326,8 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 		this.setClientId(f.getValue().getKey());
 	}
 	
-	this.getElement("total").setEditAllowed(m.getFieldValue("total_edit"));
+	this.getElement("calc").getElement("total").setEditAllowed(m.getFieldValue("total_edit"));
 	
-	this.changeUnloadType();
-	this.onSelectDestinationCont(m.getFieldValue("destination_price"),m.getFieldValue("destination_distance"),m.getFieldValue("destination_time_rout"))
+	this.getElement("calc").changeUnloadType();
+	this.getElement("calc").onSelectDestinationCont(m.getFieldValue("destination_price"),m.getFieldValue("destination_distance"),m.getFieldValue("destination_time_rout"))
 }

@@ -1235,6 +1235,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AssignedVehicleList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallClientCallHistoryList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallClientShipHistoryList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderCalc_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));

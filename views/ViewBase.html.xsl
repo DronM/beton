@@ -160,14 +160,43 @@
 	*/})});	
 	</xsl:if>
 	
-	var form = new WindowFormModalBS({
+	view_opts.onMakeOrder = function(){				
+		var order_make_grid = window.getApp().getCurrentView().getElement("order_make_grid");
+		var m = new OrderDialog_Model();
+		m.setFieldValue("destinations_ref",window.call_view.getElement("calc").getElement("destination").getValue());		
+		m.setFieldValue("clients_ref",window.call_view.getElement("client").getValue());
+		m.setFieldValue("quant",window.call_view.getElement("calc").getElement("quant").getValue());
+		m.setFieldValue("concrete_types_ref",window.call_view.getElement("calc").getElement("concrete_type").getValue());
+		m.setFieldValue("destination_price",window.call_view.getElement("calc").getElement("destination_price").getValue());
+		m.setFieldValue("total",window.call_view.getElement("calc").getElement("total").getValue());
+		m.setFieldValue("pay_cash",true);
+		m.setFieldValue("descr",window.call_view.getElement("contact_name").getValue());
+		m.setFieldValue("phone_cel",window.call_view.getElement("contact_tel").getValue());
+		m.setFieldValue("users_ref",new RefType({"keys":{"id":window.getApp().getServVar("user_id")},"descr":window.getApp().getServVar("user_name"),"dataType":"users"}));
+		m.setFieldValue("unload_type",window.call_view.getElement("calc").getElement("unload_type").getValue());
+		m.setFieldValue("pump_vehicles_ref",window.call_view.getElement("calc").getElement("pump_vehicle").getValue());
+		m.recInsert();
+		order_make_grid.edit("insert",{
+			"models":{
+				"OrderDialog_Model":m
+			}
+		});
+		
+		window.call_form.close();		
+		delete window.call_view;
+		delete window.call_form;
+		
+	}
+	
+	window.call_view = new AstIncomeCall_View("CallForm:body:v",view_opts);
+	window.call_form = new WindowFormModalBS({
 		"id":"CallForm",
 		"contentHead":"Входящий звонок",
-		"content":new AstIncomeCall_View("CallView",view_opts),
-		"cmdClose":true
-		}
-	);
-	form.open();
+		"content":window.call_view,
+		"cmdClose":true,
+		"cmdCancel":true
+	});
+	window.call_form.open();
 	</xsl:if>
 	
 	</xsl:if>

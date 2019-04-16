@@ -5,16 +5,37 @@ function ShipmentList_View(id,options){
 
 	ShipmentList_View.superclass.constructor.call(this,id,options);
 
+	var self = this;
+	this.addElement(new EditString(id+":barcode",{
+		"labelCaption":"Штрих код бланка:",
+		"maxLength":13,
+		"autofocus":true,
+		"events":{
+			"keypress":function(e){
+				e = EventHelper.fixKeyEvent(e);
+				if (e.keyCode==13){
+					self.findDoc(e.target.value);
+				}								
+			}
+			,"input":function(e){
+				e = EventHelper.fixKeyEvent(e);
+				if (e.keyCode==13){
+					self.findDoc(e.target.value);
+				}								
+			}				
+		}
+	}));
+
 	var model = options.models.ShipmentList_Model;
 	var contr = new Shipment_Controller();
-	
+
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
-	
+
 	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"field":new FieldDateTime("ship_date_time")
 	});
-	
+
 	var filters = {
 		"period":{
 			"binding":new CommandBinding({
@@ -44,7 +65,7 @@ function ShipmentList_View(id,options){
 				"field":new FieldInt("production_site_id")}),
 			"sign":"e"		
 		}
-		
+	
 		,"client":{
 			"binding":new CommandBinding({
 				"control":new ClientEdit(id+":filter-ctrl-client",{
@@ -72,7 +93,7 @@ function ShipmentList_View(id,options){
 				"field":new FieldInt("vehicle_id")}),
 			"sign":"e"		
 		}
-		
+	
 		,"destination":{
 			"binding":new CommandBinding({
 				"control":new DestinationEdit(id+":filter-ctrl-destination",{
@@ -100,9 +121,9 @@ function ShipmentList_View(id,options){
 				"field":new FieldInt("user_id")}),
 			"sign":"e"		
 		}
-		
-	};
 	
+	};
+
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
@@ -146,7 +167,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-					
+				
 						,new GridCellHead(id+":grid:head:ship_date_time",{
 							"value":"Дата",
 							"colAttrs":{"align":"center"},
@@ -253,7 +274,7 @@ function ShipmentList_View(id,options){
 						})
 
 
-						
+					
 						,new GridCellHead(id+":grid:head:quant",{
 							"value":"Количество",
 							"colAttrs":{"align":"right"},
@@ -324,7 +345,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})						
-						
+					
 					]
 				})
 			]
@@ -349,14 +370,14 @@ function ShipmentList_View(id,options){
 							"calcFieldId":"cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost"})
 						})						
-												
+											
 						,new GridCellFoot(id+":grid:foot:tot_demurrage_cost",{
 							"attrs":{"align":"right"},
 							"calcOper":"sum",
 							"calcFieldId":"demurrage_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_demurrage_cost"})
 						})						
-						
+					
 						,new GridCell(id+":grid:foot:total_sp2",{
 							"colSpan":"4"
 						})						
@@ -370,8 +391,22 @@ function ShipmentList_View(id,options){
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true
-	}));	
-	
+	}));		
 }
 extend(ShipmentList_View,ViewAjxList);
+
+ShipmentList_View.prototype.findDoc = function(barcode){
+	var pm = (new Shipment_Controller()).getPublicMethod("set_blanks_exist");
+	pm.setFieldValue("barcode",barcode);
+	
+	var self = this;
+	pm.run({
+		"ok":function(resp){
+			var ctrl = self.getElement("barcode");
+			ctrl.reset();
+			ctrl.focus();
+			ctrl.getErrorControl().setValue("Документ погашен!","info");
+		}
+	})
+}
 

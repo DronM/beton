@@ -476,7 +476,7 @@ class AstCall_Controller extends ControllerSQL{
 				FROM clients AS cl
 				LEFT JOIN client_tels AS clt
 					ON clt.client_id=cl.id
-					AND clt.tel=format_cel_phone(%s)
+					AND clt.tel=format_phone(%s)
 				WHERE cl.id=%d",
 				$p->getParamById('contact_tel'),
 				$p->getParamById('client_id')
@@ -487,15 +487,15 @@ class AstCall_Controller extends ControllerSQL{
 					$client_upd_fields = '';
 					if (strlen($pm->getParamValue('client_name'))&&$ar['client_name']!=$pm->getParamValue('client_name')){
 						$client_upd_fields.= ($client_upd_fields=='')? '':',';
-						$client_upd_fields.= sprinbtf('name=%s',$p->getParamById('client_name'));
+						$client_upd_fields.= sprintf('name=%s',$p->getParamById('client_name'));
 					}
 					if (strlen($pm->getParamValue('client_type_id'))&&$ar['client_type_id']!=$pm->getParamValue('client_type_id')){
 						$client_upd_fields.= ($client_upd_fields=='')? '':',';
-						$client_upd_fields.= sprinbtf('client_type_id=%d',$p->getParamById('client_type_id'));
+						$client_upd_fields.= sprintf('client_type_id=%d',$p->getParamById('client_type_id'));
 					}
 					if (strlen($pm->getParamValue('client_come_from_id'))&&$ar['client_come_from_id']!=$pm->getParamValue('client_come_from_id')){
 						$client_upd_fields.= ($client_upd_fields=='')? '':',';
-						$client_upd_fields.= sprinbtf('client_come_from_id=%d',$p->getParamById('client_come_from_id'));
+						$client_upd_fields.= sprintf('client_come_from_id=%d',$p->getParamById('client_come_from_id'));
 					}
 					if (strlen($pm->getParamValue('client_kind'))&&$ar['client_kind']!=$pm->getParamValue('client_kind')){
 						$client_upd_fields.= ($client_upd_fields=='')? '':',';
@@ -531,7 +531,7 @@ class AstCall_Controller extends ControllerSQL{
 						$l->query(sprintf(
 						"INSERT INTO client_tels
 						(client_id,tel,name)
-						VALUES (%d,format_cel_phone(%s),%s)",
+						VALUES (%d,format_phone(%s),%s)",
 						$p->getParamById('client_id'),
 						$p->getParamById('contact_tel'),
 						$p->getParamById('contact_name')

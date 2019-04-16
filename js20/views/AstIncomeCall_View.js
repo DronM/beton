@@ -20,8 +20,15 @@ function AstIncomeCall_View(id,options){
 	if (options.model.getNextRow()){
 		var pm = options.controller.getPublicMethod("update");
 		pm.setFieldValue("unique_id",options.model.getFieldValue("unique_id"));
+		pm.setFieldValue("contact_tel",options.model.getFieldValue("contact_tel"));
+		var client_id = options.model.getFieldValue("client_id");
+		if(client_id)
+			pm.setFieldValue("client_id",client_id);
 	}
 
+	this.m_onMakeOrder = options.onMakeOrder;
+
+	var self = this;
 	options.addElement = function(){
 		this.addElement(new EditPhone(id+":contact_tel",{
 			"labelCaption":"Телефон:",
@@ -73,15 +80,39 @@ function AstIncomeCall_View(id,options){
 		}));			
 
 		this.addElement(new ButtonCmd(id+":cmdUpdate",{
-			"caption":"Изменить",
+			"caption":"Изменить  ",
+			"glyph":"glyphicon-pencil",
 			"onClick":function(){
-				alert("!!")
+				
+				self.getElement("cmdUpdate").setEnabled(false);
+				self.onSave(
+					null,
+					function(resp,errCode,errStr){						
+						self.setError(window.getApp().formatError(errCode,errStr));
+					},
+					function(){
+						self.getElement("cmdUpdate").setEnabled(true);
+					}
+				);
 			}
 		})
 		);			
 
-		this.addElement(new OrderDialog_View(id+":order",{
+		this.addElement(new OrderCalc_View(id+":calc",{
+			"calc":true,
+			"getPayCash":function(){
+				return true;
+			}
 		}));			
+	
+		this.addElement(new ButtonCmd(id+":cmdMakeOrder",{
+			"caption":"Оформить заявку  ",
+			"glyph":"glyphicon-plus",
+			"onClick":function(){
+				self.m_onMakeOrder();
+			}
+		})
+		);			
 	
 	}
 	

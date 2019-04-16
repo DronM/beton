@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-04-15 12:09:02</lastBuild></version>
+		<lastBuild>2019-04-16 12:44:56</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -13,6 +13,7 @@
 		<version dateOpen="2019-04-15 10:04:57" dateClose="2019-04-15 10:04:59">1.006</version>
 		<version dateOpen="2019-04-15 11:04:03" dateClose="2019-04-15 11:04:03">1.007</version>
 		<version dateOpen="2019-04-15 12:04:08" dateClose="2019-04-15 12:04:09">1.008</version>
+		<version dateOpen="2019-04-15 15:04:36" dateClose="2019-04-16 12:04:45">1.009</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -2896,7 +2897,6 @@
 		<serverTemplate id="QuarryList"/>
 		<serverTemplate id="LangList"/>
 		<serverTemplate id="OrderList"/>
-		<serverTemplate id="ShipmentList"/>
 		<serverTemplate id="ShipmentForOrderList"/>
 		<serverTemplate id="OrderPumpList"/>
 		<serverTemplate id="ClientList"/>
@@ -2951,15 +2951,12 @@
 		<jsTemplate id="IcomoonList" file="tmpl/IcomoonList.html"/>
 		<jsTemplate id="ColorPaletteList" file="tmpl/ColorPaletteList.html"/>
 		<jsTemplate id="EditFile" file="tmpl/EditFile.html"/>
-		<jsTemplate id="EgrulEditData" file="tmpl/EgrulEditData.html"/>
-		<jsTemplate id="EgrulEdit" file="tmpl/EgrulEdit.html"/>
-		<jsTemplate id="CollectionField" file="tmpl/CollectionField.html"/>
-		<jsTemplate id="FieldGroup" file="tmpl/FieldGroup.html"/>
 		<jsTemplate id="EditPeriodShift" file="tmpl/EditPeriodShift.html"/>
 		<jsTemplate id="ZoneDrawingControl" file="tmpl/ZoneDrawingControl.html"/>
 		<jsTemplate id="OrderDialog_View" file="tmpl/OrderDialog_View.html"/>
 		<jsTemplate id="AssignedVehicleList_View" file="tmpl/AssignedVehicleList_View.html"/>
 		<jsTemplate id="AstIncomeCall_View" file="tmpl/AstIncomeCall_View.html"/>
+		<jsTemplate id="OrderCalc" file="tmpl/OrderCalc.html"/>
 	</jsTemplates>
 	<jsScripts>
 		<!-- Core JS files -->
@@ -3421,6 +3418,7 @@
 		<jsScript file="views/AssignedVehicleList_View.js"/>
 		<jsScript file="views/AstCallClientCallHistoryList_View.js"/>
 		<jsScript file="views/AstCallClientShipHistoryList_View.js"/>
+		<jsScript file="views/OrderCalc_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>

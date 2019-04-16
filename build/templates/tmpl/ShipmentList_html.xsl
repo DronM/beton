@@ -8,7 +8,21 @@
 <!-- -->
 
 <xsl:template match="/">
-	<xsl:apply-templates select="metadata/serverTemplates/serverTemplate[@id=$TEMPLATE_ID]"/>
+	<!--<xsl:apply-templates select="metadata/serverTemplates/serverTemplate[@id=$TEMPLATE_ID]"/>-->
+	<div id="{{{{id}}}}">
+		<div class="row">
+			<h1 class="page-header">
+			{{{{HEAD_TITLE}}}}
+			</h1>
+			<div id="{{{{id}}}}:barcode">
+			
+			</div>
+		</div>
+		
+		<div id="{{{{id}}}}:grid">
+		
+		</div>		
+	</div>	
 </xsl:template>
 
 </xsl:stylesheet>

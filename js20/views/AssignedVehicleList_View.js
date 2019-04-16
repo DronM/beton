@@ -14,6 +14,10 @@
 function AssignedVehicleList_View(id,options){
 	options = options || {};	
 	
+	options.templateOptions = {
+		"fullScreenl":(window.location.href.indexOf("v=Child")>=0)
+	};
+	
 	var refresh_interval = null;
 	if (options.noAutoRefresh!==true){
 		var constants = {"grid_refresh_interval":null};

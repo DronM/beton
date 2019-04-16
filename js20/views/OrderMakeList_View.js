@@ -37,10 +37,11 @@ function OrderMakeList_View(id,options){
 	options.addElement = function(){
 	
 		//plant load control
-		this.addElement(new PlantLoadGraphControl(id+":plant_load_graph",{
-			"model":options.models.Graph_Model
-		}));
-
+		if(window.getWidthType()!="sm"){
+			this.addElement(new PlantLoadGraphControl(id+":plant_load_graph",{
+				"model":options.models.Graph_Model
+			}));
+		}
 		//date set
 		var init_dt;
 		if(options.models&&options.models.InitDate&&options.models.InitDate.getNextRow()){
@@ -432,8 +433,9 @@ OrderMakeList_View.prototype.refresh = function(){
 			}
 			
 			//chart
-			self.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
-			
+			if(window.getWidthType()!="sm"){
+				self.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
+			}
 			//mat totals
 			var grid = self.getElement("mat_totals_grid");
 			grid.getModel().setData(resp.getModelData("MatTotals_Model"));
