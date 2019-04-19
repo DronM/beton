@@ -60,6 +60,18 @@ function PumpVehicleList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("pump_vehicles_ref"),
+									/*"formatFunction":function(f){
+										var res = "";
+										var v = f.pump_vehicles_ref.getValue();
+										if(v&&!v.isNull()){
+											res = v.getDescr();
+											v = f.owner.getValue();
+											if(v){
+												res = res + " ("+v+")";
+											}
+										}
+										return res;
+									},*/
 									"ctrlClass":VehicleEdit,
 									"ctrlOptions":{
 										"labelCaption":""
@@ -69,6 +81,15 @@ function PumpVehicleList_View(id,options){
 							],
 							"sort":"asc"
 						})
+						,new GridCellHead(id+":grid:head:owner",{
+							"value":"Владелец",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("owner")
+									})
+							]
+						})						
+						
 						,new GridCellHead(id+":grid:head:phone_cel",{
 							"value":"Телефон",
 							"columns":[

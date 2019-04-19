@@ -1,9 +1,11 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function ShipmentForOrderList_View(id,options){	
 
 	ShipmentForOrderList_View.superclass.constructor.call(this,id,options);
+
+	this.m_makeGridListView = options.listView;
 
 	var model = (options.models&&options.models.ShipmentForOrderList_Model)? options.models.ShipmentForOrderList_Model: new ShipmentForOrderList_Model();
 	var contr = new Shipment_Controller();
@@ -14,7 +16,7 @@ function ShipmentForOrderList_View(id,options){
 	var role = window.getApp().getServVar("role_id");
 		
 	var pagClass = window.getApp().getPaginationClass();
-	this.addElement(new GridAjx(id+":grid",{
+	var grid = new GridAjx(id+":grid",{
 		"model":model,
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_list_for_order"),
@@ -36,6 +38,7 @@ function ShipmentForOrderList_View(id,options){
 					"elements":[
 						new GridCellHead(id+":grid:head:id",{
 							"value":"№",
+							"className":window.getBsCol(1),
 							"columns":[
 								new GridColumn({
 									"field":model.getField("id"),
@@ -49,6 +52,7 @@ function ShipmentForOrderList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:production_sites_ref",{
 							"value":"Завод",
+							"className":window.getBsCol(2),
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("production_sites_ref"),
@@ -64,6 +68,7 @@ function ShipmentForOrderList_View(id,options){
 						
 						,new GridCellHead(id+":grid:head:date_time",{
 							"value":"Назн.",
+							"className":window.getBsCol(1),
 							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDateTime({
@@ -80,6 +85,7 @@ function ShipmentForOrderList_View(id,options){
 					
 						,new GridCellHead(id+":grid:head:ship_date_time",{
 							"value":"Отгр.",
+							"className":window.getBsCol(1),
 							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDateTime({									
@@ -95,6 +101,7 @@ function ShipmentForOrderList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:vs_state",{
 							"value":"Статус",
+							"className":window.getBsCol(2),
 							"columns":[
 								new EnumGridColumn_vehicle_states({
 									"field":model.getField("vs_state"),
@@ -109,6 +116,7 @@ function ShipmentForOrderList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:vehicle_schedules_ref",{
 							"value":"Экипаж",
+							"className":window.getBsCol(3),
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("vehicle_schedules_ref"),
@@ -125,6 +133,7 @@ function ShipmentForOrderList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:quant",{
 							"value":"Количество",
+							"className":window.getBsCol(2),
 							"colAttrs":{"align":"right"},
 							"columns":[
 								new GridColumnFloat({
@@ -162,7 +171,20 @@ function ShipmentForOrderList_View(id,options){
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true
-	}));	
+	});	
+	var self = this;
+	this.m_origGridEdit = grid.edit
+	grid.edit = function(cmd,editOptions){
+		self.m_makeGridListView.enableRefreshing(false);
+		self.m_origGridEdit.call(self.getElement("grid"),cmd,editOptions);
+	}
 	
+	this.m_origGridCloseEditView = grid.closeEditView;
+	grid.closeEditView = function(res){
+		self.m_makeGridListView.enableRefreshing(true);
+		self.m_origGridCloseEditView.call(self.getElement("grid"),res);
+	}
+	
+	this.addElement(grid);
 }
 extend(ShipmentForOrderList_View,ViewAjx);

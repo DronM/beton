@@ -83,6 +83,15 @@ function OrderDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.destination_cost = new FieldFloat("destination_cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.destination_time_rout = new FieldFloat("destination_time_rout",filed_options);
 	
 				
@@ -110,7 +119,16 @@ function OrderDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.concrete_type_price = new FieldFloat("concrete_type_price",filed_options);
+	options.fields.concrete_price = new FieldFloat("concrete_price",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.concrete_cost = new FieldFloat("concrete_cost",filed_options);
 	
 				
 	
@@ -236,7 +254,7 @@ function OrderDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.unload_price = new FieldFloat("unload_price",filed_options);
+	options.fields.unload_cost = new FieldFloat("unload_cost",filed_options);
 	
 				
 	

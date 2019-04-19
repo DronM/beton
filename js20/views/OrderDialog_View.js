@@ -12,7 +12,7 @@ function OrderDialog_View(id,options){
 	app.getConstantManager().get(constants);
 	
 	var role_id = app.getServVar("role_id");
-	var bool_bs_cl = "control-label "+window.getBsCol(4);
+	var bool_bs_cl = "control-label "+window.getBsCol(5);
 	var obj_bs_cl = ("control-label "+window.getBsCol(2));
 	
 	var self = this;
@@ -62,24 +62,24 @@ function OrderDialog_View(id,options){
 	
 		this.addElement(new EditCheckBox(id+":pay_cash",{
 			"labelCaption":"Оплата на месте:",
-			//"className":"",
+			"className":"",
 			"labelClassName":bool_bs_cl,
 			"events":{
 				"change":function(){
-					self.getElement("calc").changeSumTotals();
+					self.getElement("calc").setPayCash();
 				}
 			}
 		}));	
 
 		this.addElement(new EditCheckBox(id+":payed",{
 			"labelCaption":"Оплачено:",
-			//"className":"",
+			"className":"",
 			"labelClassName":bool_bs_cl
 		}));	
 
 		this.addElement(new EditCheckBox(id+":under_control",{
 			"labelCaption":"На контроле:",
-			//"className":"",
+			"className":"",
 			"labelClassName":bool_bs_cl
 		}));	
 	
@@ -217,6 +217,8 @@ function OrderDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("lang"),"field":this.m_model.getField("langs_ref")})
 		,new DataBinding({"control":this.getElement("user"),"field":this.m_model.getField("users_ref")})
 		,new DataBinding({"control":this.getElement("calc").getElement("destination_price")})
+		,new DataBinding({"control":this.getElement("calc").getElement("concrete_price")})
+		,new DataBinding({"control":this.getElement("calc").getElement("unload_price")})
 		,new DataBinding({"control":this.getElement("calc").getElement("total")})
 		
 	];
@@ -242,7 +244,9 @@ function OrderDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("phone_cel")})
 		,new CommandBinding({"control":this.getElement("lang"),"fieldId":"lang_id"})
 		,new CommandBinding({"control":this.getElement("user"),"fieldId":"user_id"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("destination_price")})
+		,new CommandBinding({"control":this.getElement("calc").getElement("destination_cost"),"fieldId":"destination_price"})
+		,new CommandBinding({"control":this.getElement("calc").getElement("concrete_cost"),"fieldId":"concrete_price"})
+		,new CommandBinding({"control":this.getElement("calc").getElement("unload_cost"),"fieldId":"unload_price"})
 		,new CommandBinding({"control":this.getElement("calc").getElement("total")})
 	]);
 	
@@ -326,8 +330,9 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 		this.setClientId(f.getValue().getKey());
 	}
 	
-	this.getElement("calc").getElement("total").setEditAllowed(m.getFieldValue("total_edit"));
-	
-	this.getElement("calc").changeUnloadType();
-	this.getElement("calc").onSelectDestinationCont(m.getFieldValue("destination_price"),m.getFieldValue("destination_distance"),m.getFieldValue("destination_time_rout"))
+	var ctrl_calc = this.getElement("calc");
+	ctrl_calc.getElement("total").setEditAllowed(m.getFieldValue("total_edit"));	
+	ctrl_calc.changeUnloadType();
+	ctrl_calc.setDestinationPrice(m.getFieldValue("destination_price"),m.getFieldValue("destination_distance"),m.getFieldValue("destination_time_rout"))
+	ctrl_calc.setConcretePrice(m.getFieldValue("concrete_price"));
 }

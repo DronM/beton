@@ -81,7 +81,8 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
 		    ELSE 0::numeric
 		END AS total, 
 		
-		vh.owner AS pump_vehicle_owner
+		vh.owner AS pump_vehicle_owner,
+		o.unload_type
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id

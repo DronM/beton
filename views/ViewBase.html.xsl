@@ -131,7 +131,7 @@
 	<!-- [@default='FALSE']-->
 	<xsl:variable name="def_menu_item" select="//menuitem[@default='true']"/>
 	<xsl:if test="$def_menu_item">
-	if(window.location.href.indexOf("?") &lt; 0 || window.location.href.indexOf("token=") &gt;=0) {
+	if(window.location.href.indexOf("?") &lt; 0 || window.location.href.indexOf("token=") &gt;=0 || window.location.href.indexOf("?sid") &gt;=0) {
 		var iRef = DOMHelper.getElementsByAttr("true", CommonHelper.nd("side-menu"), "defaultItem",true,"A")[0];
 		application.showMenuItem(iRef,'<xsl:value-of select="$def_menu_item/@c"/>','<xsl:value-of select="$def_menu_item/@f"/>','<xsl:value-of select="$def_menu_item/@t"/>',null,'<xsl:value-of select="$def_menu_item/@viewdescr"/>');
 	}
@@ -162,19 +162,24 @@
 	
 	view_opts.onMakeOrder = function(){				
 		var order_make_grid = window.getApp().getCurrentView().getElement("order_make_grid");
+		var calc_v = window.call_view.getElement("calc");
 		var m = new OrderDialog_Model();
-		m.setFieldValue("destinations_ref",window.call_view.getElement("calc").getElement("destination").getValue());		
+		m.setFieldValue("destinations_ref",calc_v.getElement("destination").getValue());		
 		m.setFieldValue("clients_ref",window.call_view.getElement("client").getValue());
-		m.setFieldValue("quant",window.call_view.getElement("calc").getElement("quant").getValue());
-		m.setFieldValue("concrete_types_ref",window.call_view.getElement("calc").getElement("concrete_type").getValue());
-		m.setFieldValue("destination_price",window.call_view.getElement("calc").getElement("destination_price").getValue());
-		m.setFieldValue("total",window.call_view.getElement("calc").getElement("total").getValue());
+		m.setFieldValue("quant",calc_v.getElement("quant").getValue());
+		m.setFieldValue("concrete_types_ref",calc_v.getElement("concrete_type").getValue());
+		m.setFieldValue("destination_cost",calc_v.getElement("destination_cost").getValue());
+		m.setFieldValue("destination_price",calc_v.m_destinationPrice);
+		m.setFieldValue("concrete_cost",calc_v.getElement("concrete_cost").getValue());
+		m.setFieldValue("concrete_price",calc_v.m_concretePrice);
+		m.setFieldValue("unload_cost",calc_v.getElement("unload_cost").getValue());
+		m.setFieldValue("total",calc_v.getElement("total").getValue());
 		m.setFieldValue("pay_cash",true);
 		m.setFieldValue("descr",window.call_view.getElement("contact_name").getValue());
 		m.setFieldValue("phone_cel",window.call_view.getElement("contact_tel").getValue());
 		m.setFieldValue("users_ref",new RefType({"keys":{"id":window.getApp().getServVar("user_id")},"descr":window.getApp().getServVar("user_name"),"dataType":"users"}));
-		m.setFieldValue("unload_type",window.call_view.getElement("calc").getElement("unload_type").getValue());
-		m.setFieldValue("pump_vehicles_ref",window.call_view.getElement("calc").getElement("pump_vehicle").getValue());
+		m.setFieldValue("unload_type",calc_v.getElement("unload_type").getValue());
+		m.setFieldValue("pump_vehicles_ref",calc_v.getElement("pump_vehicle").getValue());
 		m.recInsert();
 		order_make_grid.edit("insert",{
 			"models":{

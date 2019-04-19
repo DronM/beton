@@ -37,17 +37,20 @@ function OrderCalc_View(id,options){
 			}
 		}));	
 	
-		this.addElement(new EditInt(id+":quant",{
+		this.addElement(new EditMoney(id+":quant",{
+			"precision":1,
 			"labelCaption":"Количество:",
 			"labelClassName":obj_bs_cl,
 			//"editContClassName":("input-group "+window.getBsCol(7)),
 			"events":{
 				"onchange":function(){
-					self.recalcTotal();						
+					self.recalcUnloadCost();
+					self.recalcTotal();
 					if(self.m_getAvailSpots)self.m_getAvailSpots();
 				},
 				"onkeyup":function(e){
-					self.recalcTotal();						
+					self.recalcUnloadCost();
+					self.recalcTotal();
 					if(self.m_getAvailSpots)self.m_getAvailSpots();
 				}
 			}			
@@ -71,6 +74,7 @@ function OrderCalc_View(id,options){
 			"events":{
 				"change":function(){
 					self.changeUnloadType();
+					self.recalcTotal();
 				}
 			}
 		}));	
@@ -84,12 +88,13 @@ function OrderCalc_View(id,options){
 			}
 			
 		}));	
-		
-		this.addElement(new EditMoney(id+":destination_price",{
+
+		this.addElement(new EditMoney(id+":concrete_cost",{
 			"labelClassName":("control-label "+window.getBsCol(5))+" orderMoneyFieldLab",
-			"editContClassName":("input-group "+window.getBsCol(7)),
+			//"editContClassName":("input-group "+window.getBsCol(7)),
 			"className":"form-control orderMoneyField",
-			"labelCaption":"Доставка:",
+			"labelCaption":"Бетон:",
+			"enabled":false,
 			"value":0,
 			"events":{
 				"change":function(){
@@ -97,8 +102,23 @@ function OrderCalc_View(id,options){
 				}
 			}			
 		}));
-		this.addElement(new EditMoney(id+":unload_price",{
-			"labelClassName":("control-label "+window.getBsCol(4))+" orderMoneyFieldLab",
+		
+		this.addElement(new EditMoney(id+":destination_cost",{
+			"labelClassName":("control-label "+window.getBsCol(5))+" orderMoneyFieldLab",
+			//"editContClassName":("input-group"+window.getBsCol(5)),
+			"className":"form-control orderMoneyField",
+			"labelCaption":"Доставка:",
+			"value":0,
+			"enabled":false,
+			"events":{
+				"change":function(){
+					self.recalcTotal();
+				}
+			}			
+		}));
+		this.addElement(new EditMoney(id+":unload_cost",{
+			"labelClassName":("control-label "+window.getBsCol(5))+" orderMoneyFieldLab",
+			//"editContClassName":("input-group"+window.getBsCol(7)),
 			"className":"form-control orderMoneyField",
 			"labelCaption":"Насос:",
 			"value":0,
@@ -110,7 +130,8 @@ function OrderCalc_View(id,options){
 			}			
 		}));
 		this.addElement(new EditMoneyEditable(id+":total",{
-			"labelClassName":("control-label "+window.getBsCol(4))+" orderMoneyFieldLab",
+			"labelClassName":("control-label "+window.getBsCol(5))+" orderMoneyFieldLab",
+			//"editContClassName":("input-group"+window.getBsCol(7)),
 			"className":"form-control orderMoneyField",
 			"labelCaption":"Всего:",
 			"value":0,
@@ -137,11 +158,13 @@ OrderCalc_View.prototype.m_shipQuantForCostGrade_Model;
 /* public methods */
 
 OrderCalc_View.prototype.onSelectDestination = function(f){
-	if(f)
-		this.onSelectDestinationCont(f.price.getValue(),f.distance.getValue(),f.time_route.getValue());
+	if(f){
+		this.setDestinationPrice(f.price.getValue(),f.distance.getValue(),f.time_route.getValue());
+		this.recalcTotal();
+	}
 }
 
-OrderCalc_View.prototype.onSelectDestinationCont = function(price,distance,timeRout){
+OrderCalc_View.prototype.setDestinationPrice = function(price,distance,timeRout){
 	this.m_destinationPrice = parseFloat(price);
 	
 	var dest_inf = "";
@@ -150,65 +173,63 @@ OrderCalc_View.prototype.onSelectDestinationCont = function(price,distance,timeR
 			",время:"+DateHelper.format(timeRout,"H:i")+
 			",цена:"+(this.m_destinationPrice.toFixed(2))+"руб.";
 	}	
-	this.getElement("destination").getErrorControl().setValue(dest_inf,"info");
-	
-	if(this.m_getPayCash()){
-		this.getElement("destination_price").setValue(this.m_destinationPrice);
-		this.recalcTotal();
-	}	
+	this.getElement("destination").getErrorControl().setValue(dest_inf,"info");	
+}
+
+OrderCalc_View.prototype.setConcretePrice = function(price){
+	this.m_concretePrice = parseFloat(price);
+	var inf = this.m_concretePrice? ("Стоимость: "+(this.m_concretePrice).toFixed(2)+" руб/м3"):"";
+	this.getElement("concrete_type").getErrorControl().setValue(inf,"info");	
 }
 
 OrderCalc_View.prototype.onSelectConcrete = function(f){
-	this.m_concretePrice = parseFloat(f.price.getValue());
-	var inf = this.m_concretePrice? ("Стоимость: "+(this.m_concretePrice).toFixed(2)+" руб/м3"):"";
-	this.getElement("concrete_type").getErrorControl().setValue(inf,"info");
-	
+	this.setConcretePrice(f.price.getValue());
 	this.recalcTotal();
 }
 
 OrderCalc_View.prototype.recalcTotalCont = function(){		
-//console.log("OrderDialog_View.prototype.recalcTotal ")
-	if (!this.getElement("total").getEnabled()){
-		var quant = this.getElement("quant").getValue();
-		//min check
-		var quant_for_ship_cost = quant;
-		this.m_shipQuantForCostGrade_Model.reset();
-		while(this.m_shipQuantForCostGrade_Model.getNextRow()){
-			var q = this.m_shipQuantForCostGrade_Model.getFieldValue("quant");
-			if(quant<=q){
-				quant_for_ship_cost = q;
-				break;
-			}
+	var quant = this.getElement("quant").getValue();
+	
+	//min quant for destination
+	var quant_for_ship_cost = quant;
+	this.m_shipQuantForCostGrade_Model.reset();
+	while(this.m_shipQuantForCostGrade_Model.getNextRow()){
+		var q = this.m_shipQuantForCostGrade_Model.getFieldValue("quant");
+		if(quant<=q){
+			quant_for_ship_cost = q;
+			break;
 		}
-		
-/*console.log("this.m_concretePrice="+this.m_concretePrice)
-console.log("quant="+quant)
-console.log("QuantForDestination="+( (quant<dest_min_q)? dest_min_q:quant))								
-console.log("destination_price="+this.getElement("destination_price").getValue())
-console.log("dest_min_q="+dest_min_q)*/
+	}
+	
+	var concrete_cost = this.m_concretePrice * quant;
+	var destination_cost = this.m_destinationPrice * quant_for_ship_cost;
 
+	this.getElement("destination_cost").setValue(destination_cost);
+	this.getElement("concrete_cost").setValue(concrete_cost);
+
+	if(!this.getElement("total").getEnabled()){
 		this.getElement("total").setValue(
-			(this.m_concretePrice * quant +
-			quant_for_ship_cost * this.getElement("destination_price").getValue() +
-			this.getElement("unload_price").getValue()
-			)
+			(concrete_cost + destination_cost +this.getElement("unload_cost").getValue())
 		);
 	}
 }
 
 OrderCalc_View.prototype.recalcTotal = function(){		
-	if(!this.m_shipQuantForCostGrade_Model){
-		var self = this;
-		var pm = (new ShipQuantForCostGrade_Controller()).getPublicMethod("get_list");
-		pm.run({
-			"ok":function(resp){
-				self.m_shipQuantForCostGrade_Model = resp.getModel("ShipQuantForCostGrade_Model");
-				self.recalcTotalCont();
-			}
-		})
-	}
-	else{
-		this.recalcTotalCont();	
+	if (this.m_getPayCash() && !this.getElement("total").getEnabled()){
+		//Одна схема для всех доставок!
+		if(!this.m_shipQuantForCostGrade_Model){
+			var self = this;
+			var pm = (new ShipQuantForCostGrade_Controller()).getPublicMethod("get_list");
+			pm.run({
+				"ok":function(resp){
+					self.m_shipQuantForCostGrade_Model = resp.getModel("ShipQuantForCostGrade_Model");
+					self.recalcTotalCont();
+				}
+			})
+		}
+		else{
+			this.recalcTotalCont();	
+		}
 	}
 }
 
@@ -216,7 +237,7 @@ OrderCalc_View.prototype.recalcTotal = function(){
 OrderCalc_View.prototype.changeUnloadType = function(){
 	var v = this.getElement("unload_type").getValue();
 	var ctrl = this.getElement("pump_vehicle");
-	var ctrl_pr = this.getElement("unload_price");
+	var ctrl_pr = this.getElement("unload_cost");
 	if(v=="band"||v=="pump"){
 		en = true;
 	}
@@ -226,69 +247,75 @@ OrderCalc_View.prototype.changeUnloadType = function(){
 		ctrl_pr.reset();
 	}
 	ctrl.setEnabled(en);
-	ctrl_pr.setEnabled(en);
+	//ctrl_pr.setEnabled(en);
 }
 
 OrderCalc_View.prototype.recalcUnloadCost = function(){
-//console.log("OrderDialog_View.prototype.recalcUnloadCost")
 	if(this.m_getPayCash()){
+		var cost_ctrl = this.getElement("unload_cost");
+		var cost = 0;
 		if(!this.getElement("pump_vehicle").isNull()
 		&&this.m_pumpPriceValue_Model
 		&&this.m_pumpPriceValue_Model.getRowCount()
-		){
-			var cost_ctrl = this.getElement("unload_price");
+		){			
 			var quant = this.getElement("quant").getValue();
+			this.m_pumpPriceValue_Model.reset();
 			while(this.m_pumpPriceValue_Model.getNextRow()){
-				if(
-				(this.m_pumpPriceValue_Model.getFieldValue("quant_from")>=quant&&
-				this.m_pumpPriceValue_Model.getFieldValue("quant_to")<=quant)
-				||this.m_pumpPriceValue_Model.getFieldValue("price_fixed")
+				if(quant>=this.m_pumpPriceValue_Model.getFieldValue("quant_from")&&
+				quant<=this.m_pumpPriceValue_Model.getFieldValue("quant_to")
 				){
-					var cost = this.m_pumpPriceValue_Model.getFieldValue("price_fixed");
-					cost = cost? cost : (this.m_pumpPriceValue_Model.getFieldValue("price_m")*quant);
-					cost_ctrl.setValue(cost);					
+					cost = this.m_pumpPriceValue_Model.getFieldValue("price_fixed");
+					cost = cost? cost : (this.m_pumpPriceValue_Model.getFieldValue("price_m")*quant);					
 					break;
 				}
 			}
 		}
-		this.recalcTotal();
+		cost_ctrl.setValue(cost);
 	}
+}
+
+OrderCalc_View.prototype.onSelectPumpVehicleCont = function(f){
+	this.recalcUnloadCost();
+	this.recalcTotal();
 }
 
 OrderCalc_View.prototype.onSelectPumpVehicle = function(f){
 	//read all pump schema
-	if(this.getElement("pump_vehicle").isNull())return;
-	
-	if (f.pump_prices_ref.isNull()){
-		throw new Error("Не задана ценовая схема для насоса!")
+	if(this.getElement("pump_vehicle").isNull()){
+		this.onSelectPumpVehicleCont();
 	}
-	var contr = new PumpPriceValue_Controller();
-	var pm = contr.getPublicMethod("get_list");
-	pm.setFieldValue(contr.PARAM_COND_FIELDS,"pump_price_id");
-	pm.setFieldValue(contr.PARAM_COND_VALS,f.pump_prices_ref.getValue().getKey());
-	pm.setFieldValue(contr.PARAM_COND_SGNS,contr.PARAM_SGN_EQUAL);
-	var self = this;
-	pm.run({
-		"ok":function(resp){
-			debugger
-			self.m_pumpPriceValue_Model = resp.getModel("PumpPriceValue_Model");
-			self.recalcUnloadCost();
+	else{	
+		if (f.pump_prices_ref.isNull()){
+			throw new Error("Не задана ценовая схема для насоса!")
 		}
-	});
+		var contr = new PumpPriceValue_Controller();
+		var pm = contr.getPublicMethod("get_list");
+		pm.setFieldValue(contr.PARAM_COND_FIELDS,"pump_price_id");
+		pm.setFieldValue(contr.PARAM_COND_VALS,f.pump_prices_ref.getValue().getKey());
+		pm.setFieldValue(contr.PARAM_COND_SGNS,contr.PARAM_SGN_EQUAL);
+		var self = this;
+		pm.run({
+			"ok":function(resp){
+				self.m_pumpPriceValue_Model = resp.getModel("PumpPriceValue_Model");
+				self.onSelectPumpVehicleCont();
+			}
+		});
+	}
 }
 
-OrderCalc_View.prototype.changeSumTotals = function(){
+OrderCalc_View.prototype.setPayCash = function(){
 	var field_set = document.getElementById(this.getId()+":sum_totals");
 	if(this.m_getPayCash()){
 		DOMHelper.delClass(field_set,"hidden");
-		this.getElement("destination_price").setValue(this.m_destinationPrice);
 		this.recalcUnloadCost();
+		this.recalcTotal();
 	}
 	else{
 		DOMHelper.addClass(field_set,"hidden");
 		this.getElement("total").reset();
-		this.getElement("destination_price").reset();
-		this.getElement("unload_price").reset();
+		this.getElement("destination_cost").reset();
+		this.getElement("concrete_cost").reset();
+		this.getElement("unload_cost").reset();
 	}
 }
 

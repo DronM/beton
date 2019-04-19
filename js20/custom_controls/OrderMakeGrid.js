@@ -97,6 +97,7 @@ function OrderMakeGrid(id,options){
 									"master":true,
 									"detailViewClass":ShipmentForOrderList_View,
 									"detailViewOptions":{
+										"listView":self.m_listView,
 										"detailFilters":{
 											"ShipmentForOrderList_Model":[
 												{

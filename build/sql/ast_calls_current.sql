@@ -33,7 +33,11 @@ CREATE OR REPLACE VIEW ast_calls_current AS
      LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
      LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
      LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
-  WHERE ast.end_time IS NULL AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text) AND ast.caller_id_num::text <> ''::text
+  WHERE
+  	ast.end_time IS NULL
+  	AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	AND ast.caller_id_num::text <> ''::text
+  	AND (ast.start_time IS NULL OR ast.start_time::date=now()::date)
   ORDER BY ast.ext, ast.dt DESC;
 
 ALTER TABLE ast_calls_current

@@ -6,7 +6,7 @@ function OrderMakeList_View(id,options){
 	this.m_lowResDevice = (window.getWidthType()=="sm");
 	options.templateOptions = options.templateOptions || {};	
 	options.templateOptions.showChart = !this.m_lowResDevice;
-	
+//alert("getWidthType="+window.getWidthType())	
 	options.className = "row";
 	this.m_refreshMethod = (new Order_Controller()).getPublicMethod("get_make_orders_form");
 
@@ -437,7 +437,7 @@ OrderMakeList_View.prototype.refresh = function(){
 			}
 			
 			//chart
-			if(!this.m_lowResDevice){
+			if(!self.m_lowResDevice){
 				self.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
 			}
 			//mat totals
@@ -506,20 +506,28 @@ OrderMakeList_View.prototype.showVehCurrentPosition = function(vehicleScheduleId
 
 }
 */
+
+OrderMakeList_View.prototype.enableRefreshing = function(v){
+	if(v){
+		var self = this;
+		this.m_timer = setInterval(function(){
+			self.refresh();
+		}, this.m_refreshInterval);
+	}
+	else if(this.m_timer){
+		clearInterval(this.m_timer);
+	}
+}
+
 OrderMakeList_View.prototype.toDOM = function(p){
 	OrderMakeList_View.superclass.toDOM.call(this,p);
 	
 	this.showTotals();
-	
-	var self = this;
-	this.m_timer = setInterval(function(){
-		self.refresh();
-	}, this.m_refreshInterval);
-	
+	this.enableRefreshing(true);
 }
 
 OrderMakeList_View.prototype.delDOM = function(){
-	clearInterval(this.m_timer);
+	this.enableRefreshing(false);
 	
 	OrderMakeList_View.superclass.delDOM.call(this);
 	

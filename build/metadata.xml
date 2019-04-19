@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-04-16 12:59:55</lastBuild></version>
+		<lastBuild>2019-04-19 10:03:44</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -15,6 +15,7 @@
 		<version dateOpen="2019-04-15 12:04:08" dateClose="2019-04-15 12:04:09">1.008</version>
 		<version dateOpen="2019-04-15 15:04:36" dateClose="2019-04-16 12:04:45">1.009</version>
 		<version dateOpen="2019-04-16 12:04:45" dateClose="2019-04-16 13:04:00">1.0010</version>
+		<version dateOpen="2019-04-17 06:04:20" dateClose="2019-04-19 10:04:03">1.0011</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -742,10 +743,12 @@
 			<field id="users_ref" dataType="JSON"/>
 			<field id="destinations_ref" dataType="JSON"/>
 			<field id="destination_price" dataType="Float"/>
+			<field id="destination_cost" dataType="Float"/>
 			<field id="destination_time_rout" dataType="Float"/>
 			<field id="destination_distance" dataType="Float"/>
 			<field id="concrete_types_ref" dataType="JSON"/>
-			<field id="concrete_type_price" dataType="Float"/>
+			<field id="concrete_price" dataType="Float"/>
+			<field id="concrete_cost" dataType="Float"/>
 			<field id="unload_type" dataType="String"/>
 			<field id="comment_text" dataType="Text"/>
 			<field id="descr" dataType="Text"/>
@@ -759,7 +762,7 @@
 			<field id="total_edit" dataType="Bool"/>
 			<field id="payed" dataType="Bool"/>
 			<field id="pay_cash" dataType="Bool"/>
-			<field id="unload_price" dataType="Float"/>
+			<field id="unload_cost" dataType="Float"/>
 			<field id="under_control" dataType="Bool"/>
 			<field id="pump_vehicle_phone_cel" dataType="String"/>
 			<field id="pump_vehicles_ref" dataType="JSON"/>
@@ -1997,6 +2000,7 @@
 		<constant id="efficiency_warn_k" name="Значение состояния ниже которого отправляется сообщение" descr="" dataType="Int" defaultValue="-60"/>
 		<constant id="zone_violation_alarm_interval" name="Интервал оповещения о въезде в запрещенную зону" descr="" dataType="Time" defaultValue="01:00"/>
 		<constant id="weather_update_interval_sec" name="Интервал в секундах обновления данных о погоде" descr="" dataType="Time" defaultValue="00:30"/>
+		<constant id="call_history_count" name="Количество строк в истории при новом звонке" descr="Сколько последних отгрузок ипоследних звонков показывать при входящем звонке" dataType="Int" defaultValue="5"/>
 	</constants>
 	<controllers>
 		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -3703,7 +3707,7 @@
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>
-		<cssScript file="assets/css/bootstrap.min.css" compressed="TRUE" standalone="TRUE"/>
+		<cssScript file="assets/css/bootstrap.css" compressed="FALSE" standalone="TRUE"/>
 		<cssScript file="assets/css/core.min.css" compressed="TRUE" standalone="TRUE"/>
 		<cssScript file="assets/css/components.min.css" compressed="TRUE" standalone="TRUE"/>
 		<cssScript file="assets/css/colors.min.css" compressed="TRUE" standalone="TRUE"/>

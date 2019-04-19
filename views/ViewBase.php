@@ -115,7 +115,7 @@ class ViewBase extends ViewHTMLXSLT {
 		parent::__construct($name);
 		
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'assets/css/icons/icomoon/styles.css'));
-		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'assets/css/bootstrap.min.css'));
+		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'assets/css/bootstrap.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'assets/css/core.min.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'assets/css/components.min.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'assets/css/colors.min.css'));

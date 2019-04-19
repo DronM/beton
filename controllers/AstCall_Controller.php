@@ -410,7 +410,7 @@ class AstCall_Controller extends ControllerSQL{
 		"SELECT * FROM ast_calls_client_call_history_list
 		WHERE client_id=%s
 		ORDER BY dt DESC
-		LIMIT 10",
+		LIMIT const_call_history_count_val()",
 		$clientId),
 		'AstCallClientCallHistoryList_Model');
 	}
@@ -429,7 +429,7 @@ class AstCall_Controller extends ControllerSQL{
 		"SELECT * FROM ast_calls_client_ship_history_list
 		WHERE client_id=%s
 		ORDER BY date_time DESC
-		LIMIT 10",
+		LIMIT const_call_history_count_val()",
 		$clientId),
 		'AstCallClientShipHistoryList_Model');
 	

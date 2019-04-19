@@ -17,14 +17,18 @@ function AstIncomeCall_View(id,options){
 	options.controller = new AstCall_Controller();
 	options.model = options.models.AstCallCurrent_Model;
 
+	var client_id;
 	if (options.model.getNextRow()){
 		var pm = options.controller.getPublicMethod("update");
 		pm.setFieldValue("unique_id",options.model.getFieldValue("unique_id"));
 		pm.setFieldValue("contact_tel",options.model.getFieldValue("contact_tel"));
-		var client_id = options.model.getFieldValue("client_id");
+		client_id = options.model.getFieldValue("client_id");
 		if(client_id)
 			pm.setFieldValue("client_id",client_id);
 	}
+
+	options.templateOptions = options.templateOptions || {};
+	options.templateOptions.isClient = client_id? true:false;
 
 	this.m_onMakeOrder = options.onMakeOrder;
 
@@ -65,20 +69,23 @@ function AstIncomeCall_View(id,options){
 			"enabled":false
 		}));								
 		*/
-		this.addElement(new AstCallClientCallHistoryList_View(id+":client_call_history",{
-			"detail":true,
-			"models":{
-				"AstCallClientCallHistoryList_Model":options.models.AstCallClientCallHistoryList_Model
-			}
-		}));			
+		
+		if(client_id){
+			this.addElement(new AstCallClientCallHistoryList_View(id+":client_call_history",{
+				"detail":true,
+				"models":{
+					"AstCallClientCallHistoryList_Model":options.models.AstCallClientCallHistoryList_Model
+				}
+			}));			
 
-		this.addElement(new AstCallClientShipHistoryList_View(id+":client_ship_history",{
-			"detail":true,
-			"models":{
-				"AstCallClientShipHistoryList_Model":options.models.AstCallClientShipHistoryList_Model
-			}			
-		}));			
-
+			this.addElement(new AstCallClientShipHistoryList_View(id+":client_ship_history",{
+				"detail":true,
+				"models":{
+					"AstCallClientShipHistoryList_Model":options.models.AstCallClientShipHistoryList_Model
+				}			
+			}));			
+		}
+		
 		this.addElement(new ButtonCmd(id+":cmdUpdate",{
 			"caption":"Изменить  ",
 			"glyph":"glyphicon-pencil",
@@ -147,18 +154,19 @@ function AstIncomeCall_View(id,options){
 	];
 	this.setWriteBindings(write_b);
 	
-	this.addDetailDataSet({
-		"control":this.getElement("client_call_history").getElement("grid"),
-		"controlFieldId":"client_id",
-		"value":options.model.getFieldValue("client_id")
-	});
+	if(client_id){
+		this.addDetailDataSet({
+			"control":this.getElement("client_call_history").getElement("grid"),
+			"controlFieldId":"client_id",
+			"value":client_id
+		});
 
-	this.addDetailDataSet({
-		"control":this.getElement("client_ship_history").getElement("grid"),
-		"controlFieldId":"client_id",
-		"value":options.model.getFieldValue("client_id")
-	});
-	
+		this.addDetailDataSet({
+			"control":this.getElement("client_ship_history").getElement("grid"),
+			"controlFieldId":"client_id",
+			"value":client_id
+		});
+	}	
 }
 //ViewObjectAjx,ViewAjxList
 extend(AstIncomeCall_View,ViewObjectAjx);

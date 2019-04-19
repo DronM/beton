@@ -486,6 +486,40 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$this->addModel($m);
 	}
 	
+	public function login_k($pm){
+		$link = $this->getDbLink();
+		
+		$k = NULL;
+		FieldSQLString::formatForDb($link,$pm->getParamValue('k'),$k);
+		
+		$ar = $link->query_first(
+			sprintf(
+			"SELECT 
+				u.name,
+				u.role_id,
+				u.id,
+				get_role_types_descr(u.role_id) AS role_descr,
+				u.tel_ext
+			FROM user_mac_addresses AS ma
+			LEFT JOIN users AS u ON u.id=ma.user_id
+			WHERE ma.mac_address=%s",
+			$k));
+			
+		if ($ar){
+			$this->set_logged($ar);
+			
+			//session id
+			$this->addNewModel(sprintf(
+			"SELECT '%s' AS id",session_id()
+			),'session');
+			
+		}
+		else{
+			throw new Exception(ERR_AUTH);
+		}
+	
+	}
+	
 </xsl:template>
 
 </xsl:stylesheet>

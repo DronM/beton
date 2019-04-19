@@ -74,6 +74,14 @@ class OrderDialog_Model extends ModelSQLBeton{
 		$this->addField($f_destination_price);
 		//********************
 		
+		//*** Field destination_cost ***
+		$f_opts = array();
+		$f_opts['id']="destination_cost";
+				
+		$f_destination_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_cost",$f_opts);
+		$this->addField($f_destination_cost);
+		//********************
+		
 		//*** Field destination_time_rout ***
 		$f_opts = array();
 		$f_opts['id']="destination_time_rout";
@@ -98,12 +106,20 @@ class OrderDialog_Model extends ModelSQLBeton{
 		$this->addField($f_concrete_types_ref);
 		//********************
 		
-		//*** Field concrete_type_price ***
+		//*** Field concrete_price ***
 		$f_opts = array();
-		$f_opts['id']="concrete_type_price";
+		$f_opts['id']="concrete_price";
 				
-		$f_concrete_type_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_price",$f_opts);
-		$this->addField($f_concrete_type_price);
+		$f_concrete_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_price",$f_opts);
+		$this->addField($f_concrete_price);
+		//********************
+		
+		//*** Field concrete_cost ***
+		$f_opts = array();
+		$f_opts['id']="concrete_cost";
+				
+		$f_concrete_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_cost",$f_opts);
+		$this->addField($f_concrete_cost);
 		//********************
 		
 		//*** Field unload_type ***
@@ -210,12 +226,12 @@ class OrderDialog_Model extends ModelSQLBeton{
 		$this->addField($f_pay_cash);
 		//********************
 		
-		//*** Field unload_price ***
+		//*** Field unload_cost ***
 		$f_opts = array();
-		$f_opts['id']="unload_price";
+		$f_opts['id']="unload_cost";
 				
-		$f_unload_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"unload_price",$f_opts);
-		$this->addField($f_unload_price);
+		$f_unload_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"unload_cost",$f_opts);
+		$this->addField($f_unload_cost);
 		//********************
 		
 		//*** Field under_control ***

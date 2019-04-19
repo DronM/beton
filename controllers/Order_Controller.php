@@ -535,7 +535,6 @@ class Order_Controller extends ControllerSQL{
 					$pump_sms_ar = $this->getDbLink()->query_first(sprintf(
 					"SELECT * FROM %s
 					WHERE order_id=%d",
-					//($order_update)? 'sms_pump_order_upd':'sms_pump_order_ins',
 					($pumpInsert)? 'sms_pump_order_ins':'sms_pump_order_upd', 
 					$id
 					));
@@ -547,13 +546,10 @@ class Order_Controller extends ControllerSQL{
 						FieldSQLString::formatForDb($this->getDbLink(),$sms_id_resp_pump,$sms_id_pump);									
 						
 						//ответственному
-						//if (!$order_update){
-							$ph_ar = explode(',',PHONES_FOR_NEW_PUMP_ORDER);
-							foreach ($ph_ar as $ph){
-								$sms_service->send($ph,$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
-							}		
-						
-						//}
+						$tel_id = $this->pumpActionRespTels( ( ($pumpInsert)? 'order_for_pump_ins':'order_for_pump_upd') );
+						while($tel = $this->getDbLink()->fetch_array($tel_id)){
+							$sms_service->send($tel['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
+						}															
 					}
 				}
 				
@@ -771,11 +767,23 @@ class Order_Controller extends ControllerSQL{
 			$sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
 			
 			//Ответственному
-			$ph_ar = explode(',',PHONES_FOR_NEW_PUMP_ORDER);
-			foreach ($ph_ar as $ph){
-				$sms_service->send($ph,$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
-			}										
+			$tel_id = $this->pumpActionRespTels('order_for_pump_del');
+			while($tel = $this->getDbLink()->fetch_array($tel_id)){
+				$sms_service->send($tel['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
+			}			
 		}
+	}
+	
+	private function pumpActionRespTels($action){
+		return $this->getDbLink()->query(sprintf(
+			"SELECT
+				u.phone_cel
+			FROM sms_pattern_user_phones AS u_tels
+			LEFT JOIN users AS u ON u.id=u_tels.user_id
+			WHERE sms_pattern_id=(SELECT id FROM sms_patterns WHERE sms_type='%s')
+			AND u.phone_cel IS NOT NULL",
+			$action
+		));		
 	}
 	
 	public function delete($pm){
@@ -792,10 +800,10 @@ class Order_Controller extends ControllerSQL{
 			$sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
 			
 			//Ответственному
-			$ph_ar = explode(',',PHONES_FOR_NEW_PUMP_ORDER);
-			foreach ($ph_ar as $ph){
-				$sms_service->send($ph,$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
-			}					
+			$tel_id = $this->pumpActionRespTels('order_for_pump_del');
+			while($tel = $this->getDbLink()->fetch_array($tel_id)){
+				$sms_service->send($tel['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
+			}
 		}
 	
 		Graph_Controller::clearCacheOnOrderId($this->getDbLink(),$pm->getParamValue('id'));
