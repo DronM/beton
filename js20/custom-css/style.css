@@ -568,7 +568,7 @@ tr.order_current_row{
 #get_schedule_report_all td.on_shift{
 	background-color:#CDFFD7;
 }
-#OperatorList\:grid tr.shipped{
+tr.shipped{
 	background-color:#CDFFD7;
 }
 

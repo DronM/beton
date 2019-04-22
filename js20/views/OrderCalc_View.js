@@ -166,6 +166,7 @@ OrderCalc_View.prototype.onSelectDestination = function(f){
 
 OrderCalc_View.prototype.setDestinationPrice = function(price,distance,timeRout){
 	this.m_destinationPrice = parseFloat(price);
+	this.m_destinationDistance = parseFloat(distance);
 	
 	var dest_inf = "";
 	if (!this.getElement("destination").isNull()){
@@ -194,9 +195,15 @@ OrderCalc_View.prototype.recalcTotalCont = function(){
 	var quant_for_ship_cost = quant;
 	this.m_shipQuantForCostGrade_Model.reset();
 	while(this.m_shipQuantForCostGrade_Model.getNextRow()){
-		var q = this.m_shipQuantForCostGrade_Model.getFieldValue("quant");
-		if(quant<=q){
-			quant_for_ship_cost = q;
+		var q_to = this.m_shipQuantForCostGrade_Model.getFieldValue("quant_to");
+		var q_from = this.m_shipQuantForCostGrade_Model.getFieldValue("quant");
+		var dist_to = this.m_shipQuantForCostGrade_Model.getFieldValue("distance_to");
+		var dist_from = this.m_shipQuantForCostGrade_Model.getFieldValue("distance_from");
+		if(
+		this.m_destinationDistance<=dist_to
+		&&this.m_destinationDistance>=dist_from
+		&& quant<=q_to && quant>=q_from){
+			quant_for_ship_cost = q_to;
 			break;
 		}
 	}

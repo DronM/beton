@@ -154,6 +154,7 @@ function OrderMakeList_View(id,options){
 		//assigning
 		this.addElement(new AssignedVehicleList_View(id+":veh_assigning",{
 			"models":options.models,
+			"shortDestinations":true,
 			"noAutoRefresh":true
 		}));
 		

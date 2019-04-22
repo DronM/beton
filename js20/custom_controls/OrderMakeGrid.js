@@ -392,7 +392,7 @@ OrderMakeGrid.prototype.onGetData = function(){
 			var dt = this.m_model.getFieldValue("date_time");
 			if(row_cnt==0)
 				closed_shift = (dt.getTime()<now_shift_start.getTime());
-				
+			
 			var dt_m = dt.getHours()*60 + dt.getMinutes();
 			var comp_time_m = (init_time_m>prev_time_m)? init_time_m:prev_time_m;
 			if(!closed_shift && dt_m>comp_time_m && (future_shift || now_m<dt_m) ){

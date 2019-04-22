@@ -17,6 +17,7 @@ function ShipmentForOrderList_View(id,options){
 		
 	var pagClass = window.getApp().getPaginationClass();
 	var grid = new GridAjx(id+":grid",{
+		"className":"table-bordered table-responsive table-make_order",
 		"model":model,
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_list_for_order"),
@@ -30,6 +31,14 @@ function ShipmentForOrderList_View(id,options){
 				commands.push(new ShipmentGridCmdPrintInvoice(id+":grid:cmd:printInvoice"));
 			}
 		}),
+		"onEventSetRowOptions":function(opts){
+			opts.className = opts.className||"";
+			var m = this.getModel();
+			if(m.getFieldValue("shipped")){
+				console.log("Setting row to shipped!")
+				opts.className+=(opts.className.length? " ":"")+"shipped";
+			}		
+		},
 		"popUpMenu":null,
 		"filters":(options.detailFilters&&options.detailFilters.ShipmentForOrderList_Model)? options.detailFilters.ShipmentForOrderList_Model:null,
 		"head":new GridHead(id+":grid:head",{
@@ -165,7 +174,7 @@ function ShipmentForOrderList_View(id,options){
 				})		
 			]
 		}),
-		
+		"selectedRowClass":"order_current_row",
 		"pagination":null,		
 		"autoRefresh":options.detailFilters? true:false,
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,

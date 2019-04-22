@@ -15,7 +15,7 @@ function DriverEditRef(id,options){
 	options.selectDescrIds = options.selectDescrIds || ["name"];
 	
 	//форма редактирования элемента
-	options.editWinClass = User_Form;
+	options.editWinClass = null;
 	
 	options.acMinLengthForQuery = 1;
 	options.acController = new Driver_Controller(options.app);

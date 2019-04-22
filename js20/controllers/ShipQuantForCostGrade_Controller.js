@@ -39,10 +39,36 @@ extend(ShipQuantForCostGrade_Controller,ControllerObjServer);
 	var pm = this.getInsert();
 	
 	var options = {};
-	options.alias = "Объем";options.primaryKey = true;options.required = true;
+	options.primaryKey = true;options.autoInc = true;
+	var field = new FieldInt("id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Объем";
 	var field = new FieldInt("quant",options);
 	
 	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("quant_to",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("distance_from",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("distance_to",options);
+	
+	pm.addField(field);
+	
+	pm.addField(new FieldInt("ret_id",{}));
 	
 	
 }
@@ -52,12 +78,36 @@ extend(ShipQuantForCostGrade_Controller,ControllerObjServer);
 	var pm = this.getUpdate();
 	
 	var options = {};
-	options.alias = "Объем";options.primaryKey = true;
+	options.primaryKey = true;options.autoInc = true;
+	var field = new FieldInt("id",options);
+	
+	pm.addField(field);
+	
+	field = new FieldInt("old_id",{});
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Объем";
 	var field = new FieldInt("quant",options);
 	
 	pm.addField(field);
 	
-	field = new FieldInt("old_quant",{});
+	var options = {};
+	
+	var field = new FieldInt("quant_to",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("distance_from",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("distance_to",options);
+	
 	pm.addField(field);
 	
 	
@@ -67,8 +117,8 @@ extend(ShipQuantForCostGrade_Controller,ControllerObjServer);
 	ShipQuantForCostGrade_Controller.superclass.addDelete.call(this);
 	var pm = this.getDelete();
 	var options = {"required":true};
-	options.alias = "Объем";	
-	pm.addField(new FieldInt("quant",options));
+		
+	pm.addField(new FieldInt("id",options));
 }
 
 			ShipQuantForCostGrade_Controller.prototype.addGetList = function(){
@@ -89,8 +139,20 @@ extend(ShipQuantForCostGrade_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
+	
+	pm.addField(new FieldInt("id",f_opts));
+	var f_opts = {};
 	f_opts.alias = "Объем";
 	pm.addField(new FieldInt("quant",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("quant_to",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("distance_from",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("distance_to",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("quant");
 	
 }
@@ -100,8 +162,8 @@ extend(ShipQuantForCostGrade_Controller,ControllerObjServer);
 	
 	var pm = this.getGetObject();
 	var f_opts = {};
-	f_opts.alias = "Объем";	
-	pm.addField(new FieldInt("quant",f_opts));
+		
+	pm.addField(new FieldInt("id",f_opts));
 	
 	pm.addField(new FieldString("mode"));
 }

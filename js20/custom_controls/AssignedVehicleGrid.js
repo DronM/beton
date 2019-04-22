@@ -18,7 +18,9 @@ function AssignedVehicleGrid(id,options){
 	
 	if(!options.refreshInterval)
 		options.contClassName = window.getApp().getBsCol(5);
-		
+	
+	this.m_shortDestinations = options.shortDestinations;
+	var self = this;	
 	options.keyIds = ["id"];
 	options.editInline = false;
 	options.editWinClass = null;
@@ -60,8 +62,20 @@ function AssignedVehicleGrid(id,options){
 					,new GridCellHead(id+":head:row1:destinations_ref",{
 						"value":"Объект",
 						"columns":[
-							new GridColumnRef({
-								"field":options.model.getField("destinations_ref")
+							new GridColumn({
+								"field":options.model.getField("destinations_ref"),
+								"formatFunction":function(f,cell){
+									var res = "";
+									var not_empty = (f&&f.destinations_ref&&!f.destinations_ref.isNull());
+									if(self.m_shortDestinations && not_empty){
+										res = res.substr(0,15);
+										res = window.getApp().formatCell(f.destinations_ref,cell,VehicleScheduleMakeOrderList_View.prototype.COL_DEST_LEN);
+									}
+									else if(not_empty){
+										res = f.destinations_ref.getValue().getDescr();
+									}
+									return res;
+								}
 							})
 						]
 					})

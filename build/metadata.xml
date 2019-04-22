@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-04-19 10:03:44</lastBuild></version>
+		<lastBuild>2019-04-22 15:41:58</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -16,6 +16,7 @@
 		<version dateOpen="2019-04-15 15:04:36" dateClose="2019-04-16 12:04:45">1.009</version>
 		<version dateOpen="2019-04-16 12:04:45" dateClose="2019-04-16 13:04:00">1.0010</version>
 		<version dateOpen="2019-04-17 06:04:20" dateClose="2019-04-19 10:04:03">1.0011</version>
+		<version dateOpen="2019-04-19 10:04:04" dateClose="2019-04-22 15:04:42">1.0012</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -1932,7 +1933,11 @@
 			<defaultOrder>
 				<field id="quant"/>
 			</defaultOrder>
-			<field id="quant" dataType="Int" primaryKey="TRUE" required="TRUE" alias="Объем"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="quant" dataType="Int" alias="Объем"/>
+			<field id="quant_to" dataType="Int"/>
+			<field id="distance_from" dataType="Float" length="12" precision="2"/>
+			<field id="distance_to" dataType="Float" length="12" precision="2"/>
 		</model>
 		<model id="RAMaterialConsumptionDateList" virtual="TRUE" server="FALSE">
 			<field id="shift" dataType="DateTime" primaryKey="TRUE"/>

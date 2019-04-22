@@ -29,11 +29,48 @@ function ShipQuantForCostGrade_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = true;	
+	
+	options.fields.id = new FieldInt("id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Объем';
 	filed_options.autoInc = false;	
 	
 	options.fields.quant = new FieldInt("quant",filed_options);
-	options.fields.quant.getValidator().setRequired(true);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.quant_to = new FieldInt("quant_to",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.distance_from = new FieldFloat("distance_from",filed_options);
+	options.fields.distance_from.getValidator().setMaxLength('12');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.distance_to = new FieldFloat("distance_to",filed_options);
+	options.fields.distance_to.getValidator().setMaxLength('12');
 	
 		ShipQuantForCostGrade_Model.superclass.constructor.call(this,id,options);
 }

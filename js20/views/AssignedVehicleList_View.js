@@ -45,7 +45,8 @@ function AssignedVehicleList_View(id,options){
 				"model":model,
 				"prodSiteId":ps_id,
 				"prodSiteDescr":app.m_prodSite_Model.getFieldValue("name"),
-				"refreshInterval":refresh_interval
+				"refreshInterval":refresh_interval,
+				"shortDestinations":options.shortDestinations
 			}));
 		}
 	}

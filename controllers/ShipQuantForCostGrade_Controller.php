@@ -28,10 +28,21 @@ class ShipQuantForCostGrade_Controller extends ControllerSQL{
 		/* insert */
 		$pm = new PublicMethod('insert');
 		$param = new FieldExtInt('quant'
-				,array('required'=>TRUE,
+				,array(
 				'alias'=>'Объем'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtInt('quant_to'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtFloat('distance_from'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtFloat('distance_to'
+				,array());
+		$pm->addParam($param);
+		
+		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		
 		$this->addPublicMethod($pm);
@@ -41,19 +52,33 @@ class ShipQuantForCostGrade_Controller extends ControllerSQL{
 		/* update */		
 		$pm = new PublicMethod('update');
 		
-		$pm->addParam(new FieldExtInt('old_quant',array('required'=>TRUE)));
+		$pm->addParam(new FieldExtInt('old_id',array('required'=>TRUE)));
 		
 		$pm->addParam(new FieldExtInt('obj_mode'));
+		$param = new FieldExtInt('id'
+				,array(
+			));
+			$pm->addParam($param);
 		$param = new FieldExtInt('quant'
 				,array(
 			
 				'alias'=>'Объем'
 			));
 			$pm->addParam($param);
+		$param = new FieldExtInt('quant_to'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('distance_from'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('distance_to'
+				,array(
+			));
+			$pm->addParam($param);
 		
-			$param = new FieldExtInt('quant',array(
-			
-				'alias'=>'Объем'
+			$param = new FieldExtInt('id',array(
 			));
 			$pm->addParam($param);
 		
@@ -65,7 +90,7 @@ class ShipQuantForCostGrade_Controller extends ControllerSQL{
 		/* delete */
 		$pm = new PublicMethod('delete');
 		
-		$pm->addParam(new FieldExtInt('quant'
+		$pm->addParam(new FieldExtInt('id'
 		));		
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -96,7 +121,7 @@ class ShipQuantForCostGrade_Controller extends ControllerSQL{
 		$pm = new PublicMethod('get_object');
 		$pm->addParam(new FieldExtString('mode'));
 		
-		$pm->addParam(new FieldExtInt('quant'
+		$pm->addParam(new FieldExtInt('id'
 		));
 		
 		

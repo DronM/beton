@@ -117,4 +117,5 @@ extend(VehicleScheduleMakeOrderList_View,ViewAjx);
 
 VehicleScheduleMakeOrderList_View.prototype.COL_DRIVER_LEN = 8;
 VehicleScheduleMakeOrderList_View.prototype.COL_OWNER_LEN = 8;
+VehicleScheduleMakeOrderList_View.prototype.COL_DEST_LEN = 8;
 

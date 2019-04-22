@@ -40,30 +40,27 @@ function ShipQuantForCostGradeList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:distance_from",{
-							"value":"Км от",
+						new GridCellHead(id+":grid:head:distance",{
+							"value":"Км",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("distance_from"),
+									"field":model.getField("distance"),
 									"ctrlClass":EditFloat
 								})
 							]
 						})					
-						,new GridCellHead(id+":grid:head:distance_to",{
-							"value":"Км до",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("distance_to"),
-									"ctrlClass":EditFloat
-								})
-							]
-						})											
-						,new GridCellHead(id+":grid:head:quant",{
+						,new GridCellHead(id+":grid:head:quant_from",{
 							"value":"Объем от",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("quant"),
-									"ctrlClass":EditInt
+									"id":"quant_from",
+									"formatFunction":function(fields){
+										return self.m_prevQuant;
+									},
+									"ctrlClass":Edit,
+									"ctrlOptions":{
+										"enabled":false
+									}
 								})
 							]
 						})
@@ -71,11 +68,32 @@ function ShipQuantForCostGradeList_View(id,options){
 							"value":"Объем до",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("quant_to"),
-									"ctrlClass":EditInt
+									"field":model.getField("quant"),
+									"bindFieldId":"quant",
+									"ctrlClass":EditInt,
+									"ctrlOptions":{
+										"required":true
+									}
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:quant_for_cost",{
+							"value":"Объем для доставки",
+							"columns":[
+								new GridColumn({
+									"id":"quant_for_cost",
+									"formatFunction":function(fields){
+										var q = fields.quant.getValue();
+										self.m_prevQuant = q+1;
+										return q;
+									},
+									"ctrlClass":Edit,									
+									"ctrlOptions":{
+										"enabled":false
+									}
+								})
+							]
+						})						
 					]
 				})
 			]
