@@ -110,7 +110,7 @@ function OrderDialog_View(id,options){
 			"labelCaption":"Скорость разгрузки:",
 			"value":constants.def_order_unload_speed.getValue(),
 			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),
+			"editContClassName":("input-group "+window.getBsCol(2)),
 			"events":{
 				"onchange":function(){
 					self.getElement("calc").recalcTotal();						

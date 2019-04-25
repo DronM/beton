@@ -41,7 +41,7 @@ function OrderCalc_View(id,options){
 			"precision":1,
 			"labelCaption":"Количество:",
 			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),
+			"editContClassName":("input-group "+window.getBsCol(2)),
 			"events":{
 				"onchange":function(){
 					self.recalcUnloadCost();
@@ -68,7 +68,7 @@ function OrderCalc_View(id,options){
 		this.addElement(new Enum_unload_types(id+":unload_type",{
 			"labelCaption":"Вид насоса:",
 			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),			
+			//"editContClassName":("input-group "+window.getBsCol(2)),			
 			"defaultValue":"none",
 			"addNotSelected":false,
 			"events":{

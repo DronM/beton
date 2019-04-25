@@ -13,12 +13,21 @@ CREATE OR REPLACE VIEW ast_calls_current AS
 			ELSE ast.caller_id_num::text
 		END AS contact_tel,
 		
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
+		
 		ast.dt AS ring_time,
 		ast.start_time AS answer_time,
 		ast.end_time AS hangup_time,
 		ast.client_id,
 		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
 		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
 		ast.manager_comment,
 		ast.informed,
 		clt.name AS contact_name,
@@ -26,6 +35,8 @@ CREATE OR REPLACE VIEW ast_calls_current AS
 		man.name AS client_manager_descr,
 		client_types_ref(ctp) AS client_types_ref,
 		client_come_from_ref(ccf) AS client_come_from_ref
+		
+		
    FROM ast_calls ast
      LEFT JOIN clients cl ON cl.id = ast.client_id
      LEFT JOIN users man ON cl.manager_id = man.id

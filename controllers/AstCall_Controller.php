@@ -370,7 +370,7 @@ class AstCall_Controller extends ControllerSQL{
 			RETURNING unique_id,caller_id_num AS num,
 				(SELECT cl.name
 				FROM clients cl WHERE cl.id=client_id) AS client_descr",
-			$this->active_call_query(' AND t.informed=FALSE')
+			$this->active_call_query(' AND coalesce(t.informed,FALSE)=FALSE')
 			);
 			$ar = $this->getDbLinkMaster()->query_first($q);
 			
