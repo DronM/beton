@@ -35,7 +35,6 @@ function ShipmentForOrderList_View(id,options){
 			opts.className = opts.className||"";
 			var m = this.getModel();
 			if(m.getFieldValue("shipped")){
-				console.log("Setting row to shipped!")
 				opts.className+=(opts.className.length? " ":"")+"shipped";
 			}		
 		},
@@ -162,7 +161,7 @@ function ShipmentForOrderList_View(id,options){
 					"elements":[
 						new GridCell(id+":grid:foot:sp",{
 							"value":"Итого",
-							"colSpan":"5"
+							"colSpan":"6"
 						})												
 						,new GridCellFoot(id+":features_grid:foot:tot_quant",{
 							"attrs":{"align":"right"},

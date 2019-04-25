@@ -609,7 +609,8 @@ class Shipment_Controller extends ControllerSQL{
 			sh.shipped,
 			sh.ship_date_time,
 			o.comment_text,
-			sh.production_site_id
+			sh.production_site_id,
+			production_sites_ref(ps) AS production_sites_ref
 			%s
 		FROM shipments AS sh
 		LEFT JOIN orders o ON o.id = sh.order_id
@@ -619,6 +620,7 @@ class Shipment_Controller extends ControllerSQL{
 		LEFT JOIN vehicles v ON v.id = vs.vehicle_id
 		LEFT JOIN destinations dest ON dest.id = o.destination_id
 		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+		LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
 		WHERE (sh.shipped = FALSE OR (sh.ship_date_time BETWEEN %s AND %s))".$operator_cond."
 		)
 		--Все неотгруженные
@@ -644,7 +646,7 @@ class Shipment_Controller extends ControllerSQL{
 		//totals
 		$this->addNewModel(sprintf(
 		"SELECT
-			coalesce((SELECT sum(quant) FROM shipments WHERE ship_date_time BETWEEN %s AND %s),0) AS quant_shipped,
+			coalesce((SELECT sum(quant) FROM shipments WHERE ship_date_time BETWEEN %s AND %s AND shipped),0) AS quant_shipped,
 			coalesce((SELECT sum(quant) FROM orders WHERE date_time BETWEEN %s AND %s),0) AS quant_ordered",
 		$date_from_db,
 		$date_to_db,

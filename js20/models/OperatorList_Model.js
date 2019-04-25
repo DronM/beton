@@ -62,6 +62,15 @@ function OperatorList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Завод';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Объект';
 	filed_options.autoInc = false;	
 	

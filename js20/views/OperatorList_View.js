@@ -16,6 +16,7 @@ function OperatorList_View(id,options){
 	var elements = [
 		new GridCellHead(id+":grid:head:date_time",{
 			"value":"Назначен",
+			"colAttrs":{"align":"center"},
 			"columns":[
 				new GridColumnDateTime({
 					"field":model.getField("date_time"),
@@ -25,6 +26,7 @@ function OperatorList_View(id,options){
 		})
 		,new GridCellHead(id+":grid:head:ship_date_time",{
 			"value":"Отгружен",
+			"colAttrs":{"align":"center"},
 			"columns":[
 				new GridColumnDateTime({
 					"field":model.getField("ship_date_time"),
@@ -32,6 +34,14 @@ function OperatorList_View(id,options){
 				})
 			]
 		})
+		,new GridCellHead(id+":grid:head:production_sites_ref",{
+			"value":"Завод",
+			"columns":[
+				new GridColumnRef({
+					"field":model.getField("production_sites_ref")
+				})
+			]
+		})		
 		,new GridCellHead(id+":grid:head:clients_ref",{
 			"value":"Клиент",
 			"columns":[
@@ -92,7 +102,7 @@ function OperatorList_View(id,options){
 	];
 	var foot_elements = [
 		new GridCell(id+":grid:foot:sp1",{
-			"colSpan":"5"
+			"colSpan":"6"
 		})												
 		,new GridCellFoot(id+":features_grid:foot:tot_quant",{
 			"attrs":{"align":"right"},
@@ -195,6 +205,7 @@ function OperatorList_View(id,options){
 	);
 	
 	var grid = new GridAjx(id+":grid",{
+		"className":"table-bordered table-responsive table-make_order",
 		"model":model,
 		"keyIds":["id"],
 		"controller":contr,

@@ -64,6 +64,16 @@ class OperatorList_Model extends ModelSQLBeton{
 		$this->addField($f_clients_ref);
 		//********************
 		
+		//*** Field production_sites_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Завод';
+		$f_opts['id']="production_sites_ref";
+				
+		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
+		$this->addField($f_production_sites_ref);
+		//********************
+		
 		//*** Field destinations_ref ***
 		$f_opts = array();
 		
