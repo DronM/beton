@@ -1236,6 +1236,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallClientCallHistoryList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallClientShipHistoryList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderCalc_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ClientTelList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1257,6 +1258,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/VehicleScheduleMakeOrderList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/SupplierList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/SMSPatternDialog_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ClientDialog_Form.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));
@@ -1315,6 +1317,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditColorPalette.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/AssignedVehicleGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/Weather.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleDriverForSchedGenGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1516,6 +1519,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/AstCallClientCallHistoryList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/AstCallClientShipHistoryList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/AstCallCurrent_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ClientTelList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleDriverForSchedGen_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleDriverForSchedGen_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

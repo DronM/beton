@@ -17,33 +17,34 @@ function ScheduleGen_View(id,options){
 	options.templateOptions = options.templateOptions || {};
 	options.templateOptions.HEAD_TITLE = "Формирование графиков работы";
 	
+	var self = this;
 	options.addElement = function(){
 		this.addElement(new EditPeriodDate(id+":period",{
 			"valueFrom":DateHelper.time(),
 			"valueTo":DateHelper.time()
 		}));
 		
-		var day_cl = "control-label "+window.getBsCol(1);
+		var day_cl = "control-label "+window.getBsCol(3);
+		var ctrl_cl = "input-group "+window.getBsCol(1);
 		
-		this.addElement(new VehicleEdit(id+":vehicle",{
-			"required":true,
-			"labelClassName":"control-label "+window.getBsCol(1),
-			"editContClassName":"input-group "+window.getBsCol(2)
-		}));
+		this.addElement(new VehicleDriverForSchedGenGrid(id+":vehicle_list"));
 		
 		this.addElement(new EditCheckBox(id+":day1",{		
-			"labelCaption":"Понедельник",
+			"labelCaption":"Понедельник",			
 			"labelClassName":day_cl,
+			"editContClassName":ctrl_cl,
 			"checked":true
 		}));
 		this.addElement(new EditCheckBox(id+":day2",{		
 			"labelCaption":"Вторник",
 			"labelClassName":day_cl,
+			"editContClassName":ctrl_cl,
 			"checked":true
 			}));
 		this.addElement(new EditCheckBox(id+":day3",{		
 			"labelCaption":"Среда",
 			"labelClassName":day_cl,
+			"editContClassName":ctrl_cl,
 			"checked":true
 		}));
 		this.addElement(new EditCheckBox(id+":day4",{		
@@ -53,6 +54,7 @@ function ScheduleGen_View(id,options){
 		}));
 		this.addElement(new EditCheckBox(id+":day5",{		
 			"labelClassName":day_cl,
+			"editContClassName":ctrl_cl,
 			"labelCaption":"Пятница",
 			"checked":true
 		}));
@@ -62,16 +64,16 @@ function ScheduleGen_View(id,options){
 		}));
 		this.addElement(new EditCheckBox(id+":day7",{		
 			"labelClassName":day_cl,
+			"editContClassName":ctrl_cl,
 			"labelCaption":"Воскресенье"
 		}));
 		
-		var self = this;
-		this.addElement(new ButtonCmd(id+"btnOk",{
+		this.addElement(new ButtonCmd(id+":btnOk",{
 			"caption":"Сформировать",
 			"onClick":function(){
 				self.process();
 			},
-			"title":"Сформировать расписание по заданному ТС"
+			"title":"Сформировать расписание по заданным ТС"
 		
 		}));
 		
@@ -93,11 +95,15 @@ extend(ScheduleGen_View,View);
 
 /* public methods */
 ScheduleGen_View.prototype.process = function(){
-	var contr = new VehicleSchedule_Controller();	
-	var pm = contr.getPublicMethod("gen_schedule");
+	var pm = (new VehicleSchedule_Controller()).getPublicMethod("gen_schedule");
 	pm.setFieldValue("date_from",this.getElement("period").getControlFrom().getValue());
 	pm.setFieldValue("date_to",this.getElement("period").getControlTo().getValue());
-	pm.setFieldValue("vehicle_id",this.getElement("vehicle").getValue().getKey());
+	
+	//pm.setFieldValue("vehicle_id",this.getElement("vehicle").getValue().getKey());
+	//pm.setFieldValue("driver_id",this.getElement("driver").getValue().getKey());
+	
+	pm.setFieldValue("vehicle_list",this.getElement("vehicle_list").serialize());
+	
 	pm.setFieldValue("day1",this.getElement("day1").getValue());
 	pm.setFieldValue("day2",this.getElement("day2").getValue());
 	pm.setFieldValue("day3",this.getElement("day3").getValue());

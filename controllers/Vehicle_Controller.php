@@ -210,7 +210,7 @@ class Vehicle_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtInt('mid'));
 		$pm->addParam(new FieldExtString('plate'));		
 		$this->addPublicMethod($pm);					
-		$this->setCompleteModelId('Vehicle_Model');
+		$this->setCompleteModelId('VehicleDialog_Model');
 
 			
 		$pm = new PublicMethod('get_vehicle_statistics');

@@ -218,7 +218,7 @@ class VehicleSchedule_Controller extends ControllerSQL{
 	$opts=array();
 	
 		$opts['required']=TRUE;				
-		$pm->addParam(new FieldExtInt('vehicle_id',$opts));
+		$pm->addParam(new FieldExtString('vehicle_list',$opts));
 	
 				
 	$opts=array();
@@ -355,36 +355,76 @@ class VehicleSchedule_Controller extends ControllerSQL{
 	public function gen_schedule($pm){
 		$date_from = $this->getExtDbVal($pm,'date_from');
 		$date_to = $this->getExtDbVal($pm,'date_to');
-		$vehicle_id = $this->getExtDbVal($pm,'vehicle_id');
 		
-		$dbLink = $this->getDbLink();
-		$dbLink->query(
-			sprintf("SELECT gen_schedule(%d,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-			$vehicle_id,
-			$date_from,
-			$date_to,
-			$this->getExtDbVal($pm,'day1'),
-			$this->getExtDbVal($pm,'day2'),
-			$this->getExtDbVal($pm,'day3'),
-			$this->getExtDbVal($pm,'day4'),
-			$this->getExtDbVal($pm,'day5'),
-			$this->getExtDbVal($pm,'day6'),
-			$this->getExtDbVal($pm,'day7')
-			));
+		$dbLink = $this->getDbLinkMaster();
+		
+		$veh_list_v = json_decode($this->getExtVal($pm,'vehicle_list'));
+		if(!isset($veh_list_v->value)){		
+			throw new Exception('Не выбрано ни одного автомобиля1!');
+		}
+		$veh_list = json_decode($veh_list_v->value);
+		if(!isset($veh_list->rows)||!count($veh_list->rows)){		
+			throw new Exception('Не выбрано ни одного автомобиля2!');
+		}
+		
+		$vehicle_for_rep_id = 0;
+		
+		foreach($veh_list->rows as $row){
+			$vehicle_id = 0;
 			
+			if(isset($row->fields->vehicle)&&isset($row->fields->vehicle->keys)&&isset($row->fields->vehicle->keys->id)){
+				$vehicle_id = intval($row->fields->vehicle->keys->id);
+			}
+			if(!$vehicle_id){
+				continue;
+			}
+			
+			$driver_id = 0;
+			if(isset($row->fields->driver)&&isset($row->fields->driver->keys)&&isset($row->fields->driver->keys->id)){
+				$driver_id = intval($row->fields->driver->keys->id);
+			}			
+			if($driver_id){
+				$ar = $dbLink->query_first(sprintf("SELECT driver_id FROM vehicles WHERE id=%d",$vehicle_id));
+				if($ar['driver_id']!=$driver_id){
+					$dbLink->query_first(sprintf(
+					"UPDATE vehicles SET driver_id=%d WHERE id=%d",
+					$driver_id,$vehicle_id
+					));
+				}			
+			}
+			
+			$vehicle_for_rep_id = $vehicle_id;
+			//$vehicle_for_rep_id.= ($vehicle_for_rep_id==0)? '':', ';
+			//$vehicle_for_rep_id.=$vehicle_id;
+			
+			$dbLink->query(
+				sprintf("SELECT gen_schedule(%d,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+				$vehicle_id,
+				$date_from,
+				$date_to,
+				$this->getExtDbVal($pm,'day1'),
+				$this->getExtDbVal($pm,'day2'),
+				$this->getExtDbVal($pm,'day3'),
+				$this->getExtDbVal($pm,'day4'),
+				$this->getExtDbVal($pm,'day5'),
+				$this->getExtDbVal($pm,'day6'),
+				$this->getExtDbVal($pm,'day7')
+				));
+		}
 		//return report
-		$model = new ModelSQL($dbLink,array("id"=>"VehicleScheduleReport_Model"));
-		
-		$model->setSelectQueryText(sprintf(
-		"SELECT * FROM get_schedule_on_vehicle(%s,%s,%d)",
-		$date_from,$date_to,$vehicle_id
-		));
-		
-		$model->select(false,null,null,
-			null,null,null,null,null,TRUE);
-		//
-		$this->addModel($model);				
-		
+		if($vehicle_for_rep_id){
+			$model = new ModelSQL($dbLink,array("id"=>"VehicleScheduleReport_Model"));
+	
+			$model->setSelectQueryText(sprintf(
+			"SELECT * FROM get_schedule_on_vehicle(%s,%s,%d)",
+			$date_from,$date_to,$vehicle_for_rep_id
+			));
+	
+			$model->select(false,null,null,
+				null,null,null,null,null,TRUE);
+			//
+			$this->addModel($model);				
+		}
 	}
 	public function get_current_veh_list($pm){
 		$link = $this->getDbLink();

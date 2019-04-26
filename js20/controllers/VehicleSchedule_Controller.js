@@ -277,7 +277,7 @@ extend(VehicleSchedule_Controller,ControllerObjServer);
 	
 		options.required = true;
 	
-		pm.addField(new FieldInt("vehicle_id",options));
+		pm.addField(new FieldString("vehicle_list",options));
 	
 				
 	

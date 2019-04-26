@@ -72,6 +72,7 @@
 <li><a href="#UserMacAddress_Controller">UserMacAddress_Controller</a></li>
 <li><a href="#VariantStorage_Controller">VariantStorage_Controller</a></li>
 <li><a href="#Vehicle_Controller">Vehicle_Controller</a></li>
+<li><a href="#VehicleDriverForSchedGen_Controller">VehicleDriverForSchedGen_Controller</a></li>
 <li><a href="#VehicleSchedule_Controller">VehicleSchedule_Controller</a></li>
 <li><a href="#View_Controller">View_Controller</a></li>
 <li><a href="#Weather_Controller">Weather_Controller</a></li>
@@ -187,6 +188,7 @@
 <li><a href="#UserMacAddress_Model">UserMacAddress_Model</a></li>
 <li><a href="#UserMacAddressList_Model">UserMacAddressList_Model</a></li>
 <li><a href="#ClientTel_Model">ClientTel_Model</a></li>
+<li><a href="#ClientTelList_Model">ClientTelList_Model</a></li>
 <li><a href="#ClientType_Model">ClientType_Model</a></li>
 <li><a href="#ClientComeFrom_Model">ClientComeFrom_Model</a></li>
 <li><a href="#ClientDebt_Model">ClientDebt_Model</a></li>
@@ -222,6 +224,7 @@
 <li><a href="#TrackerZoneControl_Model">TrackerZoneControl_Model</a></li>
 <li><a href="#TrackerZoneControlList_Model">TrackerZoneControlList_Model</a></li>
 <li><a href="#Weather_Model">Weather_Model</a></li>
+<li><a href="#VehicleDriverForSchedGen_Model">VehicleDriverForSchedGen_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -477,14 +480,6 @@
 								Да</p>
 <p>Length:15</p>
 </div>
-<h3>ext</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Да</p>
-<p>Length:5</p>
-</div>
 </div>
 </div>
 </div>
@@ -638,7 +633,7 @@
 <a href="#ClientTel_Model">Model: ClientTel_Model</a><h2>update</h2>
 <a href="#ClientTel_Model">Model: ClientTel_Model</a><h2>delete</h2>
 <a href="#ClientTel_Model">Model: ClientTel_Model</a><h2>get_list</h2>
-<a href="#ClientTel_Model">Model: ClientTel_Model</a><h2>get_object</h2>
+<a href="#ClientTelList_Model">Model: ClientTelList_Model</a><h2>get_object</h2>
 <a href="#ClientTel_Model">Model: ClientTel_Model</a>
 </div>
 </div>
@@ -2191,7 +2186,7 @@
 <a href="#Vehicle_Model">Model: Vehicle_Model</a><h2>get_list</h2>
 <a href="#Vehicle_Model">Model: Vehicle_Model</a><h2>get_object</h2>
 <a href="#VehicleDialog_Model">Model: VehicleDialog_Model</a><h2>complete</h2>
-<a href="#Vehicle_Model">Model: Vehicle_Model</a><h2>get_vehicle_statistics</h2>
+<a href="#VehicleDialog_Model">Model: VehicleDialog_Model</a><h2>get_vehicle_statistics</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>date</h3>
@@ -2281,6 +2276,19 @@
 </div>
 </div>
 </div>
+<div id="VehicleDriverForSchedGen_Controller" class="content_box">
+<h1>VehicleDriverForSchedGen_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a><h2>update</h2>
+<a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a><h2>delete</h2>
+<a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a><h2>get_list</h2>
+<a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a><h2>get_object</h2>
+<a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a>
+</div>
+</div>
 <div id="VehicleSchedule_Controller" class="content_box">
 <h1>VehicleSchedule_Controller</h1>
 <div class="content_item">
@@ -2341,10 +2349,10 @@
 <p>Required:
 								Да</p>
 </div>
-<h3>vehicle_id</h3>
+<h3>vehicle_list</h3>
 <p></p>
 <div class="content_item content_item3">
-<p>Type:Int</p>
+<p>Type:String</p>
 <p>Required:
 								Да</p>
 </div>
@@ -3272,6 +3280,54 @@
 <div>Primary key:</div>
 <div>Required:FALSE</div>
 <div>Length:50</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ClientTelList_Model" class="content_box">
+<h1>ClientTelList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>tel</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>email</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>post</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
 <div>Precision:</div>
 </div>
 </div>
@@ -9371,6 +9427,30 @@
 <div>Precision:</div>
 <h2>tracker_last_dt</h2>
 <div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="VehicleDriverForSchedGen_Model" class="content_box">
+<h1>VehicleDriverForSchedGen_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>driver</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

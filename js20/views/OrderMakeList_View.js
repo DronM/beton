@@ -163,7 +163,7 @@ function OrderMakeList_View(id,options){
 		//veh_popup.addButton();
 		this.addElement(new GridAjx(id+":veh_schedule_grid",{
 			"model":model,
-			"className":this.TABLE_CLASS,
+			"className":"table-bordered table-responsive table-make_order",
 			"attrs":{"style":"width:100%;"},
 			"readPublicMethod":(new VehicleSchedule_Controller()).getPublicMethod("get_current_veh_list"),
 			"editInline":false,

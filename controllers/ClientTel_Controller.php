@@ -133,7 +133,7 @@ class ClientTel_Controller extends ControllerSQL{
 
 		$this->addPublicMethod($pm);
 		
-		$this->setListModelId('ClientTel_Model');
+		$this->setListModelId('ClientTelList_Model');
 		
 			
 		/* get_object */

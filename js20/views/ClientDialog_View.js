@@ -53,7 +53,11 @@ function ClientDialog_View(id,options){
 
 		this.addElement(new ClientTypeEdit(id+":client_type"));	
 
-		this.addElement(new ClientComeFromEdit(id+":client_come_from"));	
+		this.addElement(new ClientComeFromEdit(id+":client_come_from"));
+		
+		this.addElement(new ClientTelList_View(id+":client_tel_list",{
+			"detail":true
+		}));		
 						
 	}
 	
@@ -85,6 +89,12 @@ function ClientDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("client_come_from"),"fieldId":"client_come_from_id"})
 		,new CommandBinding({"control":this.getElement("client_type"),"fieldId":"client_type_id"})
 	]);
+	
+	this.addDetailDataSet({
+		"control":this.getElement("client_tel_list").getElement("grid"),
+		"controlFieldId":"client_id",
+		"fieldId":"id"
+	});
 		
 }
 extend(ClientDialog_View,ViewObjectAjx);

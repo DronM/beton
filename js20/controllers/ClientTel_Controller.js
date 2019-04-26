@@ -19,7 +19,7 @@
 
 function ClientTel_Controller(options){
 	options = options || {};
-	options.listModelClass = ClientTel_Model;
+	options.listModelClass = ClientTelList_Model;
 	options.objModelClass = ClientTel_Model;
 	ClientTel_Controller.superclass.constructor.call(this,options);	
 	
@@ -156,6 +156,9 @@ extend(ClientTel_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("client_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("clients_ref",f_opts));
 	var f_opts = {};
 	f_opts.alias = "ФИО";
 	pm.addField(new FieldText("name",f_opts));

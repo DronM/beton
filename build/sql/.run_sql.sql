@@ -1,56 +1,54 @@
--- View: ast_calls_current
+-- View: public.orders_dialog
 
- DROP VIEW ast_calls_current;
+-- DROP VIEW public.orders_dialog;
 
-CREATE OR REPLACE VIEW ast_calls_current AS 
-	SELECT DISTINCT ON (ast.ext)
-		ast.unique_id,
-		ast.ext,
-				
-		CASE
-			WHEN clt.tel IS NOT NULL THEN clt.tel
-			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
-			ELSE ast.caller_id_num::text
-		END AS contact_tel,
+CREATE OR REPLACE VIEW public.orders_dialog AS 
+	SELECT
+		o.id,
+		order_num(o.*) AS number,		
+		clients_ref(cl) AS clients_ref,		
+		destinations_ref(d) AS destinations_ref,
+		o.destination_price AS destination_cost,
+		d.price AS destination_price,
+		d.time_route,
+		d.distance,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_price AS concrete_cost,
+		concr.price AS concrete_price,
+		o.unload_type,
+		o.comment_text,
+		o.descr,
+		o.phone_cel,
+		o.unload_speed,
+		o.date_time,
+		o.time_to,		
+		o.quant,
+		langs_ref(l) AS langs_ref,
+		o.total,
+		o.total_edit,
+		o.pay_cash,
+		o.unload_price AS unload_cost,
+		o.payed,
+		o.under_control,
 		
-		--backward compatibility
-		CASE
-			WHEN clt.tel IS NOT NULL THEN clt.tel
-			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
-			ELSE ast.caller_id_num::text
-		END AS num,
+		pv.phone_cel AS pump_vehicle_phone_cel,
+		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
 		
-		ast.dt AS ring_time,
-		ast.start_time AS answer_time,
-		ast.end_time AS hangup_time,
-		ast.client_id,
-		clients_ref(cl) AS clients_ref,
-		cl.name AS client_descr,
-		cl.client_kind,
-		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
-		ast.manager_comment,
-		ast.informed,
-		clt.name AS contact_name,
-		cld.debt,
-		man.name AS client_manager_descr,
-		client_types_ref(ctp) AS client_types_ref,
-		client_come_from_ref(ccf) AS client_come_from_ref
+		users_ref(u) AS users_ref,
 		
+		d.distance AS destination_distance
 		
-   FROM ast_calls ast
-     LEFT JOIN clients cl ON cl.id = ast.client_id
-     LEFT JOIN users man ON cl.manager_id = man.id
-     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10))
-     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
-     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
-     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
-  WHERE
-  	ast.end_time IS NULL
-  	AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
-  	AND ast.caller_id_num::text <> ''::text
-  	AND (ast.start_time IS NULL OR ast.start_time::date=now()::date)
-  ORDER BY ast.ext, ast.dt DESC;
+	FROM orders o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN langs l ON l.id = o.lang_id
+	LEFT JOIN pump_vehicles pv ON pv.id = o.pump_vehicle_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	ORDER BY o.date_time;
 
-ALTER TABLE ast_calls_current
-  OWNER TO beton;
+ALTER TABLE public.orders_dialog OWNER TO beton;
 

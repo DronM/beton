@@ -1,6 +1,6 @@
 -- View: public.orders_dialog
 
- DROP VIEW public.orders_dialog;
+-- DROP VIEW public.orders_dialog;
 
 CREATE OR REPLACE VIEW public.orders_dialog AS 
 	SELECT
@@ -35,7 +35,9 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
 		pump_prices_ref(ppr) AS pump_prices_ref,
 		
-		users_ref(u) AS users_ref
+		users_ref(u) AS users_ref,
+		
+		d.distance AS destination_distance
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id

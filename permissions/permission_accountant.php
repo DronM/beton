@@ -766,6 +766,16 @@ $permissions = array();
 				
 					$permissions['Weather_Controller_get_current']=TRUE;
 				
+					$permissions['VehicleDriverForSchedGen_Controller_insert']=TRUE;
+				
+					$permissions['VehicleDriverForSchedGen_Controller_update']=TRUE;
+				
+					$permissions['VehicleDriverForSchedGen_Controller_delete']=TRUE;
+				
+					$permissions['VehicleDriverForSchedGen_Controller_get_list']=TRUE;
+				
+					$permissions['VehicleDriverForSchedGen_Controller_get_object']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

@@ -1,10 +1,50 @@
-<!--
-This file is generated from the template build/templates/tmpl/html.xsl
-All direct modification will be lost with the next build.
-Edit template instead.
--->
-<div id="{{id}}">
-  <div class="row">
-    <h1 class="page-header">{{HEAD_TITLE}}</h1>
-  </div>
+<div id="{{id}}" class="panel">
+	<div class="panel-heading">
+		<h3 class="panel-title">{{HEAD_TITLE}}
+		</h3>
+	</div>
+	
+	<div id="{{id}}:period">
+	</div>
+	
+	<div>
+		<div>Автомобили, водители
+		</div>		
+		<div id="{{id}}:vehicle_list">
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="{{bsCol}}6">
+			<div id="{{id}}:day1">
+			</div>
+			<div id="{{id}}:day2">
+			</div>
+			<div id="{{id}}:day3">
+			</div>
+		
+		</div>
+	
+		<div class="{{bsCol}}6">
+			<div id="{{id}}:day4">
+			</div>
+			<div id="{{id}}:day5">
+			</div>
+			<div id="{{id}}:day6">
+			</div>
+	
+			<div id="{{id}}:day7">
+			</div>
+		</div>
+	</div>		
+	
+	<div class="panel-footer">
+		<div class="heading-elements">
+			<div class="heading-btn pull-left">
+	
+				<div id="{{id}}:btnOk"/>
+			</div>
+		</div>
+	</div>	
+	
 </div>

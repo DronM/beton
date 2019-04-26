@@ -41,16 +41,6 @@ extend(Caller_Controller,ControllerObjServer);
 	
 		pm.addField(new FieldString("tel",options));
 	
-				
-	
-	var options = {};
-	
-		options.required = true;
-	
-		options.maxlength = "5";
-	
-		pm.addField(new FieldString("ext",options));
-	
 			
 	this.addPublicMethod(pm);
 }

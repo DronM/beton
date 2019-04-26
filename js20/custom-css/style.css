@@ -398,6 +398,13 @@ table,tr,td.noBorder{
 	color:black;
 }
 
+body{
+	font-family:serif !important;
+}
+a{
+	color:blue !important;
+	/*text-decoration:underline !important;*/
+}
 #map{
 	height:500px;
 	width:1700px;
@@ -479,7 +486,7 @@ table,tr,td.noBorder{
 }
 
 #OrderMakeList\:order_make_grid tr.order_closed{
-	background-color:#c1ffd7;
+	background-color:#00FF7F;
 }
 #OrderMakeList\:order_make_grid tr.order_not_started{
 	background-color:#FFCC99;
@@ -524,42 +531,42 @@ tr.order_current_row{
 }
 
 
-#OrderMakeList\:veh_schedule_grid tr.veh_free{
+tr.veh_free{
 	background-color:#00FF7F;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_late{
+tr.veh_late{
 	background-color:#FF9999;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_late_at_dest{
+tr.veh_late_at_dest{
 	background-color:#FFD0BA;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_assigned{
+tr.veh_assigned{
 	background-color:#CCFF99;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_shift{
+tr.veh_shift{
 	background-color:#D5C7FF;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_shift_added{
+tr.veh_shift_added{
 	background-color:#D5C7FF;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_out_from_shift{
+tr.veh_out_from_shift{
 	background-color:#CEB9D6;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_out{
+tr.veh_out{
 	background-color:#CEB9D6;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_no_tracker_data{
+veh_no_tracker_data{
 	color: red;
 	font-weight:bolder;
 	font-size:120%;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_no_tracker{
+tr.veh_no_tracker{
 	color: blue;
 	font-weight:bolder;
 	font-size:120%;
 }
 
-#OrderMakeList\:veh_schedule_grid tr.veh_in_make_list{
+tr.veh_in_make_list{
 	cursor:pointer;
 }
 #VehicleScheduleReport_Model td.on_shift{

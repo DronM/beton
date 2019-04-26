@@ -260,7 +260,7 @@
 	<xsl:apply-templates select="model[@id='ModelStyleSheet']/row"/>
 	<link rel="icon" type="image/png" href="img/favicon.png"/>
 	
-	<title><xsl:value-of select="/document/model[@id='Page_Model']/row[1]/PAGE_TITLE"/></title>
+	<title>Евробетон</title>
 </xsl:template>
 
 

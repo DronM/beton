@@ -20,7 +20,7 @@ function VehicleEdit(id,options){
 	
 	options.acMinLengthForQuery = 1;
 	options.acController = new Vehicle_Controller();
-	options.acModel = new Vehicle_Model();
+	options.acModel = new VehicleDialog_Model();
 	options.acPatternFieldId = options.acPatternFieldId || "plate";
 	options.acKeyFields = options.acKeyFields || [options.acModel.getField("id")];
 	options.acDescrFields = options.acDescrFields || [options.acModel.getField("plate")];

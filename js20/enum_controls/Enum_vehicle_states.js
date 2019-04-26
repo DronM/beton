@@ -19,12 +19,12 @@ function Enum_vehicle_states(id,options){
 ,"ru_free":"на базе"
 ,"ru_assigned":"назначен"
 ,"ru_busy":"отгружен"
-,"ru_left_for_dest":"выехал к клиенту"
+,"ru_left_for_dest":"едет на объект"
 ,"ru_at_dest":"у клиента"
-,"ru_left_for_base":"возвращается на базу"
+,"ru_left_for_base":"едет на базу"
 ,"ru_out_from_shift":"уехал со смены"
 ,"ru_out":"уехал"
-,"ru_shift_added":"добав.смена"
+,"ru_shift_added":"доб.смена"
 };
 	options.options = [{"value":"shift",
 "descr":multy_lang_values[window.getApp().getLocale()+"_"+"shift"],

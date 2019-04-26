@@ -1,12 +1,13 @@
-<div id="UserDialog">
+<div id="{{id}}">
 	<div id="{{id}}:cmd-cont">
 		<div id="{{id}}:cmdOk"/>
 		<div id="{{id}}:cmdSave"/>
+		<div id="{{id}}:cmdResetPwd" title="Назначить пользователю новый пароль и отправить СМС" options="{'caption':'Сменить пароль'}"/>
 		<div id="{{id}}:cmdCancel"/>
 	</div>
 
-	<div class="row">
-		<h1 class="page-header">Карточка пользователя</h1>
+	<div class="panel-heading">
+		<h3 class="panel-title">Карточка пользователя</h3>
 	</div>
 	
 	<ul class="nav nav-tabs" role="tablist">
@@ -24,7 +25,14 @@
 				<div id="UserDialog:tel_ext"/>
 				<div id="UserDialog:production_sites_ref"/>
 				<div id="UserDialog:banned"/>
-				<div id="UserDialog:mac-grid"/>
+				
+				<div class="panel">
+					<div class="panel-heading">
+						<h6 class="panel-title">MAC адреса</h6>		
+					</div>
+	
+					<div id="UserDialog:mac_list"/>
+				</div>
 			</div>
 		</div>
 		

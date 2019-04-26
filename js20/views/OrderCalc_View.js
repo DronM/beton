@@ -37,8 +37,8 @@ function OrderCalc_View(id,options){
 			}
 		}));	
 	
-		this.addElement(new EditMoney(id+":quant",{
-			"precision":1,
+		this.addElement(new EditFloat(id+":quant",{
+			"precision":2,
 			"labelCaption":"Количество:",
 			"labelClassName":obj_bs_cl,
 			"editContClassName":("input-group "+window.getBsCol(2)),
@@ -189,6 +189,7 @@ OrderCalc_View.prototype.onSelectConcrete = function(f){
 }
 
 OrderCalc_View.prototype.recalcTotalCont = function(){		
+
 	var quant = this.getElement("quant").getValue();
 	
 	//min quant for destination

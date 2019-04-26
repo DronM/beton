@@ -1,4 +1,4 @@
-/* Copyright (c) 2016
+/** Copyright (c) 2016,2019
  *	Andrey Mikhalevich, Katren ltd.
  */
 function UserDialog_View(id,options){	
@@ -7,40 +7,57 @@ function UserDialog_View(id,options){
 	options.controller = new User_Controller();
 	options.model = options.models.UserDialog_Model;
 	
-	UserDialog_View.superclass.constructor.call(this,id,options);
 	
-	this.addElement(new UserNameEdit(id+":name"));
-
-	this.addElement(new Enum_role_types(id+":role",{
-		"labelCaption":"Роль:",
-		"required":true
-	}));	
+	var self = this;
+	var role = window.getApp().getServVar("role_id");
+	var adm = (role=="admin"||role=="owner");
+	options.templateOptions = options.templateOptions || {};
+	options.templateOptions.adm = adm;
 	
-	this.addElement(new EditEmail(id+":email",{
-		"labelCaption":"Эл.почта:"
-	}));	
+	options.addElement = function(){
+	
+		this.addElement(new UserNameEdit(id+":name"));
 
-	this.addElement(new EditPhone(id+":phone_cel",{
-		"labelCaption":"Моб.телефон:"
-	}));
+		this.addElement(new Enum_role_types(id+":role",{
+			"labelCaption":"Роль:",
+			"required":true
+		}));	
+	
+		this.addElement(new EditEmail(id+":email",{
+			"labelCaption":"Эл.почта:"
+		}));	
 
-	this.addElement(new EditInt(id+":tel_ext",{
-		"labelCaption":"Внутр.номер:",
-		"maxLength":5
-	}));
+		this.addElement(new EditPhone(id+":phone_cel",{
+			"labelCaption":"Моб.телефон:"
+		}));
 
-	this.addElement(new EditCheckBox(id+":banned",{
-		"labelCaption":"Доступ запрещен:",
-	}));
+		this.addElement(new EditInt(id+":tel_ext",{
+			"labelCaption":"Внутр.номер:",
+			"maxLength":5
+		}));
 
-	this.addElement(new ProductionSiteEdit(id+":production_sites_ref",{
-	}));
+		this.addElement(new EditCheckBox(id+":banned",{
+			"labelCaption":"Доступ запрещен:",
+		}));
 
-	//mac grid
-	var mac_grid = new UserMacAddressList_View(id+":UserMacAddressList");
-	this.addElement(mac_grid);
+		this.addElement(new ProductionSiteEdit(id+":production_sites_ref",{
+		}));
 
+		//mac grid
+		this.addElement(new UserMacAddressList_View(id+":mac_list"));
+
+		
+		if (adm){
+			this.addElement(new ButtonCmd(id+":cmdResetPwd",{
+				"onClick":function(){
+					self.resetPwd();
+				}
+			}));		
+		}		
+	}
+	
 	//****************************************************	
+	UserDialog_View.superclass.constructor.call(this,id,options);
 	
 	//read
 	var r_bd = [
@@ -66,10 +83,34 @@ function UserDialog_View(id,options){
 	]);
 	
 	this.addDetailDataSet({
-		"control":mac_grid.getElement("grid"),
+		"control":this.getElement("mac_list").getElement("grid"),
 		"controlFieldId":"user_id",
 		"field":this.m_model.getField("id")
 	});
 	
 }
 extend(UserDialog_View,ViewObjectAjx);
+
+UserDialog_View.prototype.hideUser = function(){
+	var pm = this.getController().getPublicMethod("hide");
+	pm.setFieldValue("id",this.getElement("id").getValue());
+	var self = this;
+	pm.run({
+		"ok":function(resp){
+			self.close({"updated":true});
+		}
+	});
+}
+
+UserDialog_View.prototype.resetPwd = function(){
+	var pm = this.getController().getPublicMethod("reset_pwd");
+	pm.setFieldValue("user_id",this.getElement("id").getValue());
+	var self = this;
+	pm.run({
+		"ok":function(resp){
+			window.showNote("Пароль сброшен!");
+			self.close({"updated":true});
+		}
+	});
+}
+

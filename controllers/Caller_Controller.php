@@ -36,13 +36,6 @@ class Caller_Controller extends ControllerSQL{
 		$opts['required']=TRUE;				
 		$pm->addParam(new FieldExtString('tel',$opts));
 	
-				
-	$opts=array();
-	
-		$opts['length']=5;
-		$opts['required']=TRUE;				
-		$pm->addParam(new FieldExtString('ext',$opts));
-	
 			
 		$this->addPublicMethod($pm);
 
@@ -50,10 +43,13 @@ class Caller_Controller extends ControllerSQL{
 	}	
 	
 	public function call($pm){
-		$params = new ParamsSQL($pm,$this->getDbLink());
-		$params->addAll();
-		$ext = str_replace("'","",$params->getParamById('ext'));
-		$tel = str_replace("'","",$params->getParamById('tel'));
+		if(!defined('AST_SERVER')||!defined('AST_PORT')||!defined('AST_USER')||!defined('AST_PASSWORD') ){
+			throw new Exception('Нет настроек телефонии!');
+		}
+	
+		$ext = $_SESSION['tel_ext'];
+		$tel = $this->getExtVal($pm,'tel');
+		
 		$caller = new Caller(AST_SERVER,AST_PORT,AST_USER,AST_PASSWORD);
 		$caller->call($ext,$tel);	
 	}

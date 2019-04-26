@@ -30,6 +30,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelVars.php');
 
 require_once('common/PwdGen.php');
+require_once('common/SMSService.php');
+
 require_once('functions/CustomEmailSender.php');
 
 class User_Controller extends ControllerSQL{
@@ -37,6 +39,7 @@ class User_Controller extends ControllerSQL{
 	const PWD_LEN = 6;
 	const ER_USER_NOT_DEFIND = "Пользователь не определен!@1000";
 	const ER_NO_EMAIL = "Не задан адрес электронный почты!@1001";
+	const ER_NO_EMAIL_TEL = "У пользователя нет ни телефона ни эл.почты!";
 	const ER_LOGIN_TAKEN = "Имя пользователя занято.";
 	const ER_EMAIL_TAKEN = "Есть такой адрес электронной почты.";
 
@@ -372,7 +375,7 @@ class User_Controller extends ControllerSQL{
 		$model = new $model_id($this->getDbLinkMaster());
 		$inserted_id_ar = $this->modelInsert($model,TRUE);
 		
-		$this->pwd_notify($inserted_id_ar['id'],"'".$new_pwd."'");
+		$this->pwd_notify($inserted_id_ar['id'],$new_pwd,"'".$new_pwd."'",$email,$tel);
 			
 		$fields = array();
 		foreach($inserted_id_ar as $key=>$val){
@@ -608,17 +611,27 @@ class User_Controller extends ControllerSQL{
 		));		
 	}
 		
-	private function pwd_notify($userId,$pwd){
-		//email
-		CustomEmailSender::addEMail(
-			$this->getDbLinkMaster(),
-			sprintf("email_reset_pwd(%d,%s)",
-				$userId,
-				$pwd
-			),
-			NULL,
-			'reset_pwd'
-		);
+	private function pwd_notify($userId,$pwd,$pwdDb,$email,$tel){
+		if (strlen($email)){
+			//email
+			CustomEmailSender::addEMail(
+				$this->getDbLinkMaster(),
+				sprintf("email_user_reset_pwd(%d,%s)",
+					$userId,
+					$pwdDb
+				),
+				NULL,
+				'reset_pwd'
+			);
+		}		
+		if (strlen($tel)){
+			//SMS
+			$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
+			$sms_service->send($tel,
+				'Вам назначен новый пароль '.$pwd,
+				SMS_SIGN,SMS_TEST);			
+		}
+	
 	}
 	
 	private function email_confirm_notify($userId,$key){
@@ -642,16 +655,17 @@ class User_Controller extends ControllerSQL{
 			throw new Exception('Адрес электронной почты не найден!');
 		}		
 		
-		$pwd = "'".gen_pwd(self::PWD_LEN)."'";
+		$pwd = gen_pwd(self::PWD_LEN);
+		$pwd_db = "'".$pwd."'";
 		try{
 			$this->getDbLinkMaster()->query('BEGIN');
 			
 			$this->getDbLinkMaster()->query(sprintf(
 				"UPDATE users SET pwd=md5(%s)
 				WHERE id=%d",
-				$pwd,$ar['id'])
+				$pwd_db,$ar['id'])
 			);
-			$this->pwd_notify($ar['id'],$pwd);
+			$this->pwd_notify($ar['id'],$pwd,$pwd_db,$this->getExtVal($pm,'email'),NULL);
 			
 			$this->getDbLinkMaster()->query('COMMIT');
 		}
@@ -824,6 +838,42 @@ class User_Controller extends ControllerSQL{
 			throw new Exception(ERR_AUTH);
 		}
 	
+	}
+	
+	private function update_pwd($userId,$pwd,$email,$tel){
+		$pwd_db = NULL;
+		FieldSQLString::formatForDb($this->getDbLink(),
+			$pwd,
+			$pwd_db);
+	
+		$this->pwd_notify($userId,$pwd,$pwd_db,$email,$tel);
+		
+		$this->getDbLinkMaster()->query(sprintf(
+			"UPDATE users SET pwd=md5(%s)
+			WHERE id=%d",
+			$pwd_db,$userId)
+		);
+	}
+	
+	public function reset_pwd($pm){
+		
+		$ar = $this->getDbLink()->query_first(sprintf(
+		"SELECT email,phone_cel
+		FROM users
+		WHERE id=%d",
+		$this->getExtDbVal($pm,'user_id')
+		));
+		if (!is_array($ar)||!count($ar)){
+			throw new Exception(User_Controller::ER_USER_NOT_DEFIND);
+		}		
+		if (!strlen($ar['email'])&&!strlen($ar['phone_cel'])){
+			throw new Exception(User_Controller::ER_NO_EMAIL_TEL);
+		}
+		
+		$this->update_pwd(
+			$this->getExtDbVal($pm,'user_id'),
+			gen_pwd(self::PWD_LEN),
+			$ar['email'],$ar['phone_cel']);
 	}
 	
 

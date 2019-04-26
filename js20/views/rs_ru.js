@@ -73,3 +73,5 @@ SMSForSendingList_View.prototype.HEAD_TITLE = "СМС сообщения";
 TrackerZoneControlList_View.prototype.HEAD_TITLE = "Запретные зоны";
 
 AssignedVehicleList_View.prototype.HEAD_TITLE = "Текущие назначения";
+
+ClientTelList_View.prototype.HEAD_TITLE = "Прорабы клиентов";

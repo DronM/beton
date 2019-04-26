@@ -1,6 +1,6 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function VehicleScheduleMakeOrderList_View(id,options){	
 
 	var model = options.models.VehicleScheduleMakeOrderList_Model;
@@ -15,8 +15,9 @@ function VehicleScheduleMakeOrderList_View(id,options){
 		var popup_menu = new PopUpMenu();
 		var pagClass = window.getApp().getPaginationClass();
 		var grid = new GridAjx(id+":grid",{
+			"className":"table table-bordered table-responsive",
 			"model":model,
-			"controller":contr,
+			"readPublicMethod":contr.getPublicMethod("get_current_veh_list"),
 			"editInline":false,
 			"editWinClass":null,
 			"commands":new GridCmdContainerAjx(id+":grid:cmd",{
@@ -27,6 +28,35 @@ function VehicleScheduleMakeOrderList_View(id,options){
 				"filters":null,
 				"variantStorage":null
 			}),
+			"onEventSetRowOptions":function(opts){
+				opts.className = opts.className||"";
+				var m = this.getModel();
+				var veh_state = m.getFieldValue("state");
+					
+				opts.className+=(opts.className.length? " ":"")+"veh_in_make_list";
+				if (m.getFieldValue("is_late")){
+					opts.className+=(opts.className.length? " ":"")+"veh_late";
+				}
+				else{
+					opts.className+=(opts.className.length? " ":"")+ "veh_"+veh_state;
+				}
+				if (m.getFieldValue("is_late_at_dest")){
+					opts.className+=(opts.className.length? " ":"")+"veh_late_at_dest";
+				}
+
+				if (veh_state=="shift"){
+					opts.className+=(opts.className.length? " ":"")+"veh_shift";
+				}
+				
+				//opts.title = "Кликните для отображения местоположения ТС карте";
+				
+				/*opts.events = opts.events || {};
+				opts.events.click = function(e){
+					if(e.target.tagName=="TD"){
+						self.showVehCurrentPosition(CommonHelper.unserialize(this.getAttr("keys")).id);
+					}
+				}*/
+			},			
 			"popUpMenu":popup_menu,
 			"head":new GridHead(id+"-grid:head",{
 				"elements":[
@@ -100,6 +130,7 @@ function VehicleScheduleMakeOrderList_View(id,options){
 					})
 				]
 			}),
+			"selectedRowClass":"order_current_row",
 			"pagination":new pagClass(id+"_page",
 				{"countPerPage":constants.doc_per_page_count.getValue()}),		
 			"autoRefresh":false,
@@ -113,7 +144,7 @@ function VehicleScheduleMakeOrderList_View(id,options){
 	
 	VehicleScheduleMakeOrderList_View.superclass.constructor.call(this,id,options);
 }
-extend(VehicleScheduleMakeOrderList_View,ViewAjx);
+extend(VehicleScheduleMakeOrderList_View,ViewAjxList);
 
 VehicleScheduleMakeOrderList_View.prototype.COL_DRIVER_LEN = 8;
 VehicleScheduleMakeOrderList_View.prototype.COL_OWNER_LEN = 8;
