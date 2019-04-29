@@ -20,10 +20,10 @@ function Enum_vehicle_states(id,options){
 ,"ru_assigned":"назначен"
 ,"ru_busy":"отгружен"
 ,"ru_left_for_dest":"едет на объект"
-,"ru_at_dest":"у клиента"
+,"ru_at_dest":"на объекте"
 ,"ru_left_for_base":"едет на базу"
-,"ru_out_from_shift":"уехал со смены"
-,"ru_out":"уехал"
+,"ru_out_from_shift":"сошёл со см."
+,"ru_out":"сошёл"
 ,"ru_shift_added":"доб.смена"
 };
 	options.options = [{"value":"shift",

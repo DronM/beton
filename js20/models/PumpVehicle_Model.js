@@ -59,6 +59,16 @@ function PumpVehicle_Model(options){
 	options.fields.phone_cel = new FieldString("phone_cel",filed_options);
 	options.fields.phone_cel.getValidator().setMaxLength('15');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.deleted = new FieldBool("deleted",filed_options);
+	
 		PumpVehicle_Model.superclass.constructor.call(this,id,options);
 }
 extend(PumpVehicle_Model,ModelXML);

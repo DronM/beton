@@ -170,6 +170,7 @@
 		m.setFieldValue("concrete_types_ref",calc_v.getElement("concrete_type").getValue());
 		m.setFieldValue("destination_cost",calc_v.getElement("destination_cost").getValue());
 		m.setFieldValue("destination_price",calc_v.m_destinationPrice);
+		m.setFieldValue("destination_distance",calc_v.m_destinationDistance);
 		m.setFieldValue("concrete_cost",calc_v.getElement("concrete_cost").getValue());
 		m.setFieldValue("concrete_price",calc_v.m_concretePrice);
 		m.setFieldValue("unload_cost",calc_v.getElement("unload_cost").getValue());
@@ -258,7 +259,7 @@
 	
 	<xsl:apply-templates select="model[@id='ModelVars']"/>
 	<xsl:apply-templates select="model[@id='ModelStyleSheet']/row"/>
-	<link rel="icon" type="image/png" href="img/favicon.png"/>
+	<link rel="icon" type="image/png" href="img/favicon.ico"/>
 	
 	<title>Евробетон</title>
 </xsl:template>

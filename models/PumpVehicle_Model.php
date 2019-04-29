@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
  
 class PumpVehicle_Model extends ModelSQLBeton{
 	
@@ -52,6 +53,15 @@ class PumpVehicle_Model extends ModelSQLBeton{
 				
 		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
+		//********************
+		
+		//*** Field deleted ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="deleted";
+				
+		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
+		$this->addField($f_deleted);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

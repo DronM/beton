@@ -160,8 +160,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$ar = $this->getDbLink()->query_first(
 			sprintf(
 			"SELECT 
-				u.*
-			FROM users_dialog AS u
+				ud.*
+			FROM users AS u
+			LEFT JOIN users_dialog AS ud ON ud.id=u.id
 			WHERE (u.name=%s OR u.email=%s) AND u.pwd=md5(%s)",
 			$this->getExtDbVal($pm,'name'),
 			$this->getExtDbVal($pm,'name'),

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-04-26 07:41:48</lastBuild></version>
+		<lastBuild>2019-04-29 07:05:32</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -20,6 +20,7 @@
 		<version dateOpen="2019-04-22 15:04:42" dateClose="2019-04-25 06:04:15">1.0014</version>
 		<version dateOpen="2019-04-25 09:04:08" dateClose="2019-04-25 09:04:59">1.0015</version>
 		<version dateOpen="2019-04-25 12:04:45" dateClose="2019-04-26 07:04:41">1.0016</version>
+		<version dateOpen="2019-04-26 07:04:42" dateClose="2019-04-29 07:04:05">1.0017</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -100,16 +101,16 @@
 				<ru descr="едет на объект"/>
 			</value>
 			<value id="at_dest">
-				<ru descr="у клиента"/>
+				<ru descr="на объекте"/>
 			</value>
 			<value id="left_for_base">
 				<ru descr="едет на базу"/>
 			</value>
 			<value id="out_from_shift">
-				<ru descr="уехал со смены"/>
+				<ru descr="сошёл со см."/>
 			</value>
 			<value id="out">
-				<ru descr="уехал"/>
+				<ru descr="сошёл"/>
 			</value>
 			<value id="shift_added">
 				<ru descr="доб.смена"/>
@@ -353,6 +354,7 @@
 			<field id="phone_cel" dataType="String"/>
 			<field id="tel_ext" dataType="String"/>
 			<field id="email" dataType="String"/>
+			<field id="banned" dataType="Bool"/>
 		</model>
 		<model id="UserDialog" parent="ModelSQLBeton" dataTable="users_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
@@ -598,8 +600,20 @@
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
 			<field id="pump_price_id" dataType="Int" refTable="pump_prices" refField="id"/>
 			<field id="phone_cel" dataType="String" length="15"/>
+			<field id="deleted" dataType="Bool" defaultValue="FALSE"/>
 		</model>
 		<model id="PumpVehicleList" parent="ModelSQLBeton" dataTable="pump_veh_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="phone_cel" dataType="String"/>
+			<field id="pump_prices_ref" dataType="JSON"/>
+			<field id="pump_vehicles_ref" dataType="JSON"/>
+			<field id="owner" dataType="String"/>
+			<field id="feature" dataType="String"/>
+			<field id="make" dataType="String"/>
+			<field id="plate" dataType="String"/>
+			<field id="deleted" dataType="Bool"/>
+		</model>
+		<model id="PumpVehicleWorkList" parent="ModelSQLBeton" dataTable="pump_veh_work_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="phone_cel" dataType="String"/>
 			<field id="pump_prices_ref" dataType="JSON"/>
@@ -2717,6 +2731,7 @@
 			<publicMethod id="update" modelId="PumpVehicle"/>
 			<publicMethod id="delete" modelId="PumpVehicle"/>
 			<publicMethod id="get_list" modelId="PumpVehicleList"/>
+			<publicMethod id="get_work_list" modelId="PumpVehicleWorkList" condFields="TRUE"/>
 			<publicMethod id="get_object" modelId="PumpVehicleList"/>
 			<publicMethod id="get_price">
 				<field id="pump_id" dataType="Int" required="TRUE"/>
@@ -3740,6 +3755,7 @@
 		<jsScript file="models/ClientTelList_Model.js"/>
 		<jsScript file="controllers/VehicleDriverForSchedGen_Controller.js"/>
 		<jsScript file="models/VehicleDriverForSchedGen_Model.js"/>
+		<jsScript file="models/PumpVehicleWorkList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

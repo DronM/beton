@@ -1522,6 +1522,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ClientTelList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleDriverForSchedGen_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleDriverForSchedGen_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/PumpVehicleWorkList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

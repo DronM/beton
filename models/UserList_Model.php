@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLEnum.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
  
 class UserList_Model extends ModelSQLBeton{
 	
@@ -67,6 +68,14 @@ class UserList_Model extends ModelSQLBeton{
 				
 		$f_email=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"email",$f_opts);
 		$this->addField($f_email);
+		//********************
+		
+		//*** Field banned ***
+		$f_opts = array();
+		$f_opts['id']="banned";
+				
+		$f_banned=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"banned",$f_opts);
+		$this->addField($f_banned);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

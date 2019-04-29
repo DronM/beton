@@ -118,6 +118,7 @@
 <li><a href="#PumpPriceValue_Model">PumpPriceValue_Model</a></li>
 <li><a href="#PumpVehicle_Model">PumpVehicle_Model</a></li>
 <li><a href="#PumpVehicleList_Model">PumpVehicleList_Model</a></li>
+<li><a href="#PumpVehicleWorkList_Model">PumpVehicleWorkList_Model</a></li>
 <li><a href="#Order_Model">Order_Model</a></li>
 <li><a href="#OrderList_Model">OrderList_Model</a></li>
 <li><a href="#OrderPump_Model">OrderPump_Model</a></li>
@@ -1473,7 +1474,8 @@
 <a href="#PumpVehicle_Model">Model: PumpVehicle_Model</a><h2>update</h2>
 <a href="#PumpVehicle_Model">Model: PumpVehicle_Model</a><h2>delete</h2>
 <a href="#PumpVehicle_Model">Model: PumpVehicle_Model</a><h2>get_list</h2>
-<a href="#PumpVehicleList_Model">Model: PumpVehicleList_Model</a><h2>get_object</h2>
+<a href="#PumpVehicleList_Model">Model: PumpVehicleList_Model</a><h2>get_work_list</h2>
+<a href="#PumpVehicleWorkList_Model">Model: PumpVehicleWorkList_Model</a><h2>get_object</h2>
 <a href="#PumpVehicleList_Model">Model: PumpVehicleList_Model</a><h2>get_price</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
@@ -6389,10 +6391,76 @@
 <div>Required:</div>
 <div>Length:15</div>
 <div>Precision:</div>
+<h2>deleted</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="PumpVehicleList_Model" class="content_box">
 <h1>PumpVehicleList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>phone_cel</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_prices_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>owner</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>feature</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>make</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>plate</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>deleted</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="PumpVehicleWorkList_Model" class="content_box">
+<h1>PumpVehicleWorkList_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
 <h2>id</h2>
@@ -9109,6 +9177,12 @@
 <div>Precision:</div>
 <h2>email</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>banned</h2>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

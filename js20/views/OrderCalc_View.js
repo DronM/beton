@@ -58,7 +58,7 @@ function OrderCalc_View(id,options){
 
 		this.addElement(new ConcreteTypeEdit(id+":concrete_type",{			
 			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),
+			"editContClassName":("input-group "+window.getBsCol(2)),
 			"onSelect":function(f){
 				self.onSelectConcrete(f);
 			},
@@ -68,7 +68,7 @@ function OrderCalc_View(id,options){
 		this.addElement(new Enum_unload_types(id+":unload_type",{
 			"labelCaption":"Вид насоса:",
 			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(2)),			
+			"editContClassName":("input-group "+window.getBsCol(2)),			
 			"defaultValue":"none",
 			"addNotSelected":false,
 			"events":{
@@ -82,7 +82,7 @@ function OrderCalc_View(id,options){
 		this.addElement(new PumpVehicleEdit(id+":pump_vehicle",{
 			//"enabled":false,
 			"labelClassName":obj_bs_cl,
-			//"editContClassName":("input-group "+window.getBsCol(7)),
+			"editContClassName":("input-group "+window.getBsCol(2)),
 			"onSelect":function(f){
 				self.onSelectPumpVehicle(f);
 			}
@@ -96,6 +96,7 @@ function OrderCalc_View(id,options){
 			"labelCaption":"Бетон:",
 			"enabled":false,
 			"value":0,
+			"attrs":{"initvalue":"0.00"},
 			"events":{
 				"change":function(){
 					self.recalcTotal();
@@ -109,6 +110,7 @@ function OrderCalc_View(id,options){
 			"className":"form-control orderMoneyField",
 			"labelCaption":"Доставка:",
 			"value":0,
+			"attrs":{"initvalue":"0.00"},
 			"enabled":false,
 			"events":{
 				"change":function(){
@@ -122,6 +124,7 @@ function OrderCalc_View(id,options){
 			"className":"form-control orderMoneyField",
 			"labelCaption":"Насос:",
 			"value":0,
+			"attrs":{"initvalue":"0.00"},
 			"enabled":false,
 			"events":{
 				"change":function(){
@@ -131,10 +134,11 @@ function OrderCalc_View(id,options){
 		}));
 		this.addElement(new EditMoneyEditable(id+":total",{
 			"labelClassName":("control-label "+window.getBsCol(5))+" orderMoneyFieldLab",
-			//"editContClassName":("input-group"+window.getBsCol(7)),
+			"editContClassName":("input-group "+window.getBsCol(12)),
 			"className":"form-control orderMoneyField",
 			"labelCaption":"Всего:",
 			"value":0,
+			"attrs":{"initvalue":"0.00"},
 			"enabled":false
 		}));
 	

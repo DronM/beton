@@ -54,6 +54,12 @@ function OrderTimeSelect(id,options){
 }
 extend(OrderTimeSelect,EditSelect);
 
+OrderTimeSelect.prototype.setInitValue = function(val){
+	val = (val&&typeof(val)=="object")? DateHelper.format(val,"H:i"):val;
+	this.setAttr(this.VAL_INIT_ATTR,val);
+	this.setValue(val);
+}
+
 OrderTimeSelect.prototype.setValue = function(val){
 	val = (val&&typeof(val)=="object")? DateHelper.format(val,"H:i"):val;
 	OrderTimeSelect.superclass.setValue.call(this,val);

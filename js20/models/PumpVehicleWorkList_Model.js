@@ -16,8 +16,8 @@
  * @param {Object} options
  */
 
-function UserList_Model(options){
-	var id = 'UserList_Model';
+function PumpVehicleWorkList_Model(options){
+	var id = 'PumpVehicleWorkList_Model';
 	options = options || {};
 	
 	options.fields = {};
@@ -38,25 +38,6 @@ function UserList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.name = new FieldString("name",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.role_id = new FieldEnum("role_id",filed_options);
-	filed_options.enumValues = 'admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor';
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
 	options.fields.phone_cel = new FieldString("phone_cel",filed_options);
 	
 				
@@ -66,7 +47,7 @@ function UserList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.tel_ext = new FieldString("tel_ext",filed_options);
+	options.fields.pump_prices_ref = new FieldJSON("pump_prices_ref",filed_options);
 	
 				
 	
@@ -75,7 +56,7 @@ function UserList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.email = new FieldString("email",filed_options);
+	options.fields.pump_vehicles_ref = new FieldJSON("pump_vehicles_ref",filed_options);
 	
 				
 	
@@ -84,9 +65,36 @@ function UserList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.banned = new FieldBool("banned",filed_options);
+	options.fields.owner = new FieldString("owner",filed_options);
 	
-		UserList_Model.superclass.constructor.call(this,id,options);
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.feature = new FieldString("feature",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.make = new FieldString("make",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.plate = new FieldString("plate",filed_options);
+	
+		PumpVehicleWorkList_Model.superclass.constructor.call(this,id,options);
 }
-extend(UserList_Model,ModelXML);
+extend(PumpVehicleWorkList_Model,ModelXML);
 

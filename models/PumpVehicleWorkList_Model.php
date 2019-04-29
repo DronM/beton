@@ -9,17 +9,16 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
-class PumpVehicleList_Model extends ModelSQLBeton{
+class PumpVehicleWorkList_Model extends ModelSQLBeton{
 	
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
 		$this->setDbName("public");
 		
-		$this->setTableName("pump_veh_list");
+		$this->setTableName("pump_veh_work_list");
 			
 		//*** Field id ***
 		$f_opts = array();
@@ -84,14 +83,6 @@ class PumpVehicleList_Model extends ModelSQLBeton{
 				
 		$f_plate=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"plate",$f_opts);
 		$this->addField($f_plate);
-		//********************
-		
-		//*** Field deleted ***
-		$f_opts = array();
-		$f_opts['id']="deleted";
-				
-		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
-		$this->addField($f_deleted);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

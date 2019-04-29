@@ -20,7 +20,7 @@ CREATE OR REPLACE VIEW assigned_vehicles_list AS
 	LEFT JOIN production_sites AS ps ON ps.id=sh.production_site_id
 	WHERE sh.ship_date_time IS NULL
 		AND sh.date_time BETWEEN get_shift_start(now()::timestamp) AND get_shift_end(get_shift_start(now()::timestamp))
-	ORDER BY ps.name,sh.date_time DESC
+	ORDER BY ps.name,sh.date_time ASC
 	;
 	
 ALTER VIEW assigned_vehicles_list OWNER TO ;

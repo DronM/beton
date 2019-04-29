@@ -53,6 +53,7 @@ function AstIncomeCall_View(id,options){
 		}));	
 
 		this.addElement(new ClientEdit(id+":client",{
+			"cmdInsert":true
 		}));	
 
 		this.addElement(new Enum_client_kinds(id+":client_kind",{

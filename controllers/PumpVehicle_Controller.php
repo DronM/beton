@@ -36,6 +36,9 @@ class PumpVehicle_Controller extends ControllerSQL{
 		$param = new FieldExtString('phone_cel'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtBool('deleted'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -63,6 +66,10 @@ class PumpVehicle_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('phone_cel'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('deleted'
 				,array(
 			));
 			$pm->addParam($param);
@@ -106,6 +113,21 @@ class PumpVehicle_Controller extends ControllerSQL{
 		$this->setListModelId('PumpVehicleList_Model');
 		
 			
+		$pm = new PublicMethod('get_work_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+		$this->addPublicMethod($pm);
+
+			
 		/* get_object */
 		$pm = new PublicMethod('get_object');
 		$pm->addParam(new FieldExtString('mode'));
@@ -139,5 +161,10 @@ class PumpVehicle_Controller extends ControllerSQL{
 		
 	}	
 	
+	public function get_work_list($pm){
+		$this->setListModelId("PumpVehicleWorkList_Model");
+		parent::get_list($pm);
+	}
+
 }
 ?>

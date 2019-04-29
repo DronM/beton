@@ -419,6 +419,12 @@ a{
 	height:50px;
 	font-size:25px;
 }
+.btnMoneyField{
+	height:50px;
+}
+.glyphMoneyField{
+	font-size:25px;
+}
 /*
 #OrderDialog\:unload_price\:label{
 	font-weight:bold;

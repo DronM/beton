@@ -622,6 +622,8 @@ $permissions = array();
 				
 					$permissions['PumpVehicle_Controller_get_list']=TRUE;
 				
+					$permissions['PumpVehicle_Controller_get_work_list']=TRUE;
+				
 					$permissions['PumpVehicle_Controller_get_object']=TRUE;
 				
 					$permissions['PumpVehicle_Controller_get_price']=TRUE;

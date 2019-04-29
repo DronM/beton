@@ -69,13 +69,26 @@ AppBeton.prototype.getColorClass = function(){
 AppBeton.prototype.setColorClass = function(v){
 	this.m_colorClass = v;
 }
+
+AppBeton.prototype.formatCellStr = function(fVal,cell,len){
+	var res = "";
+	if(fVal && fVal.length>len+2){
+		cell.setAttr("title",fVal);
+		res = fVal.substr(0,len)+"...";
+	}
+	else if(fVal){
+		res = fVal;
+	}
+	return res;
+}
+
 AppBeton.prototype.formatCell = function(field,cell,len){
 	var res = "";
 	if(field&&!field.isNull()){
 		var f_val = field.getValue();
 		if(typeof f_val=="object")
 			f_val = f_val.getDescr();
-			
+		/*	
 		if(f_val&&f_val.length>len+2){
 			cell.setAttr("title",f_val);
 			res = f_val.substr(0,len)+"...";
@@ -83,6 +96,8 @@ AppBeton.prototype.formatCell = function(field,cell,len){
 		else if(f_val){
 			res = f_val;
 		}
+		*/
+		res = this.formatCellStr(f_val,cell,len);
 	}
 	return res;
 }

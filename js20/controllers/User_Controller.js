@@ -246,6 +246,9 @@ extend(User_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldString("email",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("banned",f_opts));
 }
 
 			User_Controller.prototype.addGetObject = function(){

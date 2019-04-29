@@ -27,6 +27,10 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+	public function get_work_list($pm){
+		$this->setListModelId("PumpVehicleWorkList_Model");
+		parent::get_list($pm);
+	}
 </xsl:template>
 
 </xsl:stylesheet>

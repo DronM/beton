@@ -17,6 +17,7 @@ function OrderMakeGrid(id,options){
 	this.m_listView = options.listView;
 	this.m_stepMin = parseInt(options.stepMin,10);
 	this.m_shiftStartMS = DateHelper.timeToMS(options.shiftStart);
+	this.m_shiftLengthMS = DateHelper.timeToMS(options.shiftLength);
 	this.m_periodSelect = options.periodSelect;
 	
 	var self = this;
@@ -168,11 +169,12 @@ function OrderMakeGrid(id,options){
 							"columns":[
 								new GridColumn({
 									"field":model.getField("unload_type"),
-									"formatFunction":function(fields){
+									"formatFunction":function(fields,cell){
 										var res = "";
 										var tp = fields.unload_type.getValue();
 										if(tp=="band"||tp=="pump"){
-											res = fields.pump_vehicle_owner.getValue();
+											//res = fields.pump_vehicle_owner.getValue();
+											res = window.getApp().formatCell(fields.pump_vehicle_owner,cell,self.m_listView.COL_PUMP_VEH_LEN);
 										}
 										return res;
 									}
@@ -387,12 +389,11 @@ OrderMakeGrid.prototype.onGetData = function(){
 		
 		var closed_shift;
 		while(this.m_model.getNextRow()){			
-			
 			//*** ADDED missing rows ****
 			var dt = this.m_model.getFieldValue("date_time");
-			if(row_cnt==0)
+			if(row_cnt==0){
 				closed_shift = (dt.getTime()<now_shift_start.getTime());
-			
+			}
 			var dt_m = dt.getHours()*60 + dt.getMinutes();
 			var comp_time_m = (init_time_m>prev_time_m)? init_time_m:prev_time_m;
 			if(!closed_shift && dt_m>comp_time_m && (future_shift || now_m<dt_m) ){
@@ -464,9 +465,9 @@ OrderMakeGrid.prototype.onGetData = function(){
 		}
 		
 		//ADDED
-		var h = 24*60;
-		if(!closed_shift && prev_time_m<h && (future_shift || now_m<prev_time_m) ){
-			this.addEmptyRows(prev_time_m,h,columns,row_cnt);
+		var mm = this.m_shiftLengthMS/60/1000;
+		if(!closed_shift && prev_time_m<mm && (future_shift || now_m<prev_time_m) ){
+			this.addEmptyRows(prev_time_m,mm,columns,row_cnt);
 		}			
 		//ADDED
 		
@@ -724,13 +725,10 @@ OrderMakeGrid.prototype.afterServerDelRow = function(){
 	this.deleteRowNode();
 	this.setEnabled(true);			
 	var self = this;
-	/*window.showNote(this.NT_REC_DELETED,function(){
+	window.showTempNote("Заявка удалена",function(){
 		self.focus();
-		if (self.getRefreshAfterDelRow()){
-			self.onRefresh();
-		}		
+		self.onRefresh();
 	},2000);			
-	*/
 }
 /*
 OrderMakeGrid.prototype.delDOM = function(){

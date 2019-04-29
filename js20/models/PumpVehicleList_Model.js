@@ -94,6 +94,15 @@ function PumpVehicleList_Model(options){
 	
 	options.fields.plate = new FieldString("plate",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.deleted = new FieldBool("deleted",filed_options);
+	
 		PumpVehicleList_Model.superclass.constructor.call(this,id,options);
 }
 extend(PumpVehicleList_Model,ModelXML);

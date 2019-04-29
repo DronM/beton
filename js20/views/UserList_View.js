@@ -67,6 +67,15 @@ function UserList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:banned",{
+							"value":"Доступ закрыт",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("banned"),
+									"assocClassList":{"true":"glyphicon glyphicon-ok"}
+								})
+							]
+						})
 						
 					]
 				})

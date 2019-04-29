@@ -127,7 +127,7 @@ function OrderDialog_View(id,options){
 			"fields":{
 				"descr":new FieldString("descr"),
 				"phone_cel":new FieldString("phone_cel"),
-				"langs_ref":new FieldJSON("langs_ref"),
+				//"langs_ref":new FieldJSON("langs_ref"),
 				"clients_ref":new FieldJSON("clients_ref")
 			}
 		})
@@ -161,12 +161,12 @@ function OrderDialog_View(id,options){
 			"labelClassName":obj_bs_cl,
 			"labelCaption":"Телефон:",
 		}));
-
+		/*
 		this.addElement(new LangEditRef(id+":lang",{
 			"labelClassName":obj_bs_cl,
 			"value":constants.def_lang.getValue()
 		}));	
-
+		*/
 		this.addElement(new UserEditRef(id+":user",{
 			"labelClassName":obj_bs_cl,
 			"labelCaption":"Автор документа:",
@@ -214,7 +214,7 @@ function OrderDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("calc").getElement("unload_type")})
 		,new DataBinding({"control":this.getElement("descr")})
 		,new DataBinding({"control":this.getElement("phone_cel")})
-		,new DataBinding({"control":this.getElement("lang"),"field":this.m_model.getField("langs_ref")})
+		//,new DataBinding({"control":this.getElement("lang"),"field":this.m_model.getField("langs_ref")})
 		,new DataBinding({"control":this.getElement("user"),"field":this.m_model.getField("users_ref")})
 		,new DataBinding({"control":this.getElement("calc").getElement("destination_price")})
 		,new DataBinding({"control":this.getElement("calc").getElement("concrete_price")})
@@ -226,9 +226,11 @@ function OrderDialog_View(id,options){
 	
 	//write
 	this.setWriteBindings([
-		new CommandBinding({"func":function(pm){
-			self.setPublicMethodDateTime(pm);
-		}})
+		new CommandBinding({
+			"func":function(pm){
+				self.setPublicMethodDateTime(pm);
+			}
+		})
 		,new CommandBinding({"control":this.getElement("pay_cash")})
 		,new CommandBinding({"control":this.getElement("under_control")})
 		,new CommandBinding({"control":this.getElement("payed")})
@@ -242,7 +244,7 @@ function OrderDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("calc").getElement("unload_type")})
 		,new CommandBinding({"control":this.getElement("descr")})
 		,new CommandBinding({"control":this.getElement("phone_cel")})
-		,new CommandBinding({"control":this.getElement("lang"),"fieldId":"lang_id"})
+		//,new CommandBinding({"control":this.getElement("lang"),"fieldId":"lang_id"})
 		,new CommandBinding({"control":this.getElement("user"),"fieldId":"user_id"})
 		,new CommandBinding({"control":this.getElement("calc").getElement("destination_cost"),"fieldId":"destination_price"})
 		,new CommandBinding({"control":this.getElement("calc").getElement("concrete_cost"),"fieldId":"concrete_price"})
@@ -256,7 +258,7 @@ extend(OrderDialog_View,ViewObjectAjx);
 
 OrderDialog_View.prototype.onSelectDescr = function(f){
 	this.getElement("phone_cel").setValue(f.phone_cel.getValue());
-	this.getElement("lang").setValue(f.langs_ref.getValue());
+	//this.getElement("lang").setValue(f.langs_ref.getValue());
 }
 
 OrderDialog_View.prototype.onSelectClient = function(f){
@@ -290,8 +292,16 @@ OrderDialog_View.prototype.getAvailSpots = function(){
 	);
 }
 
+OrderDialog_View.prototype.getModified = function(cmd){
+	return ((OrderDialog_View.superclass.getModified.call(this,cmd)===true)? true:this.getDateModified());
+}
+
+OrderDialog_View.prototype.getDateModified = function(pm){
+	return (this.getElement("date_time_date").getModified()||this.getElement("date_time_time").getModified());
+}
+
 OrderDialog_View.prototype.setPublicMethodDateTime = function(pm){
-	if(this.getElement("date_time_date").getModified()||this.getElement("date_time_time").getModified()){
+	if(this.getDateModified()){
 	
 		var dt = this.getElement("date_time_date").getValue();
 		if(dt){
@@ -299,6 +309,7 @@ OrderDialog_View.prototype.setPublicMethodDateTime = function(pm){
 			dt = new Date(dt.getTime()+ DateHelper.timeToMS(this.getElement("date_time_time").getValue()));
 		}
 		pm.setFieldValue("date_time",dt);
+		res = true;
 	}
 }
 

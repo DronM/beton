@@ -1,8 +1,8 @@
--- View: public.pump_veh_list
+-- View: public.pump_veh_work_list
 
--- DROP VIEW public.pump_veh_list CASCADE;
+-- DROP VIEW public.pump_veh_work_list CASCADE;
 
-CREATE OR REPLACE VIEW public.pump_veh_list AS 
+CREATE OR REPLACE VIEW public.pump_veh_work_list AS 
 	SELECT
 		pv.id,
 		pv.phone_cel,
@@ -12,14 +12,14 @@ CREATE OR REPLACE VIEW public.pump_veh_list AS
 		v.make,
 		v.owner,
 		v.feature,
-		v.plate,
-		pv.deleted
+		v.plate
 		
 	FROM pump_vehicles pv
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
 	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	WHERE coalesce(pv.deleted,FALSE)=FALSE
 	ORDER BY v.plate;
 
-ALTER TABLE public.pump_veh_list
+ALTER TABLE public.pump_veh_work_list
   OWNER TO beton;
 

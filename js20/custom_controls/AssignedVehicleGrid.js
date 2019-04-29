@@ -19,7 +19,7 @@ function AssignedVehicleGrid(id,options){
 	if(!options.refreshInterval)
 		options.contClassName = window.getApp().getBsCol(5);
 	
-	this.m_shortDestinations = options.shortDestinations;
+	this.m_shortDescriptions = options.shortDescriptions;
 	var self = this;	
 	options.keyIds = ["id"];
 	options.editInline = false;
@@ -52,8 +52,12 @@ function AssignedVehicleGrid(id,options){
 							new GridColumn({
 								"id":"driver",
 								"formatFunction":function(f){
-									var res = (f&&f.drivers_ref&&!f.drivers_ref.isNull())? f.drivers_ref.getValue().getDescr():"";
-									res+= (f&&f.vehicles_ref&&!f.vehicles_ref.isNull())? ","+f.vehicles_ref.getValue().getDescr():"";
+									var res = (f&&f.vehicles_ref&&!f.vehicles_ref.isNull())? f.vehicles_ref.getValue().getDescr():"";
+									res+= (f&&f.drivers_ref&&!f.drivers_ref.isNull())? ","+f.drivers_ref.getValue().getDescr():"";
+									if(self.m_shortDescriptions){
+										res = window.getApp().formatCellStr(res,cell,VehicleScheduleMakeOrderList_View.prototype.COL_DEST_LEN);
+									}
+									
 									return res;
 								}
 							})
@@ -67,8 +71,8 @@ function AssignedVehicleGrid(id,options){
 								"formatFunction":function(f,cell){
 									var res = "";
 									var not_empty = (f&&f.destinations_ref&&!f.destinations_ref.isNull());
-									if(self.m_shortDestinations && not_empty){
-										res = res.substr(0,15);
+									if(self.m_shortDescriptions && not_empty){
+										//res = res.substr(0,15);
 										res = window.getApp().formatCell(f.destinations_ref,cell,VehicleScheduleMakeOrderList_View.prototype.COL_DEST_LEN);
 									}
 									else if(not_empty){

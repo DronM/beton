@@ -679,14 +679,11 @@ class Order_Controller extends ControllerSQL{
 				Graph_Controller::clearCacheOnDate($dbLink,$new_date_time);
 			}			
 			
+			$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');
+			
 			$pump_sms_ar = NULL;
 			//если был насос,а сейчас нет или замена насоса - запомним старые данные для удаления насоса
-			if ($ar['pump_vehicle_id']
-			&&(
-				!$this->getExtVal($pm,'pump_vehicle_id')
-				||$this->getExtVal($pm,'pump_vehicle_id')!=$ar['pump_vehicle_id']
-				)
-			){				
+			if ($ar['pump_vehicle_id'] && $new_pump_vehicle_id && $new_pump_vehicle_id!=$ar['pump_vehicle_id']){
 				$pump_sms_ar = $this->getDbLink()->query_first(sprintf(
 					"SELECT
 						*
@@ -706,7 +703,7 @@ class Order_Controller extends ControllerSQL{
 		||($this->getExtVal($pm,'destination_id') && $this->getExtVal($pm,'destination_id')!=$ar['destination_id'])
 		||($this->getExtVal($pm,'lang_id') && $this->getExtVal($pm,'lang_id')!=$ar['lang_id'])
 		||($new_date_time && $new_date_time!=$old_date_time)
-		||($this->getExtVal($pm,'pump_vehicle_id') && $this->getExtVal($pm,'pump_vehicle_id')!=$ar['pump_vehicle_id'])
+		||($new_pump_vehicle_id && $new_pump_vehicle_id!=$ar['pump_vehicle_id'])
 		)
 		);
 		//
@@ -746,11 +743,11 @@ class Order_Controller extends ControllerSQL{
 			$date_time = $this->getExtVal($pm,"date_time");
 			$date_time = (isset($date_time))? $date_time:$old_date_time;
 			
-			/*Тип СМС для насосника insert/update
-			update только если был насос и он же остался (т.е. сейчас передали путую строку)
-			во всех остальных случаях - insert если вообще надо отправлять насоснику
-			что определяется в $pump_vehicle_id
-			*/
+			/** Тип СМС для насосника insert/update
+			 * update только если был насос и он же остался (т.е. сейчас передали путую строку)
+			 * во всех остальных случаях - insert если вообще надо отправлять насоснику
+			 * что определяется в $pump_vehicle_id
+			 */
 			$pumpInsert = !($ar['pump_vehicle_id']!='null'&&$pm->getParamValue('pump_vehicle_id')=='');
 			
 			$this->send_messages(
@@ -762,7 +759,7 @@ class Order_Controller extends ControllerSQL{
 		}
 		
 		/* Послать на удаление насоснику если был насос а сейчас нет, или сейчас другой */
-		if (is_array($pump_sms_ar)&&count($pump_sms_ar)){
+		if (is_array($pump_sms_ar) && count($pump_sms_ar)){
 			$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
 			$sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
 			

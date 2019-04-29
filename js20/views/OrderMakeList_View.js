@@ -18,7 +18,8 @@ function OrderMakeList_View(id,options){
 		"order_grid_refresh_interval":null,
 		"first_shift_start_time":null,
 		"day_shift_length":null,
-		"order_step_min":null
+		"order_step_min":null,
+		"shift_length_time":"null"
 	};
 	window.getApp().getConstantManager().get(constants);
 
@@ -69,7 +70,8 @@ function OrderMakeList_View(id,options){
 			"periodSelect":per_select,
 			"listView":this,
 			"stepMin":constants.order_step_min.getValue(),
-			"shiftStart":constants.first_shift_start_time.getValue()
+			"shiftStart":constants.first_shift_start_time.getValue(),
+			"shiftLength":constants.shift_length_time.getValue()
 		});
 		this.addElement(grid);
 		grid.onRefresh = function(){
@@ -154,7 +156,7 @@ function OrderMakeList_View(id,options){
 		//assigning
 		this.addElement(new AssignedVehicleList_View(id+":veh_assigning",{
 			"models":options.models,
-			"shortDestinations":true,
+			"shortDescriptions":true,
 			"noAutoRefresh":true
 		}));
 		
@@ -401,6 +403,7 @@ OrderMakeList_View.prototype.COL_DEST_LEN = 10;
 OrderMakeList_View.prototype.COL_COMMENT_LEN = 15;
 OrderMakeList_View.prototype.COL_DESCR_LEN = 10;
 OrderMakeList_View.prototype.COL_DRIVER_LEN = 10;
+OrderMakeList_View.prototype.COL_PUMP_VEH_LEN = 8;
 OrderMakeList_View.prototype.TABLE_CLASS = "table-bordered table-responsive table-striped table-make_order";
 
 OrderMakeList_View.prototype.m_orderedTotal;
