@@ -497,13 +497,11 @@ throw Error(CommonHelper.longString(function () {/*
 		}
 	</xsl:when>
 	
-	<xsl:when test="not($er_num='0') and not(/document/model[@id='ModelVars']/row/role_id='')">
-		throw new Error(
-			"code":<xsl:value-of select="$er_num"/>
-			,"message":CommonHelper.escapeDoubleQuotes(CommonHelper.longString(function () {/*
+	<xsl:when test="not($er_num='0') and not(/document/model[@id='ModelVars']/row/role_id='')">		
+		throw new Error(CommonHelper.escapeDoubleQuotes(CommonHelper.longString(function () {/*
 			<xsl:value-of select="/document/model[@id='ModelServResponse']/row/descr"/>
 			*/}))
-		);	
+		);
 	</xsl:when>
 	<xsl:when test="not($er_num='0')">
 		throw new FatalException({

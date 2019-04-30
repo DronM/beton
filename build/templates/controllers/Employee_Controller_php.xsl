@@ -17,9 +17,12 @@
 
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
-class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
-	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
-		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
+
+require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
+
+class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
+	public function __construct($dbLinkMaster=NULL){
+		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
 	}	
 	<xsl:call-template name="extra_methods"/>
 }
@@ -27,6 +30,16 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+	public function set_work_schedule_hour($pm){
+		$par = new ParamsSQL($pm,$this->getDbLink());				
+		$par->addAll();
+		$this->getDbLinkMaster()->query(sprintf(
+		"SELECT employee_work_time_sched_hour_set(%d,%s,%s)",
+		$par->getParamById('employee_id'),
+		$par->getParamById('day'),
+		$par->getParamById('hours')
+		));
+	}
 </xsl:template>
 
 </xsl:stylesheet>

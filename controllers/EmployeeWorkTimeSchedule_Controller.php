@@ -20,9 +20,13 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
  */
 
 
+
+require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
+require_once('common/MyDate.php');
+
 class EmployeeWorkTimeSchedule_Controller extends ControllerSQL{
-	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
-		parent::__construct($dbLinkMaster,$dbLink);
+	public function __construct($dbLinkMaster=NULL){
+		parent::__construct($dbLinkMaster);
 			
 
 		/* insert */
@@ -108,5 +112,35 @@ class EmployeeWorkTimeSchedule_Controller extends ControllerSQL{
 		
 	}	
 	
+	public function get_list($pm){
+		$db_link = $this->getDbLink();
+		$cond = new CondParamsSQL($pm,$this->getDbLink());
+		if($cond->paramExists('day','ge') && $cond->paramExists('day','le')){
+			$date_from = $cond->getVal('day','ge');
+			$date_to = $cond->getVal('day','le');
+		}
+		else{
+			$date_from = date('Y-m-d',MyDate::StartMonth(time()));
+			$date_to = date('Y-m-d',MyDate::EndMonth(time()));
+		}					
+		
+		//init date
+		$this->addModel(new ModelVars(
+			array('id'=>'InitDate',
+				'values'=>array(
+					new Field('dt',DT_DATETIME,
+						array('value'=>$date_from))
+				)
+			)
+		));		
+		
+		$this->addNewModel(sprintf(
+		"SELECT * FROM employee_work_time_schedules_list('%s','%s')",
+		$date_from,
+		$date_to
+		),
+		'EmployeeWorkTimeScheduleList_Model');
+	}
+
 }
 ?>

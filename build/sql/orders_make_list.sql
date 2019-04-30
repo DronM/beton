@@ -68,8 +68,8 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
 			FROM shipments
 			WHERE shipments.order_id = o.id AND shipments.shipped = true
 			ORDER BY shipments.ship_date_time DESC
-			LIMIT 1))::timestamp with time zone) > const_ord_mark_if_no_ship_time_val()::interval THEN true
-			ELSE false
+			LIMIT 1))::timestamp with time zone) > const_ord_mark_if_no_ship_time_val()::interval THEN TRUE
+			ELSE FALSE
 		END AS no_ship_mark,
 		
 		o.payed,

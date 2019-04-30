@@ -129,6 +129,9 @@ extend(RawMaterialProcurRate_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("supplier_id",f_opts));
 	var f_opts = {};
 	
+	pm.addField(new FieldString("supplier_descr",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldFloat("rate",f_opts));
 }
 

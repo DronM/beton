@@ -711,23 +711,17 @@ class Order_Controller extends ControllerSQL{
 		
 		if ($resend_sms){
 			//changed phone or date_time
-			$destination_id = $this->getExtDbVal($pm,'destination_id');
-			$destination_id = (isset($destination_id))? $destination_id:$ar['destination_id'];
+			$destination_id = ($pm->getParamValue('destination_id'))? $this->getExtDbVal($pm,'destination_id'):$ar['destination_id'];
 			
-			$phone_cel = $this->getExtDbVal($pm,'phone_cel');
-			$phone_cel = (isset($phone_cel))? $phone_cel:$ar['phone_cel'];			
+			$phone_cel = ($pm->getParamValue('phone_cel'))? $this->getExtDbVal($pm,'phone_cel'):$ar['phone_cel'];			
 			
-			$lang_id = $this->getExtDbVal($pm,'lang_id');
-			$lang_id = (isset($lang_id))? $lang_id:$ar['lang_id'];			
+			$lang_id = ($pm->getParamValue('lang_id'))? $this->getExtDbVal($pm,'lang_id'):$ar['lang_id'];			
 			
-			$concrete_type_id = $this->getExtDbVal($pm,'concrete_type_id');
-			$concrete_type_id = (isset($concrete_type_id))? $concrete_type_id:$ar['concrete_type_id'];
+			$concrete_type_id = ($pm->getParamValue('concrete_type_id'))? $this->getExtDbVal($pm,'concrete_type_id'):$ar['concrete_type_id'];
 			
-			$pump_vehicle_id = $this->getExtDbVal($pm,'pump_vehicle_id');
-			$pump_vehicle_id = (isset($pump_vehicle_id))? $pump_vehicle_id:$ar['pump_vehicle_id'];
+			$pump_vehicle_id = ($pm->getParamValue('pump_vehicle_id'))? $this->getExtDbVal($pm,'pump_vehicle_id'):$ar['pump_vehicle_id'];
 			
-			$quant = $this->getExtDbVal($pm,'quant');
-			$quant = (isset($quant))? $quant:$ar['quant'];
+			$quant = ($pm->getParamValue('quant'))? $this->getExtDbVal($pm,'quant'):$ar['quant'];
 			
 			$total = 0;
 			$pay_cash = $pm->getParamValue("pay_cash");
@@ -740,8 +734,7 @@ class Order_Controller extends ControllerSQL{
 				$total = (isset($total))? $total:$ar['total'];
 			}
 			
-			$date_time = $this->getExtVal($pm,"date_time");
-			$date_time = (isset($date_time))? $date_time:$old_date_time;
+			$date_time = ($pm->getParamValue('date_time'))? $this->getExtVal($pm,"date_time"):$old_date_time;
 			
 			/** Тип СМС для насосника insert/update
 			 * update только если был насос и он же остался (т.е. сейчас передали путую строку)

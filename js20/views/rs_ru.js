@@ -75,3 +75,7 @@ TrackerZoneControlList_View.prototype.HEAD_TITLE = "Запретные зоны"
 AssignedVehicleList_View.prototype.HEAD_TITLE = "Текущие назначения";
 
 ClientTelList_View.prototype.HEAD_TITLE = "Прорабы клиентов";
+
+EmployeeWorkTimeScheduleList_View.prototype.HEAD_TITLE = "Табель учета рабочего времени";
+
+ClientValidDuplicateList_View.prototype.HEAD_TITLE = "Разрешенные повторы контрагентов";

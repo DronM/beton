@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-04-29 07:05:32</lastBuild></version>
+		<lastBuild>2019-04-30 05:46:04</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -21,6 +21,7 @@
 		<version dateOpen="2019-04-25 09:04:08" dateClose="2019-04-25 09:04:59">1.0015</version>
 		<version dateOpen="2019-04-25 12:04:45" dateClose="2019-04-26 07:04:41">1.0016</version>
 		<version dateOpen="2019-04-26 07:04:42" dateClose="2019-04-29 07:04:05">1.0017</version>
+		<version dateOpen="2019-04-29 07:04:08" dateClose="2019-04-30 05:04:46">1.0018</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -545,6 +546,7 @@
 			<field id="material_id" dataType="Int" primaryKey="TRUE"/>
 			<field id="material_descr" dataType="String"/>
 			<field id="supplier_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="supplier_descr" dataType="String"/>
 			<field id="rate" dataType="Float"/>
 		</model>
 		<model id="RawMaterialProcurUpload" parent="ModelSQLBeton" dataTable="raw_material_procur_uploads" virtual="FALSE">
@@ -1501,7 +1503,7 @@
 			<field id="employee_id" dataType="Int" sysCol="TRUE"/>
 			<field id="employee_descr" dataType="String" alias="Сотрудник"/>
 			<field id="day" dataType="Date" sysCol="TRUE"/>
-			<field id="day_descr" dataType="String" alias="Дата"/>
+			<field id="day_off" dataType="Bool"/>
 			<field id="hours" dataType="Int" alias="Часы"/>
 		</model>
 		<model id="AstCall" parent="ModelSQLBeton" dataTable="ast_calls" virtual="FALSE">
@@ -1882,9 +1884,8 @@
 			</index>
 		</model>
 		<model id="ClientValidDuplicateList" parent="ModelSQLBeton" dataTable="client_valid_duplicates_list" virtual="TRUE">
-			<field id="client_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="tel" dataType="String" primaryKey="TRUE" alias="Телефон"/>
-			<field id="client_descr" dataType="String" alias="Клиент"/>
+			<field id="clients" dataType="Text" alias="Клиент"/>
 		</model>
 		<model id="ShipmentTimeNorm" parent="ModelSQLBeton" dataTable="shipment_time_norms" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE" alias="Объем"/>
@@ -2572,32 +2573,16 @@
 			<publicMethod id="delete" modelId="LabEntry"/>
 			<publicMethod id="get_list" modelId="LabEntryList"/>
 			<publicMethod id="get_object" modelId="LabEntryList"/>
-			<publicMethod id="lab_report">
-				<field id="cond_fields" dataType="String"/>
-				<field id="cond_vals" dataType="String"/>
-				<field id="cond_sgns" dataType="String"/>
-				<field id="cond_ic" dataType="String"/>
+			<publicMethod id="lab_report" condFields="TRUE">
 				<field id="templ" dataType="String"/>
 			</publicMethod>
-			<publicMethod id="item_report">
-				<field id="cond_fields" dataType="String"/>
-				<field id="cond_vals" dataType="String"/>
-				<field id="cond_sgns" dataType="String"/>
-				<field id="cond_ic" dataType="String"/>
+			<publicMethod id="item_report" condFields="TRUE">
 				<field id="templ" dataType="String"/>
 			</publicMethod>
-			<publicMethod id="lab_avg_report">
-				<field id="cond_fields" dataType="String"/>
-				<field id="cond_vals" dataType="String"/>
-				<field id="cond_sgns" dataType="String"/>
-				<field id="cond_ic" dataType="String"/>
+			<publicMethod id="lab_avg_report" condFields="TRUE">
 				<field id="templ" dataType="String"/>
 			</publicMethod>
-			<publicMethod id="item_on_rate_period_report">
-				<field id="cond_fields" dataType="String"/>
-				<field id="cond_vals" dataType="String"/>
-				<field id="cond_sgns" dataType="String"/>
-				<field id="cond_ic" dataType="String"/>
+			<publicMethod id="item_on_rate_period_report" condFields="TRUE">
 				<field id="templ" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="lab_entry30_days"/>
@@ -2639,7 +2624,7 @@
 			<publicMethod id="set_work_schedule_hour">
 				<field id="employee_id" dataType="Int" required="TRUE"/>
 				<field id="day" dataType="String" length="10" required="TRUE"/>
-				<field id="hours" dataType="Int" required="TRUE"/>
+				<field id="hours" dataType="Int"/>
 			</publicMethod>
 		</controller>
 		<controller id="EmployeeWorkTimeSchedule" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -2918,6 +2903,8 @@
 		<view id="30007" c="RawMaterialProcurUpload_Controller" t="RawMaterialProcurUploadList" f="get_list" section="Формы" descr="Лог загрузки приходов"/>
 		<view id="30008" c="SMSForSending_Controller" t="SMSForSendingList" f="get_list" section="Формы" descr="Отправка СМС"/>
 		<view id="30009" c="Shipment_Controller" t="AssignedVehicleList" f="get_assigned_vehicle_list" section="Формы" descr="Текущие назначения"/>
+		<view id="30010" c="EmployeeWorkTimeSchedule_Controller" t="EmployeeWorkTimeScheduleList" f="get_list" section="Формы" descr="Табель рабочего времени"/>
+		<view id="30011" c="ClientValidDuplicate_Controller" t="ClientValidDuplicateList" f="get_list" section="Формы" descr="Разрешенные повторы контрагентов"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС на карте"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -2925,6 +2912,7 @@
 		<view id="50005" t="VehicleEfficiency" section="Отчеты" descr="Эффективность работы ТС"/>
 		<view id="50006" t="ShipmentTimeList" section="Отчеты" descr="Опоздания назначений и отгрузок"/>
 		<view id="50007" t="SupplierOrderList" section="Отчеты" descr="Заявки на поставку"/>
+		<view id="50008" t="LabEntryReportList" section="Отчеты" descr="Отчет лаборанта"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -2981,6 +2969,8 @@
 		<serverTemplate id="AstCallClientCallHistoryList"/>
 		<serverTemplate id="AstCallClientShipHistoryList"/>
 		<serverTemplate id="ClientTelList"/>
+		<serverTemplate id="EmployeeWorkTimeScheduleList"/>
+		<serverTemplate id="ClientValidDuplicateList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -3002,6 +2992,7 @@
 		<jsTemplate id="ColorPaletteList" file="tmpl/ColorPaletteList.html"/>
 		<jsTemplate id="EditFile" file="tmpl/EditFile.html"/>
 		<jsTemplate id="EditPeriodShift" file="tmpl/EditPeriodShift.html"/>
+		<jsTemplate id="EditPeriodMonth" file="tmpl/EditPeriodMonth.html"/>
 		<jsTemplate id="ZoneDrawingControl" file="tmpl/ZoneDrawingControl.html"/>
 		<jsTemplate id="OrderDialog_View" file="tmpl/OrderDialog_View.html"/>
 		<jsTemplate id="AssignedVehicleList_View" file="tmpl/AssignedVehicleList_View.html"/>
@@ -3470,6 +3461,9 @@
 		<jsScript file="views/AstCallClientShipHistoryList_View.js"/>
 		<jsScript file="views/OrderCalc_View.js"/>
 		<jsScript file="views/ClientTelList_View.js"/>
+		<jsScript file="views/EmployeeWorkTimeScheduleList_View.js"/>
+		<jsScript file="views/ClientValidDuplicateList_View.js"/>
+		<jsScript file="views/LabEntryReportList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -3512,6 +3506,7 @@
 		<jsScript file="custom_controls/TrackerEdit.js"/>
 		<jsScript file="custom_controls/LangEditRef.js"/>
 		<jsScript file="custom_controls/EditPeriodShift.js"/>
+		<jsScript file="custom_controls/EditPeriodMonth.js"/>
 		<jsScript file="custom_controls/EditPeriodDateShift.js"/>
 		<jsScript file="custom_controls/PlantLoadGraphControl.js"/>
 		<jsScript file="custom_controls/ClientTypeEdit.js"/>
@@ -3551,6 +3546,7 @@
 		<jsScript file="custom_controls/AssignedVehicleGrid.js"/>
 		<jsScript file="custom_controls/Weather.js"/>
 		<jsScript file="custom_controls/VehicleDriverForSchedGenGrid.js"/>
+		<jsScript file="custom_controls/EmployeeWorkTimeScheduleGrid.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->

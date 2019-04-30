@@ -216,8 +216,8 @@ function OrderDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("phone_cel")})
 		//,new DataBinding({"control":this.getElement("lang"),"field":this.m_model.getField("langs_ref")})
 		,new DataBinding({"control":this.getElement("user"),"field":this.m_model.getField("users_ref")})
-		,new DataBinding({"control":this.getElement("calc").getElement("destination_price")})
-		,new DataBinding({"control":this.getElement("calc").getElement("concrete_price")})
+		,new DataBinding({"control":this.getElement("calc").getElement("destination_cost")})
+		,new DataBinding({"control":this.getElement("calc").getElement("concrete_cost")})
 		,new DataBinding({"control":this.getElement("calc").getElement("unload_price")})
 		,new DataBinding({"control":this.getElement("calc").getElement("total")})
 		
@@ -342,6 +342,7 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	}
 	
 	var ctrl_calc = this.getElement("calc");
+	
 	ctrl_calc.getElement("total").setEditAllowed(m.getFieldValue("total_edit"));	
 	ctrl_calc.changeUnloadType();
 	ctrl_calc.setDestinationPrice(m.getFieldValue("destination_price"),m.getFieldValue("destination_distance"),m.getFieldValue("destination_time_rout"))

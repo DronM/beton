@@ -137,8 +137,8 @@ extend(EmployeeWorkTimeSchedule_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldDate("day",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Дата";
-	pm.addField(new FieldString("day_descr",f_opts));
+	
+	pm.addField(new FieldBool("day_off",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Часы";
 	pm.addField(new FieldInt("hours",f_opts));

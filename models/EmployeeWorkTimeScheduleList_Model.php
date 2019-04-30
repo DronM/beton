@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
  
 class EmployeeWorkTimeScheduleList_Model extends ModelSQLBeton{
 	
@@ -57,14 +58,12 @@ class EmployeeWorkTimeScheduleList_Model extends ModelSQLBeton{
 		$this->addField($f_day);
 		//********************
 		
-		//*** Field day_descr ***
+		//*** Field day_off ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Дата';
-		$f_opts['id']="day_descr";
+		$f_opts['id']="day_off";
 				
-		$f_day_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"day_descr",$f_opts);
-		$this->addField($f_day_descr);
+		$f_day_off=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"day_off",$f_opts);
+		$this->addField($f_day_off);
 		//********************
 		
 		//*** Field hours ***

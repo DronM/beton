@@ -958,7 +958,7 @@
 <div class="content_item content_item3">
 <p>Type:Int</p>
 <p>Required:
-								Да</p>
+								Нет</p>
 </div>
 </div>
 </div>
@@ -1080,34 +1080,6 @@
 <a href="#LabEntryList_Model">Model: LabEntryList_Model</a><h2>lab_report</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
-<h3>cond_fields</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_vals</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_sgns</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_ic</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
 <h3>templ</h3>
 <p></p>
 <div class="content_item content_item3">
@@ -1119,34 +1091,6 @@
 <h2>item_report</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
-<h3>cond_fields</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_vals</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_sgns</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_ic</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
 <h3>templ</h3>
 <p></p>
 <div class="content_item content_item3">
@@ -1158,34 +1102,6 @@
 <h2>lab_avg_report</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
-<h3>cond_fields</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_vals</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_sgns</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_ic</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
 <h3>templ</h3>
 <p></p>
 <div class="content_item content_item3">
@@ -1197,34 +1113,6 @@
 <h2>item_on_rate_period_report</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
-<h3>cond_fields</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_vals</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_sgns</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>cond_ic</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
 <h3>templ</h3>
 <p></p>
 <div class="content_item content_item3">
@@ -3373,20 +3261,14 @@
 <h1>ClientValidDuplicateList_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
-<h2>client_id</h2>
-<div>Type:Int</div>
-<div>Primary key:TRUE</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
 <h2>tel</h2>
 <div>Type:String</div>
 <div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>client_descr</h2>
-<div>Type:String</div>
+<h2>clients</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -4201,8 +4083,8 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>day_descr</h2>
-<div>Type:String</div>
+<h2>day_off</h2>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -7066,6 +6948,12 @@
 <h2>supplier_id</h2>
 <div>Type:Int</div>
 <div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>supplier_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>

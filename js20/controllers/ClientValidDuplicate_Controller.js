@@ -58,14 +58,11 @@ extend(ClientValidDuplicate_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
-	
-	pm.addField(new FieldInt("client_id",f_opts));
-	var f_opts = {};
 	f_opts.alias = "Телефон";
 	pm.addField(new FieldString("tel",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Клиент";
-	pm.addField(new FieldString("client_descr",f_opts));
+	pm.addField(new FieldText("clients",f_opts));
 }
 
 		

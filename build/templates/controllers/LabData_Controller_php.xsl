@@ -15,18 +15,4 @@
 	<xsl:apply-templates select="metadata/controllers/controller[@id=$CONTROLLER_ID]"/>
 </xsl:template>
 
-<xsl:template match="controller"><![CDATA[<?php]]>
-<xsl:call-template name="add_requirements"/>
-class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
-	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
-		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
-	}	
-	<xsl:call-template name="extra_methods"/>
-}
-<![CDATA[?>]]>
-</xsl:template>
-
-<xsl:template name="extra_methods">
-</xsl:template>
-
 </xsl:stylesheet>

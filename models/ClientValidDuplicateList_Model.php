@@ -7,8 +7,8 @@
  */
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
  
 class ClientValidDuplicateList_Model extends ModelSQLBeton{
 	
@@ -19,16 +19,6 @@ class ClientValidDuplicateList_Model extends ModelSQLBeton{
 		
 		$this->setTableName("client_valid_duplicates_list");
 			
-		//*** Field client_id ***
-		$f_opts = array();
-		$f_opts['primaryKey'] = TRUE;
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="client_id";
-				
-		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
-		$this->addField($f_client_id);
-		//********************
-		
 		//*** Field tel ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
@@ -40,14 +30,14 @@ class ClientValidDuplicateList_Model extends ModelSQLBeton{
 		$this->addField($f_tel);
 		//********************
 		
-		//*** Field client_descr ***
+		//*** Field clients ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Клиент';
-		$f_opts['id']="client_descr";
+		$f_opts['id']="clients";
 				
-		$f_client_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_descr",$f_opts);
-		$this->addField($f_client_descr);
+		$f_clients=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients",$f_opts);
+		$this->addField($f_clients);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

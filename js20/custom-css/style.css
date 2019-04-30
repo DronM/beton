@@ -410,6 +410,15 @@ a{
 	width:1700px;
 }
 
+.navbar-header {
+    min-width: 0px !important;
+}
+
+table td{
+	padding:3px 3px !important;
+}
+
+
 .orderMoneyFieldLab{
 	font-weight:bold;
 	font-size:25px;
@@ -593,7 +602,7 @@ table.table-make_order th{
 }
 table.table-make_order td{
 	white-space:nowrap;
-	padding:5px 5px;
+	padding:1px 1px;
 }
 .emptyRow{
 	background-color:#FFFFED;
@@ -607,3 +616,8 @@ table.table-make_order td{
 #CallForm_dial{
 	width:1200px;
 }
+
+td.day_off{
+	background-color:#FFCC99;
+}
+

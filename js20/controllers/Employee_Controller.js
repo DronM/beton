@@ -163,8 +163,6 @@ extend(Employee_Controller,ControllerObjServer);
 	
 	var options = {};
 	
-		options.required = true;
-	
 		pm.addField(new FieldInt("hours",options));
 	
 			

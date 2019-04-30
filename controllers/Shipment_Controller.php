@@ -453,7 +453,7 @@ class Shipment_Controller extends ControllerSQL{
 			END AS time,
 			ct.name AS concrete_type_descr,
 			cl.name_full AS client_descr,
-			o.phone_cel AS client_tel,
+			format_cel_phone(o.phone_cel) AS client_tel,
 			sh.quant AS quant,
 			dest.name AS destination_descr,
 			dr.name AS driver_descr,

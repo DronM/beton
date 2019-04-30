@@ -129,9 +129,9 @@ BEGIN
 	
 	--*** КОНТРОЛЬ ЗАПРЕЩЕННЫХ ЗОН!!! ****
 	INSERT INTO sms_for_sending
-		(tel, body, sms_type)
+		(tel, body, sms_type,event_key)
 	(WITH
-	zone_vioal AS (
+	zone_viol AS (
 		SELECT
 			string_agg(sms_text.body,',') AS body
 		FROM
@@ -140,7 +140,8 @@ BEGIN
 			sms_templates_text(
 				ARRAY[
 					ROW('plate',(SELECT plate::text FROM vehicles WHERE tracker_id=NEW.car_id))::template_value,
-					ROW('zone',dest.name::text)::template_value
+					ROW('zone',dest.name::text)::template_value,
+					ROW('date_time',to_char(now(),'DD/MM/YY HH24:MI'))::template_value
 				],
 				(SELECT pattern FROM sms_patterns WHERE sms_type='vehicle_zone_violation')
 			) AS body	
@@ -173,17 +174,24 @@ BEGIN
 		LEFT JOIN destinations AS dest ON dest.id=zone_check.zone_id
 		WHERE zone_check.inside_zone
 		) AS sms_text
-		WHERE NOT exists (SELECT sms.id FROM sms_for_sending sms WHERE sms.body=sms_text.body AND (now()::timestamp-sms.date_time)<=const_zone_violation_alarm_interval_val())
+		WHERE NOT exists (
+			SELECT sms.id
+			FROM sms_for_sending sms
+			WHERE sms.event_key=NEW.car_id
+				AND (now()::timestamp-sms.date_time)<=const_zone_violation_alarm_interval_val()
+				AND sms.sms_type='vehicle_zone_violation'
+			)
 	)
 	SELECT 
 		us.phone_cel,
-		(SELECT zone_vioal.body FROM zone_vioal) AS body,
-		'vehicle_zone_violation'
+		(SELECT zone_viol.body FROM zone_viol) AS body,
+		'vehicle_zone_violation',
+		NEW.car_id
 
 	FROM sms_pattern_user_phones AS u
 	LEFT JOIN sms_patterns AS p ON p.id=u.sms_pattern_id
 	LEFT JOIN users AS us ON us.id=u.user_id
-	WHERE p.sms_type='vehicle_zone_violation' AND (SELECT zone_vioal.body FROM zone_vioal) IS NOT NULL
+	WHERE p.sms_type='vehicle_zone_violation' AND (SELECT zone_viol.body FROM zone_viol) IS NOT NULL
 	);
 	
 	RETURN NEW;

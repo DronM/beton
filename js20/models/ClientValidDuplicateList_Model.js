@@ -26,15 +26,6 @@ function ClientValidDuplicateList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.client_id = new FieldInt("client_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = true;	
 	filed_options.alias = 'Телефон';
 	filed_options.autoInc = false;	
 	
@@ -47,7 +38,7 @@ function ClientValidDuplicateList_Model(options){
 	filed_options.alias = 'Клиент';
 	filed_options.autoInc = false;	
 	
-	options.fields.client_descr = new FieldString("client_descr",filed_options);
+	options.fields.clients = new FieldText("clients",filed_options);
 	
 		ClientValidDuplicateList_Model.superclass.constructor.call(this,id,options);
 }

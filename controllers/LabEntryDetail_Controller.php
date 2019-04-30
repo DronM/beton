@@ -1,4 +1,5 @@
 <?php
+
 require_once(FRAME_WORK_PATH.'basic_classes/ControllerSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtString.php');
@@ -156,7 +157,6 @@ class LabEntryDetail_Controller extends ControllerSQL{
 		$this->setObjectModelId('LabEntryDetailList_Model');		
 
 		
-	}	
-	
+	}
 }
 ?>

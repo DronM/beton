@@ -268,7 +268,7 @@ Map_View.prototype.addZones = function(resp){
 			this.m_zone.drawZoneOnCoords(zone_points);
 		}		
 		//dest
-		var zone_str = model.getFieldValue("dest");
+		var zone_str = model.fieldExists("dest")? model.getFieldValue("dest"):null;
 		if (zone_str){
 			zone_str = zone_str.split(" ").join(",");
 			var zone_points = zone_str.split(",");	

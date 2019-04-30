@@ -1,6 +1,6 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function DriverList_View(id,options){	
 
 	DriverList_View.superclass.constructor.call(this,id,options);

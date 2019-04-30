@@ -46,6 +46,14 @@ class RawMaterialProcurRateList_Model extends ModelSQLBeton{
 		$this->addField($f_supplier_id);
 		//********************
 		
+		//*** Field supplier_descr ***
+		$f_opts = array();
+		$f_opts['id']="supplier_descr";
+				
+		$f_supplier_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"supplier_descr",$f_opts);
+		$this->addField($f_supplier_descr);
+		//********************
+		
 		//*** Field rate ***
 		$f_opts = array();
 		$f_opts['id']="rate";

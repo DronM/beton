@@ -1,12 +1,12 @@
 /** Copyright (c) 2019
  *	Andrey Mikhalevich, Katren ltd.
  */
-function LangList_View(id,options){	
+function ClientValidDuplicateList_View(id,options){	
 
-	LangList_View.superclass.constructor.call(this,id,options);
+	ClientValidDuplicateList_View.superclass.constructor.call(this,id,options);
 
-	var model = options.models.Lang_Model;
-	var contr = new Lang_Controller();
+	var model = options.models.ClientValidDuplicateList_Model;
+	var contr = new ClientValidDuplicate_Controller();
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
@@ -14,6 +14,7 @@ function LangList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
+		"keyIds":["tel"],
 		"model":model,
 		"controller":contr,
 		"editInline":true,
@@ -24,15 +25,23 @@ function LangList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:name",{
-							"value":"Наименование",
+						new GridCellHead(id+":grid:head:tel",{
+							"value":"Телефон",
 							"columns":[
-								new GridColumn({
-									"field":model.getField("name")
+								new GridColumnPhone({
+									"field":model.getField("tel")
 								})
 							],
 							"sortable":true,
 							"sort":"asc"
+						})					
+						,new GridCellHead(id+":grid:head:clients",{
+							"value":"Клиенты",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("clients")
+								})
+							]
 						})
 					]
 				})
@@ -48,4 +57,4 @@ function LangList_View(id,options){
 	}));	
 	
 }
-extend(LangList_View,ViewAjx);
+extend(ClientValidDuplicateList_View,ViewAjx);

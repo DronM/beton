@@ -20,9 +20,12 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
  */
 
 
+
+require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
+
 class Employee_Controller extends ControllerSQL{
-	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
-		parent::__construct($dbLinkMaster,$dbLink);
+	public function __construct($dbLinkMaster=NULL){
+		parent::__construct($dbLinkMaster);
 			
 
 		/* insert */
@@ -128,8 +131,7 @@ class Employee_Controller extends ControllerSQL{
 	
 				
 	$opts=array();
-	
-		$opts['required']=TRUE;				
+					
 		$pm->addParam(new FieldExtInt('hours',$opts));
 	
 			
@@ -138,5 +140,16 @@ class Employee_Controller extends ControllerSQL{
 		
 	}	
 	
+	public function set_work_schedule_hour($pm){
+		$par = new ParamsSQL($pm,$this->getDbLink());				
+		$par->addAll();
+		$this->getDbLinkMaster()->query(sprintf(
+		"SELECT employee_work_time_sched_hour_set(%d,%s,%s)",
+		$par->getParamById('employee_id'),
+		$par->getParamById('day'),
+		$par->getParamById('hours')
+		));
+	}
+
 }
 ?>

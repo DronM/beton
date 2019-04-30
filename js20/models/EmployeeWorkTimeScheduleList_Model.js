@@ -62,10 +62,10 @@ function EmployeeWorkTimeScheduleList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Дата';
+	
 	filed_options.autoInc = false;	
 	
-	options.fields.day_descr = new FieldString("day_descr",filed_options);
+	options.fields.day_off = new FieldBool("day_off",filed_options);
 	
 				
 	

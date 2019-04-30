@@ -62,6 +62,7 @@ function OrderMakeGrid(id,options){
 			}
 			
 			if (m.getFieldValue("no_ship_mark")&&quant_rest&&quant_rest!=quant){
+			//
 				opts.className+= (opts.className.length? " ":"")+"order_no_ship_for_long";
 			}
 			
@@ -273,7 +274,16 @@ function OrderMakeGrid(id,options){
 							"attrs":{"align":"right"},
 							"calcOper":"sum",
 							"calcFieldId":"quant",
-							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
+							"gridColumn":new GridColumnFloat({"id":"tot_quant"}),
+							"calc":function(model){
+								var ct_ref = model.getFieldValue("concrete_types_ref");
+								if(ct_ref&&ct_ref.getDescr()!="Вода"){
+									var f_val = model.getFieldValue(this.m_calcFieldId);
+									if(isNaN(f_val))f_val = 0;
+			
+									this.setTotal(this.getTotal()+f_val);							
+								}
+							}
 						})						
 						,new GridCell(id+":order_make_grid:foot:total_sp2",{
 							"colSpan":"3"

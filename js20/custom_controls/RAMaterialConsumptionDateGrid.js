@@ -214,6 +214,6 @@ RAMaterialConsumptionDateGrid.prototype.onGetData = function(resp){
 		
 	}
 	
-	DOCMaterialProcurementShiftGrid.superclass.onGetData.call(this,resp);
+	RAMaterialConsumptionDateGrid.superclass.onGetData.call(this,resp);
 }
 

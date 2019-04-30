@@ -56,6 +56,15 @@ function RawMaterialProcurRateList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.supplier_descr = new FieldString("supplier_descr",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.rate = new FieldFloat("rate",filed_options);
 	
 		RawMaterialProcurRateList_Model.superclass.constructor.call(this,id,options);

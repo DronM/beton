@@ -1237,6 +1237,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallClientShipHistoryList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderCalc_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ClientTelList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/EmployeeWorkTimeScheduleList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ClientValidDuplicateList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryReportList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1279,6 +1282,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/TrackerEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/LangEditRef.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodShift.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodMonth.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodDateShift.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PlantLoadGraphControl.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ClientTypeEdit.js'));
@@ -1318,6 +1322,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/AssignedVehicleGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/Weather.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleDriverForSchedGenGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EmployeeWorkTimeScheduleGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
