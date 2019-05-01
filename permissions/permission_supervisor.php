@@ -658,6 +658,8 @@ $permissions = array();
 				
 					$permissions['Quarry_Controller_get_object']=TRUE;
 				
+					$permissions['Quarry_Controller_complete']=TRUE;
+				
 					$permissions['SandQuarryVal_Controller_insert']=TRUE;
 				
 					$permissions['SandQuarryVal_Controller_update']=TRUE;
@@ -777,6 +779,66 @@ $permissions = array();
 					$permissions['VehicleDriverForSchedGen_Controller_get_list']=TRUE;
 				
 					$permissions['VehicleDriverForSchedGen_Controller_get_object']=TRUE;
+				
+					$permissions['ShipmentForDriverCostHeader_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentForDriverCostHeader_Controller_update']=TRUE;
+				
+					$permissions['ShipmentForDriverCostHeader_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentForDriverCostHeader_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentForDriverCostHeader_Controller_get_object']=TRUE;
+				
+					$permissions['ShipmentForDriverCost_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentForDriverCost_Controller_update']=TRUE;
+				
+					$permissions['ShipmentForDriverCost_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentForDriverCost_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentForDriverCost_Controller_get_object']=TRUE;
+				
+					$permissions['ShipmentForOwnerCostHeader_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentForOwnerCostHeader_Controller_update']=TRUE;
+				
+					$permissions['ShipmentForOwnerCostHeader_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentForOwnerCostHeader_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentForOwnerCostHeader_Controller_get_object']=TRUE;
+				
+					$permissions['ShipmentForOwnerCost_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentForOwnerCost_Controller_update']=TRUE;
+				
+					$permissions['ShipmentForOwnerCost_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentForOwnerCost_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentForOwnerCost_Controller_get_object']=TRUE;
+				
+					$permissions['ConcreteCostHeader_Controller_insert']=TRUE;
+				
+					$permissions['ConcreteCostHeader_Controller_update']=TRUE;
+				
+					$permissions['ConcreteCostHeader_Controller_delete']=TRUE;
+				
+					$permissions['ConcreteCostHeader_Controller_get_list']=TRUE;
+				
+					$permissions['ConcreteCostHeader_Controller_get_object']=TRUE;
+				
+					$permissions['ConcreteCost_Controller_insert']=TRUE;
+				
+					$permissions['ConcreteCost_Controller_update']=TRUE;
+				
+					$permissions['ConcreteCost_Controller_delete']=TRUE;
+				
+					$permissions['ConcreteCost_Controller_get_list']=TRUE;
+				
+					$permissions['ConcreteCost_Controller_get_object']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

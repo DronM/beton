@@ -449,36 +449,16 @@ extend(AstCall_Controller,ControllerObjServer);
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('manager_report',opts);
 	
-				
-	
-	var options = {};
-	
-		options.required = true;
-	
-		pm.addField(new FieldString("cond_fields",options));
-	
-				
-	
-	var options = {};
-	
-		options.required = true;
-	
-		pm.addField(new FieldString("cond_vals",options));
-	
-				
-	
-	var options = {};
-	
-		options.required = true;
-	
-		pm.addField(new FieldString("cond_sgns",options));
-	
-				
-	
-	var options = {};
-	
-		pm.addField(new FieldString("cond_ic",options));
-	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+
 				
 	
 	var options = {};

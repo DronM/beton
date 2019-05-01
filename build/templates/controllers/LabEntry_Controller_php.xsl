@@ -210,7 +210,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$concr_descrs = '';
 		while ($ar=$link->fetch_array($q_id)){
 			$id = 'concrete_type_id_'.$ar['id'];
-			if ($cond->getVal($id,'in',DT_BOOL)=='true'){
+			$concr_type_set = $cond->getVal($id,'in',DT_BOOL);
+			if ($concr_type_set=='true'||$concr_type_set=='1'){
 				$concr_types.=($concr_types=='')? '':',';
 				$concr_types.=$ar['id'];
 				

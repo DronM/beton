@@ -130,14 +130,14 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$this->addField($f_demurrage);
 		//********************
 		
-		//*** Field blank_exist ***
+		//*** Field blanks_exist ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Наличие бланков';
-		$f_opts['id']="blank_exist";
+		$f_opts['id']="blanks_exist";
 				
-		$f_blank_exist=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"blank_exist",$f_opts);
-		$this->addField($f_blank_exist);
+		$f_blanks_exist=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"blanks_exist",$f_opts);
+		$this->addField($f_blanks_exist);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

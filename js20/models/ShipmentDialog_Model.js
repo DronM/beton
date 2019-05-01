@@ -128,7 +128,7 @@ function ShipmentDialog_Model(options){
 	filed_options.alias = 'Наличие бланков';
 	filed_options.autoInc = false;	
 	
-	options.fields.blank_exist = new FieldInt("blank_exist",filed_options);
+	options.fields.blanks_exist = new FieldBool("blanks_exist",filed_options);
 	
 			
 		ShipmentDialog_Model.superclass.constructor.call(this,id,options);

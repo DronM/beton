@@ -64,9 +64,24 @@ assigned_vehicles_list  поставил ASC?
 1) Табель рабочего времени EmployeeWorkTimeSchedule
 2) Разрешенные повторы ClientValidDuplicate_Controller->get_list
 3) Отчет лаборанта LabEntry_Controller->lab_report
+4) Таблица оператора: кто отгрузил, раскраска колонок
+
+1.019
+1) Ввод в отгрузки баллов и простоя
+2) Журнал песок
+3) Журнал щебень
+4) Отчет по звонкам AstCall_Controller->manager_report
+5) Показатели по месяцам LabEntry_Controller->item_report
+6) Показатели по периодам LabEntry_Controller->item_on_rate_period_report
+7) Средние показатели по датам LabEntry_Controller->lab_avg_report
+8) График всегда от 0
+9) Список констант
+10) Прайс по бетону по датам
+11) Прайс по доставке по датам
+12) Прайс по доставке (водители) по датам
 
 !!! НЕПРАВИЛЬНО отображает прошлый день, время текущее!!!, например 28/04
-Ввод в отгрузки баллов и простоя
+
 
 Журнал расходов RAMaterialConsumption->get_dates
 Общая Таблица RawMaterial_Controller->total_list
@@ -75,30 +90,13 @@ assigned_vehicles_list  поставил ASC?
 
 Журнал испытания образцов LabEntry_Controller->get_list
 
-Показатели по месяцам LabEntry_Controller->item_report
-Показатели по периодам LabEntry_Controller->item_on_rate_period_report
-Средние показатели по датам LabEntry_Controller->lab_avg_report
-
-Отчет по звонкам AstCall_Controller->manager_report
 
 Контрагенты повторы Client_Controller->get_duplicates_list
-
-Список констант
-
 
 Возможность удалять отгрузки при назначенной, а если отгружена - запросить комментарий, занести в доп.таблицу
 убрать внутр звонки
 
 
+Передвигаемое окно звонка и не модальное
 
-
-
-
-6) Заявки на буд.день, если нет заявок, то отображает с 12 часов! ТОЛЬКО если открывать с календаря!!!
-
-
-- Общая таблица
-- СМС поставщикам
-- Материалы, пересчет норм
-- Передвигаемое окно звонка и не модальное
 

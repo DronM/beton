@@ -610,7 +610,8 @@ class Shipment_Controller extends ControllerSQL{
 			sh.ship_date_time,
 			o.comment_text,
 			sh.production_site_id,
-			production_sites_ref(ps) AS production_sites_ref
+			production_sites_ref(ps) AS production_sites_ref,
+			users_ref(op_u) AS operators_ref
 			%s
 		FROM shipments AS sh
 		LEFT JOIN orders o ON o.id = sh.order_id
@@ -621,6 +622,7 @@ class Shipment_Controller extends ControllerSQL{
 		LEFT JOIN destinations dest ON dest.id = o.destination_id
 		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
 		LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+		LEFT JOIN users AS op_u ON op_u.id=sh.operator_user_id
 		WHERE (sh.shipped = FALSE OR (sh.ship_date_time BETWEEN %s AND %s))".$operator_cond."
 		)
 		--Все неотгруженные

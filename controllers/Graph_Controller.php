@@ -108,7 +108,7 @@ class Graph_Controller extends Controller{
 		$chart_data[$i-$STEP_SEC]["shipments"] = VOID;
 		
 		//orders
-		$chart_data[$date_from]["orders"] = $QUANT_NORM_ON_STEP;
+		$chart_data[$date_from]["orders"] = 0;//$QUANT_NORM_ON_STEP;
 		$dbLink->query($query_orders);
 		while ($ar = $dbLink->fetch_array()){
 			$order_unload_speed = $ar['unload_speed']*$consts['step_min']/60;
@@ -135,7 +135,7 @@ class Graph_Controller extends Controller{
 		}
 		
 		//shipment
-		$chart_data[$date_from]["shipments"] = $QUANT_NORM_ON_STEP;
+		$chart_data[$date_from]["shipments"] = 0;//$QUANT_NORM_ON_STEP;
 		$dbLink->query($query_shipments);
 		while ($ar = $dbLink->fetch_array()){
 			$seconds = strtotime($ar['ship_date_time']);

@@ -1,6 +1,6 @@
-/** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+/** Copyright (c) 2016,2019
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function DestinationList_View(id,options){	
 
 	DestinationList_View.superclass.constructor.call(this,id,options);

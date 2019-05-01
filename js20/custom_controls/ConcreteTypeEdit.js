@@ -9,7 +9,7 @@
  */	
 function ConcreteTypeEdit(id,options){
 	options = options || {};
-	options.model = new ConcreteType_Model();
+	options.model = new ConcreteTypeList_Model();
 	
 	if (options.labelCaption!=""){
 		options.labelCaption = options.labelCaption || "Марка бетона:";

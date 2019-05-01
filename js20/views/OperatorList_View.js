@@ -38,7 +38,17 @@ function OperatorList_View(id,options){
 			"value":"Завод",
 			"columns":[
 				new GridColumnRef({
-					"field":model.getField("production_sites_ref")
+					"field":model.getField("production_sites_ref"),
+					"formatFunction":function(f){
+						var res = "";
+						if(f.production_sites_ref && !f.production_sites_ref.isNull()){
+							res = f.production_sites_ref.getValue().getDescr();
+						}
+						if(f.operators_ref && !f.operators_ref.isNull()){
+							res+=" "+f.operators_ref.getValue().getDescr();
+						}
+						return res;
+					}
 				})
 			]
 		})		
@@ -221,7 +231,13 @@ function OperatorList_View(id,options){
 				opts.className+= (opts.className.length? " ":"")+"shipped";
 			}
 		},
-		
+		"onEventSetCellOptions":function(opts){
+			opts.className = opts.className||"";
+			var col = opts.gridColumn.getId();
+			if (!this.getModel().getFieldValue("shipped") && (col=="concrete_types_ref"||col=="quant") ){
+				opts.className+= (opts.className.length? " ":"")+"operatorNotShipped";
+			}			
+		},
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
 				new GridRow(id+":grid:head:row0",{

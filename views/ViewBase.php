@@ -1226,6 +1226,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SupplierOrderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialProcurUploadList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RAMaterialConsumptionDateList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RAMaterialConsumptionDocList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstIncomeCall_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSForSendingList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSPatternList_View.js'));
@@ -1240,6 +1241,19 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/EmployeeWorkTimeScheduleList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ClientValidDuplicateList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryReportList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallManagerReport_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentDialog_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SandQuarryValList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/StoneQuarryValList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryItemOnRatePeriodReport_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryItemReport_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryAvgReport_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForDriverCostHeaderList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForDriverCostList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForOwnerCostHeaderList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForOwnerCostList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostHeaderList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1262,6 +1276,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/SupplierList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/SMSPatternDialog_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ClientDialog_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ShipmentDialog_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/QuarryList_Form.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));
@@ -1317,12 +1333,14 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/DOCMaterialProcurementShiftGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MaterialSelect.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RAMaterialConsumptionDateGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RAMaterialConsumptionDocGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PeriodSelectBeton.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditColorPalette.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/AssignedVehicleGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/Weather.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleDriverForSchedGenGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EmployeeWorkTimeScheduleGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/QuarryEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1528,6 +1546,20 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleDriverForSchedGen_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleDriverForSchedGen_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/PumpVehicleWorkList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForDriverCostHeader_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForDriverCost_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForOwnerCostHeader_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForOwnerCost_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ShipmentForDriverCostHeader_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ShipmentForDriverCost_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ShipmentForOwnerCostHeader_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ShipmentForOwnerCost_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostHeader_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCost_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ConcreteCostHeader_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ConcreteCost_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteTypeList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

@@ -80,6 +80,15 @@ function OperatorList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Опреатор';
+	filed_options.autoInc = false;	
+	
+	options.fields.operators_ref = new FieldJSON("operators_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Водитель';
 	filed_options.autoInc = false;	
 	

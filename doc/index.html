@@ -21,6 +21,8 @@
 <li><a href="#ClientTel_Controller">ClientTel_Controller</a></li>
 <li><a href="#ClientType_Controller">ClientType_Controller</a></li>
 <li><a href="#ClientValidDuplicate_Controller">ClientValidDuplicate_Controller</a></li>
+<li><a href="#ConcreteCost_Controller">ConcreteCost_Controller</a></li>
+<li><a href="#ConcreteCostHeader_Controller">ConcreteCostHeader_Controller</a></li>
 <li><a href="#ConcreteType_Controller">ConcreteType_Controller</a></li>
 <li><a href="#Constant_Controller">Constant_Controller</a></li>
 <li><a href="#DOCMaterialInventory_Controller">DOCMaterialInventory_Controller</a></li>
@@ -62,6 +64,10 @@
 <li><a href="#Shift_Controller">Shift_Controller</a></li>
 <li><a href="#ShipQuantForCostGrade_Controller">ShipQuantForCostGrade_Controller</a></li>
 <li><a href="#Shipment_Controller">Shipment_Controller</a></li>
+<li><a href="#ShipmentForDriverCost_Controller">ShipmentForDriverCost_Controller</a></li>
+<li><a href="#ShipmentForDriverCostHeader_Controller">ShipmentForDriverCostHeader_Controller</a></li>
+<li><a href="#ShipmentForOwnerCost_Controller">ShipmentForOwnerCost_Controller</a></li>
+<li><a href="#ShipmentForOwnerCostHeader_Controller">ShipmentForOwnerCostHeader_Controller</a></li>
 <li><a href="#ShipmentTimeNorm_Controller">ShipmentTimeNorm_Controller</a></li>
 <li><a href="#SiteFeedBack_Controller">SiteFeedBack_Controller</a></li>
 <li><a href="#SpecialistRequest_Controller">SpecialistRequest_Controller</a></li>
@@ -102,6 +108,7 @@
 <li><a href="#DestinationList_Model">DestinationList_Model</a></li>
 <li><a href="#DestinationDialog_Model">DestinationDialog_Model</a></li>
 <li><a href="#ConcreteType_Model">ConcreteType_Model</a></li>
+<li><a href="#ConcreteTypeList_Model">ConcreteTypeList_Model</a></li>
 <li><a href="#Vehicle_Model">Vehicle_Model</a></li>
 <li><a href="#VehicleDialog_Model">VehicleDialog_Model</a></li>
 <li><a href="#Driver_Model">Driver_Model</a></li>
@@ -226,6 +233,13 @@
 <li><a href="#TrackerZoneControlList_Model">TrackerZoneControlList_Model</a></li>
 <li><a href="#Weather_Model">Weather_Model</a></li>
 <li><a href="#VehicleDriverForSchedGen_Model">VehicleDriverForSchedGen_Model</a></li>
+<li><a href="#ShipmentForDriverCostHeader_Model">ShipmentForDriverCostHeader_Model</a></li>
+<li><a href="#ShipmentForDriverCost_Model">ShipmentForDriverCost_Model</a></li>
+<li><a href="#ShipmentForOwnerCostHeader_Model">ShipmentForOwnerCostHeader_Model</a></li>
+<li><a href="#ShipmentForOwnerCost_Model">ShipmentForOwnerCost_Model</a></li>
+<li><a href="#ConcreteCostHeader_Model">ConcreteCostHeader_Model</a></li>
+<li><a href="#ConcreteCost_Model">ConcreteCost_Model</a></li>
+<li><a href="#ConcreteCostList_Model">ConcreteCostList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -424,34 +438,6 @@
 <h2>manager_report</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
-<h3>cond_fields</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Да</p>
-</div>
-<h3>cond_vals</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Да</p>
-</div>
-<h3>cond_sgns</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Да</p>
-</div>
-<h3>cond_ic</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Нет</p>
-</div>
 <h3>templ</h3>
 <p></p>
 <div class="content_item content_item3">
@@ -661,6 +647,32 @@
 <a href="#ClientValidDuplicateList_Model">Model: ClientValidDuplicateList_Model</a>
 </div>
 </div>
+<div id="ConcreteCost_Controller" class="content_box">
+<h1>ConcreteCost_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ConcreteCost_Model">Model: ConcreteCost_Model</a><h2>update</h2>
+<a href="#ConcreteCost_Model">Model: ConcreteCost_Model</a><h2>delete</h2>
+<a href="#ConcreteCost_Model">Model: ConcreteCost_Model</a><h2>get_list</h2>
+<a href="#ConcreteCostList_Model">Model: ConcreteCostList_Model</a><h2>get_object</h2>
+<a href="#ConcreteCostList_Model">Model: ConcreteCostList_Model</a>
+</div>
+</div>
+<div id="ConcreteCostHeader_Controller" class="content_box">
+<h1>ConcreteCostHeader_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a><h2>update</h2>
+<a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a><h2>delete</h2>
+<a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a><h2>get_list</h2>
+<a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a><h2>get_object</h2>
+<a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a>
+</div>
+</div>
 <div id="ConcreteType_Controller" class="content_box">
 <h1>ConcreteType_Controller</h1>
 <div class="content_item">
@@ -670,9 +682,9 @@
 <a href="#ConcreteType_Model">Model: ConcreteType_Model</a><h2>update</h2>
 <a href="#ConcreteType_Model">Model: ConcreteType_Model</a><h2>delete</h2>
 <a href="#ConcreteType_Model">Model: ConcreteType_Model</a><h2>get_list</h2>
-<a href="#ConcreteType_Model">Model: ConcreteType_Model</a><h2>get_object</h2>
-<a href="#ConcreteType_Model">Model: ConcreteType_Model</a><h2>complete</h2>
-<a href="#ConcreteType_Model">Model: ConcreteType_Model</a><h2>get_list_for_lab</h2>
+<a href="#ConcreteTypeList_Model">Model: ConcreteTypeList_Model</a><h2>get_object</h2>
+<a href="#ConcreteTypeList_Model">Model: ConcreteTypeList_Model</a><h2>complete</h2>
+<a href="#ConcreteTypeList_Model">Model: ConcreteTypeList_Model</a><h2>get_list_for_lab</h2>
 <a href="#ConcreteType_Model">Model: ConcreteType_Model</a>
 </div>
 </div>
@@ -1396,6 +1408,7 @@
 <a href="#Quarry_Model">Model: Quarry_Model</a><h2>delete</h2>
 <a href="#Quarry_Model">Model: Quarry_Model</a><h2>get_list</h2>
 <a href="#Quarry_Model">Model: Quarry_Model</a><h2>get_object</h2>
+<a href="#Quarry_Model">Model: Quarry_Model</a><h2>complete</h2>
 <a href="#Quarry_Model">Model: Quarry_Model</a>
 </div>
 </div>
@@ -1405,9 +1418,7 @@
 <p class="big"></p>
 <p>Методы:</p>
 <h2>get_dates_list</h2>
-<p>Arguments:</p>
-<div class="content_item content_item2"></div>
-<h2>get_docs_list</h2>
+<a href="#RAMaterialConsumptionDateList_Model">Model: RAMaterialConsumptionDateList_Model</a><h2>get_docs_list</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
 </div>
@@ -1768,6 +1779,58 @@
 <p>Length:13</p>
 </div>
 </div>
+</div>
+</div>
+<div id="ShipmentForDriverCost_Controller" class="content_box">
+<h1>ShipmentForDriverCost_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ShipmentForDriverCost_Model">Model: ShipmentForDriverCost_Model</a><h2>update</h2>
+<a href="#ShipmentForDriverCost_Model">Model: ShipmentForDriverCost_Model</a><h2>delete</h2>
+<a href="#ShipmentForDriverCost_Model">Model: ShipmentForDriverCost_Model</a><h2>get_list</h2>
+<a href="#ShipmentForDriverCost_Model">Model: ShipmentForDriverCost_Model</a><h2>get_object</h2>
+<a href="#ShipmentForDriverCost_Model">Model: ShipmentForDriverCost_Model</a>
+</div>
+</div>
+<div id="ShipmentForDriverCostHeader_Controller" class="content_box">
+<h1>ShipmentForDriverCostHeader_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ShipmentForDriverCostHeader_Model">Model: ShipmentForDriverCostHeader_Model</a><h2>update</h2>
+<a href="#ShipmentForDriverCostHeader_Model">Model: ShipmentForDriverCostHeader_Model</a><h2>delete</h2>
+<a href="#ShipmentForDriverCostHeader_Model">Model: ShipmentForDriverCostHeader_Model</a><h2>get_list</h2>
+<a href="#ShipmentForDriverCostHeader_Model">Model: ShipmentForDriverCostHeader_Model</a><h2>get_object</h2>
+<a href="#ShipmentForDriverCostHeader_Model">Model: ShipmentForDriverCostHeader_Model</a>
+</div>
+</div>
+<div id="ShipmentForOwnerCost_Controller" class="content_box">
+<h1>ShipmentForOwnerCost_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ShipmentForOwnerCost_Model">Model: ShipmentForOwnerCost_Model</a><h2>update</h2>
+<a href="#ShipmentForOwnerCost_Model">Model: ShipmentForOwnerCost_Model</a><h2>delete</h2>
+<a href="#ShipmentForOwnerCost_Model">Model: ShipmentForOwnerCost_Model</a><h2>get_list</h2>
+<a href="#ShipmentForOwnerCost_Model">Model: ShipmentForOwnerCost_Model</a><h2>get_object</h2>
+<a href="#ShipmentForOwnerCost_Model">Model: ShipmentForOwnerCost_Model</a>
+</div>
+</div>
+<div id="ShipmentForOwnerCostHeader_Controller" class="content_box">
+<h1>ShipmentForOwnerCostHeader_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ShipmentForOwnerCostHeader_Model">Model: ShipmentForOwnerCostHeader_Model</a><h2>update</h2>
+<a href="#ShipmentForOwnerCostHeader_Model">Model: ShipmentForOwnerCostHeader_Model</a><h2>delete</h2>
+<a href="#ShipmentForOwnerCostHeader_Model">Model: ShipmentForOwnerCostHeader_Model</a><h2>get_list</h2>
+<a href="#ShipmentForOwnerCostHeader_Model">Model: ShipmentForOwnerCostHeader_Model</a><h2>get_object</h2>
+<a href="#ShipmentForOwnerCostHeader_Model">Model: ShipmentForOwnerCostHeader_Model</a>
 </div>
 </div>
 <div id="ShipmentTimeNorm_Controller" class="content_box">
@@ -3275,6 +3338,84 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="ConcreteCost_Model" class="content_box">
+<h1>ConcreteCost_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="ConcreteCostHeader_Model" class="content_box">
+<h1>ConcreteCostHeader_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ConcreteCostList_Model" class="content_box">
+<h1>ConcreteCostList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
 <div id="ConcretePrice_Model" class="content_box">
 <h1>ConcretePrice_Model</h1>
 <div class="content_item">
@@ -3339,6 +3480,48 @@
 <div>Required:</div>
 <div>Length:15</div>
 <div>Precision:2</div>
+</div>
+</div>
+<div id="ConcreteTypeList_Model" class="content_box">
+<h1>ConcreteTypeList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>code_1c</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pres_norm</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mpa_ratio</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ConstantList_Model" class="content_box">
@@ -5104,6 +5287,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>operators_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -7755,8 +7944,56 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>blank_exist</h2>
+<h2>blanks_exist</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ShipmentForDriverCost_Model" class="content_box">
+<h1>ShipmentForDriverCost_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
 <div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>distance_to</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="ShipmentForDriverCostHeader_Model" class="content_box">
+<h1>ShipmentForDriverCostHeader_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -7817,6 +8054,54 @@
 <div>Precision:</div>
 <h2>order_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ShipmentForOwnerCost_Model" class="content_box">
+<h1>ShipmentForOwnerCost_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>distance_to</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="ShipmentForOwnerCostHeader_Model" class="content_box">
+<h1>ShipmentForOwnerCostHeader_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

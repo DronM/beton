@@ -1,6 +1,6 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function QuarryList_View(id,options){	
 
 	QuarryList_View.superclass.constructor.call(this,id,options);
@@ -28,7 +28,7 @@ function QuarryList_View(id,options){
 							"value":"Наименование",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("name")
+									"field":model.getField("name")									
 								})
 							]
 						})

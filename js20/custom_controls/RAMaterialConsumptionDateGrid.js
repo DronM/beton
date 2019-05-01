@@ -132,12 +132,12 @@ RAMaterialConsumptionDateGrid.prototype.onGetData = function(resp){
 			"value":"Смена",
 			"columns":[
 				new GridColumn({
-					"field":this.m_model.getField("shift_descr")/*,
+					"field":this.m_model.getField("shift_descr"),
 					"master":true,
-					"detailViewClass":DOCMaterialProcurementList_View,
+					"detailViewClass":RAMaterialConsumptionDocList_View,
 					"detailViewOptions":{
 						"detailFilters":{
-							"DOCMaterialProcurementList_Model":[
+							"RAMaterialConsumptionDocList_Model":[
 								{
 								"masterFieldId":"shift_date_time",
 								"field":"date_time",
@@ -153,7 +153,6 @@ RAMaterialConsumptionDateGrid.prototype.onGetData = function(resp){
 							]
 						}													
 					}
-					*/										
 				})
 			]
 		}));

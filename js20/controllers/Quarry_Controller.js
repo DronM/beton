@@ -29,6 +29,7 @@ function Quarry_Controller(options){
 	this.addDelete();
 	this.addGetList();
 	this.addGetObject();
+	this.addComplete();
 		
 }
 extend(Quarry_Controller,ControllerObjServer);
@@ -121,6 +122,16 @@ extend(Quarry_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("id",f_opts));
 	
 	pm.addField(new FieldString("mode"));
+}
+
+			Quarry_Controller.prototype.addComplete = function(){
+	Quarry_Controller.superclass.addComplete.call(this);
+	
+	var f_opts = {};
+	
+	var pm = this.getComplete();
+	pm.addField(new FieldString("name",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");	
 }
 
 		

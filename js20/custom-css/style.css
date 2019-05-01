@@ -621,3 +621,8 @@ td.day_off{
 	background-color:#FFCC99;
 }
 
+td.operatorNotShipped{
+	background-color:#FFCC99;
+	font-size:bigger;
+	font-weight:bolder;
+}

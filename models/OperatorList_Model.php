@@ -84,6 +84,16 @@ class OperatorList_Model extends ModelSQLBeton{
 		$this->addField($f_destinations_ref);
 		//********************
 		
+		//*** Field operators_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Опреатор';
+		$f_opts['id']="operators_ref";
+				
+		$f_operators_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"operators_ref",$f_opts);
+		$this->addField($f_operators_ref);
+		//********************
+		
 		//*** Field drivers_ref ***
 		$f_opts = array();
 		

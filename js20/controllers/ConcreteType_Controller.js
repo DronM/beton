@@ -19,8 +19,8 @@
 
 function ConcreteType_Controller(options){
 	options = options || {};
-	options.listModelClass = ConcreteType_Model;
-	options.objModelClass = ConcreteType_Model;
+	options.listModelClass = ConcreteTypeList_Model;
+	options.objModelClass = ConcreteTypeList_Model;
 	ConcreteType_Controller.superclass.constructor.call(this,options);	
 	
 	//methods
@@ -170,8 +170,6 @@ extend(ConcreteType_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Цена";
 	pm.addField(new FieldFloat("price",f_opts));
-	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
-	
 }
 
 			ConcreteType_Controller.prototype.addGetObject = function(){

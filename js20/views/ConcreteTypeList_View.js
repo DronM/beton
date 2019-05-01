@@ -53,7 +53,12 @@ function ConcreteTypeList_View(id,options){
 						,new GridCellHead(id+":grid:head:price",{
 							"value":"Цена",
 							"columns":[
-								new GridColumnFloat({"field":model.getField("price")})
+								new GridColumnFloat({
+									"field":model.getField("price"),
+									"ctrlOptions":{
+										"enabled":false
+									}
+								})
 							]
 						})								
 						

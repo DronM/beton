@@ -17,9 +17,9 @@
 
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
-class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
-	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
-		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
+class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
+	public function __construct($dbLinkMaster=NULL){
+		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
 	}	
 	<xsl:call-template name="extra_methods"/>
 }
@@ -27,6 +27,10 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+	public function get_list_for_lab($pm){
+		$this->addNewModel('SELECT * FROM concrete_types_for_lab_list',
+		'ConcreteType_Model');	
+	}
 </xsl:template>
 
 </xsl:stylesheet>

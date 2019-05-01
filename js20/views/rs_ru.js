@@ -79,3 +79,17 @@ ClientTelList_View.prototype.HEAD_TITLE = "Прорабы клиентов";
 EmployeeWorkTimeScheduleList_View.prototype.HEAD_TITLE = "Табель учета рабочего времени";
 
 ClientValidDuplicateList_View.prototype.HEAD_TITLE = "Разрешенные повторы контрагентов";
+
+SandQuarryValList_View.prototype.HEAD_TITLE = "Журнал по песку";
+StoneQuarryValList_View.prototype.HEAD_TITLE = "Журнал по щебню";
+
+AstCallManagerReport_View.prototype.HEAD_TITLE = "Звонки по менеджерам";
+
+LabEntryItemReport_View.prototype.HEAD_TITLE = "Показатели по периодам";
+LabEntryItemOnRatePeriodReport_View.prototype.HEAD_TITLE = "Показатели по месяцам";
+LabEntryAvgReport_View.prototype.HEAD_TITLE = "Средние показатели по датам";
+
+ShipmentForDriverCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы по доставке для водителей";
+ShipmentForOwnerCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы по доставке для собственников";
+
+ConcreteCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы на бетон";

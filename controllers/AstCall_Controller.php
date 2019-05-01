@@ -311,29 +311,16 @@ class AstCall_Controller extends ControllerSQL{
 			
 		$pm = new PublicMethod('manager_report');
 		
-				
-	$opts=array();
-	
-		$opts['required']=TRUE;				
-		$pm->addParam(new FieldExtString('cond_fields',$opts));
-	
-				
-	$opts=array();
-	
-		$opts['required']=TRUE;				
-		$pm->addParam(new FieldExtString('cond_vals',$opts));
-	
-				
-	$opts=array();
-	
-		$opts['required']=TRUE;				
-		$pm->addParam(new FieldExtString('cond_sgns',$opts));
-	
-				
-	$opts=array();
-					
-		$pm->addParam(new FieldExtString('cond_ic',$opts));
-	
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
 				
 	$opts=array();
 					

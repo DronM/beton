@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-04-30 05:46:04</lastBuild></version>
+		<lastBuild>2019-05-01 07:29:05</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -22,6 +22,7 @@
 		<version dateOpen="2019-04-25 12:04:45" dateClose="2019-04-26 07:04:41">1.0016</version>
 		<version dateOpen="2019-04-26 07:04:42" dateClose="2019-04-29 07:04:05">1.0017</version>
 		<version dateOpen="2019-04-29 07:04:08" dateClose="2019-04-30 05:04:46">1.0018</version>
+		<version dateOpen="2019-04-30 06:04:13" dateClose="2019-05-01 07:05:29">1.0019</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -465,6 +466,14 @@
 				<field id="code_1c" unique="TRUE"/>
 			</index>
 		</model>
+		<model id="ConcreteTypeList" parent="ModelSQLBeton" dataTable="concrete_types_list" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="name" dataType="String" alias="Наименование"/>
+			<field id="code_1c" dataType="String" alias="Код 1С"/>
+			<field id="pres_norm" dataType="Float" alias="Норма давл."/>
+			<field id="mpa_ratio" dataType="Float" alias="Кф.МПА"/>
+			<field id="price" dataType="Float" alias="Цена"/>
+		</model>
 		<model id="Vehicle" parent="ModelSQLBeton" dataTable="vehicles" virtual="FALSE">
 			<defaultOrder>
 				<field id="plate"/>
@@ -855,7 +864,7 @@
 			<field id="shipped" dataType="Bool" alias="Отгружен"/>
 			<field id="client_mark" dataType="Int" alias="Оценка"/>
 			<field id="demurrage" dataType="String" alias="Простой"/>
-			<field id="blank_exist" dataType="Int" alias="Наличие бланков"/>
+			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<sql/>
 		</model>
 		<model id="ShipmentForOrderList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE">
@@ -876,6 +885,7 @@
 			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="operators_ref" dataType="JSON" alias="Опреатор"/>
 			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
 			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
 			<field id="comment_text" dataType="Text" alias="Комментарий"/>
@@ -1995,6 +2005,57 @@
 			<field id="vehicle" dataType="JSON"/>
 			<field id="driver" dataType="JSON"/>
 		</model>
+		<model id="ShipmentForDriverCostHeader" parent="ModelSQLBeton" dataTable="shipment_for_driver_costs_h" virtual="FALSE">
+			<defaultOrder>
+				<field id="date" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="date" dataType="Date" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="comment_text" dataType="Text"/>
+		</model>
+		<model id="ShipmentForDriverCost" parent="ModelSQLBeton" dataTable="shipment_for_driver_costs" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date" dataType="Date" refTable="shipment_for_driver_costs_h" refField="date" required="TRUE"/>
+			<field id="distance_to" dataType="Float" length="19" precision="4"/>
+			<field id="price" dataType="Float" length="15" precision="2"/>
+			<index id="shipment_for_driver_costs_date_distance_idx" unique="TRUE">
+				<field id="date"/>
+				<field id="distance_to"/>
+			</index>
+		</model>
+		<model id="ShipmentForOwnerCostHeader" parent="ModelSQLBeton" dataTable="shipment_for_owner_costs_h" virtual="FALSE">
+			<field id="date" dataType="Date" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="comment_text" dataType="Text"/>
+		</model>
+		<model id="ShipmentForOwnerCost" parent="ModelSQLBeton" dataTable="shipment_for_owner_costs" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date" dataType="Date" refTable="shipment_for_driver_costs_h" refField="date" required="TRUE"/>
+			<field id="distance_to" dataType="Float" length="19" precision="4"/>
+			<field id="price" dataType="Float" length="15" precision="2"/>
+			<index id="shipment_for_owner_costs_date_distance_idx" unique="TRUE">
+				<field id="date"/>
+				<field id="distance_to"/>
+			</index>
+		</model>
+		<model id="ConcreteCostHeader" parent="ModelSQLBeton" dataTable="concrete_costs_h" virtual="FALSE">
+			<field id="date" dataType="Date" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="comment_text" dataType="Text"/>
+		</model>
+		<model id="ConcreteCost" parent="ModelSQLBeton" dataTable="concrete_costs" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date" dataType="Date" refTable="shipment_for_driver_costs_h" refField="date" required="TRUE"/>
+			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id"/>
+			<field id="price" dataType="Float" length="15" precision="2"/>
+			<index id="concrete_costs_date_concrete_idx" unique="TRUE">
+				<field id="date"/>
+				<field id="concrete_type_id"/>
+			</index>
+		</model>
+		<model id="ConcreteCostList" parent="ModelSQLBeton" dataTable="concrete_costs_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date" dataType="Date"/>
+			<field id="concrete_types_ref" dataType="JSON"/>
+			<field id="price" dataType="Float" length="15" precision="2"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -2075,9 +2136,9 @@
 			<publicMethod id="insert" modelId="ConcreteType"/>
 			<publicMethod id="update" modelId="ConcreteType"/>
 			<publicMethod id="delete" modelId="ConcreteType"/>
-			<publicMethod id="get_list" modelId="ConcreteType"/>
-			<publicMethod id="get_object" modelId="ConcreteType"/>
-			<publicMethod id="complete" modelId="ConcreteType" patternFieldId="name"/>
+			<publicMethod id="get_list" modelId="ConcreteTypeList"/>
+			<publicMethod id="get_object" modelId="ConcreteTypeList"/>
+			<publicMethod id="complete" modelId="ConcreteTypeList" patternFieldId="name"/>
 			<publicMethod id="get_list_for_lab" modelId="ConcreteType"/>
 		</controller>
 		<controller id="Destination" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -2247,7 +2308,7 @@
 			<publicMethod id="get_object" modelId="RawMaterialProcurRateList"/>
 		</controller>
 		<controller id="RAMaterialConsumption" parentId="ControllerSQL" state="TRUE" noState="FALSE">
-			<publicMethod id="get_dates_list" condFields="TRUE"/>
+			<publicMethod id="get_dates_list" condFields="TRUE" modelId="RAMaterialConsumptionDateList"/>
 			<publicMethod id="get_docs_list" condFields="TRUE"/>
 		</controller>
 		<controller id="RawMaterialConsRate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -2674,11 +2735,7 @@
 				<field id="offer_result" dataType="String"/>
 				<field id="comment_text" dataType="Text"/>
 			</publicMethod>
-			<publicMethod id="manager_report">
-				<field id="cond_fields" dataType="String" required="TRUE"/>
-				<field id="cond_vals" dataType="String" required="TRUE"/>
-				<field id="cond_sgns" dataType="String" required="TRUE"/>
-				<field id="cond_ic" dataType="String"/>
+			<publicMethod id="manager_report" condFields="TRUE">
 				<field id="templ" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="restart_ast"/>
@@ -2743,6 +2800,7 @@
 			<publicMethod id="delete" modelId="Quarry"/>
 			<publicMethod id="get_list" modelId="Quarry"/>
 			<publicMethod id="get_object" modelId="Quarry"/>
+			<publicMethod id="complete" modelId="Quarry" patternFieldId="name"/>
 		</controller>
 		<controller id="SandQuarryVal" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="SandQuarryVal"/>
@@ -2842,6 +2900,48 @@
 			<publicMethod id="get_list" modelId="VehicleDriverForSchedGen"/>
 			<publicMethod id="get_object" modelId="VehicleDriverForSchedGen"/>
 		</controller>
+		<controller id="ShipmentForDriverCostHeader" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ShipmentForDriverCostHeader"/>
+			<publicMethod id="update" modelId="ShipmentForDriverCostHeader"/>
+			<publicMethod id="delete" modelId="ShipmentForDriverCostHeader"/>
+			<publicMethod id="get_list" modelId="ShipmentForDriverCostHeader"/>
+			<publicMethod id="get_object" modelId="ShipmentForDriverCostHeader"/>
+		</controller>
+		<controller id="ShipmentForDriverCost" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ShipmentForDriverCost"/>
+			<publicMethod id="update" modelId="ShipmentForDriverCost"/>
+			<publicMethod id="delete" modelId="ShipmentForDriverCost"/>
+			<publicMethod id="get_list" modelId="ShipmentForDriverCost"/>
+			<publicMethod id="get_object" modelId="ShipmentForDriverCost"/>
+		</controller>
+		<controller id="ShipmentForOwnerCostHeader" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ShipmentForOwnerCostHeader"/>
+			<publicMethod id="update" modelId="ShipmentForOwnerCostHeader"/>
+			<publicMethod id="delete" modelId="ShipmentForOwnerCostHeader"/>
+			<publicMethod id="get_list" modelId="ShipmentForOwnerCostHeader"/>
+			<publicMethod id="get_object" modelId="ShipmentForOwnerCostHeader"/>
+		</controller>
+		<controller id="ShipmentForOwnerCost" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ShipmentForOwnerCost"/>
+			<publicMethod id="update" modelId="ShipmentForOwnerCost"/>
+			<publicMethod id="delete" modelId="ShipmentForOwnerCost"/>
+			<publicMethod id="get_list" modelId="ShipmentForOwnerCost"/>
+			<publicMethod id="get_object" modelId="ShipmentForOwnerCost"/>
+		</controller>
+		<controller id="ConcreteCostHeader" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ConcreteCostHeader"/>
+			<publicMethod id="update" modelId="ConcreteCostHeader"/>
+			<publicMethod id="delete" modelId="ConcreteCostHeader"/>
+			<publicMethod id="get_list" modelId="ConcreteCostHeader"/>
+			<publicMethod id="get_object" modelId="ConcreteCostHeader"/>
+		</controller>
+		<controller id="ConcreteCost" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ConcreteCost"/>
+			<publicMethod id="update" modelId="ConcreteCost"/>
+			<publicMethod id="delete" modelId="ConcreteCost"/>
+			<publicMethod id="get_list" modelId="ConcreteCostList"/>
+			<publicMethod id="get_object" modelId="ConcreteCostList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -2888,12 +2988,17 @@
 		<view id="10021" c="SMSPattern_Controller" t="SMSPatternList" f="get_list" section="Справочники" descr="Шаблоны СМС сообщений"/>
 		<view id="10022" c="TrackerZoneControl_Controller" t="TrackerZoneControlList" f="get_list" section="Справочники" descr="Запретные зоны"/>
 		<view id="10023" c="ClientTel_Controller" t="ClientTelList" f="get_list" section="Справочники" descr="Прорабы клиентов"/>
+		<view id="10024" c="ShipmentForDriverCostHeader_Controller" t="ShipmentForDriverCostHeaderList" f="get_list" section="Справочники" descr="Прайс доставки для водителей"/>
+		<view id="10025" c="ShipmentForOwnerCostHeader_Controller" t="ShipmentForOwnerCostHeaderList" f="get_list" section="Справочники" descr="Прайс доставки для собственников"/>
+		<view id="10026" c="ConcreteCostHeader_Controller" t="ConcreteCostHeaderList" f="get_list" section="Справочники" descr="Прайс бетон"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
 		<view id="20003" c="Shipment_Controller" t="ShipmentDateList" f="get_shipment_date_list" section="Документы" descr="Отгрузки (по дням)"/>
 		<view id="20004" c="DOCMaterialProcurement_Controller" t="DOCMaterialProcurementShiftList" f="get_shift_list" section="Документы" descr="Поступление материалов"/>
 		<view id="20005" c="RAMaterialConsumption_Controller" t="RAMaterialConsumptionDateList" f="get_dates_list" section="Документы" descr="Расход материалов"/>
+		<view id="20006" c="SandQuarryVal_Controller" t="SandQuarryValList" f="get_list" section="Документы" descr="Журнал по песку"/>
+		<view id="20007" c="StoneQuarryVal_Controller" t="StoneQuarryValList" f="get_list" section="Документы" descr="Журнал по щебню"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -2913,6 +3018,10 @@
 		<view id="50006" t="ShipmentTimeList" section="Отчеты" descr="Опоздания назначений и отгрузок"/>
 		<view id="50007" t="SupplierOrderList" section="Отчеты" descr="Заявки на поставку"/>
 		<view id="50008" t="LabEntryReportList" section="Отчеты" descr="Отчет лаборанта"/>
+		<view id="50009" t="AstCallManagerReport" section="Отчеты" descr="Звонки по менеджерам"/>
+		<view id="50010" t="LabEntryItemReport" section="Отчеты" descr="Показатели по месяцам"/>
+		<view id="50011" t="LabEntryItemOnRatePeriodReport" section="Отчеты" descr="Показатели по периодам"/>
+		<view id="50012" t="LabEntryAvgReport" section="Отчеты" descr="Средние показатели по датам"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -2962,7 +3071,7 @@
 		<serverTemplate id="SupplierOrderList"/>
 		<serverTemplate id="RawMaterialProcurUploadList"/>
 		<serverTemplate id="RAMaterialConsumptionDateList"/>
-		<serverTemplate id="RAMaterialConsumptionDateList"/>
+		<serverTemplate id="RAMaterialConsumptionDocList"/>
 		<serverTemplate id="SMSForSendingList"/>
 		<serverTemplate id="SMSPatternList"/>
 		<serverTemplate id="TrackerZoneControlList"/>
@@ -2971,6 +3080,15 @@
 		<serverTemplate id="ClientTelList"/>
 		<serverTemplate id="EmployeeWorkTimeScheduleList"/>
 		<serverTemplate id="ClientValidDuplicateList"/>
+		<serverTemplate id="SandQuarryValList"/>
+		<serverTemplate id="StoneQuarryValList"/>
+		<serverTemplate id="AstCallManagerReport"/>
+		<serverTemplate id="LabEntryItemReport"/>
+		<serverTemplate id="LabEntryItemOnRatePeriodReport"/>
+		<serverTemplate id="LabEntryAvgReport"/>
+		<serverTemplate id="ShipmentForDriverCostHeaderList"/>
+		<serverTemplate id="ShipmentForOwnerCostHeaderList"/>
+		<serverTemplate id="ConcreteCostHeaderList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -3450,6 +3568,7 @@
 		<jsScript file="views/SupplierOrderList_View.js"/>
 		<jsScript file="views/RawMaterialProcurUploadList_View.js"/>
 		<jsScript file="views/RAMaterialConsumptionDateList_View.js"/>
+		<jsScript file="views/RAMaterialConsumptionDocList_View.js"/>
 		<jsScript file="views/AstIncomeCall_View.js"/>
 		<jsScript file="views/SMSForSendingList_View.js"/>
 		<jsScript file="views/SMSPatternList_View.js"/>
@@ -3464,6 +3583,19 @@
 		<jsScript file="views/EmployeeWorkTimeScheduleList_View.js"/>
 		<jsScript file="views/ClientValidDuplicateList_View.js"/>
 		<jsScript file="views/LabEntryReportList_View.js"/>
+		<jsScript file="views/AstCallManagerReport_View.js"/>
+		<jsScript file="views/ShipmentDialog_View.js"/>
+		<jsScript file="views/SandQuarryValList_View.js"/>
+		<jsScript file="views/StoneQuarryValList_View.js"/>
+		<jsScript file="views/LabEntryItemOnRatePeriodReport_View.js"/>
+		<jsScript file="views/LabEntryItemReport_View.js"/>
+		<jsScript file="views/LabEntryAvgReport_View.js"/>
+		<jsScript file="views/ShipmentForDriverCostHeaderList_View.js"/>
+		<jsScript file="views/ShipmentForDriverCostList_View.js"/>
+		<jsScript file="views/ShipmentForOwnerCostHeaderList_View.js"/>
+		<jsScript file="views/ShipmentForOwnerCostList_View.js"/>
+		<jsScript file="views/ConcreteCostHeaderList_View.js"/>
+		<jsScript file="views/ConcreteCostList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -3486,6 +3618,8 @@
 		<jsScript file="forms/SupplierList_Form.js"/>
 		<jsScript file="forms/SMSPatternDialog_Form.js"/>
 		<jsScript file="forms/ClientDialog_Form.js"/>
+		<jsScript file="forms/ShipmentDialog_Form.js"/>
+		<jsScript file="forms/QuarryList_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="custom_controls/App.enums.js"/>
@@ -3541,12 +3675,14 @@
 		<jsScript file="custom_controls/DOCMaterialProcurementShiftGrid.js"/>
 		<jsScript file="custom_controls/MaterialSelect.js"/>
 		<jsScript file="custom_controls/RAMaterialConsumptionDateGrid.js"/>
+		<jsScript file="custom_controls/RAMaterialConsumptionDocGrid.js"/>
 		<jsScript file="custom_controls/PeriodSelectBeton.js"/>
 		<jsScript file="custom_controls/EditColorPalette.js"/>
 		<jsScript file="custom_controls/AssignedVehicleGrid.js"/>
 		<jsScript file="custom_controls/Weather.js"/>
 		<jsScript file="custom_controls/VehicleDriverForSchedGenGrid.js"/>
 		<jsScript file="custom_controls/EmployeeWorkTimeScheduleGrid.js"/>
+		<jsScript file="custom_controls/QuarryEdit.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -3752,6 +3888,20 @@
 		<jsScript file="controllers/VehicleDriverForSchedGen_Controller.js"/>
 		<jsScript file="models/VehicleDriverForSchedGen_Model.js"/>
 		<jsScript file="models/PumpVehicleWorkList_Model.js"/>
+		<jsScript file="models/ShipmentForDriverCostHeader_Model.js"/>
+		<jsScript file="models/ShipmentForDriverCost_Model.js"/>
+		<jsScript file="models/ShipmentForOwnerCostHeader_Model.js"/>
+		<jsScript file="models/ShipmentForOwnerCost_Model.js"/>
+		<jsScript file="controllers/ShipmentForDriverCostHeader_Controller.js"/>
+		<jsScript file="controllers/ShipmentForDriverCost_Controller.js"/>
+		<jsScript file="controllers/ShipmentForOwnerCostHeader_Controller.js"/>
+		<jsScript file="controllers/ShipmentForOwnerCost_Controller.js"/>
+		<jsScript file="models/ConcreteCostHeader_Model.js"/>
+		<jsScript file="models/ConcreteCost_Model.js"/>
+		<jsScript file="controllers/ConcreteCostHeader_Controller.js"/>
+		<jsScript file="controllers/ConcreteCost_Controller.js"/>
+		<jsScript file="models/ConcreteCostList_Model.js"/>
+		<jsScript file="models/ConcreteTypeList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

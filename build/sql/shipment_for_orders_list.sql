@@ -13,7 +13,9 @@ CREATE OR REPLACE VIEW shipment_for_orders_list AS
 		sh.shipped,
 		o.id AS order_id,
 		
-		production_sites_ref(ps) AS production_sites_ref
+		production_sites_ref(ps) AS production_sites_ref,
+		
+		users_ref(op_u) AS operators_ref
 		
 		/*
 		(SELECT t.state
@@ -30,6 +32,7 @@ CREATE OR REPLACE VIEW shipment_for_orders_list AS
 	LEFT JOIN drivers d ON d.id = vs.driver_id
 	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
 	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	LEFT JOIN users AS op_u ON op_u.id=sh.operator_user_id
 	
 	LEFT JOIN (
 		SELECT

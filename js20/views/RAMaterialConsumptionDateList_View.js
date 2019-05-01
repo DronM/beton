@@ -1,5 +1,5 @@
 /**	
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2018
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2019
 
  * @extends ViewAjxList
  * @requires core/extend.js
@@ -13,7 +13,6 @@
  */
 function RAMaterialConsumptionDateList_View(id,options){
 	options = options || {};
-	console.dir(options.models.RAMaterialConsumptionDateList_Model)	
 	options.addElement = function(){
 		this.addElement(new RAMaterialConsumptionDateGrid(id+":grid",{
 			"model":options.models.RAMaterialConsumptionDateList_Model

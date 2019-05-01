@@ -21,8 +21,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
 
 
 class ConcreteType_Controller extends ControllerSQL{
-	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
-		parent::__construct($dbLinkMaster,$dbLink);
+	public function __construct($dbLinkMaster=NULL){
+		parent::__construct($dbLinkMaster);
 			
 
 		/* insert */
@@ -141,7 +141,7 @@ class ConcreteType_Controller extends ControllerSQL{
 
 		$this->addPublicMethod($pm);
 		
-		$this->setListModelId('ConcreteType_Model');
+		$this->setListModelId('ConcreteTypeList_Model');
 		
 			
 		/* get_object */
@@ -153,7 +153,7 @@ class ConcreteType_Controller extends ControllerSQL{
 		
 		
 		$this->addPublicMethod($pm);
-		$this->setObjectModelId('ConcreteType_Model');		
+		$this->setObjectModelId('ConcreteTypeList_Model');		
 
 			
 		/* complete  */
@@ -164,7 +164,7 @@ class ConcreteType_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtInt('mid'));
 		$pm->addParam(new FieldExtString('name'));		
 		$this->addPublicMethod($pm);					
-		$this->setCompleteModelId('ConcreteType_Model');
+		$this->setCompleteModelId('ConcreteTypeList_Model');
 
 			
 		$pm = new PublicMethod('get_list_for_lab');
@@ -174,5 +174,10 @@ class ConcreteType_Controller extends ControllerSQL{
 		
 	}	
 	
+	public function get_list_for_lab($pm){
+		$this->addNewModel('SELECT * FROM concrete_types_for_lab_list',
+		'ConcreteType_Model');	
+	}
+
 }
 ?>

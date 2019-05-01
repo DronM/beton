@@ -130,11 +130,11 @@ function ShipmentList_View(id,options){
 		"model":model,
 		"controller":contr,
 		"editInline":false,
-		"editWinClass":null,
+		"editWinClass":ShipmentDialog_Form,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdInsert":false,
-			"cmdInsert":false,
-			"cmdDelete":false,
+			"cmdEdit":true,
+			"cmdDelete":true,
 			"cmdFilter":true,
 			"filters":filters,
 			"variantStorage":options.variantStorage

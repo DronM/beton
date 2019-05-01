@@ -123,11 +123,11 @@ class RAMaterialConsumption_Controller extends ControllerSQL{
 	}
 	public function get_docs_list($pm){
 		$link = $this->getDbLink();
-		$ar = $link->query_first('SELECT COUNT(*) AS cnt FROM raw_materials');
+		$ar = $link->query_first("SELECT COUNT(*) AS cnt FROM raw_materials WHERE name <>''");
 		$mat_count = $ar['cnt'];				
 		//
 		//result model
-		$model = new ModelSQL($link,array("id"=>"get_docs_list"));
+		$model = new ModelSQL($link,array("id"=>"RAMaterialConsumptionDocList_Model"));
 		$model->addField(new FieldSQLString($link,null,null,"date_time"));
 		$model->addField(new FieldSQLString($link,null,null,"date_time_descr"));		
 		$model->addField(new FieldSQLString($link,null,null,"concrete_type_descr"));
@@ -151,13 +151,13 @@ class RAMaterialConsumption_Controller extends ControllerSQL{
 		if (!$where){
 			throw new Exception("Не заданы условия!");
 		}		
-		$sql=sprintf("SELECT
+		$sql = sprintf("SELECT
 			date_time,date_time_descr,
 			concrete_type_id,concrete_type_descr,
 			vehicle_id,vehicle_descr,
 			driver_id,driver_descr,
 			concrete_quant%s
-		FROM ra_material_consumption_doc_materials(%s,%s)
+		FROM ra_material_consumption_doc_materials_list(%s,%s)
 		AS (date_time timestamp,date_time_descr text,
 		concrete_type_id int,concrete_type_descr text,
 		vehicle_id int, vehicle_descr text,
@@ -174,7 +174,7 @@ class RAMaterialConsumption_Controller extends ControllerSQL{
 		$mat_model = new ModelSQL($link,array('id'=>'RawMaterial_Model'));
 		$mat_model->addField(new FieldSQLInt($link,null,null,"id"));
 		$mat_model->addField(new FieldSQLString($link,null,null,"name"));
-		$mat_model->query('SELECT id,name FROM raw_materials ORDER BY id',
+		$mat_model->query("SELECT id,name FROM raw_materials WHERE name <>'' ORDER BY id",
 		TRUE);
 		$this->addModel($mat_model);			
 	}	
