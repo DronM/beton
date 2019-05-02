@@ -4,6 +4,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 
 class Destination_Model extends ModelSQLBeton{
@@ -75,6 +76,15 @@ class Destination_Model extends ModelSQLBeton{
 				
 		$f_zone=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"zone",$f_opts);
 		$this->addField($f_zone);
+		//********************
+		
+		//*** Field special_price ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="special_price";
+				
+		$f_special_price=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"special_price",$f_opts);
+		$this->addField($f_special_price);
 		//********************
 	
 		$order = new ModelOrderSQL();		

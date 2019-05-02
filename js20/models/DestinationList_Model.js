@@ -70,7 +70,25 @@ function DestinationList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.special_price = new FieldBool("special_price",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.price = new FieldString("price",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.special_price = new FieldBool("special_price",filed_options);
 	
 		DestinationList_Model.superclass.constructor.call(this,id,options);
 }

@@ -85,6 +85,15 @@ function DestinationDialog_Model(options){
 	
 	options.fields.zone_center_str = new FieldString("zone_center_str",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.special_price = new FieldBool("special_price",filed_options);
+	
 		DestinationDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(DestinationDialog_Model,ModelXML);

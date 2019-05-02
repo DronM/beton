@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-01 07:29:05</lastBuild></version>
+		<lastBuild>2019-05-02 06:41:31</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -23,6 +23,7 @@
 		<version dateOpen="2019-04-26 07:04:42" dateClose="2019-04-29 07:04:05">1.0017</version>
 		<version dateOpen="2019-04-29 07:04:08" dateClose="2019-04-30 05:04:46">1.0018</version>
 		<version dateOpen="2019-04-30 06:04:13" dateClose="2019-05-01 07:05:29">1.0019</version>
+		<version dateOpen="2019-05-02 05:05:59" dateClose="2019-05-02 06:05:41">1.00120</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -429,6 +430,7 @@
 			<field id="time_route" dataType="Time" required="TRUE" alias="Время"/>
 			<field id="price" dataType="Float" alias="Стоимость"/>
 			<field id="zone" dataType="String"/>
+			<field id="special_price" dataType="Bool" defaultValue="FALSE"/>
 			<index id="destination_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -441,7 +443,9 @@
 			<field id="name" dataType="String" required="TRUE" length="100"/>
 			<field id="distance" dataType="String"/>
 			<field id="time_route" dataType="Time"/>
+			<field id="special_price" dataType="Bool"/>
 			<field id="price" dataType="String"/>
+			<field id="special_price" dataType="Bool"/>
 		</model>
 		<model id="DestinationDialog" parent="ModelSQLBeton" dataTable="destinations_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -451,6 +455,7 @@
 			<field id="price" dataType="Float"/>
 			<field id="zone_str" dataType="String"/>
 			<field id="zone_center_str" dataType="String"/>
+			<field id="special_price" dataType="Bool"/>
 		</model>
 		<model id="ConcreteType" parent="ModelSQLBeton" dataTable="concrete_types" virtual="FALSE">
 			<defaultOrder>

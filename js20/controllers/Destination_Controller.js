@@ -78,6 +78,12 @@ extend(Destination_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("special_price",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -126,6 +132,12 @@ extend(Destination_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("special_price",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -168,7 +180,13 @@ extend(Destination_Controller,ControllerObjServer);
 	pm.addField(new FieldTime("time_route",f_opts));
 	var f_opts = {};
 	
+	pm.addField(new FieldBool("special_price",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldString("price",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("special_price",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }

@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
  
 class DestinationDialog_Model extends ModelSQLBeton{
 	
@@ -75,6 +76,14 @@ class DestinationDialog_Model extends ModelSQLBeton{
 				
 		$f_zone_center_str=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"zone_center_str",$f_opts);
 		$this->addField($f_zone_center_str);
+		//********************
+		
+		//*** Field special_price ***
+		$f_opts = array();
+		$f_opts['id']="special_price";
+				
+		$f_special_price=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"special_price",$f_opts);
+		$this->addField($f_special_price);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

@@ -54,6 +54,9 @@ class Destination_Controller extends ControllerSQL{
 		$param = new FieldExtString('zone'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtBool('special_price'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -99,6 +102,10 @@ class Destination_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('zone'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('special_price'
 				,array(
 			));
 			$pm->addParam($param);

@@ -7,6 +7,7 @@ function DestinationDialog_View(id,options){
 	options.controller = new Destination_Controller();
 	options.model = options.models.DestinationDialog_Model;
 	
+	var self = this;
 	options.addElement = function(){
 		this.addElement(new EditString(id+":name",{
 			"labelCaption":"Наименование:",
@@ -16,17 +17,29 @@ function DestinationDialog_View(id,options){
 	
 		this.addElement(new EditFloat(id+":distance",{
 			"labelCaption":"Расстояние (км.):",
+			"editContClassName":"input-group "+window.getBsCol(4)
 		}));	
 
 		this.addElement(new EditTime(id+":time_route",{
 			"labelCaption":"Время в пути (часы):",
+			"editContClassName":"input-group "+window.getBsCol(4)
 		}));	
 
 		this.addElement(new EditFloat(id+":price",{
 			"labelCaption":"Стоимость доставки:",
+			"editContClassName":"input-group "+window.getBsCol(4)
 		}));	
-
-		var self = this;
+		this.addElement(new EditCheckBox(id+":special_price",{
+			"labelCaption":"Специальная цена:",
+			"title":"Разрешить для объекта использовать специальную цену (не по прайсу)",
+			"labelClassName":"control-label "+window.getBsCol(3),
+			"events":{
+				"change":function(){
+					self.setPriceEnabled();
+				}
+			}
+		}));	
+		
 		this.addElement(new ButtonCmd(id+":cmdFindOnMap",{
 			"caption":"Найти на карте ",
 			"glyph":"glyphicon-search",
@@ -49,6 +62,7 @@ function DestinationDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("distance")})
 		,new DataBinding({"control":this.getElement("time_route")})
 		,new DataBinding({"control":this.getElement("price")})
+		,new DataBinding({"control":this.getElement("special_price")})
 	];
 	this.setDataBindings(r_bd);
 	
@@ -57,7 +71,18 @@ function DestinationDialog_View(id,options){
 		new CommandBinding({"control":this.getElement("name")})
 		,new CommandBinding({"control":this.getElement("distance")})
 		,new CommandBinding({"control":this.getElement("time_route")})
-		,new CommandBinding({"control":this.getElement("price")})
+		,new CommandBinding({
+			"control":this.getElement("price"),
+			"func":function(pm){
+				if(self.getElement("special_price").getValue()){
+					pm.setFieldValue("price",self.getElement("price").getValue());
+				}
+				else{
+					pm.unsetFieldValue("price");
+				}
+			}
+		})
+		,new CommandBinding({"control":this.getElement("special_price")})
 	]);
 	
 }
@@ -65,8 +90,23 @@ extend(DestinationDialog_View,ViewObjectAjx);
 
 DestinationDialog_View.prototype.PAM_DIV_ID = "mapdiv";
 
+DestinationDialog_View.prototype.setPriceEnabled = function(resp,cmd){
+	var price_en = this.getElement("special_price").getValue();
+	var ctrl = this.getElement("price");
+	if(ctrl.getEnabled()!=price_en){
+		ctrl.setEnabled(price_en);
+		ctrl.setAttr("title", price_en? "Специальная цена, не по прайсу":"Цена согласно прайса" );
+	}
+}
+
+DestinationDialog_View.prototype.onGetData = function(resp,cmd){
+	DestinationDialog_View.superclass.onGetData.call(this,resp,cmd);
+	
+	this.setPriceEnabled();
+}
+
 DestinationDialog_View.prototype.updateZone = function(zoneStr){
-console.log("DestinationDialog_View.prototype.updateZone zoneStr="+zoneStr)
+//console.log("DestinationDialog_View.prototype.updateZone zoneStr="+zoneStr)
 	this.getController().getPublicMethod("update").setFieldValue("zone",zoneStr);
 	this.getController().getPublicMethod("insert").setFieldValue("zone",zoneStr);
 }

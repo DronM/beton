@@ -83,6 +83,16 @@ function Destination_Model(options){
 	
 	options.fields.zone = new FieldString("zone",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.special_price = new FieldBool("special_price",filed_options);
+	
 			
 		Destination_Model.superclass.constructor.call(this,id,options);
 }

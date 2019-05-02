@@ -25,15 +25,22 @@ CREATE OR REPLACE VIEW destination_list_view AS
 		destinations.name,
 		destinations.distance,
 		time5_descr(destinations.time_route) AS time_route,
-		coalesce(
-			coalesce(
-				(SELECT act_price.price
-				FROM act_price
-				WHERE destinations.distance <= act_price.distance_to
-				LIMIT 1
-				)
-			,destinations.price)
-		,0) AS price
+		CASE
+			WHEN coalesce(destinations.special_price,FALSE) = TRUE THEN coalesce(destinations.price,0)
+			ELSE
+				coalesce(
+					coalesce(
+						(SELECT act_price.price
+						FROM act_price
+						WHERE destinations.distance <= act_price.distance_to
+						LIMIT 1
+						)
+					,destinations.price)
+				,0)
+		END AS price,
+		
+		destinations.special_price
+		
 	FROM destinations
 	
 	ORDER BY destinations.name;
