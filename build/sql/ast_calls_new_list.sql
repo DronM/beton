@@ -33,8 +33,8 @@ CREATE OR REPLACE VIEW ast_calls_new_list AS
 		ac.ext,
 		
 		CASE
-		WHEN ac.call_type = 'in'::call_types THEN (ac.caller_id_num::text || ' => '::text) || ac.ext::text
-		ELSE (ac.ext::text || ' => '::text) || ac.caller_id_num::text
+		WHEN ac.call_type = 'in'::call_types THEN (format_cel_phone(ac.caller_id_num) || ' => '::text) || ac.ext::text
+		ELSE (format_cel_phone(ac.ext) || ' => '::text) || format_cel_phone(ac.caller_id_num)
 		END AS num,
 		
 		offer.quant AS offer_quant,

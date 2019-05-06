@@ -139,7 +139,10 @@ function OrderCalc_View(id,options){
 			"labelCaption":"Всего:",
 			"value":0,
 			"attrs":{"initvalue":"0.00"},
-			"enabled":false
+			"enabled":false,
+			"onToggleEditable":function(){
+				self.recalcTotal();
+			}
 		}));
 	
 	

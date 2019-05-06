@@ -138,10 +138,6 @@ extend(AstCall_Controller,ControllerObjServer);
 	
 		var options = {};
 				
-		pm.addField(new FieldString("contact_tel",options));
-	
-		var options = {};
-				
 		pm.addField(new FieldString("client_name",options));
 	
 		var options = {};

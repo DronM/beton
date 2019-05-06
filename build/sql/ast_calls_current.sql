@@ -40,7 +40,7 @@ CREATE OR REPLACE VIEW ast_calls_current AS
    FROM ast_calls ast
      LEFT JOIN clients cl ON cl.id = ast.client_id
      LEFT JOIN users man ON cl.manager_id = man.id
-     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10))
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
      LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
      LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
      LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id

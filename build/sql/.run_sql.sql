@@ -1,52 +1,56 @@
--- View: public.destinations_dialog
+-- View: ast_calls_current
 
- DROP VIEW public.destinations_dialog;
+ DROP VIEW ast_calls_current;
 
-CREATE OR REPLACE VIEW public.destinations_dialog AS 
-	WITH
-	last_price AS
-		(SELECT
-			max(t.date) AS date,
-			t.distance_to
-		FROM shipment_for_owner_costs AS t
-		GROUP BY t.distance_to
-		ORDER BY t.distance_to
-		)
-	,act_price AS
-		(SELECT
-			t.distance_to,
-			t.price
-		FROM last_price
-		LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
-		ORDER BY t.distance_to
-		)
-
-	SELECT
-		destinations.id,
-		destinations.name,
-		destinations.distance,
-		destinations.time_route,
-		
+CREATE OR REPLACE VIEW ast_calls_current AS 
+	SELECT DISTINCT ON (ast.ext)
+		ast.unique_id,
+		ast.ext,
+				
 		CASE
-			WHEN coalesce(destinations.special_price,FALSE) = TRUE THEN coalesce(destinations.price,0)
-			ELSE
-				coalesce(
-					coalesce(
-						(SELECT act_price.price
-						FROM act_price
-						WHERE destinations.distance <= act_price.distance_to
-						LIMIT 1
-						)
-					,destinations.price)
-				,0)
-		END AS price,
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS contact_tel,
 		
-		destinations.special_price,
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
 		
-		replace(replace(st_astext(destinations.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS zone_str,
-		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str
+		ast.dt AS ring_time,
+		ast.start_time AS answer_time,
+		ast.end_time AS hangup_time,
+		ast.client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
+		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
+		ast.manager_comment,
+		ast.informed,
+		clt.name AS contact_name,
+		cld.debt,
+		man.name AS client_manager_descr,
+		client_types_ref(ctp) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref
 		
-	FROM destinations;
+		
+   FROM ast_calls ast
+     LEFT JOIN clients cl ON cl.id = ast.client_id
+     LEFT JOIN users man ON cl.manager_id = man.id
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
+     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
+     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
+     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+  WHERE
+  	ast.end_time IS NULL
+  	AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	AND ast.caller_id_num::text <> ''::text
+  	AND (ast.start_time IS NULL OR ast.start_time::date=now()::date)
+  ORDER BY ast.ext, ast.dt DESC;
 
-ALTER TABLE public.destinations_dialog OWNER TO beton;
+ALTER TABLE ast_calls_current
+  OWNER TO beton;
 

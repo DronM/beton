@@ -15,7 +15,7 @@
 function EditPeriodDateShift(id,options){
 	options = options || {};	
 
-	var constants = {"first_shift_start_time":null};
+	var constants = {"first_shift_start_time":null,"shift_length_time":null};
 	window.getApp().getConstantManager().get(constants);
 
 	//options.valueFrom = options.valueFrom || DateHelper.strtotime("2019-03-19T00:00:00+05:00")//DateHelper.getStartOfShift();
@@ -28,7 +28,8 @@ function EditPeriodDateShift(id,options){
 	options.periodSelectOptions = {"periodShift":true};
 
 	this.DEF_FROM_TIME = constants.first_shift_start_time.getValue();
-	this.DEF_TO_TIME = "06:59:59";//DateHelper.format(options.valueTo,"H:i:s");
+	//console.log("shift_length_time="+constants.shift_length_time.getValue())
+	this.DEF_TO_TIME = "05:59:59";//DateHelper.format(options.valueTo,"H:i:s");
 
 	EditPeriodDateShift.superclass.constructor.call(this,id,options);
 }

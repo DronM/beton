@@ -6,6 +6,8 @@ function OrderDialog_View(id,options){
 	options = options || {};
 	options.controller = new Order_Controller();
 	options.model = (options.models&&options.models.OrderDialog_Model)? options.models.OrderDialog_Model: new OrderDialog_Model();
+	
+	options.cmdSave = false;
 
 	var app = window.getApp();
 	var constants = {"def_order_unload_speed":null,"def_lang":null};
@@ -229,6 +231,12 @@ function OrderDialog_View(id,options){
 		new CommandBinding({
 			"func":function(pm){
 				self.setPublicMethodDateTime(pm);
+				if(self.getTotalEditModified()){
+					pm.setFieldValue("total_edit",!self.m_model.getFieldValue("total_edit"));
+				}
+				else{
+					pm.unsetFieldValue("total_edit");
+				}
 			}
 		})
 		,new CommandBinding({"control":this.getElement("pay_cash")})
@@ -293,7 +301,13 @@ OrderDialog_View.prototype.getAvailSpots = function(){
 }
 
 OrderDialog_View.prototype.getModified = function(cmd){
-	return ((OrderDialog_View.superclass.getModified.call(this,cmd)===true)? true:this.getDateModified());
+	return (
+		OrderDialog_View.superclass.getModified.call(this,cmd) || this.getDateModified() || this.getTotalEditModified()
+	);
+}
+
+OrderDialog_View.prototype.getTotalEditModified = function(pm){
+	return (this.getElement("calc").getElement("total").getEditAllowed()!=this.m_model.getFieldValue("total_edit"));
 }
 
 OrderDialog_View.prototype.getDateModified = function(pm){
@@ -302,14 +316,15 @@ OrderDialog_View.prototype.getDateModified = function(pm){
 
 OrderDialog_View.prototype.setPublicMethodDateTime = function(pm){
 	if(this.getDateModified()){
-	
 		var dt = this.getElement("date_time_date").getValue();
 		if(dt){
 			dt = DateHelper.dateStart(dt);
 			dt = new Date(dt.getTime()+ DateHelper.timeToMS(this.getElement("date_time_time").getValue()));
 		}
 		pm.setFieldValue("date_time",dt);
-		res = true;
+	}
+	else{
+		pm.unsetFieldValue("date_time");
 	}
 }
 

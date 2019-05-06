@@ -1228,6 +1228,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RAMaterialConsumptionDateList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RAMaterialConsumptionDocList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstIncomeCall_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstIncomeUnknownCall_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSForSendingList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSPatternList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/SMSPatternDialog_View.js'));

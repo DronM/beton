@@ -39,7 +39,7 @@ function EditPeriodShift(id,options){
 	if(options.dateFrom){
 		options.dateFrom = new Date(options.dateFrom.getTime()+this.m_shiftStartMS);
 	}
-	this.m_dateFrom = DateHelper.getStartOfShift(options.dateFrom);	
+	this.m_dateFrom = DateHelper.getStartOfShift(options.dateFrom);		
 	this.calcDateTo();
 	
 	this.m_daysOfWeek = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
@@ -86,7 +86,7 @@ EditPeriodShift.prototype.picCustomDate = function(){
 		format:{
 			//called after date is selected
 			toDisplay: function (date, format, language) {
-				self.setDateFrom(new Date(date.getTime() + self.m_shiftStartMS));
+				self.setDateFrom(new Date(date.getTime() + self.m_shiftStartMS + date.getTimezoneOffset()*60*1000));
 			},
 			//called in ctrl edit?
 			toValue: function (date, format, language) {

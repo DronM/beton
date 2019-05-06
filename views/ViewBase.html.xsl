@@ -194,15 +194,45 @@
 		
 	}
 	
-	window.call_view = new AstIncomeCall_View("CallForm:body:v",view_opts);
-	window.call_form = new WindowFormModalBS({
-		"id":"CallForm",
-		"contentHead":"Входящий звонок",
-		"content":window.call_view,
-		"cmdClose":true,
-		"cmdCancel":true
-	});
-	window.call_form.open();
+	window.showClientCallForm = function(viewOpts){
+		window.call_view = new AstIncomeCall_View("CallForm:body:v",viewOpts);
+		window.call_form = new WindowFormModalBS({
+			"id":"CallForm",
+			"contentHead":"Входящий звонок",
+			"content":window.call_view,
+			"cmdClose":true,
+			"cmdCancel":true
+		});
+		window.call_form.open();			
+	}
+	
+	if(view_opts.models.AstCallCurrent_Model.getNextRow()){
+		if (view_opts.models.AstCallCurrent_Model.getFieldValue("client_id")){
+			if (view_opts.models.AstCallCurrent_Model.getFieldValue("client_kind")=="buyer"){
+				window.showClientCallForm(view_opts);
+			}
+		}
+		else{
+			view_opts.onSetClientBuyer = function(viewOpts){
+				window.call_form.close();
+				delete window.call_view;
+				delete window.window.call_form;
+				
+				if(viewOpts.models.AstCallCurrent_Model.getFieldValue("client_kind")=="buyer")
+					window.showClientCallForm(viewOpts);
+			}
+			window.call_view = new AstIncomeUnknownCall_View("CallForm:body:v",view_opts);
+			window.call_form = new WindowFormModalBS({
+				"id":"CallForm",
+				"contentHead":"Входящий звонок",
+				"content":window.call_view,
+				"cmdClose":false,
+				"cmdCancel":false
+			});
+			window.call_form.open();		
+		}
+	}
+	
 	</xsl:if>
 	
 	</xsl:if>

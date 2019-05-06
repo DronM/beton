@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-02 06:41:31</lastBuild></version>
+		<lastBuild>2019-05-06 06:47:19</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -24,6 +24,7 @@
 		<version dateOpen="2019-04-29 07:04:08" dateClose="2019-04-30 05:04:46">1.0018</version>
 		<version dateOpen="2019-04-30 06:04:13" dateClose="2019-05-01 07:05:29">1.0019</version>
 		<version dateOpen="2019-05-02 05:05:59" dateClose="2019-05-02 06:05:41">1.00120</version>
+		<version dateOpen="2019-05-03 05:05:42" dateClose="2019-05-06 06:05:47">1.00121</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -2702,7 +2703,6 @@
 		<controller id="AstCall" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="update" modelId="AstCall">
 				<field id="contact_name" dataType="String"/>
-				<field id="contact_tel" dataType="String"/>
 				<field id="client_name" dataType="String"/>
 				<field id="client_kind" dataType="Enum" enumId="client_kinds"/>
 				<field id="client_come_from_id" dataType="Int"/>
@@ -3120,6 +3120,7 @@
 		<jsTemplate id="OrderDialog_View" file="tmpl/OrderDialog_View.html"/>
 		<jsTemplate id="AssignedVehicleList_View" file="tmpl/AssignedVehicleList_View.html"/>
 		<jsTemplate id="AstIncomeCall_View" file="tmpl/AstIncomeCall_View.html"/>
+		<jsTemplate id="AstIncomeUnknownCall_View" file="tmpl/AstIncomeUnknownCall_View.html"/>
 		<jsTemplate id="OrderCalc" file="tmpl/OrderCalc.html"/>
 	</jsTemplates>
 	<jsScripts>
@@ -3575,6 +3576,7 @@
 		<jsScript file="views/RAMaterialConsumptionDateList_View.js"/>
 		<jsScript file="views/RAMaterialConsumptionDocList_View.js"/>
 		<jsScript file="views/AstIncomeCall_View.js"/>
+		<jsScript file="views/AstIncomeUnknownCall_View.js"/>
 		<jsScript file="views/SMSForSendingList_View.js"/>
 		<jsScript file="views/SMSPatternList_View.js"/>
 		<jsScript file="views/SMSPatternDialog_View.js"/>

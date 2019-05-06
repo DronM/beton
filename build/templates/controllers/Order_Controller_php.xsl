@@ -526,6 +526,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$this->getExtDbVal($pm,'id')
 		));	
 	}	
+	
 }
 <![CDATA[?>]]>
 </xsl:template>

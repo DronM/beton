@@ -144,8 +144,19 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$p->add('client_type_id',DT_INT,$pm->getParamValue('client_type_id'));
 				$p->add('client_kind',DT_STRING,$pm->getParamValue('client_kind'));
 				$p->add('manager_comment',DT_STRING,$pm->getParamValue('manager_comment'));
-				$p->add('unique_id',DT_STRING,$pm->getParamValue('unique_id'));
+				$p->add('unique_id',DT_STRING,$pm->getParamValue('old_unique_id'));
 			
+				$ar = $l->query_first(sprintf(
+				"SELECT
+					caller_id_num,
+					client_id
+				FROM ast_calls
+				WHERE unique_id=%s",
+				$p->getParamById('unique_id')
+				));
+				$contact_tel_db = "'".$ar['caller_id_num']."'";
+				$contact_client_id = $ar['client_id'];
+				
 				/** сверим имя клиента
 				 * и имя контакта с базой - если надо обновим
 				 */
@@ -154,15 +165,18 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					cl.name AS client_name,
 					clt.name AS contact_name,
 					clt.tel AS contact_tel,
+					clt.id AS contact_id,
+					clt.client_id AS contact_client_id,
 					cl.client_kind AS client_kind,
 					cl.client_come_from_id,
 					cl.client_type_id
 				FROM clients AS cl
 				LEFT JOIN client_tels AS clt
 					ON clt.client_id=cl.id
-					AND clt.tel=format_phone(%s)
+					AND (clt.tel=format_phone(%s) OR clt.tel=%s)
 				WHERE cl.id=%d",
-				$p->getParamById('contact_tel'),
+				$contact_tel_db,
+				$contact_tel_db,
 				$p->getParamById('client_id')
 				));
 				
@@ -183,7 +197,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					}
 					if (strlen($pm->getParamValue('client_kind'))&amp;&amp;$ar['client_kind']!=$pm->getParamValue('client_kind')){
 						$client_upd_fields.= ($client_upd_fields=='')? '':',';
-						$client_upd_fields.= sprinbtf('client_kind=%s',$p->getParamById('client_kind'));
+						$client_upd_fields.= sprintf('client_kind=%s',$p->getParamById('client_kind'));
 					}
 					
 					if (strlen($client_upd_fields)){						
@@ -215,9 +229,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 						$l->query(sprintf(
 						"INSERT INTO client_tels
 						(client_id,tel,name)
-						VALUES (%d,format_phone(%s),%s)",
+						VALUES (%d,(SELECT caller_id_num FROM ast_calls WHERE unique_id=%s),%s)",
 						$p->getParamById('client_id'),
-						$p->getParamById('contact_tel'),
+						$p->getParamById('unique_id'),
 						$p->getParamById('contact_name')
 						));
 					}					
@@ -232,6 +246,28 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					$p->getParamById('manager_comment'),
 					$p->getParamById('unique_id')
 					));											
+				}
+				
+				//Другой клиент
+				$client_id = $p->getParamById('client_id');
+				if($contact_client_id!=$client_id){
+					$l->query(sprintf(
+					"UPDATE ast_calls
+					SET client_id=%d
+					WHERE unique_id=%s",
+					$client_id,
+					$p->getParamById('unique_id')
+					));					
+					
+					if($ar['contact_id']){
+						$l->query(sprintf(
+						"UPDATE client_tels
+						SET client_id=%d
+						WHERE id=%d",
+						$client_id,
+						$ar['contact_id']
+						));					
+					}
 				}
 				
 				$l->query("COMMIT");
@@ -257,19 +293,39 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			VALUES ('Клиент '||
 				(SELECT coalesce(max(id),0)+1
 				FROM clients),%s)
-			RETURNING id",
+			RETURNING id,name",
 			$p->getParamById('kind'))
 			);
 			
 			//Контакт клиента
 			$l->query(sprintf("INSERT INTO client_tels
 			(client_id,tel)
-			VALUES (%d,(
-				SELECT format_cel_phone(ast.caller_id_num)
-				FROM ast_calls ast WHERE ast.unique_id=%s))",
+			VALUES (%d,
+				(SELECT ast.caller_id_num FROM ast_calls ast WHERE ast.unique_id=%s)
+			)",
 			$ar['id'],
 			$p->getParamById('id')
 			));
+
+			//Звонок
+			$l->query(sprintf(
+				"UPDATE ast_calls
+				SET client_id=%d
+				WHERE unique_id=%s",
+				$ar['id'],
+				$p->getParamById('id')
+			));
+
+			$this->addModel(new ModelVars(
+				array('name'=>'Vars',
+					'id'=>'InsertedId_Model',
+					'values'=>array(
+							new Field('client_id',DT_INT,array('value'=>$ar['id']))
+							,new Field('client_name',DT_STRING,array('value'=>$ar['name']))
+						)						
+					)
+				)
+			);					
 			
 		try{
 			$l->query("COMMIT");

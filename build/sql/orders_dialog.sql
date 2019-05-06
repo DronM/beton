@@ -7,14 +7,38 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 		o.id,
 		order_num(o.*) AS number,		
 		clients_ref(cl) AS clients_ref,		
+		
 		destinations_ref(d) AS destinations_ref,
-		o.destination_price AS destination_cost,
-		d.price AS destination_price,
+		o.destination_price AS destination_cost,		
+		--d.price AS destination_price,		
+		CASE
+			WHEN d.special_price THEN coalesce(d.price,0)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to<=d.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(d.price,0))			
+		END  AS destination_price,
+		
 		d.time_route,
 		d.distance,
+		
 		concrete_types_ref(concr) AS concrete_types_ref,
-		o.concrete_price AS concrete_cost,
-		concr.price AS concrete_price,
+		o.concrete_price AS concrete_cost,		
+		--concr.price AS concrete_price,
+		coalesce(
+			(SELECT ct_p.price
+			FROM concrete_costs ct_p
+			WHERE ct_p.date<=o.date_time::date AND ct_p.concrete_type_id=o.concrete_type_id
+			ORDER BY ct_p.date DESC
+			LIMIT 1
+			),
+		coalesce(concr.price,0)) AS concrete_price,
+		
 		o.unload_type,
 		o.comment_text,
 		o.descr,

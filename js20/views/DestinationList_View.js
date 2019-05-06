@@ -50,7 +50,16 @@ function DestinationList_View(id,options){
 						,new GridCellHead(id+":grid:head:price",{
 							"value":"Стоимость доставки",
 							"columns":[
-								new GridColumnFloat({"field":model.getField("price")})
+								new GridColumn({
+									"field":model.getField("price"),
+									"formatFunction":function(f){
+										var res = parseFloat(f.price.getValue()).toFixed(2);
+										if(f.special_price.getValue()){
+											res+= " (!)";
+										}
+										return res;
+									}
+								})
 							]
 						})
 						

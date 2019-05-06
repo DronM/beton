@@ -380,6 +380,7 @@ OrderMakeGrid.prototype.onGetData = function(){
 		var prev_time_m,init_time_m;
 		var future_shift;
 		var now_m = now.getHours()*60 + now.getMinutes();
+		//console.log("shift_start_time="+shift_start_time)
 		if(now.getTime() < shift_start_time.getTime()){
 			//future shift
 			future_shift = true;
@@ -394,7 +395,7 @@ OrderMakeGrid.prototype.onGetData = function(){
 		init_time_m = prev_time_m;
 		
 		var model_ind = 0;
-		//console.log("StartPrevTime="+prev_time_m)
+		//console.log("StartTime="+prev_time_m)
 		//*** ADDED ****
 		
 		var closed_shift;

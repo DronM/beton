@@ -948,5 +948,6 @@ class Order_Controller extends ControllerSQL{
 			$this->getExtDbVal($pm,'id')
 		));	
 	}	
+	
 }
 ?>

@@ -434,6 +434,11 @@ table td{
 .glyphMoneyField{
 	font-size:25px;
 }
+
+.moneyEditable{
+	background:yellow;
+}
+
 /*
 #OrderDialog\:unload_price\:label{
 	font-weight:bold;

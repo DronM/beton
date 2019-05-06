@@ -44,6 +44,16 @@ function AstCallList_View(id,options){
 				"field":new FieldInt("client_id")}),
 			"sign":"e"		
 		}
+		,"client_tel":{
+			"binding":new CommandBinding({
+				"control":new EditPhone(id+":filter-ctrl-client_tel",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Номер клиента"
+				}),
+				"field":new FieldString("caller_id_num")}),
+			"sign":"e"		
+		}
+		
 		,"call_type":{
 			"binding":new CommandBinding({
 				"control":new Enum_call_types(id+":filter-ctrl-call_type",{
@@ -114,6 +124,7 @@ function AstCallList_View(id,options){
 					"elements":[
 						new GridCellHead(id+":grid:head:start_time_date",{
 							"value":"Дата",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDate({
 									"id":"start_time_date",
@@ -125,6 +136,7 @@ function AstCallList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:start_time_time",{
 							"value":"Время",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDateTime({
 									"id":"start_time_time",
@@ -141,6 +153,15 @@ function AstCallList_View(id,options){
 								})
 							]
 						})						
+						,new GridCellHead(id+":grid:head:client_tel",{
+							"value":"Номер клиента",
+							"columns":[
+								new GridColumnPhone({
+									"field":model.getField("caller_id_num")
+								})
+							]
+						})						
+						
 						,new GridCellHead(id+":grid:head:clients_ref",{
 							"value":"Контрагент",
 							"columns":[

@@ -18,16 +18,13 @@ function AstIncomeCall_View(id,options){
 	options.model = options.models.AstCallCurrent_Model;
 
 	var client_id;
-	if (options.model.getNextRow()){
+	if (options.model.getRowCount()){
 		var pm = options.controller.getPublicMethod("update");
 		pm.setFieldValue("unique_id",options.model.getFieldValue("unique_id"));
-		pm.setFieldValue("contact_tel",options.model.getFieldValue("contact_tel"));
 		client_id = options.model.getFieldValue("client_id");
-		if(client_id)
-			pm.setFieldValue("client_id",client_id);
 	}
-
-	options.templateOptions = options.templateOptions || {};
+	options.template = window.getApp().getTemplate("AstIncomeCall_View");
+	options.templateOptions = {};
 	options.templateOptions.isClient = client_id? true:false;
 
 	this.m_onMakeOrder = options.onMakeOrder;
@@ -94,6 +91,14 @@ function AstIncomeCall_View(id,options){
 				
 				self.getElement("cmdUpdate").setEnabled(false);
 				self.onSave(
+					/*
+					function(){
+						var client_id = self.getElement("client").getValue().getKey();
+						if(!client_id||client_id=="null"){
+							self.getElement("client").setKeys(self.getElement("client").getInitKeys());
+						}
+					}
+					*/
 					null,
 					function(resp,errCode,errStr){						
 						self.setError(window.getApp().formatError(errCode,errStr));
@@ -117,9 +122,9 @@ function AstIncomeCall_View(id,options){
 			"caption":"Оформить заявку  ",
 			"glyph":"glyphicon-plus",
 			"onClick":function(){
-				self.m_onMakeOrder();
-			}
-		})
+					self.m_onMakeOrder();
+				}
+			})
 		);			
 	
 	}
@@ -146,12 +151,28 @@ function AstIncomeCall_View(id,options){
 	
 	var write_b = [
 		new CommandBinding({"control":this.getElement("contact_name")})
-		,new CommandBinding({"control":this.getElement("contact_tel")})
 		,new CommandBinding({"control":this.getElement("manager_comment")})		
 		,new CommandBinding({"control":this.getElement("client"),"fieldId":"client_id"})
 		,new CommandBinding({"control":this.getElement("client_come_from"),"fieldId":"client_come_from_id"})
 		,new CommandBinding({"control":this.getElement("client_type"),"fieldId":"client_type_id"})
 		,new CommandBinding({"control":this.getElement("client_kind")})
+		,new CommandBinding({
+			"func":function(pm){
+				var client_id = self.getElement("client").getValue().getKey();
+				if(self.m_model.getFieldValue("clients_ref").getDescr()!=self.getElement("client").getNode().value){
+					pm.setFieldValue("client_name",self.getElement("client").getNode().value);
+					if(!client_id||client_id=="null"){
+						self.getElement("client").setKeys(self.getElement("client").getInitKeys());
+						DOMHelper.delClass(self.getElement("client").getNode(),"null-ref");
+						client_id = self.getElement("client").getInitKeys().id;
+					}
+				}
+				else{
+					pm.unsetFieldValue("client_name");
+				}
+				pm.setFieldValue("client_id",client_id);
+			}
+		})
 	];
 	this.setWriteBindings(write_b);
 	
