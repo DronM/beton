@@ -166,7 +166,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					clt.name AS contact_name,
 					clt.tel AS contact_tel,
 					clt.id AS contact_id,
-					clt.client_id AS contact_client_id,
 					cl.client_kind AS client_kind,
 					cl.client_come_from_id,
 					cl.client_type_id
@@ -257,17 +256,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					WHERE unique_id=%s",
 					$client_id,
 					$p->getParamById('unique_id')
-					));					
-					
-					if($ar['contact_id']){
-						$l->query(sprintf(
-						"UPDATE client_tels
-						SET client_id=%d
-						WHERE id=%d",
-						$client_id,
-						$ar['contact_id']
-						));					
-					}
+					));										
 				}
 				
 				$l->query("COMMIT");

@@ -210,22 +210,22 @@ extend(Shipment_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
-	f_opts.alias = "Код";
+	f_opts.alias = "Номер";
 	pm.addField(new FieldInt("id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Дата отгрузки";
 	pm.addField(new FieldDateTime("ship_date_time",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Количество";
 	pm.addField(new FieldFloat("quant",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Доставка";
+	f_opts.alias = "Стоимость доставки";
 	pm.addField(new FieldFloat("cost",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Отгружен";
 	pm.addField(new FieldBool("shipped",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Марка";
 	pm.addField(new FieldJSON("concrete_types_ref",f_opts));
 	var f_opts = {};
 	
@@ -234,25 +234,25 @@ extend(Shipment_Controller,ControllerObjServer);
 	f_opts.alias = "Владелец";
 	pm.addField(new FieldString("owner",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Автомобиль";
 	pm.addField(new FieldJSON("vehicles_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("vehicle_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Водитель";
 	pm.addField(new FieldJSON("drivers_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("driver_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Объект";
 	pm.addField(new FieldJSON("destinations_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("destination_id",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Код клиента";
+	
 	pm.addField(new FieldInt("client_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Клиент";
@@ -261,7 +261,7 @@ extend(Shipment_Controller,ControllerObjServer);
 	f_opts.alias = "Простой";
 	pm.addField(new FieldTime("demurrage",f_opts));
 	var f_opts = {};
-	f_opts.alias = "За простой";
+	f_opts.alias = "Стомость простоя";
 	pm.addField(new FieldFloat("demurrage_cost",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Оценка";
@@ -273,7 +273,7 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldInt("user_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Автор";
 	pm.addField(new FieldJSON("users_ref",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Завод";

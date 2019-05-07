@@ -23,6 +23,8 @@ class ShipmentPumpList_Model extends ModelSQLBeton{
 			
 		//*** Field ship_date_time ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Дата отгрузки';
 		$f_opts['id']="ship_date_time";
 				
 		$f_ship_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
@@ -31,8 +33,7 @@ class ShipmentPumpList_Model extends ModelSQLBeton{
 		
 		//*** Field ship_date_time_descr ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Дата отгрузки';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="ship_date_time_descr";
 				
 		$f_ship_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time_descr",$f_opts);
@@ -41,8 +42,7 @@ class ShipmentPumpList_Model extends ModelSQLBeton{
 		
 		//*** Field client_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Код клиента';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="client_id";
 				
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
@@ -61,8 +61,7 @@ class ShipmentPumpList_Model extends ModelSQLBeton{
 		
 		//*** Field destination_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Код объекта';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="destination_id";
 				
 		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);

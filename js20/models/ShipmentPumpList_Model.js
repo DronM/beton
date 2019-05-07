@@ -26,7 +26,7 @@ function ShipmentPumpList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Дата отгрузки';
 	filed_options.autoInc = false;	
 	
 	options.fields.ship_date_time = new FieldDateTime("ship_date_time",filed_options);
@@ -35,7 +35,7 @@ function ShipmentPumpList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Дата отгрузки';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.ship_date_time_descr = new FieldString("ship_date_time_descr",filed_options);
@@ -44,7 +44,7 @@ function ShipmentPumpList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Код клиента';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.client_id = new FieldInt("client_id",filed_options);
@@ -62,7 +62,7 @@ function ShipmentPumpList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Код объекта';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.destination_id = new FieldInt("destination_id",filed_options);

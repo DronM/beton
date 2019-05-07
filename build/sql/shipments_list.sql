@@ -7,7 +7,30 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		sh.id,
 		sh.ship_date_time,
 		sh.quant,
-		calc_ship_cost(sh.*, dest.*, true) AS cost,
+		--calc_ship_cost(sh.*, dest.*, true) AS cost,
+		CASE
+			WHEN dest.id=const_self_ship_dest_id_val() OR concr.name='Вода' THEN 0
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+					coalesce(dest.price,0))			
+				END
+				*
+				CASE
+					WHEN o.quant>=7 THEN sh.quant
+					WHEN dest.distance<=60 THEN 5
+					ELSE 7
+				END
+		END AS cost,
+		
 		sh.shipped,
 		concrete_types_ref(concr) AS concrete_types_ref,
 		o.concrete_type_id,		

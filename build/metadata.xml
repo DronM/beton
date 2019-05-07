@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-06 06:47:19</lastBuild></version>
+		<lastBuild>2019-05-07 05:50:30</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -25,6 +25,7 @@
 		<version dateOpen="2019-04-30 06:04:13" dateClose="2019-05-01 07:05:29">1.0019</version>
 		<version dateOpen="2019-05-02 05:05:59" dateClose="2019-05-02 06:05:41">1.00120</version>
 		<version dateOpen="2019-05-03 05:05:42" dateClose="2019-05-06 06:05:47">1.00121</version>
+		<version dateOpen="2019-05-06 06:05:47" dateClose="2019-05-07 05:05:50">1.00122</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -832,30 +833,30 @@
 			</index>
 		</model>
 		<model id="ShipmentList" parent="ModelSQLBeton" dataTable="shipments_list" virtual="TRUE">
-			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
-			<field id="ship_date_time" dataType="DateTime"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
-			<field id="cost" dataType="Float" alias="Доставка"/>
+			<field id="cost" dataType="Float" alias="Стоимость доставки"/>
 			<field id="shipped" dataType="Bool" alias="Отгружен"/>
-			<field id="concrete_types_ref" dataType="JSON"/>
-			<field id="concrete_type_id" dataType="Int"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
 			<field id="owner" dataType="String" alias="Владелец"/>
-			<field id="vehicles_ref" dataType="JSON"/>
-			<field id="vehicle_id" dataType="Int"/>
-			<field id="drivers_ref" dataType="JSON"/>
-			<field id="driver_id" dataType="Int"/>
-			<field id="destinations_ref" dataType="JSON"/>
-			<field id="destination_id" dataType="Int"/>
-			<field id="client_id" dataType="Int" alias="Код клиента"/>
+			<field id="vehicles_ref" dataType="JSON" alias="Автомобиль"/>
+			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
+			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
+			<field id="driver_id" dataType="Int" sysCol="TRUE"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
 			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
 			<field id="demurrage" dataType="Time" alias="Простой"/>
-			<field id="demurrage_cost" dataType="Float" alias="За простой"/>
+			<field id="demurrage_cost" dataType="Float" alias="Стомость простоя"/>
 			<field id="client_mark" dataType="Int" alias="Оценка"/>
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
-			<field id="user_id" dataType="Int"/>
-			<field id="users_ref" dataType="JSON"/>
+			<field id="user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="users_ref" dataType="JSON" alias="Автор"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
-			<field id="production_site_id" dataType="Int"/>
+			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
 			<sql/>
 		</model>
 		<model id="ShipmentDialog" parent="ModelSQLBeton" dataTable="shipments_dialog" virtual="TRUE">
@@ -874,18 +875,18 @@
 			<sql/>
 		</model>
 		<model id="ShipmentForOrderList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE">
-			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
 			<field id="date_time" dataType="DateTime" alias="Назначен"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Отгружен"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
 			<field id="vehicle_schedules_ref" dataType="JSON" alias="Экипаж"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
-			<field id="vs_state" dataType="String"/>
+			<field id="vs_state" dataType="String" alias="Статус"/>
 			<field id="shipped" dataType="Bool" alias="Отгружен"/>
-			<field id="order_id" dataType="Int"/>
+			<field id="order_id" dataType="Int" sysCol="TRUE"/>
 		</model>
 		<model id="OperatorList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE" server="FALSE">
-			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
 			<field id="date_time" dataType="DateTime" alias="Назначен"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Отгружен"/>
 			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
@@ -912,11 +913,11 @@
 			<field id="quant" dataType="Float" alias="Количество"/>
 		</model>
 		<model id="ShipmentPumpList" parent="ModelSQLBeton" dataTable="shipments_pumps_list" virtual="TRUE">
-			<field id="ship_date_time" dataType="DateTime"/>
-			<field id="ship_date_time_descr" dataType="String" alias="Дата отгрузки"/>
-			<field id="client_id" dataType="Int" alias="Код клиента"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
+			<field id="ship_date_time_descr" dataType="String" sysCol="TRUE"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
 			<field id="client_descr" dataType="String" alias="Клиент"/>
-			<field id="destination_id" dataType="Int" alias="Код объекта"/>
+			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
 			<field id="destination_descr" dataType="String" alias="Объект"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
 			<field id="pump_price" dataType="Float" alias="Цена насоса"/>
@@ -927,14 +928,14 @@
 			<field id="blanks_exist" dataType="String" alias="Бланки"/>
 		</model>
 		<model id="ShipmentDateList" parent="ModelSQLBeton" dataTable="shipment_dates_list" virtual="TRUE">
-			<field id="ship_date" dataType="DateTime"/>
-			<field id="client_id" dataType="Int" alias="Код клиента"/>
+			<field id="ship_date" dataType="DateTime" alias="Дата"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
 			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
-			<field id="concrete_type_id" dataType="Int" alias="Код марки"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
-			<field id="destination_id" dataType="Int" alias="Код объекта"/>
+			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
-			<field id="production_site_id" dataType="Int" alias="Код завода"/>
+			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
 			<field id="ship_cost" dataType="Float" alias="Стоимость доставки"/>

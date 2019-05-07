@@ -12,12 +12,12 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 		o.destination_price AS destination_cost,		
 		--d.price AS destination_price,		
 		CASE
-			WHEN d.special_price THEN coalesce(d.price,0)
+			WHEN coalesce(d.special_price,FALSE) THEN coalesce(d.price,0)
 			ELSE
 			coalesce(
 				(SELECT sh_p.price
 				FROM shipment_for_owner_costs sh_p
-				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to<=d.distance
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=d.distance
 				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
 				LIMIT 1
 				),			

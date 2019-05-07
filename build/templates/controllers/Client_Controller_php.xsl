@@ -133,7 +133,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			) AS last_order ON last_order.client_id=clients.id
 			LEFT JOIN concrete_types AS ct ON ct.id=last_order.concrete_type_id
 			LEFT JOIN destinations AS dest ON dest.id=last_order.destination_id
-			WHERE lower(clients.name) LIKE lower(%s)||'%%'",
+			WHERE lower(clients.name) LIKE lower(%s)||'%%'
+			LIMIT 5",
 			$this->getExtDbVal($pm,'name')
 			),
 			'OrderClient_Model'

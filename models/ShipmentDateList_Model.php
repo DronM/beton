@@ -23,6 +23,8 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 			
 		//*** Field ship_date ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Дата';
 		$f_opts['id']="ship_date";
 				
 		$f_ship_date=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date",$f_opts);
@@ -31,8 +33,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		//*** Field client_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Код клиента';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="client_id";
 				
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
@@ -51,8 +52,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		//*** Field concrete_type_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Код марки';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="concrete_type_id";
 				
 		$f_concrete_type_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_id",$f_opts);
@@ -71,8 +71,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		//*** Field destination_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Код объекта';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="destination_id";
 				
 		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
@@ -91,8 +90,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		//*** Field production_site_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Код завода';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="production_site_id";
 				
 		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);

@@ -208,9 +208,9 @@
 	
 	if(view_opts.models.AstCallCurrent_Model.getNextRow()){
 		if (view_opts.models.AstCallCurrent_Model.getFieldValue("client_id")){
-			if (view_opts.models.AstCallCurrent_Model.getFieldValue("client_kind")=="buyer"){
-				window.showClientCallForm(view_opts);
-			}
+			window.showClientCallForm(view_opts);
+			//if (view_opts.models.AstCallCurrent_Model.getFieldValue("client_kind")=="buyer"){				
+			//}
 		}
 		else{
 			view_opts.onSetClientBuyer = function(viewOpts){

@@ -26,7 +26,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	filed_options.alias = 'Код';
+	filed_options.alias = 'Номер';
 	filed_options.autoInc = false;	
 	
 	options.fields.id = new FieldInt("id",filed_options);
@@ -35,7 +35,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Дата отгрузки';
 	filed_options.autoInc = false;	
 	
 	options.fields.ship_date_time = new FieldDateTime("ship_date_time",filed_options);
@@ -53,7 +53,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Доставка';
+	filed_options.alias = 'Стоимость доставки';
 	filed_options.autoInc = false;	
 	
 	options.fields.cost = new FieldFloat("cost",filed_options);
@@ -71,7 +71,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Марка';
 	filed_options.autoInc = false;	
 	
 	options.fields.concrete_types_ref = new FieldJSON("concrete_types_ref",filed_options);
@@ -98,7 +98,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Автомобиль';
 	filed_options.autoInc = false;	
 	
 	options.fields.vehicles_ref = new FieldJSON("vehicles_ref",filed_options);
@@ -116,7 +116,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Водитель';
 	filed_options.autoInc = false;	
 	
 	options.fields.drivers_ref = new FieldJSON("drivers_ref",filed_options);
@@ -134,7 +134,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Объект';
 	filed_options.autoInc = false;	
 	
 	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
@@ -152,7 +152,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Код клиента';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.client_id = new FieldInt("client_id",filed_options);
@@ -179,7 +179,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'За простой';
+	filed_options.alias = 'Стомость простоя';
 	filed_options.autoInc = false;	
 	
 	options.fields.demurrage_cost = new FieldFloat("demurrage_cost",filed_options);
@@ -215,7 +215,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Автор';
 	filed_options.autoInc = false;	
 	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);

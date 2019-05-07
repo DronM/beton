@@ -102,11 +102,15 @@ extend(AssignedVehicleGrid,Grid);
 /* private members */
 
 /* protected*/
-
+AssignedVehicleGrid.prototype.m_oldData;
 
 /* public methods */
 
 AssignedVehicleGrid.prototype.onGetData = function(){
+	//ADDED
+	var new_data = [];
+	var new_data_added = false;
+	
 	if (this.m_model){
 		//refresh from model
 		var self = this;
@@ -151,7 +155,7 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 		/* temporaly always set to 0*/
 		var h_row_ind = 0;
 		var key_id_ar = this.getKeyIds();
-		
+				
 		while(this.m_model.getNextRow()){			
 			
 			//ADDED CODE
@@ -192,7 +196,14 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 				field_cnt++;				
 			}
 		
-			row.setAttr("keys",CommonHelper.serialize(row_keys));			
+			//ADDED
+			var row_keys_str = CommonHelper.serialize(row_keys);
+			if(this.m_oldData && CommonHelper.inArray(row_keys_str,this.m_oldData)==-1){
+				new_data_added = true;
+				this.m_oldData.push(row_keys_str);
+			} 
+			new_data.push(row_keys_str);
+			row.setAttr("keys", row_keys_str);
 			
 			if (details_expanded){
 				var row_key_h = hex_md5(row.getAttr("keys"));
@@ -258,12 +269,20 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 				}
 			}
 		}
-
-		
-		
 	}
 	if (this.m_navigate || this.m_navigateClick){
 		this.setSelection();
 	}
+	
+	//*********
+	this.m_oldData = new_data;
+	if(new_data_added){
+		this.makeSound();
+	}
 }
 
+
+AssignedVehicleGrid.prototype.makeSound = function(){
+	//var audio = new Audio("img/Bell-sound-effect-ding.mp3");
+	//audio.play();
+}

@@ -27,7 +27,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		
-		$f_opts['alias']='Код';
+		$f_opts['alias']='Номер';
 		$f_opts['id']="id";
 				
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
@@ -86,6 +86,8 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		//*** Field vs_state ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Статус';
 		$f_opts['id']="vs_state";
 				
 		$f_vs_state=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vs_state",$f_opts);
@@ -104,6 +106,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		//*** Field order_id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="order_id";
 				
 		$f_order_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_id",$f_opts);

@@ -1,56 +1,77 @@
--- View: ast_calls_current
+-- View: public.shipments_list
 
- DROP VIEW ast_calls_current;
+-- DROP VIEW public.shipments_list;
 
-CREATE OR REPLACE VIEW ast_calls_current AS 
-	SELECT DISTINCT ON (ast.ext)
-		ast.unique_id,
-		ast.ext,
-				
+CREATE OR REPLACE VIEW public.shipments_list AS 
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.quant,
+		--calc_ship_cost(sh.*, dest.*, true) AS cost,
 		CASE
-			WHEN clt.tel IS NOT NULL THEN clt.tel
-			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
-			ELSE ast.caller_id_num::text
-		END AS contact_tel,
+			WHEN dest.id=const_self_ship_dest_id_val() OR concr.name='Вода' THEN 0
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+					coalesce(dest.price,0))			
+				END
+				*
+				CASE
+					WHEN o.quant>=7 THEN sh.quant
+					WHEN dest.distance<=60 THEN 5
+					ELSE 7
+				END
+		END AS cost,
 		
-		--backward compatibility
-		CASE
-			WHEN clt.tel IS NOT NULL THEN clt.tel
-			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
-			ELSE ast.caller_id_num::text
-		END AS num,
+		sh.shipped,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,		
+		v.owner,
 		
-		ast.dt AS ring_time,
-		ast.start_time AS answer_time,
-		ast.end_time AS hangup_time,
-		ast.client_id,
-		clients_ref(cl) AS clients_ref,
-		cl.name AS client_descr,
-		cl.client_kind,
-		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
-		ast.manager_comment,
-		ast.informed,
-		clt.name AS contact_name,
-		cld.debt,
-		man.name AS client_manager_descr,
-		client_types_ref(ctp) AS client_types_ref,
-		client_come_from_ref(ccf) AS client_come_from_ref
+		vehicles_ref(v) AS vehicles_ref,
+		vs.vehicle_id,
+		
+		drivers_ref(d) AS drivers_ref,
+		vs.driver_id,
+		
+		destinations_ref(dest) As destinations_ref,
+		o.destination_id,
+		
+		clients_ref(cl) As clients_ref,
+		o.client_id,
+		calc_demurrage_cost(sh.demurrage::interval) AS demurrage_cost,
+		sh.demurrage,
+		
+		sh.client_mark,
+		sh.blanks_exist,
+		
+		users_ref(u) As users_ref,
+		o.user_id,
+		
+		production_sites_ref(ps) AS production_sites_ref,
+		sh.production_site_id
 		
 		
-   FROM ast_calls ast
-     LEFT JOIN clients cl ON cl.id = ast.client_id
-     LEFT JOIN users man ON cl.manager_id = man.id
-     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
-     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
-     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
-     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
-  WHERE
-  	ast.end_time IS NULL
-  	AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
-  	AND ast.caller_id_num::text <> ''::text
-  	AND (ast.start_time IS NULL OR ast.start_time::date=now()::date)
-  ORDER BY ast.ext, ast.dt DESC;
+	FROM shipments sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN drivers d ON d.id = vs.driver_id
+	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+	LEFT JOIN users u ON u.id = sh.user_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	ORDER BY sh.date_time DESC;
 
-ALTER TABLE ast_calls_current
+ALTER TABLE public.shipments_list
   OWNER TO beton;
 

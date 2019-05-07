@@ -26,7 +26,7 @@ function OperatorList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	filed_options.alias = 'Код';
+	filed_options.alias = 'Номер';
 	filed_options.autoInc = false;	
 	
 	options.fields.id = new FieldInt("id",filed_options);

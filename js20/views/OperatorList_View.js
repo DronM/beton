@@ -81,7 +81,8 @@ function OperatorList_View(id,options){
 			"colAttrs":{"align":"right"},
 			"columns":[
 				new GridColumnFloat({
-					"field":model.getField("quant")
+					"field":model.getField("quant"),
+					"precision":1
 				})
 			]
 		})
@@ -118,7 +119,10 @@ function OperatorList_View(id,options){
 			"attrs":{"align":"right"},
 			"calcOper":"sum",
 			"calcFieldId":"quant",
-			"gridColumn":new GridColumnFloat({"id":"tot_quant"})
+			"gridColumn":new GridColumnFloat({
+				"id":"tot_quant",
+				"precision":1
+			})
 		})						
 	];
 	

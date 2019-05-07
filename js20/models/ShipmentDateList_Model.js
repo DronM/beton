@@ -26,7 +26,7 @@ function ShipmentDateList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
 	options.fields.ship_date = new FieldDateTime("ship_date",filed_options);
@@ -35,7 +35,7 @@ function ShipmentDateList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Код клиента';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.client_id = new FieldInt("client_id",filed_options);
@@ -53,7 +53,7 @@ function ShipmentDateList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Код марки';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.concrete_type_id = new FieldInt("concrete_type_id",filed_options);
@@ -71,7 +71,7 @@ function ShipmentDateList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Код объекта';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.destination_id = new FieldInt("destination_id",filed_options);
@@ -89,7 +89,7 @@ function ShipmentDateList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Код завода';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);

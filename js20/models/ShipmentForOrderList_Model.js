@@ -26,7 +26,7 @@ function ShipmentForOrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	filed_options.alias = 'Код';
+	filed_options.alias = 'Номер';
 	filed_options.autoInc = false;	
 	
 	options.fields.id = new FieldInt("id",filed_options);
@@ -80,7 +80,7 @@ function ShipmentForOrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Статус';
 	filed_options.autoInc = false;	
 	
 	options.fields.vs_state = new FieldString("vs_state",filed_options);

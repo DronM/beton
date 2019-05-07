@@ -146,6 +146,7 @@ function ShipmentList_View(id,options){
 					"elements":[
 						new GridCellHead(id+":grid:head:id",{
 							"value":"Номер",
+							"colAttrs":{"clign":"center"},
 							"columns":[
 								new GridColumn({
 									"field":model.getField("id")
@@ -182,6 +183,7 @@ function ShipmentList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:concrete_types_ref",{
 							"value":"Марка",
+							"colAttrs":{"clign":"center"},
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("concrete_types_ref"),
@@ -208,6 +210,7 @@ function ShipmentList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("clients_ref"),
+									"form":ClientDialog_Form,
 									"ctrlClass":ClientEdit,
 									"searchOptions":{
 										"field":new FieldInt("client_id"),
@@ -223,6 +226,7 @@ function ShipmentList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
+									"form":Destination_Form,
 									"ctrlClass":DestinationEdit,
 									"searchOptions":{
 										"field":new FieldInt("destination_id"),

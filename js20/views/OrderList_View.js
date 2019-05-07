@@ -104,7 +104,7 @@ function OrderList_View(id,options){
 					"elements":[
 						new GridCellHead(id+":grid:head:number",{
 							"value":"Номер",
-							"attrs":{"align":"center"},
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumn({
 									"field":model.getField("number")
@@ -131,6 +131,7 @@ function OrderList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("clients_ref"),
+									"form":ClientDialog_Form,
 									"ctrlClass":ClientEdit,
 									"searchOptions":{
 										"field":new FieldInt("client_id"),
@@ -145,6 +146,7 @@ function OrderList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
+									"form":Destination_Form,
 									"ctrlClass":DestinationEdit,
 									"searchOptions":{
 										"field":new FieldInt("destination_id"),
@@ -156,15 +158,17 @@ function OrderList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:quant",{
 							"value":"Количество",
-							"attrs":{"align":"right"},
+							"colAttrs":{"align":"right"},
 							"columns":[
-								new GridColumn({
-									"field":model.getField("quant")
+								new GridColumnFloat({
+									"field":model.getField("quant"),
+									"precision":1
 								})
 							]
 						})
 						,new GridCellHead(id+":grid:head:concrete_types_ref",{
 							"value":"Марка",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("concrete_types_ref"),
@@ -179,7 +183,7 @@ function OrderList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:date_time",{
 							"value":"Дата",
-							"attrs":{"align":"center"},
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDateTime({
 									"field":model.getField("date_time")									
@@ -190,6 +194,7 @@ function OrderList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:unload_type",{
 							"value":"Подача",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new EnumGridColumn_unload_types({
 									"field":model.getField("unload_type"),
@@ -244,7 +249,7 @@ function OrderList_View(id,options){
 							"value":"Итого"
 						})												
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
-							"attrs":{"align":"right"},
+							"colAttrs":{"align":"right"},
 							"calcOper":"sum",
 							"calcFieldId":"quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
