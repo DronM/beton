@@ -120,7 +120,7 @@ function VehicleScheduleList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.owner = new FieldString("owner",filed_options);
+	options.fields.vehicle_owners_ref = new FieldJSON("vehicle_owners_ref",filed_options);
 	
 				
 	

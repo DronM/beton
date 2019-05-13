@@ -26,7 +26,7 @@ function ClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	filed_options.alias = 'Код';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.id = new FieldInt("id",filed_options);
@@ -44,7 +44,7 @@ function ClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Сотовый телефон';
+	filed_options.alias = 'Телефон';
 	filed_options.autoInc = false;	
 	
 	options.fields.phone_cel = new FieldString("phone_cel",filed_options);
@@ -80,7 +80,7 @@ function ClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Источник';
 	filed_options.autoInc = false;	
 	
 	options.fields.client_come_from_ref = new FieldJSON("client_come_from_ref",filed_options);
@@ -107,7 +107,7 @@ function ClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Наш';
 	filed_options.autoInc = false;	
 	
 	options.fields.ours = new FieldString("ours",filed_options);
@@ -116,7 +116,7 @@ function ClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Первое обращение';
 	filed_options.autoInc = false;	
 	
 	options.fields.first_call_date = new FieldDate("first_call_date",filed_options);
@@ -125,10 +125,19 @@ function ClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Кто завел';
 	filed_options.autoInc = false;	
 	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'ИНН';
+	filed_options.autoInc = false;	
+	
+	options.fields.inn = new FieldString("inn",filed_options);
 	
 		ClientList_Model.superclass.constructor.call(this,id,options);
 }

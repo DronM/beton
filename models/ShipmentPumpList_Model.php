@@ -19,7 +19,7 @@ class ShipmentPumpList_Model extends ModelSQLBeton{
 		
 		$this->setDbName("public");
 		
-		$this->setTableName("shipments_pumps_list");
+		$this->setTableName("shipment_pumps_list");
 			
 		//*** Field ship_date_time ***
 		$f_opts = array();
@@ -29,15 +29,6 @@ class ShipmentPumpList_Model extends ModelSQLBeton{
 				
 		$f_ship_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
 		$this->addField($f_ship_date_time);
-		//********************
-		
-		//*** Field ship_date_time_descr ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="ship_date_time_descr";
-				
-		$f_ship_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time_descr",$f_opts);
-		$this->addField($f_ship_date_time_descr);
 		//********************
 		
 		//*** Field client_id ***
@@ -98,14 +89,14 @@ class ShipmentPumpList_Model extends ModelSQLBeton{
 		$this->addField($f_pump_price);
 		//********************
 		
-		//*** Field owner ***
+		//*** Field vehicle_owners_ref ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Владелец';
-		$f_opts['id']="owner";
+		$f_opts['id']="vehicle_owners_ref";
 				
-		$f_owner=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner",$f_opts);
-		$this->addField($f_owner);
+		$f_vehicle_owners_ref=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
+		$this->addField($f_vehicle_owners_ref);
 		//********************
 		
 		//*** Field plate ***

@@ -105,12 +105,12 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		$this->addField($f_load_capacity);
 		//********************
 		
-		//*** Field owner ***
+		//*** Field vehicle_owners_ref ***
 		$f_opts = array();
-		$f_opts['id']="owner";
+		$f_opts['id']="vehicle_owners_ref";
 				
-		$f_owner=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner",$f_opts);
-		$this->addField($f_owner);
+		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
+		$this->addField($f_vehicle_owners_ref);
 		//********************
 		
 		//*** Field phone_cel ***

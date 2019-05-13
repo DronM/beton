@@ -174,8 +174,10 @@ function OrderMakeGrid(id,options){
 										var res = "";
 										var tp = fields.unload_type.getValue();
 										if(tp=="band"||tp=="pump"){
-											//res = fields.pump_vehicle_owner.getValue();
-											res = window.getApp().formatCell(fields.pump_vehicle_owner,cell,self.m_listView.COL_PUMP_VEH_LEN);
+											res = window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
+											var l = fields.pump_vehicle_length.getValue();
+											if(l)
+												res+="("+l+")";
 										}
 										return res;
 									}

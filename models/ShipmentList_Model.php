@@ -8,7 +8,6 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
@@ -94,14 +93,14 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_concrete_type_id);
 		//********************
 		
-		//*** Field owner ***
+		//*** Field vehicle_owners_ref ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Владелец';
-		$f_opts['id']="owner";
+		$f_opts['id']="vehicle_owners_ref";
 				
-		$f_owner=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner",$f_opts);
-		$this->addField($f_owner);
+		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
+		$this->addField($f_vehicle_owners_ref);
 		//********************
 		
 		//*** Field vehicles_ref ***

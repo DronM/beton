@@ -12,6 +12,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
  
 class Shipment_Model extends ModelSQLBeton{
 	
@@ -124,6 +125,23 @@ class Shipment_Model extends ModelSQLBeton{
 				
 		$f_blanks_exist=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"blanks_exist",$f_opts);
 		$this->addField($f_blanks_exist);
+		//********************
+		
+		//*** Field owner_agreed ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="owner_agreed";
+				
+		$f_owner_agreed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_agreed",$f_opts);
+		$this->addField($f_owner_agreed);
+		//********************
+		
+		//*** Field owner_agreed_date_time ***
+		$f_opts = array();
+		$f_opts['id']="owner_agreed_date_time";
+				
+		$f_owner_agreed_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_agreed_date_time",$f_opts);
+		$this->addField($f_owner_agreed_date_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

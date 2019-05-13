@@ -1,77 +1,127 @@
--- View: public.shipments_list
-
--- DROP VIEW public.shipments_list;
-
-CREATE OR REPLACE VIEW public.shipments_list AS 
-	SELECT
-		sh.id,
-		sh.ship_date_time,
-		sh.quant,
-		--calc_ship_cost(sh.*, dest.*, true) AS cost,
+CREATE OR REPLACE VIEW public.vehicle_states_all AS 
+	SELECT 
+		st.date_time,
+		vs.id,
 		CASE
-			WHEN dest.id=const_self_ship_dest_id_val() OR concr.name='Вода' THEN 0
-			ELSE
-				CASE
-					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
-					ELSE
-					coalesce(
-						(SELECT sh_p.price
-						FROM shipment_for_owner_costs sh_p
-						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
-						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
-						LIMIT 1
-						),			
-					coalesce(dest.price,0))			
-				END
-				*
-				CASE
-					WHEN o.quant>=7 THEN sh.quant
-					WHEN dest.distance<=60 THEN 5
-					ELSE 7
-				END
-		END AS cost,
-		
-		sh.shipped,
-		concrete_types_ref(concr) AS concrete_types_ref,
-		o.concrete_type_id,		
-		v.owner,
+		    WHEN st.state <> 'out'::vehicle_states AND st.state <> 'out_from_shift'::vehicle_states AND st.state <> 'shift'::vehicle_states AND st.state <> 'shift_added'::vehicle_states 
+
+			THEN 1
+			ELSE 0
+		END AS vehicles_count,
 		
 		vehicles_ref(v) AS vehicles_ref,
-		vs.vehicle_id,
+		
+		CASE
+			WHEN v.vehicle_owner_id IS NULL THEN v.owner
+			ELSE v_own.name
+		END AS owner,
 		
 		drivers_ref(d) AS drivers_ref,
-		vs.driver_id,
+		d.phone_cel::text AS driver_phone_cel,
 		
-		destinations_ref(dest) As destinations_ref,
-		o.destination_id,
+		st.state, 
+
+		CASE 
+			--WHEN st.state = 'busy'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone < CURRENT_TIMESTAMP
+				--THEN true
+			WHEN st.state = 'busy'::vehicle_states AND (st.date_time + coalesce(dest.time_route::interval,'00:00'::interval))::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN true
+			
+			WHEN st.state = 'left_for_base'::vehicle_states AND (st.date_time +  coalesce(dest.time_route,'00:00'::time)::interval)::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN true
+			ELSE false
+		END AS is_late,
+
+		CASE
+			WHEN st.state = 'at_dest'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*1 + constant_vehicle_unload_time())::interval)::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN true
+			ELSE false
+		END AS is_late_at_dest,
 		
-		clients_ref(cl) As clients_ref,
-		o.client_id,
-		calc_demurrage_cost(sh.demurrage::interval) AS demurrage_cost,
-		sh.demurrage,
+		CASE
+			--shift - no inf
+			WHEN st.state = 'shift'::vehicle_states OR st.state = 'shift_added'::vehicle_states
+				THEN ''
+
+			-- out_from_shift && out inf=out time
+			WHEN st.state = 'out_from_shift'::vehicle_states OR st.state = 'out'::vehicle_states
+				THEN time5_descr(st.date_time::time)::text
+
+			--free && assigned inf= time elapsed
+			WHEN st.state = 'free'::vehicle_states OR st.state = 'assigned'::vehicle_states
+				THEN to_char(CURRENT_TIMESTAMP-st.date_time,'HH24:MI')
+
+			--busy && late inf = -
+			--WHEN st.state = 'busy'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				--THEN '-'::text || time5_descr((CURRENT_TIMESTAMP - (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone)::time without time zone)::text
+			WHEN st.state = 'busy'::vehicle_states AND (st.date_time + coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN time5_descr((coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::time without time zone)::text
+				
+			-- busy not late
+			WHEN st.state = 'busy'::vehicle_states
+				--THEN time5_descr(((st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
+				THEN time5_descr((coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::time without time zone)::text
+
+			--at dest && late inf=route_time
+			WHEN st.state = 'at_dest'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*1+constant_vehicle_unload_time())::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN time5_descr(coalesce(dest.time_route,'00:00'::time))::text
+
+			--at dest NOT late
+			WHEN st.state = 'at_dest'::vehicle_states
+				THEN time5_descr( ((st.date_time + (coalesce(dest.time_route::interval,'00:00'::interval)+constant_vehicle_unload_time()::interval))::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
+
+			--left_for_base && LATE
+			WHEN st.state = 'left_for_base'::vehicle_states AND (st.date_time + coalesce(dest.time_route,'00:00'::time)::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN '-'::text || time5_descr((CURRENT_TIMESTAMP - (st.date_time + coalesce(dest.time_route,'00:00'::time)::interval)::timestamp with time zone)::time without time zone)::text
+
+			--left_for_base NOT late
+			WHEN st.state = 'left_for_base'::vehicle_states
+				THEN time5_descr( ((st.date_time + coalesce(dest.time_route,'00:00'::time)::interval)::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
+		    
+			ELSE ''
+		    
+		END AS inf_on_return, 
 		
-		sh.client_mark,
-		sh.blanks_exist,
+		v.load_capacity,
+		(SELECT COUNT(*)
+		FROM shipments
+		WHERE (shipments.vehicle_schedule_id = vs.id AND shipments.shipped)
+		) AS runs,
+
+		(SELECT 
+			(now()-(tr.period+AGE(now(),now() AT TIME ZONE 'UTC')) )>constant_no_tracker_signal_warn_interval()
+			FROM car_tracking AS tr
+			WHERE tr.car_id=v.tracker_id
+			ORDER BY tr.period DESC LIMIT 1
+		) AS tracker_no_data,
 		
-		users_ref(u) As users_ref,
-		o.user_id,
+		(v.tracker_id IS NULL OR v.tracker_id='') AS no_tracker,
 		
-		production_sites_ref(ps) AS production_sites_ref,
-		sh.production_site_id
+		vs.schedule_date,
 		
+		vehicle_schedules_ref(vs,v,d) AS vehicle_schedules_ref
 		
-	FROM shipments sh
-	LEFT JOIN orders o ON o.id = sh.order_id
-	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
-	LEFT JOIN clients cl ON cl.id = o.client_id
-	LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
-	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	FROM vehicle_schedules vs
+	
 	LEFT JOIN drivers d ON d.id = vs.driver_id
 	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
-	LEFT JOIN users u ON u.id = sh.user_id
-	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
-	ORDER BY sh.date_time DESC;
+	
+	
+	LEFT JOIN vehicle_schedule_states st ON
+		st.id = (SELECT vehicle_schedule_states.id 
+			FROM vehicle_schedule_states
+			WHERE vehicle_schedule_states.schedule_id = vs.id
+			ORDER BY vehicle_schedule_states.date_time DESC NULLS LAST
+			LIMIT 1
+		)
+	
+	LEFT JOIN shipments AS sh ON sh.id=st.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id		
+	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_owners AS v_own ON v_own.id=v.vehicle_owner_id
+	;		
+	--WHERE vs.schedule_date=in_date
 
-ALTER TABLE public.shipments_list
-  OWNER TO beton;
+
+ALTER TABLE public.vehicle_states_all OWNER TO beton;
 

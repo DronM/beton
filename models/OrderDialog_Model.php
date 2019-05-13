@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class OrderDialog_Model extends ModelSQLBeton{
@@ -56,6 +57,14 @@ class OrderDialog_Model extends ModelSQLBeton{
 				
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
+		//********************
+		
+		//*** Field last_modif_users_ref ***
+		$f_opts = array();
+		$f_opts['id']="last_modif_users_ref";
+				
+		$f_last_modif_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_users_ref",$f_opts);
+		$this->addField($f_last_modif_users_ref);
 		//********************
 		
 		//*** Field destinations_ref ***
@@ -264,6 +273,14 @@ class OrderDialog_Model extends ModelSQLBeton{
 				
 		$f_pump_prices_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_prices_ref",$f_opts);
 		$this->addField($f_pump_prices_ref);
+		//********************
+		
+		//*** Field last_modif_date_time ***
+		$f_opts = array();
+		$f_opts['id']="last_modif_date_time";
+				
+		$f_last_modif_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_date_time",$f_opts);
+		$this->addField($f_last_modif_date_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

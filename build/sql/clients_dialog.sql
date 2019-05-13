@@ -13,7 +13,9 @@ CREATE OR REPLACE VIEW public.clients_dialog AS
 		cl.phone_cel,
 		cl.email,
 		cl.client_kind,
-		users_ref(u) AS users_ref
+		users_ref(u) AS users_ref,
+		
+		cl.inn
 		
 	FROM clients cl
 	LEFT JOIN client_types ct ON ct.id = cl.client_type_id

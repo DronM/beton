@@ -36,6 +36,9 @@ class PumpVehicle_Controller extends ControllerSQL{
 		$param = new FieldExtString('phone_cel'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtInt('pump_length'
+				,array());
+		$pm->addParam($param);
 		$param = new FieldExtBool('deleted'
 				,array());
 		$pm->addParam($param);
@@ -66,6 +69,10 @@ class PumpVehicle_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('phone_cel'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('pump_length'
 				,array(
 			));
 			$pm->addParam($param);

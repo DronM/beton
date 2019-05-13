@@ -29,7 +29,7 @@ function Vehicle_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	filed_options.alias = 'Код';
+	
 	filed_options.autoInc = true;	
 	
 	options.fields.id = new FieldInt("id",filed_options);
@@ -71,20 +71,10 @@ function Vehicle_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Водитель';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.driver_id = new FieldInt("driver_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Владелец';
-	filed_options.autoInc = false;	
-	
-	options.fields.owner = new FieldString("owner",filed_options);
-	options.fields.owner.getValidator().setMaxLength('50');
 	
 				
 	
@@ -123,6 +113,16 @@ function Vehicle_Model(options){
 	
 	options.fields.sim_number = new FieldString("sim_number",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Номер телефона SIM карты';
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
+	
+			
 			
 			
 			

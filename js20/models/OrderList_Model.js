@@ -35,7 +35,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Номер';
 	filed_options.autoInc = false;	
 	
 	options.fields.number = new FieldString("number",filed_options);
@@ -44,7 +44,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Клиент';
 	filed_options.autoInc = false;	
 	
 	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
@@ -62,7 +62,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Объект';
 	filed_options.autoInc = false;	
 	
 	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
@@ -80,7 +80,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Марка';
 	filed_options.autoInc = false;	
 	
 	options.fields.concrete_types_ref = new FieldJSON("concrete_types_ref",filed_options);
@@ -98,7 +98,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Вид разгрузки';
 	filed_options.autoInc = false;	
 	
 	options.fields.unload_type = new FieldString("unload_type",filed_options);
@@ -107,7 +107,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Комментарий';
 	filed_options.autoInc = false;	
 	
 	options.fields.comment_text = new FieldText("comment_text",filed_options);
@@ -116,7 +116,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Прораб';
 	filed_options.autoInc = false;	
 	
 	options.fields.descr = new FieldText("descr",filed_options);
@@ -125,7 +125,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Телефон';
 	filed_options.autoInc = false;	
 	
 	options.fields.phone_cel = new FieldString("phone_cel",filed_options);
@@ -134,7 +134,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
 	options.fields.date_time = new FieldDateTime("date_time",filed_options);
@@ -143,7 +143,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Количество';
 	filed_options.autoInc = false;	
 	
 	options.fields.quant = new FieldFloat("quant",filed_options);
@@ -152,7 +152,7 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Сотрудник';
 	filed_options.autoInc = false;	
 	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);

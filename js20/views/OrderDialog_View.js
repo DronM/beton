@@ -222,7 +222,6 @@ function OrderDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("calc").getElement("concrete_cost")})
 		,new DataBinding({"control":this.getElement("calc").getElement("unload_price")})
 		,new DataBinding({"control":this.getElement("calc").getElement("total")})
-		
 	];
 	this.setDataBindings(r_bd);
 	
@@ -362,4 +361,9 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	ctrl_calc.changeUnloadType();
 	ctrl_calc.setDestinationPrice(m.getFieldValue("destination_price"),m.getFieldValue("destination_distance"),m.getFieldValue("destination_time_rout"))
 	ctrl_calc.setConcretePrice(m.getFieldValue("concrete_price"));
+	
+	//last modif
+	var last_modif_users_ref = m.getFieldValue("last_modif_users_ref");	
+	DOMHelper.setText(document.getElementById(this.getId()+":last_modif_user"), (last_modif_users_ref&&!last_modif_users_ref.isNull()? last_modif_users_ref.getDescr():""));
+	DOMHelper.setText(document.getElementById(this.getId()+":last_modif_date_time"), DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
 }

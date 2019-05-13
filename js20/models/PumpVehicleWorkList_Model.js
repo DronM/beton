@@ -65,7 +65,7 @@ function PumpVehicleWorkList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.owner = new FieldString("owner",filed_options);
+	options.fields.vehicle_owners_ref = new FieldJSON("vehicle_owners_ref",filed_options);
 	
 				
 	
@@ -93,6 +93,15 @@ function PumpVehicleWorkList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.plate = new FieldString("plate",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_length = new FieldInt("pump_length",filed_options);
 	
 		PumpVehicleWorkList_Model.superclass.constructor.call(this,id,options);
 }

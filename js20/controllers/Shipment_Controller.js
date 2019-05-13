@@ -109,6 +109,18 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("owner_agreed",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldDateTimeTZ("owner_agreed_date_time",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -181,6 +193,18 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("owner_agreed",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldDateTimeTZ("owner_agreed_date_time",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -232,7 +256,7 @@ extend(Shipment_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("concrete_type_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Владелец";
-	pm.addField(new FieldString("owner",f_opts));
+	pm.addField(new FieldJSON("vehicle_owners_ref",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Автомобиль";
 	pm.addField(new FieldJSON("vehicles_ref",f_opts));

@@ -76,15 +76,6 @@ function VehicleDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Владелец';
-	filed_options.autoInc = false;	
-	
-	options.fields.owner = new FieldString("owner",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
 	filed_options.alias = 'Свойство';
 	filed_options.autoInc = false;	
 	
@@ -125,6 +116,15 @@ function VehicleDialog_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.tracker_last_dt = new FieldDateTimeTZ("tracker_last_dt",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owners_ref = new FieldJSONB("vehicle_owners_ref",filed_options);
 	
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);
 }

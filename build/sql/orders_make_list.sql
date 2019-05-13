@@ -1,6 +1,6 @@
 -- View: public.orders_make_list
 
- DROP VIEW public.orders_make_list;
+-- DROP VIEW public.orders_make_list;
 
 CREATE OR REPLACE VIEW public.orders_make_list AS 
 	SELECT
@@ -82,7 +82,10 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
 		END AS total, 
 		
 		vh.owner AS pump_vehicle_owner,
-		o.unload_type
+		o.unload_type,
+		vehicle_owners_ref(v_own) AS pump_vehicle_owners_ref,
+		pvh.pump_length AS pump_vehicle_length
+		
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id
@@ -90,6 +93,7 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
 	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = vh.vehicle_owner_id
 	ORDER BY o.date_time;
 
 ALTER TABLE public.orders_make_list OWNER TO beton;

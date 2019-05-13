@@ -116,6 +116,25 @@ function Shipment_Model(options){
 	
 	options.fields.blanks_exist = new FieldBool("blanks_exist",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.owner_agreed = new FieldBool("owner_agreed",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.owner_agreed_date_time = new FieldDateTimeTZ("owner_agreed_date_time",filed_options);
+	
 			
 			
 			

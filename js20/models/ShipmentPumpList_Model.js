@@ -38,15 +38,6 @@ function ShipmentPumpList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.ship_date_time_descr = new FieldString("ship_date_time_descr",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
 	options.fields.client_id = new FieldInt("client_id",filed_options);
 	
 				
@@ -101,7 +92,7 @@ function ShipmentPumpList_Model(options){
 	filed_options.alias = 'Владелец';
 	filed_options.autoInc = false;	
 	
-	options.fields.owner = new FieldString("owner",filed_options);
+	options.fields.vehicle_owners_ref = new FieldString("vehicle_owners_ref",filed_options);
 	
 				
 	

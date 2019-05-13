@@ -1,6 +1,6 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function VehicleList_View(id,options){	
 
 	VehicleList_View.superclass.constructor.call(this,id,options);
@@ -48,10 +48,12 @@ function VehicleList_View(id,options){
 							],
 							"sortable":true
 						})						
-						,new GridCellHead(id+":grid:head:owner",{
+						,new GridCellHead(id+":grid:head:vehicle_owner",{
 							"value":"Владелец",
 							"columns":[
-								new GridColumn({"field":model.getField("owner")})
+								new GridColumnRef({
+									"field":model.getField("vehicle_owners_ref")
+								})
 							],
 							"sortable":true
 						})						

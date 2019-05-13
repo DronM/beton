@@ -13,7 +13,8 @@ CREATE OR REPLACE VIEW vehicle_schedules_list AS
 		v.load_capacity,
 		oc.comment_text AS out_comment,
 		v.owner,
-		d.phone_cel
+		d.phone_cel,
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref
 		
 	FROM vehicle_schedules vs
 	LEFT JOIN drivers d ON d.id = vs.driver_id
@@ -29,7 +30,7 @@ CREATE OR REPLACE VIEW vehicle_schedules_list AS
 		ON st.schedule_id=s_max.schedule_id AND st.date_time = s_max.date_time
 		
 	LEFT JOIN out_comments oc ON oc.vehicle_schedule_id = vs.id
-	
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
 	
 	ORDER BY
 		CASE

@@ -6,36 +6,42 @@ CREATE OR REPLACE VIEW shipment_dates_list AS
 	SELECT
 		sh.ship_date_time::date AS ship_date,
 		
-		concr.id AS concrete_type_id,
-		concrete_types_ref(concr) AS concrete_types_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref::text,
 		
-		dest.id AS destination_id,
-		destinations_ref(dest) AS destinations_ref,
+		sh.destination_id,
+		sh.destinations_ref::text,
 		
-		cl.id AS client_id,
-		clients_ref(cl) AS clients_ref,
+		sh.client_id,
+		sh.clients_ref::text,
 		
 		sh.production_site_id,
-		production_sites_ref(psites) AS production_sites_ref,
+		sh.production_sites_ref::text,
 		
 		sum(sh.quant) AS quant,
-		sum(calc_ship_coast(sh.*, dest.*, true)) AS ship_cost,
-		sum(sh.demurrage::interval)::time without time zone AS demurrage,
-		sum(calc_demurrage_coast(sh.demurrage::interval)) AS demurrage_cost
+		sum(sh.cost) AS ship_cost,
 		
-	FROM shipments sh
-	LEFT JOIN orders o ON o.id = sh.order_id
+		sum(sh.demurrage) AS demurrage,
+		sum(sh.demurrage_cost) AS demurrage_cost
+		
+	FROM shipments_list sh
+	/*LEFT JOIN shipments sh_t ON sh_t.id = sh.id
+	LEFT JOIN orders o ON o.id = sh_t.order_id
 	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
 	LEFT JOIN clients cl ON cl.id = o.client_id
-	LEFT JOIN destinations dest ON dest.id = o.destination_id
-	LEFT JOIN production_sites psites ON psites.id = sh.production_site_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	*/
 	GROUP BY
 		sh.ship_date_time::date,
-		concr.id,
-		dest.id,		
-		cl.id,
+		sh.concrete_type_id,
+		sh.concrete_types_ref::text,
+		sh.destination_id,
+		sh.destinations_ref::text,
+		sh.client_id,
+		sh.clients_ref::text,
 		sh.production_site_id,
-		psites.*
+		sh.production_sites_ref::text
+		
 	ORDER BY sh.ship_date_time::date DESC;
 
 ALTER TABLE shipment_dates_list

@@ -23,7 +23,15 @@ function VehicleEdit(id,options){
 	options.acModel = new VehicleDialog_Model();
 	options.acPatternFieldId = options.acPatternFieldId || "plate";
 	options.acKeyFields = options.acKeyFields || [options.acModel.getField("id")];
-	options.acDescrFields = options.acDescrFields || [options.acModel.getField("plate")];
+	//options.acDescrFields = options.acDescrFields || [options.acModel.getField("plate")];
+	options.acDescrFunction = function(f){
+		var res = f.plate.getValue();
+		var owner = f.vehicle_owners_ref.getValue();
+		if(owner && !owner.isNull()){
+			res+= "("+owner.getDescr()+")";
+		}
+		return res;
+	}
 	options.acICase = options.acICase || "1";
 	options.acMid = options.acMid || "1";
 	

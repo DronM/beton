@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-07 05:50:30</lastBuild></version>
+		<lastBuild>2019-05-13 06:15:03</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -26,6 +26,7 @@
 		<version dateOpen="2019-05-02 05:05:59" dateClose="2019-05-02 06:05:41">1.00120</version>
 		<version dateOpen="2019-05-03 05:05:42" dateClose="2019-05-06 06:05:47">1.00121</version>
 		<version dateOpen="2019-05-06 06:05:47" dateClose="2019-05-07 05:05:50">1.00122</version>
+		<version dateOpen="2019-05-07 05:05:55" dateClose="2019-05-13 06:05:15">1.00123</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -393,23 +394,28 @@
 			<field id="manager_id" dataType="Int" refTable="users" refField="id" alias="Менеджер"/>
 			<field id="create_date" dataType="Date"/>
 			<field id="email" dataType="String" required="FALSE" length="50"/>
+			<field id="inn" dataType="String" length="12"/>
 			<index id="clients_name_index">
 				<expression>lower(name)</expression>
 			</index>
+			<index id="clients_inn_idx" unique="TRUE">
+				<field id="inn"/>
+			</index>
 		</model>
 		<model id="ClientList" parent="ModelSQLBeton" dataTable="clients_list" virtual="TRUE">
-			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="name" dataType="String" alias="Наименование"/>
-			<field id="phone_cel" dataType="String" alias="Сотовый телефон"/>
+			<field id="phone_cel" dataType="String" alias="Телефон"/>
 			<field id="quant" dataType="String" alias="Объем"/>
-			<field id="client_types_ref" dataType="JSON"/>
-			<field id="client_type_id" dataType="Int"/>
-			<field id="client_come_from_ref" dataType="JSON"/>
-			<field id="client_come_from_id" dataType="Int"/>
+			<field id="client_types_ref" dataType="JSON" sysCol="TRUE"/>
+			<field id="client_type_id" dataType="Int" sysCol="TRUE"/>
+			<field id="client_come_from_ref" dataType="JSON" alias="Источник"/>
+			<field id="client_come_from_id" dataType="Int" sysCol="TRUE"/>
 			<field id="client_kind" dataType="String" alias="Вид клиента"/>
-			<field id="ours" dataType="String"/>
-			<field id="first_call_date" dataType="Date"/>
-			<field id="users_ref" dataType="JSON"/>
+			<field id="ours" dataType="String" alias="Наш"/>
+			<field id="first_call_date" dataType="Date" alias="Первое обращение"/>
+			<field id="users_ref" dataType="JSON" alias="Кто завел"/>
+			<field id="inn" dataType="String" alias="ИНН"/>
 		</model>
 		<model id="ClientDialog" parent="ModelSQLBeton" dataTable="clients_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
@@ -421,6 +427,7 @@
 			<field id="client_come_from_ref" dataType="JSON"/>
 			<field id="client_kind" dataType="String"/>
 			<field id="users_ref" dataType="JSON"/>
+			<field id="inn" dataType="String"/>
 		</model>
 		<model id="Destination" parent="ModelSQLBeton" dataTable="destinations" virtual="FALSE">
 			<defaultOrder>
@@ -485,24 +492,28 @@
 			<defaultOrder>
 				<field id="plate"/>
 			</defaultOrder>
-			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE" alias="Код"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE" sysCol="TRUE"/>
 			<field id="plate" dataType="String" required="TRUE" length="6" alias="Номер"/>
 			<field id="load_capacity" dataType="Float" required="TRUE" length="15" precision="2" alias="Грузоподъемность"/>
 			<field id="make" dataType="String" required="FALSE" length="20" alias="Марка"/>
-			<field id="driver_id" dataType="Int" required="FALSE" refTable="drivers" refField="id" alias="Водитель"/>
-			<field id="owner" dataType="String" required="FALSE" length="50" alias="Владелец"/>
+			<field id="driver_id" dataType="Int" required="FALSE" refTable="drivers" refField="id" sysCol="TRUE"/>
 			<field id="feature" dataType="String" required="FALSE" length="50" alias="Свойство"/>
 			<field id="tracker_id" dataType="String" alias="Трэкер"/>
 			<field id="sim_id" dataType="String" alias="Идентификатор SIM карты"/>
 			<field id="sim_number" dataType="String" alias="Номер телефона SIM карты"/>
-			<index id="vehicles_plate_index" unique="TRUE">
+			<field id="vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" alias="Номер телефона SIM карты"/>
+			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
+				<field id="vehicle_owner_id"/>
 			</index>
 			<index id="vehicles_owner_index">
 				<expression>lower(owner)</expression>
 			</index>
 			<index id="vehicles_feature_index">
 				<expression>lower(feature)</expression>
+			</index>
+			<index id="vehicles_owner_idx">
+				<field id="vehicle_owner_id"/>
 			</index>
 		</model>
 		<model id="VehicleDialog" parent="ModelSQLBeton" dataTable="vehicles_dialog" virtual="TRUE">
@@ -511,12 +522,12 @@
 			<field id="load_capacity" dataType="Float" required="TRUE" length="15" precision="2" alias="Грузоподъемность"/>
 			<field id="make" dataType="String" required="FALSE" length="20" alias="Марка"/>
 			<field id="drivers_ref" dataType="JSONB"/>
-			<field id="owner" dataType="String" alias="Владелец"/>
 			<field id="feature" dataType="String" alias="Свойство"/>
 			<field id="tracker_id" dataType="String" alias="Трэкер"/>
 			<field id="sim_id" dataType="String" alias="Идентификатор SIM карты"/>
 			<field id="sim_number" dataType="String" alias="Номер телефона SIM карты"/>
 			<field id="tracker_last_dt" dataType="DateTimeTZ"/>
+			<field id="vehicle_owners_ref" dataType="JSONB"/>
 		</model>
 		<model id="Driver" parent="ModelSQLBeton" dataTable="drivers" virtual="FALSE">
 			<defaultOrder>
@@ -618,6 +629,7 @@
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
 			<field id="pump_price_id" dataType="Int" refTable="pump_prices" refField="id"/>
 			<field id="phone_cel" dataType="String" length="15"/>
+			<field id="pump_length" dataType="Int"/>
 			<field id="deleted" dataType="Bool" defaultValue="FALSE"/>
 		</model>
 		<model id="PumpVehicleList" parent="ModelSQLBeton" dataTable="pump_veh_list" virtual="TRUE">
@@ -625,21 +637,23 @@
 			<field id="phone_cel" dataType="String"/>
 			<field id="pump_prices_ref" dataType="JSON"/>
 			<field id="pump_vehicles_ref" dataType="JSON"/>
-			<field id="owner" dataType="String"/>
+			<field id="vehicle_owners_ref" dataType="JSON"/>
 			<field id="feature" dataType="String"/>
 			<field id="make" dataType="String"/>
 			<field id="plate" dataType="String"/>
 			<field id="deleted" dataType="Bool"/>
+			<field id="pump_length" dataType="Int"/>
 		</model>
 		<model id="PumpVehicleWorkList" parent="ModelSQLBeton" dataTable="pump_veh_work_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="phone_cel" dataType="String"/>
 			<field id="pump_prices_ref" dataType="JSON"/>
 			<field id="pump_vehicles_ref" dataType="JSON"/>
-			<field id="owner" dataType="String"/>
+			<field id="vehicle_owners_ref" dataType="JSON"/>
 			<field id="feature" dataType="String"/>
 			<field id="make" dataType="String"/>
 			<field id="plate" dataType="String"/>
+			<field id="pump_length" dataType="Int"/>
 		</model>
 		<model id="Order" parent="ModelSQLBeton" dataTable="orders" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
@@ -665,6 +679,8 @@
 			<field id="total_edit" dataType="Bool" defaultValue="FALSE"/>
 			<field id="payed" dataType="Bool" defaultValue="FALSE"/>
 			<field id="under_control" dataType="Bool" defaultValue="FALSE"/>
+			<field id="last_modif_user_id" dataType="Int" refTable="users" refField="id" alias="Кто последний вносил изменения"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
 			<index id="date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -679,22 +695,22 @@
 			</index>
 		</model>
 		<model id="OrderList" parent="ModelSQLBeton" dataTable="orders_list" virtual="TRUE">
-			<field id="id" dataType="Int" primaryKey="TRUE"/>
-			<field id="number" dataType="String"/>
-			<field id="clients_ref" dataType="JSON"/>
-			<field id="client_id" dataType="Int"/>
-			<field id="destinations_ref" dataType="JSON"/>
-			<field id="destination_id" dataType="Int"/>
-			<field id="concrete_types_ref" dataType="JSON"/>
-			<field id="concrete_type_id" dataType="Int"/>
-			<field id="unload_type" dataType="String"/>
-			<field id="comment_text" dataType="Text"/>
-			<field id="descr" dataType="Text"/>
-			<field id="phone_cel" dataType="String"/>
-			<field id="date_time" dataType="DateTime"/>
-			<field id="quant" dataType="Float"/>
-			<field id="users_ref" dataType="JSON"/>
-			<field id="user_id" dataType="Int"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="number" dataType="String" alias="Номер"/>
+			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
+			<field id="unload_type" dataType="String" alias="Вид разгрузки"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			<field id="descr" dataType="Text" alias="Прораб"/>
+			<field id="phone_cel" dataType="String" alias="Телефон"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="users_ref" dataType="JSON" alias="Сотрудник"/>
+			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 		</model>
 		<model id="OrderPump" parent="ModelSQLBeton" dataTable="order_pumps" virtual="FALSE">
 			<field id="order_id" dataType="Int" primaryKey="TRUE" required="FALSE" refTable="orders" refField="id"/>
@@ -702,24 +718,24 @@
 			<field id="comment" dataType="Text"/>
 		</model>
 		<model id="OrderPumpList" parent="ModelSQLBeton" dataTable="order_pumps_list_view" virtual="TRUE">
-			<field id="order_id" dataType="Int" primaryKey="TRUE"/>
-			<field id="number" dataType="String"/>
-			<field id="client_id" dataType="Int"/>
-			<field id="clients_ref" dataType="JSON"/>
-			<field id="destination_id" dataType="Int"/>
-			<field id="destinations_ref" dataType="JSON"/>
-			<field id="concrete_type_id" dataType="Int"/>
-			<field id="concrete_types_ref" dataType="JSON"/>
-			<field id="unload_type" dataType="String"/>
-			<field id="comment_text" dataType="Text"/>
-			<field id="descr" dataType="Text"/>
-			<field id="phone_cel" dataType="String"/>
-			<field id="date_time" dataType="DateTime"/>
-			<field id="quant" dataType="Float"/>
-			<field id="viewed" dataType="Bool"/>
-			<field id="comment" dataType="Text"/>
-			<field id="users_ref" dataType="JSON"/>
-			<field id="user_id" dataType="Int"/>
+			<field id="order_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="number" dataType="String" alias="Номер"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
+			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="unload_type" dataType="String" alias="Подача"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий заявки"/>
+			<field id="descr" dataType="Text" alias="Прораб"/>
+			<field id="phone_cel" dataType="String" alias="Телефон"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="viewed" dataType="Bool" sysCol="TRUE"/>
+			<field id="comment" dataType="Text" alias="Комментарий"/>
+			<field id="users_ref" dataType="JSON" alias="Автор"/>
+			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 		</model>
 		<model id="Offer" parent="ModelSQLBeton" dataTable="offer" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
@@ -769,14 +785,16 @@
 			<field id="payed" dataType="Bool"/>
 			<field id="under_control" dataType="Bool"/>
 			<field id="pay_cash" dataType="Bool"/>
-			<field id="pump_vehicle_owner" dataType="String"/>
+			<field id="pump_vehicle_owners_ref" dataType="JSON"/>
 			<field id="total" dataType="Float"/>
+			<field id="pump_vehicle_length" dataType="Int"/>
 		</model>
 		<model id="OrderDialog" parent="ModelSQLBeton" dataTable="orders_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="number" dataType="String"/>
 			<field id="clients_ref" dataType="JSON"/>
 			<field id="users_ref" dataType="JSON"/>
+			<field id="last_modif_users_ref" dataType="JSON"/>
 			<field id="destinations_ref" dataType="JSON"/>
 			<field id="destination_price" dataType="Float"/>
 			<field id="destination_cost" dataType="Float"/>
@@ -803,6 +821,7 @@
 			<field id="pump_vehicle_phone_cel" dataType="String"/>
 			<field id="pump_vehicles_ref" dataType="JSON"/>
 			<field id="pump_prices_ref" dataType="JSON"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ"/>
 		</model>
 		<model id="ProductionSite" parent="ModelSQLBeton" dataTable="production_sites" virtual="FALSE">
 			<defaultOrder>
@@ -822,6 +841,8 @@
 			<field id="client_mark" dataType="Int" alias="Баллы"/>
 			<field id="demurrage" dataType="Time" alias="Простой"/>
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
+			<field id="owner_agreed" dataType="Bool" defaultValue="FALSE"/>
+			<field id="owner_agreed_date_time" dataType="DateTimeTZ"/>
 			<index id="shipments_date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -840,7 +861,7 @@
 			<field id="shipped" dataType="Bool" alias="Отгружен"/>
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
 			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
-			<field id="owner" dataType="String" alias="Владелец"/>
+			<field id="vehicle_owners_ref" dataType="JSON" alias="Владелец"/>
 			<field id="vehicles_ref" dataType="JSON" alias="Автомобиль"/>
 			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
 			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
@@ -912,16 +933,15 @@
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
 		</model>
-		<model id="ShipmentPumpList" parent="ModelSQLBeton" dataTable="shipments_pumps_list" virtual="TRUE">
+		<model id="ShipmentPumpList" parent="ModelSQLBeton" dataTable="shipment_pumps_list" virtual="TRUE">
 			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
-			<field id="ship_date_time_descr" dataType="String" sysCol="TRUE"/>
 			<field id="client_id" dataType="Int" sysCol="TRUE"/>
 			<field id="client_descr" dataType="String" alias="Клиент"/>
 			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
 			<field id="destination_descr" dataType="String" alias="Объект"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
 			<field id="pump_price" dataType="Float" alias="Цена насоса"/>
-			<field id="owner" dataType="String" alias="Владелец"/>
+			<field id="vehicle_owners_ref" dataType="String" alias="Владелец"/>
 			<field id="plate" dataType="String" alias="Гос.номер"/>
 			<field id="driver_descr" dataType="String" alias="Водитель"/>
 			<field id="demurrage" dataType="String" alias="Простой"/>
@@ -1011,7 +1031,7 @@
 			<field id="state_date_time" dataType="DateTime"/>
 			<field id="out_comment" dataType="String"/>
 			<field id="load_capacity" dataType="Float"/>
-			<field id="owner" dataType="String"/>
+			<field id="vehicle_owners_ref" dataType="JSON"/>
 			<field id="phone_cel" dataType="String"/>
 		</model>
 		<model id="VehicleScheduleComplete" parent="ModelSQLBeton" dataTable="vehicle_schedule_complete_view" virtual="TRUE">
@@ -1926,7 +1946,7 @@
 			<field id="vehicles_count" dataType="Int"/>
 			<field id="vehicles_ref" dataType="JSON"/>
 			<field id="drivers_ref" dataType="JSON"/>
-			<field id="owner" dataType="Text"/>
+			<field id="owner" dataType="String"/>
 			<field id="load_capacity" dataType="Int"/>
 			<field id="state" dataType="String"/>
 			<field id="inf_on_return" dataType="Text"/>
@@ -2063,6 +2083,16 @@
 			<field id="concrete_types_ref" dataType="JSON"/>
 			<field id="price" dataType="Float" length="15" precision="2"/>
 		</model>
+		<model id="VehicleOwner" parent="ModelSQLBeton" dataTable="vehicle_owners" virtual="FALSE">
+			<defaultOrder>
+				<field id="name" sortDirect="ASC"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="name" dataType="String" length="150" required="TRUE"/>
+			<index id="vehicle_owners_name_idx">
+				<expression>lower(name)</expression>
+			</index>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -2180,11 +2210,6 @@
 			</publicMethod>
 			<publicMethod id="complete_features" modelId="VehicleFeatureList">
 				<field id="feature" dataType="String"/>
-				<field id="ic" dataType="Int"/>
-				<field id="mid" dataType="Int"/>
-			</publicMethod>
-			<publicMethod id="complete_owners" modelId="VehicleOwnerList">
-				<field id="owner" dataType="String"/>
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
 			</publicMethod>
@@ -2948,6 +2973,14 @@
 			<publicMethod id="get_list" modelId="ConcreteCostList"/>
 			<publicMethod id="get_object" modelId="ConcreteCostList"/>
 		</controller>
+		<controller id="VehicleOwner" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="VehicleOwner"/>
+			<publicMethod id="update" modelId="VehicleOwner"/>
+			<publicMethod id="delete" modelId="VehicleOwner"/>
+			<publicMethod id="get_list" modelId="VehicleOwner"/>
+			<publicMethod id="get_object" modelId="VehicleOwner"/>
+			<publicMethod id="complete" modelId="VehicleOwner" patternFieldId="name"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -2997,6 +3030,7 @@
 		<view id="10024" c="ShipmentForDriverCostHeader_Controller" t="ShipmentForDriverCostHeaderList" f="get_list" section="Справочники" descr="Прайс доставки для водителей"/>
 		<view id="10025" c="ShipmentForOwnerCostHeader_Controller" t="ShipmentForOwnerCostHeaderList" f="get_list" section="Справочники" descr="Прайс доставки для собственников"/>
 		<view id="10026" c="ConcreteCostHeader_Controller" t="ConcreteCostHeaderList" f="get_list" section="Справочники" descr="Прайс бетон"/>
+		<view id="10027" c="VehicleOwner_Controller" t="VehicleOwnerList" f="get_list" section="Справочники" descr="Владельцы транспортных средств"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -3095,6 +3129,7 @@
 		<serverTemplate id="ShipmentForDriverCostHeaderList"/>
 		<serverTemplate id="ShipmentForOwnerCostHeaderList"/>
 		<serverTemplate id="ConcreteCostHeaderList"/>
+		<serverTemplate id="VehicleOwnerList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -3604,6 +3639,7 @@
 		<jsScript file="views/ShipmentForOwnerCostList_View.js"/>
 		<jsScript file="views/ConcreteCostHeaderList_View.js"/>
 		<jsScript file="views/ConcreteCostList_View.js"/>
+		<jsScript file="views/VehicleOwnerList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -3628,6 +3664,7 @@
 		<jsScript file="forms/ClientDialog_Form.js"/>
 		<jsScript file="forms/ShipmentDialog_Form.js"/>
 		<jsScript file="forms/QuarryList_Form.js"/>
+		<jsScript file="forms/VehicleOwnerList_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="custom_controls/App.enums.js"/>
@@ -3642,7 +3679,7 @@
 		<jsScript file="custom_controls/UserPwdEdit.js"/>
 		<jsScript file="custom_controls/rs/UserPwdEdit.rs_ru.js"/>
 		<jsScript file="custom_controls/DriverEditRef.js"/>
-		<jsScript file="custom_controls/OwnerEdit.js"/>
+		<jsScript file="custom_controls/VehicleOwnerEdit.js"/>
 		<jsScript file="custom_controls/MakeEdit.js"/>
 		<jsScript file="custom_controls/FeatureEdit.js"/>
 		<jsScript file="custom_controls/TrackerEdit.js"/>
@@ -3910,6 +3947,8 @@
 		<jsScript file="controllers/ConcreteCost_Controller.js"/>
 		<jsScript file="models/ConcreteCostList_Model.js"/>
 		<jsScript file="models/ConcreteTypeList_Model.js"/>
+		<jsScript file="models/VehicleOwner_Model.js"/>
+		<jsScript file="controllers/VehicleOwner_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

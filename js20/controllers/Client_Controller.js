@@ -111,6 +111,12 @@ extend(Client_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldString("inn",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -191,6 +197,12 @@ extend(Client_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldString("inn",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -220,13 +232,13 @@ extend(Client_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
-	f_opts.alias = "Код";
+	
 	pm.addField(new FieldInt("id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Наименование";
 	pm.addField(new FieldString("name",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Сотовый телефон";
+	f_opts.alias = "Телефон";
 	pm.addField(new FieldString("phone_cel",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Объем";
@@ -238,7 +250,7 @@ extend(Client_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldInt("client_type_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Источник";
 	pm.addField(new FieldJSON("client_come_from_ref",f_opts));
 	var f_opts = {};
 	
@@ -247,14 +259,17 @@ extend(Client_Controller,ControllerObjServer);
 	f_opts.alias = "Вид клиента";
 	pm.addField(new FieldString("client_kind",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Наш";
 	pm.addField(new FieldString("ours",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Первое обращение";
 	pm.addField(new FieldDate("first_call_date",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Кто завел";
 	pm.addField(new FieldJSON("users_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "ИНН";
+	pm.addField(new FieldString("inn",f_opts));
 }
 
 			Client_Controller.prototype.addGetObject = function(){

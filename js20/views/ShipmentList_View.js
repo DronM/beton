@@ -333,7 +333,8 @@ function ShipmentList_View(id,options){
 								new GridColumnBool({
 									"field":model.getField("blanks_exist")									
 								})
-							]
+							],
+							"sortable":true
 						})
 						,new GridCellHead(id+":grid:head:users_ref",{
 							"value":"Автор",
@@ -409,7 +410,8 @@ ShipmentList_View.prototype.findDoc = function(barcode){
 			var ctrl = self.getElement("barcode");
 			ctrl.reset();
 			ctrl.focus();
-			ctrl.getErrorControl().setValue("Документ погашен!","info");
+			
+			window.showTempNote("Документ погашен!",1000);
 		}
 	})
 }

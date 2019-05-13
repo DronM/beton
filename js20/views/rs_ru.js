@@ -93,3 +93,5 @@ ShipmentForDriverCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы по �
 ShipmentForOwnerCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы по доставке для собственников";
 
 ConcreteCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы на бетон";
+
+VehicleOwnerList_View.prototype.HEAD_TITLE = "Владельцы транспортных средств";

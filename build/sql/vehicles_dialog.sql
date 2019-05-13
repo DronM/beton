@@ -22,10 +22,14 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 			ORDER BY tr.period DESC
 			LIMIT 1)
 		END AS tracker_last_dt,
-		drivers_ref(dr.*) AS drivers_ref
+		drivers_ref(dr.*) AS drivers_ref,
+		
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref
 		
 	FROM vehicles v
-	LEFT JOIN drivers dr ON dr.id = v.driver_id;
+	LEFT JOIN drivers dr ON dr.id = v.driver_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	;
 
 ALTER TABLE public.vehicles_dialog
   OWNER TO beton;

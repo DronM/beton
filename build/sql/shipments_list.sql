@@ -9,7 +9,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		sh.quant,
 		--calc_ship_cost(sh.*, dest.*, true) AS cost,
 		CASE
-			WHEN dest.id=const_self_ship_dest_id_val() OR concr.name='Вода' THEN 0
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
 			ELSE
 				CASE
 					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
@@ -25,8 +25,8 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 				END
 				*
 				CASE
-					WHEN o.quant>=7 THEN sh.quant
-					WHEN dest.distance<=60 THEN 5
+					WHEN sh.quant>=7 THEN sh.quant
+					WHEN dest.distance<=60 THEN greatest(5,sh.quant)
 					ELSE 7
 				END
 		END AS cost,
@@ -57,7 +57,9 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		o.user_id,
 		
 		production_sites_ref(ps) AS production_sites_ref,
-		sh.production_site_id
+		sh.production_site_id,
+		
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref
 		
 		
 	FROM shipments sh
@@ -70,6 +72,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
 	LEFT JOIN users u ON u.id = sh.user_id
 	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
 	ORDER BY sh.date_time DESC;
 
 ALTER TABLE public.shipments_list

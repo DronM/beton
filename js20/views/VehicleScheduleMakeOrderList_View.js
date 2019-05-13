@@ -99,13 +99,13 @@ function VehicleScheduleMakeOrderList_View(id,options){
 									})
 								]
 							})
-							,new GridCellHead(id+":grid:head:owner",{
+							,new GridCellHead(id+":grid:head:vehicle_owners_ref",{
 								"value":"Владелец ТС",
 								"columns":[
-									new GridColumn({
-										"field":model.getField("owner"),
+									new GridColumnRef({
+										"field":model.getField("vehicle_owners_ref"),
 										"formatFunction":function(fields,cell){
-											return window.getApp().formatCell(fields.owner,cell,self.COL_OWNER_LEN);
+											return window.getApp().formatCell(fields.vehicle_owners_ref,cell,self.COL_OWNER_LEN);
 										}																												
 									})
 								]

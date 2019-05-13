@@ -106,6 +106,15 @@ function ClientDialog_Model(options){
 	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.inn = new FieldString("inn",filed_options);
+	
 		ClientDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(ClientDialog_Model,ModelXML);

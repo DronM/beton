@@ -99,6 +99,14 @@ class ClientDialog_Model extends ModelSQLBeton{
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
 		//********************
+		
+		//*** Field inn ***
+		$f_opts = array();
+		$f_opts['id']="inn";
+				
+		$f_inn=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
+		$this->addField($f_inn);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

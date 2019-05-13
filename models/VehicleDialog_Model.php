@@ -74,16 +74,6 @@ class VehicleDialog_Model extends ModelSQLBeton{
 		$this->addField($f_drivers_ref);
 		//********************
 		
-		//*** Field owner ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Владелец';
-		$f_opts['id']="owner";
-				
-		$f_owner=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner",$f_opts);
-		$this->addField($f_owner);
-		//********************
-		
 		//*** Field feature ***
 		$f_opts = array();
 		
@@ -130,6 +120,14 @@ class VehicleDialog_Model extends ModelSQLBeton{
 				
 		$f_tracker_last_dt=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tracker_last_dt",$f_opts);
 		$this->addField($f_tracker_last_dt);
+		//********************
+		
+		//*** Field vehicle_owners_ref ***
+		$f_opts = array();
+		$f_opts['id']="vehicle_owners_ref";
+				
+		$f_vehicle_owners_ref=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
+		$this->addField($f_vehicle_owners_ref);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

@@ -53,12 +53,12 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		$this->addField($f_pump_vehicles_ref);
 		//********************
 		
-		//*** Field owner ***
+		//*** Field vehicle_owners_ref ***
 		$f_opts = array();
-		$f_opts['id']="owner";
+		$f_opts['id']="vehicle_owners_ref";
 				
-		$f_owner=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner",$f_opts);
-		$this->addField($f_owner);
+		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
+		$this->addField($f_vehicle_owners_ref);
 		//********************
 		
 		//*** Field feature ***
@@ -83,6 +83,14 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 				
 		$f_plate=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"plate",$f_opts);
 		$this->addField($f_plate);
+		//********************
+		
+		//*** Field pump_length ***
+		$f_opts = array();
+		$f_opts['id']="pump_length";
+				
+		$f_pump_length=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_length",$f_opts);
+		$this->addField($f_pump_length);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

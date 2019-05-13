@@ -58,6 +58,12 @@ function ClientDialog_View(id,options){
 		this.addElement(new ClientTelList_View(id+":client_tel_list",{
 			"detail":true
 		}));		
+
+		this.addElement(new EditNum(id+":inn",{
+			"labelCaption":"ИНН:",
+			"maxLength":"12",
+			"title":"ИНН организации или предпринимателя"
+		}));		
 						
 	}
 	
@@ -75,6 +81,7 @@ function ClientDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("manager"),"fieldId":"users_ref"})
 		,new DataBinding({"control":this.getElement("client_come_from"),"fieldId":"client_come_from"})
 		,new DataBinding({"control":this.getElement("client_type"),"fieldId":"client_type"})
+		,new DataBinding({"control":this.getElement("inn")})
 	]);
 	
 	//write
@@ -88,6 +95,7 @@ function ClientDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("manager"),"fieldId":"manager_id"})
 		,new CommandBinding({"control":this.getElement("client_come_from"),"fieldId":"client_come_from_id"})
 		,new CommandBinding({"control":this.getElement("client_type"),"fieldId":"client_type_id"})
+		,new CommandBinding({"control":this.getElement("inn")})
 	]);
 	
 	this.addDetailDataSet({

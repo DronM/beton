@@ -129,6 +129,17 @@ function Client_Model(options){
 	options.fields.email = new FieldString("email",filed_options);
 	options.fields.email.getValidator().setMaxLength('50');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.inn = new FieldString("inn",filed_options);
+	options.fields.inn.getValidator().setMaxLength('12');
+	
+			
 			
 		Client_Model.superclass.constructor.call(this,id,options);
 }

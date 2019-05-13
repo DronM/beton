@@ -66,6 +66,12 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	
 	var options = {};
 	
+	var field = new FieldInt("pump_length",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
 	var field = new FieldBool("deleted",options);
 	
 	pm.addField(field);
@@ -103,6 +109,12 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldString("phone_cel",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("pump_length",options);
 	
 	pm.addField(field);
 	
@@ -154,7 +166,7 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	pm.addField(new FieldJSON("pump_vehicles_ref",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldString("owner",f_opts));
+	pm.addField(new FieldJSON("vehicle_owners_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldString("feature",f_opts));
@@ -167,6 +179,9 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldBool("deleted",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("pump_length",f_opts));
 }
 
 			PumpVehicle_Controller.prototype.add_get_work_list = function(){

@@ -24,7 +24,9 @@ CREATE OR REPLACE VIEW public.clients_list AS
 		LIMIT 1
 		) AS first_call_date,
 		
-		users_ref(man) AS users_ref
+		users_ref(man) AS users_ref,
+		
+		cl.inn
 		
 	FROM clients cl
 	LEFT JOIN client_types ct ON ct.id = cl.client_type_id

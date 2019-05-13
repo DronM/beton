@@ -467,49 +467,6 @@ OrderMakeList_View.prototype.refresh = function(){
 		}
 	})
 }
-/*
-OrderMakeList_View.prototype.showVehCurrentPosition = function(vehicleScheduleId){
-	var m = this.getElement("veh_schedule_grid").getModel();
-	var veh_id;
-	m.reset();
-	while(m.getNextRow()){
-		if(m.getFieldValue("id")==vehicleScheduleId){
-			veh_id = m.getFieldValue("vehicles_ref").getKey("id");
-			break;
-		}
-	}
-	
-	if(!veh_id)return;
-	
-	var self = this;
-	
-	var win_w = $( window ).width();
-	var h = $( window ).height()-20;//win_w/3*2;
-	var left = win_w/3;
-	var w = win_w/3*2;//left - 20;
-	
-	this.m_mapForm = new WindowForm({
-		"id":"MapForm",
-		"height":h,
-		"width":w,
-		"left":left,
-		"top":10,
-		"URLParams":"t=Map&v=Child",
-		"name":"Map",
-		"params":{
-			"editViewOptions":{
-				"vehicle":new RefType({"keys":{"id":veh_id}})	
-			}
-		},
-		"onClose":function(){
-			self.m_mapForm.close();
-			delete self.m_mapForm;			
-		}
-	});
-	this.m_mapForm.open();
-
-}
-*/
 
 OrderMakeList_View.prototype.enableRefreshing = function(v){
 	if(v){

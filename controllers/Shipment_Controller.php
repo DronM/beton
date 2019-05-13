@@ -92,6 +92,12 @@ class Shipment_Controller extends ControllerSQL{
 				'alias'=>'Наличие бланков'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtBool('owner_agreed'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('owner_agreed_date_time'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -164,6 +170,14 @@ class Shipment_Controller extends ControllerSQL{
 				,array(
 			
 				'alias'=>'Наличие бланков'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('owner_agreed'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('owner_agreed_date_time'
+				,array(
 			));
 			$pm->addParam($param);
 		

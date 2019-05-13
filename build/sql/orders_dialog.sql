@@ -61,7 +61,10 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 		
 		users_ref(u) AS users_ref,
 		
-		d.distance AS destination_distance
+		d.distance AS destination_distance,
+		
+		users_ref(lm_u) AS last_modif_users_ref,
+		o.last_modif_date_time
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id
@@ -72,6 +75,7 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 	LEFT JOIN users u ON u.id = o.user_id
 	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
 	ORDER BY o.date_time;
 
 ALTER TABLE public.orders_dialog OWNER TO beton;

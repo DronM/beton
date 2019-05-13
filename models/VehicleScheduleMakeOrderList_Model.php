@@ -59,7 +59,7 @@ class VehicleScheduleMakeOrderList_Model extends {
 		$f_opts = array();
 		$f_opts['id']="owner";
 				
-		$f_owner=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner",$f_opts);
+		$f_owner=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner",$f_opts);
 		$this->addField($f_owner);
 		//********************
 		

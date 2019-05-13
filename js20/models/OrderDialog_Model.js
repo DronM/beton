@@ -65,6 +65,15 @@ function OrderDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.last_modif_users_ref = new FieldJSON("last_modif_users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
 	
 				
@@ -291,6 +300,15 @@ function OrderDialog_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.pump_prices_ref = new FieldJSON("pump_prices_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_date_time = new FieldDateTimeTZ("last_modif_date_time",filed_options);
 	
 		OrderDialog_Model.superclass.constructor.call(this,id,options);
 }

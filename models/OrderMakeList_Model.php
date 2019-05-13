@@ -194,12 +194,12 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		$this->addField($f_pay_cash);
 		//********************
 		
-		//*** Field pump_vehicle_owner ***
+		//*** Field pump_vehicle_owners_ref ***
 		$f_opts = array();
-		$f_opts['id']="pump_vehicle_owner";
+		$f_opts['id']="pump_vehicle_owners_ref";
 				
-		$f_pump_vehicle_owner=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owner",$f_opts);
-		$this->addField($f_pump_vehicle_owner);
+		$f_pump_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owners_ref",$f_opts);
+		$this->addField($f_pump_vehicle_owners_ref);
 		//********************
 		
 		//*** Field total ***
@@ -208,6 +208,14 @@ class OrderMakeList_Model extends ModelSQLBeton{
 				
 		$f_total=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"total",$f_opts);
 		$this->addField($f_total);
+		//********************
+		
+		//*** Field pump_vehicle_length ***
+		$f_opts = array();
+		$f_opts['id']="pump_vehicle_length";
+				
+		$f_pump_vehicle_length=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_length",$f_opts);
+		$this->addField($f_pump_vehicle_length);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

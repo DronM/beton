@@ -65,7 +65,7 @@ function VehicleScheduleMakeOrderList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.owner = new FieldText("owner",filed_options);
+	options.fields.owner = new FieldString("owner",filed_options);
 	
 				
 	

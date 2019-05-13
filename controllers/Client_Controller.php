@@ -77,6 +77,9 @@ class Client_Controller extends ControllerSQL{
 		$param = new FieldExtString('email'
 				,array('required'=>FALSE));
 		$pm->addParam($param);
+		$param = new FieldExtString('inn'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -151,6 +154,10 @@ class Client_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('email'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtString('inn'
 				,array(
 			));
 			$pm->addParam($param);

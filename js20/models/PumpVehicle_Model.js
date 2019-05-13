@@ -63,6 +63,15 @@ function PumpVehicle_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_length = new FieldInt("pump_length",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.defValue = true;
 	
 	filed_options.autoInc = false;	

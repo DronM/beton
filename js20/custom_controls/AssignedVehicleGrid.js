@@ -283,6 +283,6 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 
 
 AssignedVehicleGrid.prototype.makeSound = function(){
-	//var audio = new Audio("img/Bell-sound-effect-ding.mp3");
-	//audio.play();
+	var audio = new Audio("img/Bell-sound-effect-ding.mp3");
+	audio.play();
 }

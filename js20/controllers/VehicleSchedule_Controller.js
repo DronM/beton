@@ -167,7 +167,7 @@ extend(VehicleSchedule_Controller,ControllerObjServer);
 	pm.addField(new FieldFloat("load_capacity",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldString("owner",f_opts));
+	pm.addField(new FieldJSON("vehicle_owners_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldString("phone_cel",f_opts));

@@ -133,6 +133,15 @@ class Client_Model extends ModelSQLBeton{
 		$f_email=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"email",$f_opts);
 		$this->addField($f_email);
 		//********************
+		
+		//*** Field inn ***
+		$f_opts = array();
+		$f_opts['length']=12;
+		$f_opts['id']="inn";
+				
+		$f_inn=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
+		$this->addField($f_inn);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

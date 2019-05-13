@@ -20,7 +20,9 @@ function VehicleDialog_View(id,options){
 	this.addElement(new DriverEditRef(id+":driver"));	
 	
 	this.addElement(new MakeEdit(id+":make"));	
-	this.addElement(new OwnerEdit(id+":owner"));		
+	
+	//this.addElement(new OwnerEdit(id+":owner"));		
+	
 	this.addElement(new FeatureEdit(id+":feature"));	
 	
 	this.addElement(new TrackerEdit(id+":tracker_id"));	
@@ -39,6 +41,8 @@ function VehicleDialog_View(id,options){
 		"enabled":false
 	}));	
 
+	this.addElement(new VehicleOwnerEdit(id+":owner",{
+	}));	
 
 	
 	//****************************************************	

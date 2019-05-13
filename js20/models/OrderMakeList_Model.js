@@ -218,7 +218,7 @@ function OrderMakeList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.pump_vehicle_owner = new FieldString("pump_vehicle_owner",filed_options);
+	options.fields.pump_vehicle_owners_ref = new FieldJSON("pump_vehicle_owners_ref",filed_options);
 	
 				
 	
@@ -228,6 +228,15 @@ function OrderMakeList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.total = new FieldFloat("total",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_length = new FieldInt("pump_vehicle_length",filed_options);
 	
 		OrderMakeList_Model.superclass.constructor.call(this,id,options);
 }

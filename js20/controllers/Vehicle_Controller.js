@@ -32,7 +32,6 @@ function Vehicle_Controller(options){
 	this.addComplete();
 	this.add_get_vehicle_statistics();
 	this.add_complete_features();
-	this.add_complete_owners();
 	this.add_complete_makes();
 	this.add_check_for_broken_trackers();
 	this.add_vehicles_with_trackers();
@@ -51,7 +50,7 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var pm = this.getInsert();
 	
 	var options = {};
-	options.alias = "Код";options.primaryKey = true;options.autoInc = true;
+	options.primaryKey = true;options.autoInc = true;
 	var field = new FieldInt("id",options);
 	
 	pm.addField(field);
@@ -75,14 +74,8 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Водитель";
+	
 	var field = new FieldInt("driver_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	options.alias = "Владелец";
-	var field = new FieldString("owner",options);
 	
 	pm.addField(field);
 	
@@ -110,6 +103,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Номер телефона SIM карты";
+	var field = new FieldInt("vehicle_owner_id",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -120,7 +119,7 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var pm = this.getUpdate();
 	
 	var options = {};
-	options.alias = "Код";options.primaryKey = true;options.autoInc = true;
+	options.primaryKey = true;options.autoInc = true;
 	var field = new FieldInt("id",options);
 	
 	pm.addField(field);
@@ -147,14 +146,8 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Водитель";
+	
 	var field = new FieldInt("driver_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	options.alias = "Владелец";
-	var field = new FieldString("owner",options);
 	
 	pm.addField(field);
 	
@@ -182,6 +175,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Номер телефона SIM карты";
+	var field = new FieldInt("vehicle_owner_id",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -189,7 +188,7 @@ extend(Vehicle_Controller,ControllerObjServer);
 	Vehicle_Controller.superclass.addDelete.call(this);
 	var pm = this.getDelete();
 	var options = {"required":true};
-	options.alias = "Код";	
+		
 	pm.addField(new FieldInt("id",options));
 }
 
@@ -211,7 +210,7 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
-	f_opts.alias = "Код";
+	
 	pm.addField(new FieldInt("id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Номер";
@@ -223,11 +222,8 @@ extend(Vehicle_Controller,ControllerObjServer);
 	f_opts.alias = "Марка";
 	pm.addField(new FieldString("make",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Водитель";
+	
 	pm.addField(new FieldInt("driver_id",f_opts));
-	var f_opts = {};
-	f_opts.alias = "Владелец";
-	pm.addField(new FieldString("owner",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Свойство";
 	pm.addField(new FieldString("feature",f_opts));
@@ -240,6 +236,9 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Номер телефона SIM карты";
 	pm.addField(new FieldString("sim_number",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Номер телефона SIM карты";
+	pm.addField(new FieldInt("vehicle_owner_id",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("plate");
 	
 }
@@ -288,32 +287,6 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldString("feature",options));
-	
-				
-	
-	var options = {};
-	
-		pm.addField(new FieldInt("ic",options));
-	
-				
-	
-	var options = {};
-	
-		pm.addField(new FieldInt("mid",options));
-	
-			
-	this.addPublicMethod(pm);
-}
-
-			Vehicle_Controller.prototype.add_complete_owners = function(){
-	var opts = {"controller":this};	
-	var pm = new PublicMethodServer('complete_owners',opts);
-	
-				
-	
-	var options = {};
-	
-		pm.addField(new FieldString("owner",options));
 	
 				
 	

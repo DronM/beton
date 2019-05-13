@@ -55,6 +55,14 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		$this->addField($f_phone_cel);
 		//********************
 		
+		//*** Field pump_length ***
+		$f_opts = array();
+		$f_opts['id']="pump_length";
+				
+		$f_pump_length=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_length",$f_opts);
+		$this->addField($f_pump_length);
+		//********************
+		
 		//*** Field deleted ***
 		$f_opts = array();
 		$f_opts['defaultValue']='FALSE';

@@ -217,6 +217,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	}
 	
 	public function update($pm){
+	
+		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
+	
 		$dbLink = $this->getDbLink();
 		$ar = $dbLink->query_first(sprintf(
 			"SELECT

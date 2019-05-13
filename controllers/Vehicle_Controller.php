@@ -45,14 +45,7 @@ class Vehicle_Controller extends ControllerSQL{
 			));
 		$pm->addParam($param);
 		$param = new FieldExtInt('driver_id'
-				,array('required'=>FALSE,
-				'alias'=>'Водитель'
-			));
-		$pm->addParam($param);
-		$param = new FieldExtString('owner'
-				,array('required'=>FALSE,
-				'alias'=>'Владелец'
-			));
+				,array('required'=>FALSE));
 		$pm->addParam($param);
 		$param = new FieldExtString('feature'
 				,array('required'=>FALSE,
@@ -74,6 +67,11 @@ class Vehicle_Controller extends ControllerSQL{
 				'alias'=>'Номер телефона SIM карты'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtInt('vehicle_owner_id'
+				,array(
+				'alias'=>'Номер телефона SIM карты'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -90,8 +88,6 @@ class Vehicle_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtInt('obj_mode'));
 		$param = new FieldExtInt('id'
 				,array(
-			
-				'alias'=>'Код'
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('plate'
@@ -114,14 +110,6 @@ class Vehicle_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		$param = new FieldExtInt('driver_id'
 				,array(
-			
-				'alias'=>'Водитель'
-			));
-			$pm->addParam($param);
-		$param = new FieldExtString('owner'
-				,array(
-			
-				'alias'=>'Владелец'
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('feature'
@@ -148,10 +136,14 @@ class Vehicle_Controller extends ControllerSQL{
 				'alias'=>'Номер телефона SIM карты'
 			));
 			$pm->addParam($param);
+		$param = new FieldExtInt('vehicle_owner_id'
+				,array(
+			
+				'alias'=>'Номер телефона SIM карты'
+			));
+			$pm->addParam($param);
 		
 			$param = new FieldExtInt('id',array(
-			
-				'alias'=>'Код'
 			));
 			$pm->addParam($param);
 		
@@ -230,27 +222,6 @@ class Vehicle_Controller extends ControllerSQL{
 	$opts=array();
 			
 		$pm->addParam(new FieldExtString('feature',$opts));
-	
-				
-	$opts=array();
-					
-		$pm->addParam(new FieldExtInt('ic',$opts));
-	
-				
-	$opts=array();
-					
-		$pm->addParam(new FieldExtInt('mid',$opts));
-	
-			
-		$this->addPublicMethod($pm);
-
-			
-		$pm = new PublicMethod('complete_owners');
-		
-				
-	$opts=array();
-			
-		$pm->addParam(new FieldExtString('owner',$opts));
 	
 				
 	$opts=array();

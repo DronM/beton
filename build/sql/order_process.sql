@@ -9,8 +9,13 @@ BEGIN
 	IF (TG_OP='INSERT') OR ((TG_OP='UPDATE') AND (NEW.date_time::date!=OLD.date_time::date)) THEN
 		SELECT coalesce(MAX(number),0)+1
 		INTO NEW.number
-		FROM orders AS o WHERE o.date_time::date=NEW.date_time::date;
+		FROM orders AS o WHERE o.date_time::date=NEW.date_time::date;		
 	END IF;
+	
+	IF TG_OP='INSERT' THEN
+		NEW.last_modif_user_id = NEW.user_id;		
+	END IF;
+	NEW.last_modif_date_time = now();
 	
 	NEW.date_time_to = get_order_date_time_to(NEW.date_time,NEW.quant::numeric, NEW.unload_speed::numeric, const_order_step_min_val());
 

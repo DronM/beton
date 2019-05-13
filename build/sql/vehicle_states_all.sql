@@ -1,3 +1,4 @@
+--DROP VIEW public.vehicle_states_all;
 CREATE OR REPLACE VIEW public.vehicle_states_all AS 
 	SELECT 
 		st.date_time,
@@ -11,7 +12,10 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 		
 		vehicles_ref(v) AS vehicles_ref,
 		
-		v.owner AS owner,
+		CASE
+			WHEN v.vehicle_owner_id IS NULL THEN v.owner
+			ELSE v_own.name
+		END AS owner,
 		
 		drivers_ref(d) AS drivers_ref,
 		d.phone_cel::text AS driver_phone_cel,
@@ -115,6 +119,7 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 	LEFT JOIN shipments AS sh ON sh.id=st.shipment_id
 	LEFT JOIN orders AS o ON o.id=sh.order_id		
 	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_owners AS v_own ON v_own.id=v.vehicle_owner_id
 	;		
 	--WHERE vs.schedule_date=in_date
 

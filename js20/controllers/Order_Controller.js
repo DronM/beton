@@ -185,6 +185,18 @@ extend(Order_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Кто последний вносил изменения";
+	var field = new FieldInt("last_modif_user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Время последнего изменения";
+	var field = new FieldDateTimeTZ("last_modif_date_time",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -337,6 +349,18 @@ extend(Order_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Кто последний вносил изменения";
+	var field = new FieldInt("last_modif_user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Время последнего изменения";
+	var field = new FieldDateTimeTZ("last_modif_date_time",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -369,46 +393,46 @@ extend(Order_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldInt("id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Номер";
 	pm.addField(new FieldString("number",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Клиент";
 	pm.addField(new FieldJSON("clients_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("client_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Объект";
 	pm.addField(new FieldJSON("destinations_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("destination_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Марка";
 	pm.addField(new FieldJSON("concrete_types_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("concrete_type_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Вид разгрузки";
 	pm.addField(new FieldString("unload_type",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Комментарий";
 	pm.addField(new FieldText("comment_text",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Прораб";
 	pm.addField(new FieldText("descr",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Телефон";
 	pm.addField(new FieldString("phone_cel",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Дата";
 	pm.addField(new FieldDateTime("date_time",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Количество";
 	pm.addField(new FieldFloat("quant",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Сотрудник";
 	pm.addField(new FieldJSON("users_ref",f_opts));
 	var f_opts = {};
 	

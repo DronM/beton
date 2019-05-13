@@ -148,6 +148,16 @@ class Order_Controller extends ControllerSQL{
 		$param = new FieldExtBool('under_control'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtInt('last_modif_user_id'
+				,array(
+				'alias'=>'Кто последний вносил изменения'
+			));
+		$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('last_modif_date_time'
+				,array(
+				'alias'=>'Время последнего изменения'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -291,6 +301,18 @@ class Order_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		$param = new FieldExtBool('under_control'
 				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('last_modif_user_id'
+				,array(
+			
+				'alias'=>'Кто последний вносил изменения'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('last_modif_date_time'
+				,array(
+			
+				'alias'=>'Время последнего изменения'
 			));
 			$pm->addParam($param);
 		
@@ -639,6 +661,9 @@ class Order_Controller extends ControllerSQL{
 	}
 	
 	public function update($pm){
+	
+		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
+	
 		$dbLink = $this->getDbLink();
 		$ar = $dbLink->query_first(sprintf(
 			"SELECT

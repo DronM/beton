@@ -22,10 +22,10 @@ function PumpVehicleList_View(id,options){
 		}
 		,"owner":{
 			"binding":new CommandBinding({
-				"control":new OwnerEdit(id+":filter-ctrl-owner",{
+				"control":new VehicleOwnerEdit(id+":filter-ctrl-owner",{
 					"contClassName":"form-group-filter"
 				}),
-				"field":new FieldString("owner")}),
+				"field":new FieldInt("vehicle_owner_id")}),
 			"sign":"e"		
 		}
 		,"feature":{
@@ -79,15 +79,22 @@ function PumpVehicleList_View(id,options){
 									"ctrlBindFieldId":"vehicle_id"
 								})
 							],
-							"sort":"asc"
+							"sort":"asc",
+							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:owner",{
+						,new GridCellHead(id+":grid:head:vehicle_owner",{
 							"value":"Владелец",
 							"columns":[
-								new GridColumn({
-									"field":model.getField("owner")
-									})
-							]
+								new GridColumnRef({
+									"field":model.getField("vehicle_owners_ref"),
+									"ctrlClass":VehicleOwnerEdit,
+									"ctrlOptions":{
+										"labelCaption":"",
+										"enabled":false
+									}
+								})
+							],
+							"sortable":true
 						})						
 						
 						,new GridCellHead(id+":grid:head:phone_cel",{
@@ -110,7 +117,20 @@ function PumpVehicleList_View(id,options){
 									"ctrlBindFieldId":"pump_price_id"
 								})
 							]
+						})
+						,new GridCellHead(id+":grid:head:pump_length",{
+							"value":"Длина подачи",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("pump_length"),
+									"ctrlClass":EditInt,
+									"ctrlOptions":{
+										"labelCaption":""
+									}									
+								})
+							]
 						})						
+												
 						,new GridCellHead(id+":grid:head:deleted",{
 							"value":"Удален",
 							"columns":[

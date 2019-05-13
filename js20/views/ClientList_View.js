@@ -79,6 +79,16 @@ function ClientList_View(id,options){
 								new GridColumnDate({"field":model.getField("first_call_date")})
 							]
 						})						
+
+						,new GridCellHead(id+":grid:head:inn",{
+							"value":"ИНН",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("inn")
+								})
+							],
+							"sortable":true
+						})						
 						
 					]
 				})

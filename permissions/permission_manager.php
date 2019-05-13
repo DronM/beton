@@ -76,8 +76,6 @@ $permissions = array();
 				
 					$permissions['Vehicle_Controller_complete_features']=TRUE;
 				
-					$permissions['Vehicle_Controller_complete_owners']=TRUE;
-				
 					$permissions['Vehicle_Controller_complete_makes']=TRUE;
 				
 					$permissions['Vehicle_Controller_check_for_broken_trackers']=TRUE;
@@ -839,6 +837,18 @@ $permissions = array();
 					$permissions['ConcreteCost_Controller_get_list']=TRUE;
 				
 					$permissions['ConcreteCost_Controller_get_object']=TRUE;
+				
+					$permissions['VehicleOwner_Controller_insert']=TRUE;
+				
+					$permissions['VehicleOwner_Controller_update']=TRUE;
+				
+					$permissions['VehicleOwner_Controller_delete']=TRUE;
+				
+					$permissions['VehicleOwner_Controller_get_list']=TRUE;
+				
+					$permissions['VehicleOwner_Controller_get_object']=TRUE;
+				
+					$permissions['VehicleOwner_Controller_complete']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

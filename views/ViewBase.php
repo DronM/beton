@@ -1255,6 +1255,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForOwnerCostList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostHeaderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1279,6 +1280,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ClientDialog_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ShipmentDialog_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/QuarryList_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/VehicleOwnerList_Form.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));
@@ -1293,7 +1295,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/UserPwdEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/rs/UserPwdEdit.rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/DriverEditRef.js'));
-		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OwnerEdit.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleOwnerEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MakeEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/FeatureEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/TrackerEdit.js'));
@@ -1561,6 +1563,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ConcreteCost_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteTypeList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwner_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleOwner_Controller.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

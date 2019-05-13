@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLEnum.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
  
 class Order_Model extends ModelSQLBeton{
 	
@@ -257,6 +258,26 @@ class Order_Model extends ModelSQLBeton{
 				
 		$f_under_control=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"under_control",$f_opts);
 		$this->addField($f_under_control);
+		//********************
+		
+		//*** Field last_modif_user_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Кто последний вносил изменения';
+		$f_opts['id']="last_modif_user_id";
+				
+		$f_last_modif_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_user_id",$f_opts);
+		$this->addField($f_last_modif_user_id);
+		//********************
+		
+		//*** Field last_modif_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Время последнего изменения';
+		$f_opts['id']="last_modif_date_time";
+				
+		$f_last_modif_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_date_time",$f_opts);
+		$this->addField($f_last_modif_date_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
