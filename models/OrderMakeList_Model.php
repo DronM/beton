@@ -217,6 +217,14 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		$f_pump_vehicle_length=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_length",$f_opts);
 		$this->addField($f_pump_vehicle_length);
 		//********************
+		
+		//*** Field pump_vehicle_comment ***
+		$f_opts = array();
+		$f_opts['id']="pump_vehicle_comment";
+				
+		$f_pump_vehicle_comment=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_comment",$f_opts);
+		$this->addField($f_pump_vehicle_comment);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

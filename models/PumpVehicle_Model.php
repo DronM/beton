@@ -71,6 +71,15 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
 		$this->addField($f_deleted);
 		//********************
+		
+		//*** Field comment_text ***
+		$f_opts = array();
+		$f_opts['length']=100;
+		$f_opts['id']="comment_text";
+				
+		$f_comment_text=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
+		$this->addField($f_comment_text);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

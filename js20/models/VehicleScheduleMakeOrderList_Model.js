@@ -74,6 +74,15 @@ function VehicleScheduleMakeOrderList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.vehicle_owners_ref = new FieldJSON("vehicle_owners_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.load_capacity = new FieldInt("load_capacity",filed_options);
 	
 				

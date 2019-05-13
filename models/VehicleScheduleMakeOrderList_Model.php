@@ -63,6 +63,14 @@ class VehicleScheduleMakeOrderList_Model extends {
 		$this->addField($f_owner);
 		//********************
 		
+		//*** Field vehicle_owners_ref ***
+		$f_opts = array();
+		$f_opts['id']="vehicle_owners_ref";
+				
+		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
+		$this->addField($f_vehicle_owners_ref);
+		//********************
+		
 		//*** Field load_capacity ***
 		$f_opts = array();
 		$f_opts['id']="load_capacity";

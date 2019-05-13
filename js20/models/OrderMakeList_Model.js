@@ -238,6 +238,15 @@ function OrderMakeList_Model(options){
 	
 	options.fields.pump_vehicle_length = new FieldInt("pump_vehicle_length",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_comment = new FieldString("pump_vehicle_comment",filed_options);
+	
 		OrderMakeList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderMakeList_Model,ModelXML);

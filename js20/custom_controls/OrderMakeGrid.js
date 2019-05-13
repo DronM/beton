@@ -174,10 +174,15 @@ function OrderMakeGrid(id,options){
 										var res = "";
 										var tp = fields.unload_type.getValue();
 										if(tp=="band"||tp=="pump"){
+											var cmt = fields.pump_vehicle_comment.getValue();
 											res = window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
 											var l = fields.pump_vehicle_length.getValue();
-											if(l)
-												res+="("+l+")";
+											if(l){
+												res+="("+l+((cmt&&cmt.length)? ","+cmt:"")+")";
+											}
+											else if(cmt&&cmt.length){
+												res+="("+cmt+")";
+											}
 										}
 										return res;
 									}

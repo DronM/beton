@@ -398,12 +398,12 @@ function OrderMakeList_View(id,options){
 }
 extend(OrderMakeList_View,View);
 
-OrderMakeList_View.prototype.COL_CLIENT_LEN = 15;
+OrderMakeList_View.prototype.COL_CLIENT_LEN = 20;
 OrderMakeList_View.prototype.COL_DEST_LEN = 10;
 OrderMakeList_View.prototype.COL_COMMENT_LEN = 15;
-OrderMakeList_View.prototype.COL_DESCR_LEN = 10;
+OrderMakeList_View.prototype.COL_DESCR_LEN = 15;
 OrderMakeList_View.prototype.COL_DRIVER_LEN = 10;
-OrderMakeList_View.prototype.COL_PUMP_VEH_LEN = 8;
+OrderMakeList_View.prototype.COL_PUMP_VEH_LEN = 10;
 OrderMakeList_View.prototype.TABLE_CLASS = "table-bordered table-responsive table-striped table-make_order";
 
 OrderMakeList_View.prototype.m_orderedTotal;

@@ -15,8 +15,14 @@
 function PeriodSelectBeton(id,options){
 	options = options || {};	
 
-	this.PERIOD_ALIASES = ["all",(options.periodShift? "shift":"day"),"week","month","quarter","year"];
-	this.PERIODS = ["Произвольный период",(options.periodShift? "Текущая смена":"Текущий день"),"Текущая неделя","Текущий месяц","Текущий квартал","Текущий год"];
+	if(options.periodShift){
+		this.PERIOD_ALIASES = ["all","shift","prev_shift","week","month","quarter","year"];
+		this.PERIODS = ["Произвольный период","Текущая смена","Предыдущая смена","Текущая неделя","Текущий месяц","Текущий квартал","Текущий год"];
+	}
+	else{
+		this.PERIOD_ALIASES = ["all","day","week","month","quarter","year"];
+		this.PERIODS = ["Произвольный период","Текущий день","Текущая неделя","Текущий месяц","Текущий квартал","Текущий год"];
+	}
 	
 	PeriodSelectBeton.superclass.constructor.call(this,id,options);
 	

@@ -102,7 +102,12 @@ assigned_vehicles_list  поставил ASC?
 4) Сортировка по бланкам в отгрузках
 5) Поле согласовая отгрузок владельцем
 
+1.026 13/05
+1) Коммент в насосах
+2) Убрал косяки с валдельцем
 
+
+1.027
 
 Журнал расходов RAMaterialConsumption->get_dates
 Общая Таблица RawMaterial_Controller->total_list

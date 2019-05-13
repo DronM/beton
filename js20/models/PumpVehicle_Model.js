@@ -78,6 +78,16 @@ function PumpVehicle_Model(options){
 	
 	options.fields.deleted = new FieldBool("deleted",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.comment_text = new FieldString("comment_text",filed_options);
+	options.fields.comment_text.getValidator().setMaxLength('100');
+	
 		PumpVehicle_Model.superclass.constructor.call(this,id,options);
 }
 extend(PumpVehicle_Model,ModelXML);

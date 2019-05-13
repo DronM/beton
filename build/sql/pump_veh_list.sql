@@ -15,7 +15,8 @@ CREATE OR REPLACE VIEW public.pump_veh_list AS
 		v.plate,
 		pv.deleted,
 		pv.pump_length,
-		vehicle_owners_ref(v_own) AS vehicle_owners_ref
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		pv.comment_text
 		
 	FROM pump_vehicles pv
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id

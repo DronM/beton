@@ -84,7 +84,8 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
 		vh.owner AS pump_vehicle_owner,
 		o.unload_type,
 		vehicle_owners_ref(v_own) AS pump_vehicle_owners_ref,
-		pvh.pump_length AS pump_vehicle_length
+		pvh.pump_length AS pump_vehicle_length,
+		pvh.comment_text AS pump_vehicle_comment
 		
 		
 	FROM orders o

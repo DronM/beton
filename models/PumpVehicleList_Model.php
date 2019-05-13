@@ -101,6 +101,14 @@ class PumpVehicleList_Model extends ModelSQLBeton{
 		$f_pump_length=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_length",$f_opts);
 		$this->addField($f_pump_length);
 		//********************
+		
+		//*** Field comment_text ***
+		$f_opts = array();
+		$f_opts['id']="comment_text";
+				
+		$f_comment_text=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
+		$this->addField($f_comment_text);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

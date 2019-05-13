@@ -130,6 +130,19 @@ function PumpVehicleList_View(id,options){
 								})
 							]
 						})						
+						,new GridCellHead(id+":grid:head:comment_text",{
+							"value":"Комментарий",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("comment_text"),
+									"ctrlClass":EditString,
+									"ctrlBindFieldId":"comment_text",
+									"ctrlOptions":{
+										"maxLength":"100"
+									}
+								})
+							]
+						})						
 												
 						,new GridCellHead(id+":grid:head:deleted",{
 							"value":"Удален",

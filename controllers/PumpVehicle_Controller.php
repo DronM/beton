@@ -42,6 +42,9 @@ class PumpVehicle_Controller extends ControllerSQL{
 		$param = new FieldExtBool('deleted'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtString('comment_text'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -77,6 +80,10 @@ class PumpVehicle_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtBool('deleted'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtString('comment_text'
 				,array(
 			));
 			$pm->addParam($param);
