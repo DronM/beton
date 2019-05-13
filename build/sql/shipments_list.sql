@@ -10,6 +10,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		--calc_ship_cost(sh.*, dest.*, true) AS cost,
 		CASE
 			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
 			ELSE
 				CASE
 					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)

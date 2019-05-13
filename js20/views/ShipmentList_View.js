@@ -196,11 +196,11 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:owner",{
+						,new GridCellHead(id+":grid:head:vehicle_owners_ref",{
 							"value":"Владелец ТС",
 							"columns":[
-								new GridColumn({
-									"field":model.getField("owner")
+								new GridColumnRef({
+									"field":model.getField("vehicle_owners_ref")
 								})
 							],
 							"sortable":true

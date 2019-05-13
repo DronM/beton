@@ -129,11 +129,11 @@ function VehicleScheduleList_View(id,options){
 									})
 								]
 							})
-							,new GridCellHead(id+":grid:head:vehicle_owner",{
+							,new GridCellHead(id+":grid:head:vehicle_owners_ref",{
 								"value":"Владелец ТС",
 								"columns":[
 									new GridColumnRef({
-										"field":model.getField("vehicle_owner")
+										"field":model.getField("vehicle_owners_ref")
 									})
 								]
 							})

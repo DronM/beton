@@ -7,12 +7,6 @@ function OrderDialog_View(id,options){
 	options.controller = new Order_Controller();
 	options.model = (options.models&&options.models.OrderDialog_Model)? options.models.OrderDialog_Model: new OrderDialog_Model();
 	
-	options.templateOptions = options.templateOptions || {};
-	if (options.model && (options.model.getRowIndex()>=0 || options.model.getNextRow()) ){			
-		var last_modif_users_ref = options.model.getFieldValue("last_modif_users_ref");	
-		options.templateOptions.cmdEdit = (last_modif_users_ref&&!last_modif_users_ref.isNull());
-	}
-	
 	options.cmdSave = false;
 
 	var app = window.getApp();
@@ -371,7 +365,9 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	//last modif
 	var last_modif_users_ref = m.getFieldValue("last_modif_users_ref");	
 	if(last_modif_users_ref&&!last_modif_users_ref.isNull()){
-		DOMHelper.setText(document.getElementById(this.getId()+":last_modif_user"), last_modif_users_ref.getDescr());
-		DOMHelper.setText(document.getElementById(this.getId()+":last_modif_date_time"), DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
+		var id =this.getId();
+		document.getElementById(id+":cmd-cont").style = "float:left;";
+		DOMHelper.setText(document.getElementById(id+":last_modif_user"), last_modif_users_ref.getDescr());
+		DOMHelper.setText(document.getElementById(id+":last_modif_date_time"), DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
 	}
 }
