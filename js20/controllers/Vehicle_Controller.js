@@ -19,7 +19,7 @@
 
 function Vehicle_Controller(options){
 	options = options || {};
-	options.listModelClass = Vehicle_Model;
+	options.listModelClass = VehicleDialog_Model;
 	options.objModelClass = VehicleDialog_Model;
 	Vehicle_Controller.superclass.constructor.call(this,options);	
 	
@@ -210,7 +210,7 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
-	
+	f_opts.alias = "Код";
 	pm.addField(new FieldInt("id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Номер";
@@ -223,7 +223,7 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(new FieldString("make",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldInt("driver_id",f_opts));
+	pm.addField(new FieldJSONB("drivers_ref",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Свойство";
 	pm.addField(new FieldString("feature",f_opts));
@@ -237,10 +237,11 @@ extend(Vehicle_Controller,ControllerObjServer);
 	f_opts.alias = "Номер телефона SIM карты";
 	pm.addField(new FieldString("sim_number",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Номер телефона SIM карты";
-	pm.addField(new FieldInt("vehicle_owner_id",f_opts));
-	pm.getField(this.PARAM_ORD_FIELDS).setValue("plate");
 	
+	pm.addField(new FieldDateTimeTZ("tracker_last_dt",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSONB("vehicle_owners_ref",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){

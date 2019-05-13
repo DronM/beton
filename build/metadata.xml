@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-13 06:15:03</lastBuild></version>
+		<lastBuild>2019-05-13 09:45:16</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -27,6 +27,7 @@
 		<version dateOpen="2019-05-03 05:05:42" dateClose="2019-05-06 06:05:47">1.00121</version>
 		<version dateOpen="2019-05-06 06:05:47" dateClose="2019-05-07 05:05:50">1.00122</version>
 		<version dateOpen="2019-05-07 05:05:55" dateClose="2019-05-13 06:05:15">1.00123</version>
+		<version dateOpen="2019-05-13 06:05:20" dateClose="2019-05-13 09:05:45">1.00124</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -2202,7 +2203,7 @@
 			<publicMethod id="insert" modelId="Vehicle"/>
 			<publicMethod id="update" modelId="Vehicle"/>
 			<publicMethod id="delete" modelId="Vehicle"/>
-			<publicMethod id="get_list" modelId="Vehicle"/>
+			<publicMethod id="get_list" modelId="VehicleDialog"/>
 			<publicMethod id="get_object" modelId="VehicleDialog"/>
 			<publicMethod id="complete" modelId="VehicleDialog" patternFieldId="plate"/>
 			<publicMethod id="get_vehicle_statistics">

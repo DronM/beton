@@ -1,18 +1,18 @@
 <div id="{{id}}" class="panel">
-	<div id="{{id}}:cmd-cont" style="float:left;">
+	<div id="{{id}}:cmd-cont" {{#cmdEdit}}style="float:left;"{{/cmdEdit}}>
 		<div id="{{id}}:cmdOk">
 		</div>
 		<div id="{{id}}:cmdCancel">
 		</div>				
 	</div>
-
+	{{#cmdEdit}}
 	<div class="text-right orderLastModif" title="Последнее изменение">	
 		<div id="{{id}}:last_modif_user" class="text-info">
 		</div>
 		<div id="{{id}}:last_modif_date_time" class="text-info">
 		</div>				
 	</div>
-
+	{{/cmdEdit}}
 	<div class="panel-heading">
 	
 		<h2 class="panel-title">Заявка №

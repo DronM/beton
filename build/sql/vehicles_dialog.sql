@@ -29,6 +29,7 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id
 	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	ORDER BY v.plate
 	;
 
 ALTER TABLE public.vehicles_dialog

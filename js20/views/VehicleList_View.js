@@ -5,7 +5,7 @@ function VehicleList_View(id,options){
 
 	VehicleList_View.superclass.constructor.call(this,id,options);
 
-	var model = options.models.Vehicle_Model;
+	var model = options.models.VehicleDialog_Model;
 	var contr = new Vehicle_Controller();
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
@@ -37,14 +37,18 @@ function VehicleList_View(id,options){
 						,new GridCellHead(id+":grid:head:make",{
 							"value":"Марка",
 							"columns":[
-								new GridColumn({"field":model.getField("make")})
+								new GridColumn({
+									"field":model.getField("make")
+								})
 							],
 							"sortable":true
 						})						
 						,new GridCellHead(id+":grid:head:load_capacity",{
 							"value":"Грузоподъемность",
 							"columns":[
-								new GridColumn({"field":model.getField("load_capacity")})
+								new GridColumn({									
+									"field":model.getField("load_capacity")
+								})
 							],
 							"sortable":true
 						})						
@@ -60,7 +64,9 @@ function VehicleList_View(id,options){
 						,new GridCellHead(id+":grid:head:feature",{
 							"value":"Свойство",
 							"columns":[
-								new GridColumn({"field":model.getField("feature")})
+								new GridColumn({
+									"field":model.getField("feature")
+								})
 							],
 							"sortable":true
 						})						

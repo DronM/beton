@@ -179,7 +179,7 @@ class Vehicle_Controller extends ControllerSQL{
 
 		$this->addPublicMethod($pm);
 		
-		$this->setListModelId('Vehicle_Model');
+		$this->setListModelId('VehicleDialog_Model');
 		
 			
 		/* get_object */
