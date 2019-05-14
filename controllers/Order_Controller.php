@@ -480,6 +480,17 @@ class Order_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		/* complete  */
+		$pm = new PublicMethod('complete');
+		$pm->addParam(new FieldExtString('pattern'));
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('ic'));
+		$pm->addParam(new FieldExtInt('mid'));
+		$pm->addParam(new FieldExtString('number'));		
+		$this->addPublicMethod($pm);					
+		$this->setCompleteModelId('OrderList_Model');
+
 		
 	}	
 	

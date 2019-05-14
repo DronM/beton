@@ -108,6 +108,10 @@ assigned_vehicles_list  поставил ASC?
 
 
 1.027
+1) Журнал отгрузок стоимость насосов
+2) Звонки при изменении контрагента все контакты переписываются на него!
+3) Назначение: звук только при большом экране
+4) Косяк в списке владельцев
 
 Журнал расходов RAMaterialConsumption->get_dates
 Общая Таблица RawMaterial_Controller->total_list
@@ -117,7 +121,7 @@ assigned_vehicles_list  поставил ASC?
 Журнал испытания образцов LabEntry_Controller->get_list
 
 
-Контрагенты повторы Client_Controller->get_duplicates_list
+???Контрагенты повторы Client_Controller->get_duplicates_list
 
 Возможность удалять отгрузки при назначенной, а если отгружена - запросить комментарий, занести в доп.таблицу
 убрать внутр звонки

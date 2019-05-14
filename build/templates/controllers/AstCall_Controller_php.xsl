@@ -256,7 +256,17 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					WHERE unique_id=%s",
 					$client_id,
 					$p->getParamById('unique_id')
-					));										
+					));
+					
+					//перенос всех контактов!!!
+					$l->query(sprintf(
+					"UPDATE client_tels
+					SET client_id=%d
+					WHERE client_id=%d",
+					$client_id,
+					$contact_client_id
+					));
+															
 				}
 				
 				$l->query("COMMIT");

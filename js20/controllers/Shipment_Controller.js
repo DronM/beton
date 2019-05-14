@@ -40,6 +40,8 @@ function Shipment_Controller(options){
 	this.add_shipment_invoice();
 	this.add_get_time_list();
 	this.add_set_blanks_exist();
+	this.add_delete_shipped();
+	this.add_delete_assigned();
 		
 }
 extend(Shipment_Controller,ControllerObjServer);
@@ -118,6 +120,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldDateTimeTZ("owner_agreed_date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("acc_comment",options);
 	
 	pm.addField(field);
 	
@@ -205,6 +213,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldText("acc_comment",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -240,14 +254,23 @@ extend(Shipment_Controller,ControllerObjServer);
 	f_opts.alias = "Дата отгрузки";
 	pm.addField(new FieldDateTime("ship_date_time",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Количество";
-	pm.addField(new FieldFloat("quant",f_opts));
+	f_opts.alias = "Завод";
+	pm.addField(new FieldJSON("production_sites_ref",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Стоимость доставки";
-	pm.addField(new FieldFloat("cost",f_opts));
+	
+	pm.addField(new FieldInt("production_site_id",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Отгружен";
-	pm.addField(new FieldBool("shipped",f_opts));
+	
+	pm.addField(new FieldInt("client_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Клиент";
+	pm.addField(new FieldJSON("clients_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Объект";
+	pm.addField(new FieldJSON("destinations_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("destination_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Марка";
 	pm.addField(new FieldJSON("concrete_types_ref",f_opts));
@@ -255,8 +278,8 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldInt("concrete_type_id",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Владелец";
-	pm.addField(new FieldJSON("vehicle_owners_ref",f_opts));
+	f_opts.alias = "Количество";
+	pm.addField(new FieldFloat("quant",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Автомобиль";
 	pm.addField(new FieldJSON("vehicles_ref",f_opts));
@@ -270,23 +293,41 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldInt("driver_id",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Объект";
-	pm.addField(new FieldJSON("destinations_ref",f_opts));
-	var f_opts = {};
 	
-	pm.addField(new FieldInt("destination_id",f_opts));
+	pm.addField(new FieldInt("vehicle_owner_id",f_opts));
 	var f_opts = {};
-	
-	pm.addField(new FieldInt("client_id",f_opts));
+	f_opts.alias = "Владелец";
+	pm.addField(new FieldJSON("vehicle_owners_ref",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Клиент";
-	pm.addField(new FieldJSON("clients_ref",f_opts));
+	f_opts.alias = "Комментарий бухгалетрии";
+	pm.addField(new FieldText("acc_comment",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Простой";
 	pm.addField(new FieldTime("demurrage",f_opts));
 	var f_opts = {};
+	f_opts.alias = "Стоимость доставки";
+	pm.addField(new FieldFloat("cost",f_opts));
+	var f_opts = {};
 	f_opts.alias = "Стомость простоя";
 	pm.addField(new FieldFloat("demurrage_cost",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Стоимость насос";
+	pm.addField(new FieldFloat("pump_cost",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Насос";
+	pm.addField(new FieldJSON("pump_vehicles_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "TRUE";
+	pm.addField(new FieldInt("pump_vehicle_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Насос,владелец";
+	pm.addField(new FieldJSON("pump_vehicles_owners_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "TRUE";
+	pm.addField(new FieldInt("pump_vehicle_owner_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("shipped",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Оценка";
 	pm.addField(new FieldInt("client_mark",f_opts));
@@ -299,12 +340,6 @@ extend(Shipment_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Автор";
 	pm.addField(new FieldJSON("users_ref",f_opts));
-	var f_opts = {};
-	f_opts.alias = "Завод";
-	pm.addField(new FieldJSON("production_sites_ref",f_opts));
-	var f_opts = {};
-	
-	pm.addField(new FieldInt("production_site_id",f_opts));
 }
 
 			Shipment_Controller.prototype.add_get_list_for_order = function(){
@@ -513,6 +548,31 @@ extend(Shipment_Controller,ControllerObjServer);
 		pm.addField(new FieldString("barcode",options));
 	
 			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_delete_shipped = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('delete_shipped',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "500";
+	
+		pm.addField(new FieldString("comment_text",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_delete_assigned = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('delete_assigned',opts);
+	
 	this.addPublicMethod(pm);
 }
 

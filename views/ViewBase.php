@@ -57,6 +57,10 @@ require_once('models/MainMenu_Model_plant_director.php');
 if (file_exists('models/MainMenu_Model_supervisor.php')){
 require_once('models/MainMenu_Model_supervisor.php');
 }
+			
+if (file_exists('models/MainMenu_Model_vehicle_owner.php')){
+require_once('models/MainMenu_Model_vehicle_owner.php');
+}
 		
 class ViewBase extends ViewHTMLXSLT {	
 
@@ -1256,6 +1260,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostHeaderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentCancelationList.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1281,6 +1286,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ShipmentDialog_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/QuarryList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/VehicleOwnerList_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/OrderList_Form.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));
@@ -1565,6 +1571,10 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteTypeList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwner_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleOwner_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentCancelations_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ShipmentCancelation_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentCancelation_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentCancelationList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

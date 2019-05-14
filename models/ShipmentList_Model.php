@@ -8,6 +8,7 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
@@ -44,34 +45,61 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_ship_date_time);
 		//********************
 		
-		//*** Field quant ***
+		//*** Field production_sites_ref ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Количество';
-		$f_opts['id']="quant";
+		$f_opts['alias']='Завод';
+		$f_opts['id']="production_sites_ref";
 				
-		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
-		$this->addField($f_quant);
+		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
+		$this->addField($f_production_sites_ref);
 		//********************
 		
-		//*** Field cost ***
+		//*** Field production_site_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Стоимость доставки';
-		$f_opts['id']="cost";
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="production_site_id";
 				
-		$f_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost",$f_opts);
-		$this->addField($f_cost);
+		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
+		$this->addField($f_production_site_id);
 		//********************
 		
-		//*** Field shipped ***
+		//*** Field client_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="client_id";
+				
+		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
+		$this->addField($f_client_id);
+		//********************
+		
+		//*** Field clients_ref ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Отгружен';
-		$f_opts['id']="shipped";
+		$f_opts['alias']='Клиент';
+		$f_opts['id']="clients_ref";
 				
-		$f_shipped=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipped",$f_opts);
-		$this->addField($f_shipped);
+		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
+		$this->addField($f_clients_ref);
+		//********************
+		
+		//*** Field destinations_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Объект';
+		$f_opts['id']="destinations_ref";
+				
+		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
+		$this->addField($f_destinations_ref);
+		//********************
+		
+		//*** Field destination_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="destination_id";
+				
+		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
+		$this->addField($f_destination_id);
 		//********************
 		
 		//*** Field concrete_types_ref ***
@@ -93,14 +121,14 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_concrete_type_id);
 		//********************
 		
-		//*** Field vehicle_owners_ref ***
+		//*** Field quant ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Владелец';
-		$f_opts['id']="vehicle_owners_ref";
+		$f_opts['alias']='Количество';
+		$f_opts['id']="quant";
 				
-		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
-		$this->addField($f_vehicle_owners_ref);
+		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
+		$this->addField($f_quant);
 		//********************
 		
 		//*** Field vehicles_ref ***
@@ -141,42 +169,32 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_driver_id);
 		//********************
 		
-		//*** Field destinations_ref ***
+		//*** Field vehicle_owner_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Объект';
-		$f_opts['id']="destinations_ref";
+		$f_opts['id']="vehicle_owner_id";
 				
-		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
-		$this->addField($f_destinations_ref);
+		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
+		$this->addField($f_vehicle_owner_id);
 		//********************
 		
-		//*** Field destination_id ***
+		//*** Field vehicle_owners_ref ***
 		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="destination_id";
+		
+		$f_opts['alias']='Владелец';
+		$f_opts['id']="vehicle_owners_ref";
 				
-		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
-		$this->addField($f_destination_id);
+		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
+		$this->addField($f_vehicle_owners_ref);
 		//********************
 		
-		//*** Field client_id ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="client_id";
-				
-		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
-		$this->addField($f_client_id);
-		//********************
-		
-		//*** Field clients_ref ***
+		//*** Field acc_comment ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Клиент';
-		$f_opts['id']="clients_ref";
+		$f_opts['alias']='Комментарий бухгалетрии';
+		$f_opts['id']="acc_comment";
 				
-		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
-		$this->addField($f_clients_ref);
+		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
+		$this->addField($f_acc_comment);
 		//********************
 		
 		//*** Field demurrage ***
@@ -189,6 +207,16 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_demurrage);
 		//********************
 		
+		//*** Field cost ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость доставки';
+		$f_opts['id']="cost";
+				
+		$f_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost",$f_opts);
+		$this->addField($f_cost);
+		//********************
+		
 		//*** Field demurrage_cost ***
 		$f_opts = array();
 		
@@ -197,6 +225,65 @@ class ShipmentList_Model extends ModelSQLBeton{
 				
 		$f_demurrage_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage_cost",$f_opts);
 		$this->addField($f_demurrage_cost);
+		//********************
+		
+		//*** Field pump_cost ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость насос';
+		$f_opts['id']="pump_cost";
+				
+		$f_pump_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost",$f_opts);
+		$this->addField($f_pump_cost);
+		//********************
+		
+		//*** Field pump_vehicles_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Насос';
+		$f_opts['id']="pump_vehicles_ref";
+				
+		$f_pump_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicles_ref",$f_opts);
+		$this->addField($f_pump_vehicles_ref);
+		//********************
+		
+		//*** Field pump_vehicle_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='TRUE';
+		$f_opts['id']="pump_vehicle_id";
+				
+		$f_pump_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_id",$f_opts);
+		$this->addField($f_pump_vehicle_id);
+		//********************
+		
+		//*** Field pump_vehicles_owners_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Насос,владелец';
+		$f_opts['id']="pump_vehicles_owners_ref";
+				
+		$f_pump_vehicles_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicles_owners_ref",$f_opts);
+		$this->addField($f_pump_vehicles_owners_ref);
+		//********************
+		
+		//*** Field pump_vehicle_owner_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='TRUE';
+		$f_opts['id']="pump_vehicle_owner_id";
+				
+		$f_pump_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owner_id",$f_opts);
+		$this->addField($f_pump_vehicle_owner_id);
+		//********************
+		
+		//*** Field shipped ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="shipped";
+				
+		$f_shipped=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipped",$f_opts);
+		$this->addField($f_shipped);
 		//********************
 		
 		//*** Field client_mark ***
@@ -236,25 +323,6 @@ class ShipmentList_Model extends ModelSQLBeton{
 				
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
-		//********************
-		
-		//*** Field production_sites_ref ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Завод';
-		$f_opts['id']="production_sites_ref";
-				
-		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
-		$this->addField($f_production_sites_ref);
-		//********************
-		
-		//*** Field production_site_id ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="production_site_id";
-				
-		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
-		$this->addField($f_production_site_id);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

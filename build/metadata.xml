@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-13 11:08:17</lastBuild></version>
+		<lastBuild>2019-05-14 06:03:18</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -30,6 +30,7 @@
 		<version dateOpen="2019-05-13 06:05:20" dateClose="2019-05-13 09:05:45">1.00124</version>
 		<version dateOpen="2019-05-13 09:05:45" dateClose="2019-05-13 10:05:21">1.00125</version>
 		<version dateOpen="2019-05-13 10:05:21" dateClose="2019-05-13 11:05:08">1.00126</version>
+		<version dateOpen="2019-05-13 11:05:21" dateClose="2019-05-14 06:05:03">1.00127</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -80,6 +81,9 @@
 			</value>
 			<value id="supervisor">
 				<ru descr="Смотрящий"/>
+			</value>
+			<value id="vehicle_owner">
+				<ru descr="Владелец траспорта"/>
 			</value>
 		</enum>
 		<enum id="unload_types">
@@ -716,6 +720,7 @@
 			<field id="quant" dataType="Float" alias="Количество"/>
 			<field id="users_ref" dataType="JSON" alias="Сотрудник"/>
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="orders_ref" dataType="JSON" sysCol="TRUE"/>
 		</model>
 		<model id="OrderPump" parent="ModelSQLBeton" dataTable="order_pumps" virtual="FALSE">
 			<field id="order_id" dataType="Int" primaryKey="TRUE" required="FALSE" refTable="orders" refField="id"/>
@@ -849,6 +854,7 @@
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<field id="owner_agreed" dataType="Bool" defaultValue="FALSE"/>
 			<field id="owner_agreed_date_time" dataType="DateTimeTZ"/>
+			<field id="acc_comment" dataType="Text"/>
 			<index id="shipments_date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -862,28 +868,35 @@
 		<model id="ShipmentList" parent="ModelSQLBeton" dataTable="shipments_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
-			<field id="quant" dataType="Float" alias="Количество"/>
-			<field id="cost" dataType="Float" alias="Стоимость доставки"/>
-			<field id="shipped" dataType="Bool" alias="Отгружен"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
+			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
+			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
 			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
-			<field id="vehicle_owners_ref" dataType="JSON" alias="Владелец"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
 			<field id="vehicles_ref" dataType="JSON" alias="Автомобиль"/>
 			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
 			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
 			<field id="driver_id" dataType="Int" sysCol="TRUE"/>
-			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
-			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
-			<field id="client_id" dataType="Int" sysCol="TRUE"/>
-			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+			<field id="vehicle_owner_id" dataType="Int" stsCol="TRUE"/>
+			<field id="vehicle_owners_ref" dataType="JSON" alias="Владелец"/>
+			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
 			<field id="demurrage" dataType="Time" alias="Простой"/>
+			<field id="cost" dataType="Float" alias="Стоимость доставки"/>
 			<field id="demurrage_cost" dataType="Float" alias="Стомость простоя"/>
+			<field id="pump_cost" dataType="Float" alias="Стоимость насос"/>
+			<field id="pump_vehicles_ref" dataType="JSON" alias="Насос"/>
+			<field id="pump_vehicle_id" dataType="Int" alias="TRUE"/>
+			<field id="pump_vehicles_owners_ref" dataType="JSON" alias="Насос,владелец"/>
+			<field id="pump_vehicle_owner_id" dataType="Int" alias="TRUE"/>
+			<field id="shipped" dataType="Bool" sysCol="TRUE"/>
 			<field id="client_mark" dataType="Int" alias="Оценка"/>
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 			<field id="users_ref" dataType="JSON" alias="Автор"/>
-			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
-			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
 			<sql/>
 		</model>
 		<model id="ShipmentDialog" parent="ModelSQLBeton" dataTable="shipments_dialog" virtual="TRUE">
@@ -899,6 +912,7 @@
 			<field id="client_mark" dataType="Int" alias="Оценка"/>
 			<field id="demurrage" dataType="String" alias="Простой"/>
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
+			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
 			<sql/>
 		</model>
 		<model id="ShipmentForOrderList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE">
@@ -911,6 +925,27 @@
 			<field id="vs_state" dataType="String" alias="Статус"/>
 			<field id="shipped" dataType="Bool" alias="Отгружен"/>
 			<field id="order_id" dataType="Int" sysCol="TRUE"/>
+		</model>
+		<model id="ShipmentCancelation" parent="ModelSQLBeton" dataTable="shipment_cancelations" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата" dbRequired="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата отгрузки" dbRequired="TRUE"/>
+			<field id="order_id" dataType="Int" required="TRUE" refTable="orders" refField="id" alias="Заявка"/>
+			<field id="vehicle_schedule_id" dataType="Int" required="TRUE" refTable="vehicle_schedules" refField="id" alias="Экипаж"/>
+			<field id="comment_text" dataType="Text" required="TRUE" alias="Комментарий"/>
+			<field id="user_id" dataType="Int" dbRequired="TRUE" refTable="users" refField="id" alias="Пользователь"/>
+		</model>
+		<model id="ShipmentCancelationList" parent="ModelSQLBeton" dataTable="shipment_cancelations_list" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата отгрузки"/>
+			<field id="order_id" dataType="Int" sysCol="TRUE"/>
+			<field id="orders_ref" dataType="JSON" alias="Заявка"/>
+			<field id="vehicle_schedule_id" dataType="Int" sysCol="TRUE"/>
+			<field id="vehicle_schedules_ref" dataType="JSON" alias="ТС,водитель"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			<field id="user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="users_ref" dataType="JSON" alias="Пользователь"/>
 		</model>
 		<model id="OperatorList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE" server="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
@@ -2278,6 +2313,7 @@
 			<publicMethod id="set_payed">
 				<field id="id" dataType="Int" required="TRUE"/>
 			</publicMethod>
+			<publicMethod id="complete" modelId="OrderList" patternFieldId="number"/>
 		</controller>
 		<controller id="Driver" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="Driver"/>
@@ -2432,6 +2468,10 @@
 			<publicMethod id="set_blanks_exist">
 				<field id="barcode" dataType="String" length="13"/>
 			</publicMethod>
+			<publicMethod id="delete_shipped">
+				<field id="comment_text" dataType="String" length="500" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="delete_assigned"/>
 		</controller>
 		<controller id="User" parentId="ControllerSQL" state="TRUE" noState="TRUE">
 			<publicMethod id="insert" modelId="User"/>
@@ -2989,6 +3029,13 @@
 			<publicMethod id="get_object" modelId="VehicleOwner"/>
 			<publicMethod id="complete" modelId="VehicleOwner" patternFieldId="name"/>
 		</controller>
+		<controller id="ShipmentCancelation" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ShipmentCancelation"/>
+			<publicMethod id="update" modelId="ShipmentCancelation"/>
+			<publicMethod id="delete" modelId="ShipmentCancelation"/>
+			<publicMethod id="get_list" modelId="ShipmentCancelationList"/>
+			<publicMethod id="get_object" modelId="ShipmentCancelationList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -3009,6 +3056,14 @@
 		<permission type="allow" controllerId="User" methodId="logged" roleId="guest"/>
 		<permission type="allow" controllerId="User" methodId="logout" roleId="guest"/>
 		<permission type="allow" controllerId="Captcha" methodId="get" roleId="guest"/>
+		<!-- Vehicle owner -->
+		<permission type="allow" controllerId="User" methodId="login" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="login_html" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="login_k" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="login_ext" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="logged" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="logout" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Captcha" methodId="get" roleId="vehicle_owner"/>
 	</permissions>
 	<views>
 		<view id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи"/>
@@ -3058,6 +3113,7 @@
 		<view id="30009" c="Shipment_Controller" t="AssignedVehicleList" f="get_assigned_vehicle_list" section="Формы" descr="Текущие назначения"/>
 		<view id="30010" c="EmployeeWorkTimeSchedule_Controller" t="EmployeeWorkTimeScheduleList" f="get_list" section="Формы" descr="Табель рабочего времени"/>
 		<view id="30011" c="ClientValidDuplicate_Controller" t="ClientValidDuplicateList" f="get_list" section="Формы" descr="Разрешенные повторы контрагентов"/>
+		<view id="30012" c="ShipmentCancelation_Controller" t="ShipmentCancelationList" f="get_list" section="Формы" descr="Отмененные отгрузки"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС на карте"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -3138,6 +3194,7 @@
 		<serverTemplate id="ShipmentForOwnerCostHeaderList"/>
 		<serverTemplate id="ConcreteCostHeaderList"/>
 		<serverTemplate id="VehicleOwnerList"/>
+		<serverTemplate id="ShipmentCancelationList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -3648,6 +3705,7 @@
 		<jsScript file="views/ConcreteCostHeaderList_View.js"/>
 		<jsScript file="views/ConcreteCostList_View.js"/>
 		<jsScript file="views/VehicleOwnerList_View.js"/>
+		<jsScript file="views/ShipmentCancelationList.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -3673,6 +3731,7 @@
 		<jsScript file="forms/ShipmentDialog_Form.js"/>
 		<jsScript file="forms/QuarryList_Form.js"/>
 		<jsScript file="forms/VehicleOwnerList_Form.js"/>
+		<jsScript file="forms/OrderList_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="custom_controls/App.enums.js"/>
@@ -3957,6 +4016,10 @@
 		<jsScript file="models/ConcreteTypeList_Model.js"/>
 		<jsScript file="models/VehicleOwner_Model.js"/>
 		<jsScript file="controllers/VehicleOwner_Controller.js"/>
+		<jsScript file="models/ShipmentCancelations_Model.js"/>
+		<jsScript file="controllers/ShipmentCancelation_Controller.js"/>
+		<jsScript file="models/ShipmentCancelation_Model.js"/>
+		<jsScript file="models/ShipmentCancelationList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

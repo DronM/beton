@@ -166,6 +166,15 @@ function OrderList_Model(options){
 	
 	options.fields.user_id = new FieldInt("user_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.orders_ref = new FieldJSON("orders_ref",filed_options);
+	
 		OrderList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderList_Model,ModelXML);

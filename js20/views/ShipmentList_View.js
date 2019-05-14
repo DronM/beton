@@ -144,7 +144,20 @@ function ShipmentList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:id",{
+						new GridCellHead(id+":grid:head:ship_date_time",{
+							"value":"Дата",
+							"colAttrs":{"align":"center"},
+							"columns":[
+								new GridColumnDate({
+									"field":model.getField("ship_date_time"),
+									"dateFormat":"d/m/y H:i"
+								})
+							],
+							"sortable":true,
+							"sort":"desc"
+						})
+					
+						,new GridCellHead(id+":grid:head:id",{
 							"value":"Номер",
 							"colAttrs":{"clign":"center"},
 							"columns":[
@@ -164,43 +177,6 @@ function ShipmentList_View(id,options){
 										"field":new FieldInt("production_site_id"),
 										"searchType":"on_match"
 									}
-								})
-							],
-							"sortable":true
-						})
-				
-						,new GridCellHead(id+":grid:head:ship_date_time",{
-							"value":"Дата",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumnDate({
-									"field":model.getField("ship_date_time"),
-									"dateFormat":"d/m/y H:i"
-								})
-							],
-							"sortable":true,
-							"sort":"desc"
-						})
-						,new GridCellHead(id+":grid:head:concrete_types_ref",{
-							"value":"Марка",
-							"colAttrs":{"clign":"center"},
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("concrete_types_ref"),
-									"ctrlClass":ConcreteTypeEdit,
-									"searchOptions":{
-										"field":new FieldInt("concrete_type_id"),
-										"searchType":"on_match"
-									}									
-								})
-							],
-							"sortable":true
-						})
-						,new GridCellHead(id+":grid:head:vehicle_owners_ref",{
-							"value":"Владелец ТС",
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("vehicle_owners_ref")
 								})
 							],
 							"sortable":true
@@ -237,6 +213,31 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
+										
+						,new GridCellHead(id+":grid:head:concrete_types_ref",{
+							"value":"Марка",
+							"colAttrs":{"clign":"center"},
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("concrete_types_ref"),
+									"ctrlClass":ConcreteTypeEdit,
+									"searchOptions":{
+										"field":new FieldInt("concrete_type_id"),
+										"searchType":"on_match"
+									}									
+								})
+							],
+							"sortable":true
+						})
+						,new GridCellHead(id+":grid:head:quant",{
+							"value":"Количество",
+							"colAttrs":{"align":"right"},
+							"columns":[
+								new GridColumn({
+									"field":model.getField("quant")
+								})
+							]
+						})
 						,new GridCellHead(id+":grid:head:vehicles_ref",{
 							"value":"ТС",
 							"colAttrs":{"align":"center"},
@@ -267,29 +268,37 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:shipped",{
-							"value":"Отгружено",
-							"colAttrs":{"align":"center"},
+						
+						,new GridCellHead(id+":grid:head:vehicle_owners_ref",{
+							"value":"Владелец ТС",
 							"columns":[
-								new GridColumnBool({
-									"field":model.getField("shipped")
+								new GridColumnRef({
+									"field":model.getField("vehicle_owners_ref")
 								})
-							]
+							],
+							"sortable":true
 						})
-
-
-					
-						,new GridCellHead(id+":grid:head:quant",{
-							"value":"Количество",
-							"colAttrs":{"align":"right"},
+						,new GridCellHead(id+":grid:head:acc_comment",{
+							"value":"Бух.коммент.",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("quant")
+									"field":model.getField("acc_comment")
+								})
+							]
+						})						
+						,new GridCellHead(id+":grid:head:demurrage",{
+							"value":"Время простоя",
+							"colAttrs":{"align":"center"},
+							"columns":[
+								new GridColumnDate({
+									"field":model.getField("demurrage"),
+									"dateFormat":"H:i"
 								})
 							]
 						})
+						
 						,new GridCellHead(id+":grid:head:cost",{
-							"value":"Стоимость",
+							"value":"Доставка",
 							"colAttrs":{"align":"right"},
 							"columns":[
 								new GridColumnFloat({
@@ -307,16 +316,44 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:demurrage",{
-							"value":"Время простоя",
-							"colAttrs":{"align":"center"},
+						,new GridCellHead(id+":grid:head:pump_cost",{
+							"value":"Стоим.насос",
+							"colAttrs":{"align":"right"},
 							"columns":[
-								new GridColumnDate({
-									"field":model.getField("demurrage"),
-									"dateFormat":"H:i"
+								new GridColumnFloat({
+									"field":model.getField("pump_cost")									
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:pump_vehicles_ref",{
+							"value":"Насос",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("pump_vehicles_ref"),
+									"ctrlClass":PumpVehicleEdit,
+									"searchOptions":{
+										"field":new FieldInt("pump_vehicle_id"),
+										"searchType":"on_match"
+									}																										
+								})
+							],
+							"sortable":true
+						})						
+						,new GridCellHead(id+":grid:head:pump_vehicles_owners_ref",{
+							"value":"Насос,влад.",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("pump_vehicles_owners_ref"),
+									"ctrlClass":VehicleOwnerEdit,
+									"searchOptions":{
+										"field":new FieldInt("pump_vehicle_owner_id"),
+										"searchType":"on_match"
+									}																										
+								})
+							],
+							"sortable":true
+						})						
+						
 						,new GridCellHead(id+":grid:head:client_mark",{
 							"value":"Баллы",
 							"colAttrs":{"align":"center"},
@@ -361,7 +398,7 @@ function ShipmentList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":"10"
+							"colSpan":"6"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
@@ -369,6 +406,10 @@ function ShipmentList_View(id,options){
 							"calcFieldId":"quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
+						,new GridCell(id+":grid:foot:total_sp2",{
+							"colSpan":"5"
+						})											
+						
 						,new GridCellFoot(id+":grid:foot:tot_cost",{
 							"attrs":{"align":"right"},
 							"calcOper":"sum",
@@ -382,9 +423,15 @@ function ShipmentList_View(id,options){
 							"calcFieldId":"demurrage_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_demurrage_cost"})
 						})						
+						,new GridCellFoot(id+":grid:foot:tot_pump_cost",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"pump_cost",
+							"gridColumn":new GridColumnFloat({"id":"tot_pump_cost"})
+						})						
 					
-						,new GridCell(id+":grid:foot:total_sp2",{
-							"colSpan":"4"
+						,new GridCell(id+":grid:foot:total_sp3",{
+							"colSpan":"5"
 						})						
 					]
 				})		

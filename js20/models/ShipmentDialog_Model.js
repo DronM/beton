@@ -130,6 +130,15 @@ function ShipmentDialog_Model(options){
 	
 	options.fields.blanks_exist = new FieldBool("blanks_exist",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Комментарий бухгалетрии';
+	filed_options.autoInc = false;	
+	
+	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
+	
 			
 		ShipmentDialog_Model.superclass.constructor.call(this,id,options);
 }

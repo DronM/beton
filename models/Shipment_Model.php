@@ -8,6 +8,7 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
@@ -142,6 +143,14 @@ class Shipment_Model extends ModelSQLBeton{
 				
 		$f_owner_agreed_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_agreed_date_time",$f_opts);
 		$this->addField($f_owner_agreed_date_time);
+		//********************
+		
+		//*** Field acc_comment ***
+		$f_opts = array();
+		$f_opts['id']="acc_comment";
+				
+		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
+		$this->addField($f_acc_comment);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

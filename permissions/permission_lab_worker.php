@@ -118,6 +118,8 @@ $permissions = array();
 				
 					$permissions['Order_Controller_set_payed']=TRUE;
 				
+					$permissions['Order_Controller_complete']=TRUE;
+				
 					$permissions['Driver_Controller_insert']=TRUE;
 				
 					$permissions['Driver_Controller_update']=TRUE;
@@ -265,6 +267,10 @@ $permissions = array();
 					$permissions['Shipment_Controller_get_time_list']=TRUE;
 				
 					$permissions['Shipment_Controller_set_blanks_exist']=TRUE;
+				
+					$permissions['Shipment_Controller_delete_shipped']=TRUE;
+				
+					$permissions['Shipment_Controller_delete_assigned']=TRUE;
 				
 					$permissions['User_Controller_insert']=TRUE;
 				
@@ -849,6 +855,16 @@ $permissions = array();
 					$permissions['VehicleOwner_Controller_get_object']=TRUE;
 				
 					$permissions['VehicleOwner_Controller_complete']=TRUE;
+				
+					$permissions['ShipmentCancelation_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentCancelation_Controller_update']=TRUE;
+				
+					$permissions['ShipmentCancelation_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentCancelation_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentCancelation_Controller_get_object']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

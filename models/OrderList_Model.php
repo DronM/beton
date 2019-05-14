@@ -178,6 +178,15 @@ class OrderList_Model extends ModelSQLBeton{
 		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
 		$this->addField($f_user_id);
 		//********************
+		
+		//*** Field orders_ref ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="orders_ref";
+				
+		$f_orders_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"orders_ref",$f_opts);
+		$this->addField($f_orders_ref);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

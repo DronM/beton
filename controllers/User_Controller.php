@@ -55,7 +55,7 @@ class User_Controller extends ControllerSQL{
 				,array('required'=>TRUE));
 		$pm->addParam($param);
 		
-				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor'
+				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
 		$param = new FieldExtString('email'
@@ -107,7 +107,7 @@ class User_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor'
+				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner'
 				,array(
 			));
 			$pm->addParam($param);

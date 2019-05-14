@@ -73,6 +73,10 @@ function ShipmentDialog_View(id,options){
 			"labelCaption":"Простой:"
 		}));	
 
+		this.addElement(new EditText(id+":acc_comment",{
+			"labelCaption":"Комментарий бухгалтерии:"
+		}));	
+
 	}
 	
 	ShipmentDialog_View.superclass.constructor.call(this,id,options);
@@ -90,6 +94,7 @@ function ShipmentDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("client_mark")})
 		,new DataBinding({"control":this.getElement("blanks_exist")})
 		,new DataBinding({"control":this.getElement("demurrage")})
+		,new DataBinding({"control":this.getElement("acc_comment")})
 	]);
 	
 	//write
@@ -97,6 +102,7 @@ function ShipmentDialog_View(id,options){
 		new CommandBinding({"control":this.getElement("client_mark")})
 		,new CommandBinding({"control":this.getElement("blanks_exist")})
 		,new CommandBinding({"control":this.getElement("demurrage")})
+		,new CommandBinding({"control":this.getElement("acc_comment")})
 	]);
 	
 }

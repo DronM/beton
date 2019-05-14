@@ -55,6 +55,7 @@ function Enum_role_types(id,options){
 ,"ru_sales":"Реализация"
 ,"ru_plant_director":"Нач.базы"
 ,"ru_supervisor":"Смотрящий"
+,"ru_vehicle_owner":"Владелец траспорта"
 };
 	options.options = [{"value":"owner",
 "descr":multy_lang_values[window.getApp().getLocale()+"_"+"owner"],
@@ -89,6 +90,9 @@ checked:(options.defaultValue&&options.defaultValue=="plant_director")}
 ,{"value":"supervisor",
 "descr":multy_lang_values[window.getApp().getLocale()+"_"+"supervisor"],
 checked:(options.defaultValue&&options.defaultValue=="supervisor")}
+,{"value":"vehicle_owner",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"vehicle_owner"],
+checked:(options.defaultValue&&options.defaultValue=="vehicle_owner")}
 ];
 	
 	Enum_role_types.superclass.constructor.call(this,id,options);

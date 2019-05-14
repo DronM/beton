@@ -65,6 +65,8 @@ function EnumGridColumn_role_types(options){
 	options.multyLangValues["ru"]["plant_director"] = "Нач.базы";
 
 	options.multyLangValues["ru"]["supervisor"] = "Смотрящий";
+
+	options.multyLangValues["ru"]["vehicle_owner"] = "Владелец траспорта";
 EnumGridColumn_role_types.superclass.constructor.call(this,options);
 	
 }

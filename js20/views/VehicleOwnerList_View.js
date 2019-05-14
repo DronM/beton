@@ -16,8 +16,8 @@ function VehicleOwnerList_View(id,options){
 	this.addElement(new GridAjx(id+":grid",{
 		"model":model,
 		"controller":contr,
-		"editInline":false,
-		"editWinClass":VehicleDialog_Form,
+		"editInline":true,
+		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd"),		
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
@@ -28,7 +28,11 @@ function VehicleOwnerList_View(id,options){
 							"value":"Владелец",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("name")
+									"field":model.getField("name"),
+									"ctrlClass":EditString,
+									"ctrlOptions":{
+										"maxLength":"150"
+									}
 								})
 							],
 							"sortable":true,

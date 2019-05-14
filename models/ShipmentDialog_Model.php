@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
@@ -138,6 +139,16 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 				
 		$f_blanks_exist=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"blanks_exist",$f_opts);
 		$this->addField($f_blanks_exist);
+		//********************
+		
+		//*** Field acc_comment ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Комментарий бухгалетрии';
+		$f_opts['id']="acc_comment";
+				
+		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
+		$this->addField($f_acc_comment);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

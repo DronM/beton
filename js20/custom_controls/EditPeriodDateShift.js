@@ -40,6 +40,11 @@ EditPeriodDateShift.prototype.setPredefinedPeriod = function(per){
 		this.setCtrlDateTime(this.getControlFrom(),DateHelper.dateStart());
 		this.setCtrlDateTime(this.getControlTo(),new Date(DateHelper.dateStart().getTime()+24*60*60*1000));
 	}				
+	else if (per=="prev_shift"){
+		this.setCtrlDateTime(this.getControlFrom(),DateHelper.dateStart(new Date(DateHelper.time().getTime()-24*60*60*1000)));
+		this.setCtrlDateTime(this.getControlTo(),new Date(DateHelper.dateStart().getTime()));
+	}				
+	
 	EditPeriodDateShift.superclass.setPredefinedPeriod.call(this,per);
 }
 
@@ -57,6 +62,11 @@ EditPeriodDateShift.prototype.go = function(sign){
 		this.addDaysToControl(this.getControlFrom(),1*sign);
 		this.addDaysToControl(this.getControlTo(),1*sign);	
 	}	
+	else if (this.getControlPeriodSelect().getValue()=="prev_shift"){
+		this.addDaysToControl(this.getControlFrom(),2*sign);
+		this.addDaysToControl(this.getControlTo(),2*sign);	
+	}	
+	
 	else{
 		EditPeriodDateShift.superclass.go.call(this,sign);	
 	}

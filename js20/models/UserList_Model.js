@@ -48,7 +48,7 @@ function UserList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.role_id = new FieldEnum("role_id",filed_options);
-	filed_options.enumValues = 'admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor';
+	filed_options.enumValues = 'admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner';
 	
 				
 	

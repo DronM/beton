@@ -135,6 +135,15 @@ function Shipment_Model(options){
 	
 	options.fields.owner_agreed_date_time = new FieldDateTimeTZ("owner_agreed_date_time",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
+	
 			
 			
 			

@@ -177,8 +177,8 @@ EditPeriodShift.prototype.setPredefinedPeriod = function(per){
 		this.setCtrlDateTime(this.getControlTo(),new Date(DateHelper.dateStart().getTime()+24*60*60*1000));
 	}				
 	else if (per=="prev_shift"){
-		this.setCtrlDateTime(this.getControlFrom(),DateHelper.dateStart(new Date(DateHelper.time().getTime()-24*60*60-1000)));
-		this.setCtrlDateTime(this.getControlTo(),new Date(DateHelper.dateStart().getTime()+24*60*60*1000));
+		this.setCtrlDateTime(this.getControlFrom(),DateHelper.dateStart(new Date(DateHelper.time().getTime()-24*60*60*1000)));
+		this.setCtrlDateTime(this.getControlTo(),new Date(DateHelper.dateStart().getTime()));
 	}				
 	
 	EditPeriodShift.superclass.setPredefinedPeriod.call(this,per);

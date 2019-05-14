@@ -44,28 +44,55 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Количество';
+	filed_options.alias = 'Завод';
 	filed_options.autoInc = false;	
 	
-	options.fields.quant = new FieldFloat("quant",filed_options);
+	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Стоимость доставки';
+	
 	filed_options.autoInc = false;	
 	
-	options.fields.cost = new FieldFloat("cost",filed_options);
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Отгружен';
+	
 	filed_options.autoInc = false;	
 	
-	options.fields.shipped = new FieldBool("shipped",filed_options);
+	options.fields.client_id = new FieldInt("client_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Клиент';
+	filed_options.autoInc = false;	
+	
+	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Объект';
+	filed_options.autoInc = false;	
+	
+	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.destination_id = new FieldInt("destination_id",filed_options);
 	
 				
 	
@@ -89,10 +116,10 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Владелец';
+	filed_options.alias = 'Количество';
 	filed_options.autoInc = false;	
 	
-	options.fields.vehicle_owners_ref = new FieldJSON("vehicle_owners_ref",filed_options);
+	options.fields.quant = new FieldFloat("quant",filed_options);
 	
 				
 	
@@ -134,37 +161,28 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Объект';
+	
 	filed_options.autoInc = false;	
 	
-	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
+	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Владелец';
 	filed_options.autoInc = false;	
 	
-	options.fields.destination_id = new FieldInt("destination_id",filed_options);
+	options.fields.vehicle_owners_ref = new FieldJSON("vehicle_owners_ref",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Комментарий бухгалетрии';
 	filed_options.autoInc = false;	
 	
-	options.fields.client_id = new FieldInt("client_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Клиент';
-	filed_options.autoInc = false;	
-	
-	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
+	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
 	
 				
 	
@@ -179,10 +197,73 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость доставки';
+	filed_options.autoInc = false;	
+	
+	options.fields.cost = new FieldFloat("cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Стомость простоя';
 	filed_options.autoInc = false;	
 	
 	options.fields.demurrage_cost = new FieldFloat("demurrage_cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_cost = new FieldFloat("pump_cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicles_ref = new FieldJSON("pump_vehicles_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'TRUE';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_id = new FieldInt("pump_vehicle_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Насос,владелец';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicles_owners_ref = new FieldJSON("pump_vehicles_owners_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'TRUE';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_owner_id = new FieldInt("pump_vehicle_owner_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.shipped = new FieldBool("shipped",filed_options);
 	
 				
 	
@@ -219,24 +300,6 @@ function ShipmentList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Завод';
-	filed_options.autoInc = false;	
-	
-	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
 	
 			
 		ShipmentList_Model.superclass.constructor.call(this,id,options);

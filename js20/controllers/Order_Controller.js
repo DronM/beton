@@ -37,6 +37,7 @@ function Order_Controller(options){
 	this.add_get_comment();
 	this.add_fields_from_client_order();
 	this.add_set_payed();
+	this.addComplete();
 		
 }
 extend(Order_Controller,ControllerObjServer);
@@ -437,6 +438,9 @@ extend(Order_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("user_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("orders_ref",f_opts));
 }
 
 			Order_Controller.prototype.addGetObject = function(){
@@ -597,6 +601,16 @@ extend(Order_Controller,ControllerObjServer);
 	
 			
 	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.addComplete = function(){
+	Order_Controller.superclass.addComplete.call(this);
+	
+	var f_opts = {};
+	f_opts.alias = "";
+	var pm = this.getComplete();
+	pm.addField(new FieldString("number",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("number");	
 }
 
 		

@@ -1,101 +1,32 @@
--- View: public.orders_make_list
+-- View: orders_list
 
--- DROP VIEW public.orders_make_list;
+-- DROP VIEW orders_list;
 
-CREATE OR REPLACE VIEW public.orders_make_list AS 
+CREATE OR REPLACE VIEW orders_list AS 
 	SELECT
 		o.id,
+		order_num(o.*) AS number,
 		clients_ref(cl) AS clients_ref,
+		o.client_id,
 		destinations_ref(d) AS destinations_ref,
+		o.destination_id,
 		concrete_types_ref(concr) AS concrete_types_ref,
-		o.comment_text,
-		o.descr,
+		o.concrete_type_id,
+		o.unload_type AS unload_type,
+		o.comment_text AS comment_text,
+		o.descr AS descr,
 		o.phone_cel,
-		o.unload_speed,
 		o.date_time,
-		o.date_time_to,
 		o.quant,
+		users_ref(u) AS users_ref,
+		o.user_id,
+		orders_ref(o) AS orders_ref
 		
-		o.quant - COALESCE(
-			( SELECT
-				sum(shipments.quant) AS sum
-			FROM shipments
-			WHERE shipments.order_id = o.id AND shipments.shipped
-			), 0::double precision)
-		AS quant_rest,
-		
-		CASE
-		WHEN o.date_time::time without time zone >= const_first_shift_start_time_val()
-			AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
-			AND o.date_time_to::time without time zone >= const_first_shift_start_time_val()
-			AND o.date_time_to::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
-				THEN o.quant
-		WHEN o.date_time::time without time zone >= const_first_shift_start_time_val()
-			AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
-			AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
-				THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, o.date_time::date + (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) - o.date_time) / 60::double precision))::numeric, 2)::double precision
-		ELSE 0::double precision
-		END AS quant_ordered_day,
-		
-		CASE
-			WHEN now()::timestamp without time zone > o.date_time AND now()::timestamp without time zone < o.date_time_to THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, now()::timestamp without time zone::timestamp with time zone - o.date_time::timestamp with time zone) / 60::double precision))::numeric, 2)::double precision
-			WHEN now()::timestamp without time zone > o.date_time_to THEN o.quant
-			ELSE 0::double precision
-		END AS quant_ordered_before_now,
-		
-		(SELECT
-			COALESCE(sum(shipments.quant), 0::double precision) AS sum
-		FROM shipments
-		WHERE shipments.order_id = o.id AND shipments.ship_date_time < now()::timestamp without time zone
-		) AS quant_shipped_before_now,
-		
-		(SELECT
-			COALESCE(sum(shipments.quant), 0::double precision) AS sum
-		FROM shipments
-		WHERE shipments.order_id = o.id AND shipments.ship_date_time::time without time zone >= constant_first_shift_start_time()
-			AND shipments.ship_date_time::time without time zone <= (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
-		) AS quant_shipped_day_before_now,
-		
-		CASE
-			WHEN (o.quant - COALESCE(
-				(SELECT
-					sum(shipments.quant) AS sum
-				FROM shipments
-				WHERE shipments.order_id = o.id AND shipments.shipped = true
-				), 0::double precision)
-				) > 0::double precision
-				AND (now()::timestamp without time zone::timestamp with time zone - (( SELECT shipments.ship_date_time
-			FROM shipments
-			WHERE shipments.order_id = o.id AND shipments.shipped = true
-			ORDER BY shipments.ship_date_time DESC
-			LIMIT 1))::timestamp with time zone) > const_ord_mark_if_no_ship_time_val()::interval THEN TRUE
-			ELSE FALSE
-		END AS no_ship_mark,
-		
-		o.payed,
-		o.under_control,
-		o.pay_cash,
-		
-		CASE
-		    WHEN o.pay_cash THEN o.total
-		    ELSE 0::numeric
-		END AS total, 
-		
-		vh.owner AS pump_vehicle_owner,
-		o.unload_type,
-		vehicle_owners_ref(v_own) AS pump_vehicle_owners_ref,
-		pvh.pump_length AS pump_vehicle_length,
-		pvh.comment_text AS pump_vehicle_comment
-		
-		
-	FROM orders o
-	LEFT JOIN clients cl ON cl.id = o.client_id
-	LEFT JOIN destinations d ON d.id = o.destination_id
-	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
-	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
-	LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
-	LEFT JOIN vehicle_owners v_own ON v_own.id = vh.vehicle_owner_id
-	ORDER BY o.date_time;
+   FROM orders o
+   LEFT JOIN clients cl ON cl.id = o.client_id
+   LEFT JOIN destinations d ON d.id = o.destination_id
+   LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+   LEFT JOIN users u ON u.id = o.user_id
+  ORDER BY o.date_time DESC;
 
-ALTER TABLE public.orders_make_list OWNER TO beton;
-
+ALTER TABLE orders_list OWNER TO beton;

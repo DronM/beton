@@ -98,6 +98,9 @@ class Shipment_Controller extends ControllerSQL{
 		$param = new FieldExtDateTimeTZ('owner_agreed_date_time'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtText('acc_comment'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -177,6 +180,10 @@ class Shipment_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtDateTimeTZ('owner_agreed_date_time'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtText('acc_comment'
 				,array(
 			));
 			$pm->addParam($param);
@@ -395,6 +402,24 @@ class Shipment_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtString('barcode',$opts));
 	
 			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('delete_shipped');
+		
+				
+	$opts=array();
+	
+		$opts['length']=500;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtString('comment_text',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('delete_assigned');
+		
 		$this->addPublicMethod($pm);
 
 		
@@ -823,5 +848,11 @@ class Shipment_Controller extends ControllerSQL{
 	public function get_assigned_vehicle_list($pm){
 		$this->addModel(self::getAssigningModel($this->getDbLink()));
 	}
+	
+	public function delete_shipped($pm){
+	}
+	public function delete_assigned($pm){
+	}
+	
 }
 ?>
