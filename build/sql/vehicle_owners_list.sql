@@ -12,4 +12,4 @@ CREATE OR REPLACE VIEW vehicle_owners_list AS
 	ORDER BY own.name
 	;
 	
-ALTER VIEW vehicle_owners_list OWNER TO beton;
+ALTER VIEW vehicle_owners_list OWNER TO ;

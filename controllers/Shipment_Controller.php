@@ -516,7 +516,7 @@ class Shipment_Controller extends ControllerSQL{
 		
 		//barcode
 		$shipment_id = $this->getExtVal($pm,'id');
-		$barcode_descr = '0'.$shipment_id.substr('000000000000',1,12-strlen($shipment_id)-1);
+		$barcode_descr = '0'.substr('000000000000',1,12-strlen($shipment_id)-1).$shipment_id;
 		$barcode_descr = $barcode_descr.EAN_check_sum($barcode_descr,13);
 		//**** Генерация баркода ****
 		$colorFont = new BCGColor(0, 0, 0);

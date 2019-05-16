@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-14 06:03:18</lastBuild></version>
+		<lastBuild>2019-05-16 06:27:10</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -31,6 +31,7 @@
 		<version dateOpen="2019-05-13 09:05:45" dateClose="2019-05-13 10:05:21">1.00125</version>
 		<version dateOpen="2019-05-13 10:05:21" dateClose="2019-05-13 11:05:08">1.00126</version>
 		<version dateOpen="2019-05-13 11:05:21" dateClose="2019-05-14 06:05:03">1.00127</version>
+		<version dateOpen="2019-05-14 06:05:03" dateClose="2019-05-16 06:05:27">1.00128</version>
 	</versions>
 	<enums>
 		<enum id="locales">
@@ -1402,9 +1403,6 @@
 		<model id="VehicleMakeList" parent="ModelSQLBeton" dataTable="vehicle_make_list_view" virtual="TRUE">
 			<field id="make" dataType="String"/>
 		</model>
-		<model id="VehicleOwnerList" parent="ModelSQLBeton" dataTable="vehicle_owner_list_view" virtual="TRUE">
-			<field id="owner" dataType="String"/>
-		</model>
 		<model id="LabData" parent="ModelSQLBeton" dataTable="lab_data" virtual="FALSE">
 			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
 			<field id="ok_sm" dataType="Float" alias="ОК см"/>
@@ -2131,9 +2129,15 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="name" dataType="String" length="150" required="TRUE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
 			<index id="vehicle_owners_name_idx">
 				<expression>lower(name)</expression>
 			</index>
+		</model>
+		<model id="VehicleOwnerList" parent="ModelSQLBeton" dataTable="vehicle_owners_list" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="name" dataType="String"/>
+			<field id="clients_ref" dataType="JSON"/>
 		</model>
 	</models>
 	<constants>
@@ -3025,8 +3029,8 @@
 			<publicMethod id="insert" modelId="VehicleOwner"/>
 			<publicMethod id="update" modelId="VehicleOwner"/>
 			<publicMethod id="delete" modelId="VehicleOwner"/>
-			<publicMethod id="get_list" modelId="VehicleOwner"/>
-			<publicMethod id="get_object" modelId="VehicleOwner"/>
+			<publicMethod id="get_list" modelId="VehicleOwnerList"/>
+			<publicMethod id="get_object" modelId="VehicleOwnerList"/>
 			<publicMethod id="complete" modelId="VehicleOwner" patternFieldId="name"/>
 		</controller>
 		<controller id="ShipmentCancelation" parentId="ControllerSQL" state="TRUE">

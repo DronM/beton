@@ -30,6 +30,9 @@ class VehicleOwner_Controller extends ControllerSQL{
 		$param = new FieldExtString('name'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
+		$param = new FieldExtInt('client_id'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -49,6 +52,10 @@ class VehicleOwner_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('name'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('client_id'
 				,array(
 			));
 			$pm->addParam($param);
@@ -89,7 +96,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 
 		$this->addPublicMethod($pm);
 		
-		$this->setListModelId('VehicleOwner_Model');
+		$this->setListModelId('VehicleOwnerList_Model');
 		
 			
 		/* get_object */
@@ -101,7 +108,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 		
 		
 		$this->addPublicMethod($pm);
-		$this->setObjectModelId('VehicleOwner_Model');		
+		$this->setObjectModelId('VehicleOwnerList_Model');		
 
 			
 		/* complete  */

@@ -5,7 +5,7 @@ function VehicleOwnerList_View(id,options){
 
 	VehicleOwnerList_View.superclass.constructor.call(this,id,options);
 
-	var model = options.models.VehicleOwner_Model;
+	var model = options.models.VehicleOwnerList_Model;
 	var contr = new VehicleOwner_Controller();
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
@@ -38,6 +38,21 @@ function VehicleOwnerList_View(id,options){
 							"sortable":true,
 							"sort":"asc"														
 						})
+						,new GridCellHead(id+":grid:head:clients_ref",{
+							"value":"Клиент",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("clients_ref"),
+									"ctrlClass":ClientEdit,
+									"ctrlBindFieldId":"client_id",
+									"ctrlOptions":{
+										"labelCaption":""
+									}
+								})
+							],
+							"sortable":true
+						})
+						
 					]
 				})
 			]

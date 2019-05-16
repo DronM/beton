@@ -260,11 +260,20 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					
 					//перенос всех контактов!!!
 					$l->query(sprintf(
-					"UPDATE client_tels
-					SET client_id=%d
-					WHERE client_id=%d",
-					$client_id,
-					$contact_client_id
+						"UPDATE client_tels
+						SET
+							client_id=%d
+						WHERE client_id=%d
+						AND NOT EXISTS (
+						   SELECT 1 FROM client_tels AS t WHERE t.client_id=%d AND t.tel=client_tels.tel
+						)",
+						$client_id,
+						$contact_client_id,
+						$client_id
+					));
+					$l->query(sprintf(
+						"DELETE FROM client_tels WHERE client_id=%d",
+						$contact_client_id
 					));
 															
 				}

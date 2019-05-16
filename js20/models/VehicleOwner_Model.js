@@ -45,6 +45,15 @@ function VehicleOwner_Model(options){
 	options.fields.name.getValidator().setRequired(true);
 	options.fields.name.getValidator().setMaxLength('150');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_id = new FieldInt("client_id",filed_options);
+	
 			
 		VehicleOwner_Model.superclass.constructor.call(this,id,options);
 }

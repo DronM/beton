@@ -26,14 +26,14 @@ BEGIN
 		END IF;
 
 		IF (char_length(v_search)>3) THEN
-			v_search = format_cel_phone(RIGHT(v_search,10));
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
 				
 			NEW.client_id = (
 				SELECT
 					client_tels.client_id
 				FROM client_tels
 				LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
-				WHERE client_tels.tel=v_search
+				WHERE client_tels.tel=v_search OR client_tels.tel=format_cel_phone(RIGHT(v_search,10))
 				ORDER BY ast_calls.dt DESC NULLS LAST
 				LIMIT 1			
 			);
@@ -52,14 +52,14 @@ BEGIN
 				v_search = NEW.caller_id_num;
 				
 				IF (char_length(v_search)>3) THEN
-					v_search = format_cel_phone(RIGHT(v_search,10));
+					--!!!v_search = format_cel_phone(RIGHT(v_search,10));
 				
 					NEW.client_id = (
 						SELECT
 							client_tels.client_id
 						FROM client_tels
 						LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
-						WHERE client_tels.tel=v_search
+						WHERE client_tels.tel=v_search OR client_tels.tel=format_cel_phone(RIGHT(v_search,10))
 						ORDER BY ast_calls.dt DESC NULLS LAST
 						LIMIT 1			
 					);

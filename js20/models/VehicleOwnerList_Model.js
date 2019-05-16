@@ -25,11 +25,29 @@ function VehicleOwnerList_Model(options){
 				
 	
 	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.id = new FieldInt("id",filed_options);
+	
+				
+	
+	var filed_options = {};
 	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.owner = new FieldString("owner",filed_options);
+	options.fields.name = new FieldString("name",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
 	
 		VehicleOwnerList_Model.superclass.constructor.call(this,id,options);
 }

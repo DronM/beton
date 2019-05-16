@@ -108,13 +108,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$_SESSION['user_id']		= $ar['id'];
 		$_SESSION['user_name']		= $ar['name'];
 		$_SESSION['role_id']		= $ar['role_id'];
-		$_SESSION['locale_id'] 		= $ar['locale_id'];
+		$_SESSION['locale_id'] 		= 'ru';
 		$_SESSION['user_time_locale'] 	= $ar['user_time_locale'];
 		$_SESSION['tel_ext'] 		= $ar['tel_ext'];
 		if(isset($ar['production_sites_ref'])){
-			$production_site_id = intval(json_decode($ar['production_sites_ref'])->keys->id);
-		}
-		$_SESSION['production_site_id']	= $production_site_id;
+			$_SESSION['production_site_id']	= intval(json_decode($ar['production_sites_ref'])->keys->id);
+		}		
 		
 		//global filters				
 		

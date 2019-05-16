@@ -177,7 +177,6 @@
 <li><a href="#SMSPatternList_Model">SMSPatternList_Model</a></li>
 <li><a href="#VehicleFeatureList_Model">VehicleFeatureList_Model</a></li>
 <li><a href="#VehicleMakeList_Model">VehicleMakeList_Model</a></li>
-<li><a href="#VehicleOwnerList_Model">VehicleOwnerList_Model</a></li>
 <li><a href="#LabData_Model">LabData_Model</a></li>
 <li><a href="#LabDataList_Model">LabDataList_Model</a></li>
 <li><a href="#LabEntry_Model">LabEntry_Model</a></li>
@@ -245,6 +244,7 @@
 <li><a href="#ConcreteCost_Model">ConcreteCost_Model</a></li>
 <li><a href="#ConcreteCostList_Model">ConcreteCostList_Model</a></li>
 <li><a href="#VehicleOwner_Model">VehicleOwner_Model</a></li>
+<li><a href="#VehicleOwnerList_Model">VehicleOwnerList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -2285,8 +2285,8 @@
 <a href="#VehicleOwner_Model">Model: VehicleOwner_Model</a><h2>update</h2>
 <a href="#VehicleOwner_Model">Model: VehicleOwner_Model</a><h2>delete</h2>
 <a href="#VehicleOwner_Model">Model: VehicleOwner_Model</a><h2>get_list</h2>
-<a href="#VehicleOwner_Model">Model: VehicleOwner_Model</a><h2>get_object</h2>
-<a href="#VehicleOwner_Model">Model: VehicleOwner_Model</a><h2>complete</h2>
+<a href="#VehicleOwnerList_Model">Model: VehicleOwnerList_Model</a><h2>get_object</h2>
+<a href="#VehicleOwnerList_Model">Model: VehicleOwnerList_Model</a><h2>complete</h2>
 <a href="#VehicleOwner_Model">Model: VehicleOwner_Model</a>
 </div>
 </div>
@@ -10080,14 +10080,32 @@
 <div>Required:TRUE</div>
 <div>Length:150</div>
 <div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleOwnerList_Model" class="content_box">
 <h1>VehicleOwnerList_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
-<h2>owner</h2>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

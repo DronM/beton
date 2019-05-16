@@ -19,8 +19,8 @@
 
 function VehicleOwner_Controller(options){
 	options = options || {};
-	options.listModelClass = VehicleOwner_Model;
-	options.objModelClass = VehicleOwner_Model;
+	options.listModelClass = VehicleOwnerList_Model;
+	options.objModelClass = VehicleOwnerList_Model;
 	VehicleOwner_Controller.superclass.constructor.call(this,options);	
 	
 	//methods
@@ -51,6 +51,12 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldInt("client_id",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -72,6 +78,12 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldString("name",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("client_id",options);
 	
 	pm.addField(field);
 	
@@ -109,8 +121,9 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldString("name",f_opts));
-	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
+	var f_opts = {};
 	
+	pm.addField(new FieldJSON("clients_ref",f_opts));
 }
 
 			VehicleOwner_Controller.prototype.addGetObject = function(){
