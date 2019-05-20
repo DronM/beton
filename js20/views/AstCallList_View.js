@@ -100,7 +100,6 @@ function AstCallList_View(id,options){
 		}
 		
 	};
-	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
@@ -167,12 +166,8 @@ function AstCallList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("clients_ref"),
-									"form":Client_Form,
-									"ctrlClass":ClientEdit,
-									"searchOptions":{
-										"field":new FieldInt("client_id"),
-										"searchType":"on_match"
-									}									
+									"form":Client_Form
+									,"ctrlClass":ClientEdit
 								})
 							],
 							"sortable":true
@@ -231,11 +226,7 @@ function AstCallList_View(id,options){
 							"value":"Вид клиента",
 							"columns":[
 								new EnumGridColumn_client_kinds({
-									"field":model.getField("client_kind"),
-									"searchOptions":{
-										"field":new FieldInt("client_kind")
-									}									
-									
+									"field":model.getField("client_kind")
 								})
 							]
 						})
@@ -256,12 +247,7 @@ function AstCallList_View(id,options){
 							"value":"Звонок",
 							"columns":[
 								new EnumGridColumn_call_types({
-									"field":model.getField("call_type"),
-									"ctrlClass":EnumGridColumn_call_types,
-									"searchOptions":{
-										"field":new FieldString("call_type"),
-										"searchType":"on_match"
-									}																		
+									"field":model.getField("call_type")
 								})
 							]
 						})

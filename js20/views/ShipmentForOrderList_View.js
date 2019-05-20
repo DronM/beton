@@ -27,8 +27,10 @@ function ShipmentForOrderList_View(id,options){
 			"cmdSearch":false,
 			"cmdFilter":false,
 			"cmdAllCommands":false,
+			"cmdDelete":false,
 			"addCustomCommandsAfter":function(commands){
 				commands.push(new ShipmentGridCmdPrintInvoice(id+":grid:cmd:printInvoice"));
+				commands.push(new ShipmentGridCmdDelete(id+":grid:cmd:delete"));
 			}
 		}),
 		"onEventSetRowOptions":function(opts){

@@ -139,6 +139,16 @@ function ShipmentDialog_Model(options){
 	
 	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
+	
+			
 			
 		ShipmentDialog_Model.superclass.constructor.call(this,id,options);
 }

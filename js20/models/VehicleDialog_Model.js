@@ -126,6 +126,16 @@ function VehicleDialog_Model(options){
 	
 	options.fields.vehicle_owners_ref = new FieldJSONB("vehicle_owners_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
+	
+			
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(VehicleDialog_Model,ModelXML);

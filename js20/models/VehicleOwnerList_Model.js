@@ -49,6 +49,15 @@ function VehicleOwnerList_Model(options){
 	
 	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	
 		VehicleOwnerList_Model.superclass.constructor.call(this,id,options);
 }
 extend(VehicleOwnerList_Model,ModelXML);

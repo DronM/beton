@@ -18,7 +18,53 @@ $permissions = array();
 		
 			$permissions['User_Controller_logout']=TRUE;
 		
+			$permissions['User_Controller_logout_html']=TRUE;
+		
+			$permissions['User_Controller_get_profile']=TRUE;
+		
+			$permissions['User_Controller_update']=TRUE;
+		
 			$permissions['Captcha_Controller_get']=TRUE;
+		
+			$permissions['Shipment_Controller_get_list']=TRUE;
+		
+			$permissions['Shipment_Controller_owner_set_agreed']=TRUE;
+		
+			$permissions['Vehicle_Controller_get_list']=TRUE;
+		
+			$permissions['Vehicle_Controller_get_object']=TRUE;
+		
+			$permissions['Vehicle_Controller_vehicles_with_trackers']=TRUE;
+		
+			$permissions['Vehicle_Controller_get_current_position']=TRUE;
+		
+			$permissions['Vehicle_Controller_get_current_position_all']=TRUE;
+		
+			$permissions['Vehicle_Controller_get_track']=TRUE;
+		
+			$permissions['Vehicle_Controller_get_stops_at_dest']=TRUE;
+		
+			$permissions['Vehicle_Controller_complete']=TRUE;
+		
+			$permissions['PumpVehicle_Controller_get_list']=TRUE;
+		
+			$permissions['PumpVehicle_Controller_get_object']=TRUE;
+		
+			$permissions['Constant_Controller_get_values']=TRUE;
+		
+			$permissions['Weather_Controller_get_current']=TRUE;
+		
+			$permissions['ConcreteType_Controller_get_list']=TRUE;
+		
+			$permissions['ConcreteType_Controller_complete']=TRUE;
+		
+			$permissions['Destination_Controller_get_list']=TRUE;
+		
+			$permissions['Destination_Controller_complete_dest']=TRUE;
+		
+			$permissions['Driver_Controller_get_list']=TRUE;
+		
+			$permissions['ProductionSite_Controller_get_list']=TRUE;
 		
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

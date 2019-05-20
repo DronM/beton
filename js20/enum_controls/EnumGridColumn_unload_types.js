@@ -23,8 +23,14 @@ function EnumGridColumn_unload_types(options){
 	options.multyLangValues["ru"]["band"] = "лента";
 
 	options.multyLangValues["ru"]["none"] = "нет";
-EnumGridColumn_unload_types.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_unload_types;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_unload_types.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_unload_types,GridColumnEnum);
 

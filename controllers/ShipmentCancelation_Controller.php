@@ -37,6 +37,11 @@ class ShipmentCancelation_Controller extends ControllerSQL{
 				'alias'=>'Дата отгрузки'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('assign_date_time'
+				,array(
+				'alias'=>'Дата назначения'
+			));
+		$pm->addParam($param);
 		$param = new FieldExtInt('order_id'
 				,array('required'=>TRUE,
 				'alias'=>'Заявка'
@@ -55,6 +60,11 @@ class ShipmentCancelation_Controller extends ControllerSQL{
 		$param = new FieldExtInt('user_id'
 				,array(
 				'alias'=>'Пользователь'
+			));
+		$pm->addParam($param);
+		$param = new FieldExtFloat('quant'
+				,array(
+				'alias'=>'Количество'
 			));
 		$pm->addParam($param);
 		
@@ -89,6 +99,12 @@ class ShipmentCancelation_Controller extends ControllerSQL{
 				'alias'=>'Дата отгрузки'
 			));
 			$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('assign_date_time'
+				,array(
+			
+				'alias'=>'Дата назначения'
+			));
+			$pm->addParam($param);
 		$param = new FieldExtInt('order_id'
 				,array(
 			
@@ -111,6 +127,12 @@ class ShipmentCancelation_Controller extends ControllerSQL{
 				,array(
 			
 				'alias'=>'Пользователь'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('quant'
+				,array(
+			
+				'alias'=>'Количество'
 			));
 			$pm->addParam($param);
 		

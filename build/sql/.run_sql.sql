@@ -1,15 +1,27 @@
--- VIEW: vehicle_owners_list
+-- VIEW: shipment_cancelations_list
 
---DROP VIEW vehicle_owners_list;
+DROP VIEW shipment_cancelations_list;
 
-CREATE OR REPLACE VIEW vehicle_owners_list AS
+CREATE OR REPLACE VIEW shipment_cancelations_list AS
 	SELECT
-		own.id,
-		own.name,
-		clients_ref(cl) AS clients_ref
-	FROM vehicle_owners AS own
-	LEFT JOIN clients AS cl ON cl.id=own.client_id
-	ORDER BY own.name
+		sh.id,
+		sh.date_time,
+		sh.order_id,
+		orders_ref(o) AS orders_ref,
+		sh.vehicle_schedule_id,
+		vehicle_schedules_ref(vsch,vh,dr) AS vehicle_schedules_ref,
+		sh.comment_text,
+		sh.user_id,
+		users_ref(u) AS users_ref,
+		sh.assign_date_time,
+		sh.ship_date_time
+		
+	FROM shipment_cancelations AS sh
+	LEFT JOIN orders o ON o.id=sh.order_id
+	LEFT JOIN vehicle_schedules vsch ON vsch.id=sh.vehicle_schedule_id
+	LEFT JOIN users u ON u.id=sh.user_id
+	LEFT JOIN vehicles vh ON vh.id=vsch.vehicle_id
+	LEFT JOIN drivers dr ON dr.id=vsch.driver_id
 	;
 	
-ALTER VIEW vehicle_owners_list OWNER TO beton;
+ALTER VIEW shipment_cancelations_list OWNER TO beton;

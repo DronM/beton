@@ -24,7 +24,8 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 		END AS tracker_last_dt,
 		drivers_ref(dr.*) AS drivers_ref,
 		
-		vehicle_owners_ref(v_own) AS vehicle_owners_ref
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		v.vehicle_owner_id
 		
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id

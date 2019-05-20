@@ -403,26 +403,32 @@ class Vehicle_Controller extends ControllerSQL{
 	}
 	public function vehicles_with_trackers($pm){
 		$this->addNewModel(
-			"
-			SELECT 0 AS id,'*** ВСЕ ***' AS plate
-			UNION ALL
-			(SELECT id,plate FROM vehicles
-			WHERE tracker_id IS NOT NULL AND tracker_id <>''
-			ORDER BY plate)",
+			sprintf(
+				"SELECT 0 AS id,'*** ВСЕ ***' AS plate
+				UNION ALL
+				(SELECT id,plate FROM vehicles
+				WHERE tracker_id IS NOT NULL AND tracker_id <>''%s
+				ORDER BY plate)",
+				($_SESSION['role_id']=='vehicle_owner')? sprintf(' AND vehicles.vehicle_owner_id=%d',$_SESSION['global_vehicle_owner_id']):''
+			),
 			'vehicles_with_trackers'
 		);		
 	}
 	public function get_tracker_inf($pm){
 		$params = new ParamsSQL($pm,$this->getDbLink());
 		$params->setValidated('id',DT_INT);	
-		$this->addNewModel(vsprintf(
-			"SELECT
-			date5_time5_descr(recieved_dt+age(now(),now() at time zone 'UTC')) AS recieved_dt_str
-			FROM car_tracking
-			LEFT JOIN vehicles ON vehicles.tracker_id=car_tracking.car_id
-			WHERE vehicles.id=%d
-			ORDER BY period DESC LIMIT 1",
-			$params->getArray()),
+		
+		$cond = ($_SESSION['role_id']=='vehicle_owner')? sprintf(' AND vehicles.vehicle_owner_id=%d',$_SESSION['global_vehicle_owner_id']):'';
+		$this->addNewModel(
+			vsprintf(
+				"SELECT
+				date5_time5_descr(recieved_dt+age(now(),now() at time zone 'UTC')) AS recieved_dt_str
+				FROM car_tracking
+				LEFT JOIN vehicles ON vehicles.tracker_id=car_tracking.car_id
+				WHERE vehicles.id=%d".$cond."
+				ORDER BY period DESC LIMIT 1",
+				$params->getArray()				
+			),
 			'get_tracker_inf'
 		);		
 	}
@@ -430,7 +436,17 @@ class Vehicle_Controller extends ControllerSQL{
 	public function get_current_position($pm){
 		$params = new ParamsSQL($pm,$this->getDbLink());
 		$params->setValidated('id',DT_INT);	
+		
+		$vehicle_id = $this->getExtDbVal($pm,'id');
+		if($_SESSION['role_id']=='vehicle_owner'){
+			$ar = $this->getDbLink()->query_first(sprintf("SELECT vehicle_owner_id FROM vehicles WHERE id=%d",$vehicle_id));
+			if(!is_array($ar) ||!count($ar) || $ar['vehicle_owner_id']!=$_SESSION['global_vehicle_owner_id']){
+				throw new Exception('Permission denied!');
+			}
+		}
+		
 		//zones
+		$cond = ($_SESSION['role_id']=='vehicle_owner')? sprintf(' AND vs.vehicle_id IN (SELECT vv.id FROM vehicles vv WHERE vv.id=%d)',$_SESSION['global_vehicle_owner_id']):'';
 		$this->addNewModel(
 		vsprintf("SELECT 
 			(SELECT replace(replace(st_astext(d.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text)
@@ -457,17 +473,21 @@ class Vehicle_Controller extends ControllerSQL{
 			
 			FROM vehicle_schedule_states AS st
 			LEFT JOIN vehicle_schedules AS vs ON vs.id=st.schedule_id
-			WHERE vs.vehicle_id=%d AND st.date_time < now()
+			WHERE vs.vehicle_id=%d AND st.date_time < now()".$cond."
 			ORDER BY st.date_time DESC
-			LIMIT 1",$params->getArray()),
+			LIMIT 1",
+			$params->getArray()			
+		),
 		'zones'
 		);
 		
 		//position
-		$this->addNewModel(vsprintf(
-			"SELECT * FROM vehicle_current_pos_all
-			WHERE id=%d",
-			$params->getArray()),
+		$this->addNewModel(
+			sprintf(
+				"SELECT * FROM vehicle_current_pos_all
+				WHERE id=%d",
+				$vehicle_id
+			),
 			'get_current_position'
 		);
 	}
@@ -483,14 +503,28 @@ class Vehicle_Controller extends ControllerSQL{
 		'zones');
 		
 		//position
-		$this->addNewModel(
-			"SELECT * FROM vehicle_current_pos_all",
-			'get_current_position'
-		);		
+		if($_SESSION['role_id']=='vehicle_owner'){
+			$q = sprintf(
+				"SELECT * FROM vehicle_current_pos_all WHERE id IN (SELECT t.id FROM vehicles t WHERE t.vehicle_owner_id=%d)",
+				$_SESSION['global_vehicle_owner_id']
+			);
+		}
+		else{
+			$q = "SELECT * FROM vehicle_current_pos_all";
+		}
+		
+		$this->addNewModel($q,'get_current_position');		
 	}
 	
 	public function get_track($pm){
 		$link = $this->getDbLink();
+		
+		if($_SESSION['role_id']=='vehicle_owner'){
+			$ar = $link->query_first(sprintf("SELECT vehicle_owner_id FROM vehicles WHERE id=%d",$this->getExtDbVal($pm,'id')));
+			if(!is_array($ar) ||!count($ar) || $ar['vehicle_owner_id']!=$_SESSION['global_vehicle_owner_id']){
+				throw new Exception('Permission denied!');
+			}
+		}
 		
 		$this->addNewModel(
 		sprintf(
@@ -571,6 +605,7 @@ class Vehicle_Controller extends ControllerSQL{
 		$to = null;
 		$destination_id = 0;
 		$vehicle_id = 0;
+		$vehicle_owner_id = 0;
 		$stop_dur = "'00:05'";
 		
 		foreach($where->fields as $w_field){
@@ -593,11 +628,19 @@ class Vehicle_Controller extends ControllerSQL{
 				$stop_dur = $w_field['field']->getValueForDb();
 			}			
 		}
+		
+		if($_SESSION['role_id']=='vehicle_owner' && $vehicle_id){
+			$ar = $link->query_first(sprintf("SELECT vehicle_owner_id FROM vehicles WHERE id=%d",$vehicle_id));
+			if(!is_array($ar) ||!count($ar) || $ar['vehicle_owner_id']!=$_SESSION['global_vehicle_owner_id']){
+				throw new Exception('Permission denied!');
+			}
+			$vehicle_owner_id = $_SESSION['global_vehicle_owner_id'];
+		}
 				
 		$model->setSelectQueryText(
 		sprintf(
-		"SELECT * FROM vehicles_at_destination(%s,%s,%d,%d,%s::interval)",
-		$from,$to,$destination_id,$vehicle_id,$stop_dur));
+		"SELECT * FROM vehicles_at_destination(%s,%s,%d,%d,%s::interval,%d)",
+		$from,$to,$destination_id,$vehicle_id,$stop_dur,$vehicle_owner_id));
 		
 		$model->select(false,null,null,
 			null,null,null,null,null,TRUE);

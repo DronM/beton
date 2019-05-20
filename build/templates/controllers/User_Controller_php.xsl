@@ -116,6 +116,30 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}		
 		
 		//global filters				
+		if ($ar['role_id']=='vehicle_owner'){
+			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
+			if(is_array($ar_veh_owner) &amp;&amp; count($ar_veh_owner)){
+				$_SESSION['global_vehicle_owner_id'] = $ar_veh_owner['id'];
+			}
+			else{
+				$_SESSION['global_vehicle_owner_id'] = 0;
+			}
+			<xsl:for-each select="/metadata/models/model/globalFilter[@id='vehicle_owner_id']">
+			<xsl:variable name="model_id" select="concat(../@id,'_Model')"/>
+			<xsl:variable name="field_id">
+				<xsl:choose>
+					<xsl:when test="@fieldId">'<xsl:value-of select="@fieldId"/>'</xsl:when>
+					<xsl:otherwise>'vehicle_owner_id'</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>			
+			$model = new <xsl:value-of select="$model_id"/>($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById(<xsl:value-of select="$field_id"/>);
+			$field->setValue($_SESSION['global_vehicle_owner_id']);
+			$filter->addField($field,'=');
+			GlobalFilter::set('<xsl:value-of select="$model_id"/>',$filter);
+			</xsl:for-each>
+		}
 		
 		$log_ar = $this->getDbLinkMaster()->query_first(
 			sprintf("SELECT pub_key FROM logins
@@ -568,6 +592,14 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$this->getExtDbVal($pm,'user_id'),
 			gen_pwd(self::PWD_LEN),
 			$ar['email'],$ar['phone_cel']);
+	}
+	
+	
+	public function update($pm){
+		if($this->getExtDbVal($pm,'old_id')!=$_SESSION['user_id'] &amp;&amp; $_SESSION['role_id']!='owner'){
+			throw new Exception('Permission denied!');
+		}
+		parent::update($pm);
 	}
 	
 </xsl:template>

@@ -54,6 +54,15 @@ function ShipmentCancelation_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата назначения';
+	filed_options.autoInc = false;	
+	
+	options.fields.assign_date_time = new FieldDateTimeTZ("assign_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Заявка';
 	filed_options.autoInc = false;	
 	
@@ -88,6 +97,16 @@ function ShipmentCancelation_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.user_id = new FieldInt("user_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Количество';
+	filed_options.autoInc = false;	
+	
+	options.fields.quant = new FieldFloat("quant",filed_options);
+	options.fields.quant.getValidator().setMaxLength('19');
 	
 		ShipmentCancelation_Model.superclass.constructor.call(this,id,options);
 }

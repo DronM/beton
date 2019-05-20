@@ -56,19 +56,25 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
 			AND shipments.ship_date_time::time without time zone <= (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
 		) AS quant_shipped_day_before_now,
 		
+		
 		CASE
-			WHEN (o.quant - COALESCE(
-				(SELECT
-					sum(shipments.quant) AS sum
-				FROM shipments
-				WHERE shipments.order_id = o.id AND shipments.shipped = true
-				), 0::double precision)
+			WHEN
+				(o.quant - COALESCE(
+					(SELECT sum(shipments.quant) AS sum
+					FROM shipments
+					WHERE shipments.order_id = o.id AND shipments.shipped)
+					, 0::double precision
+					)
 				) > 0::double precision
-				AND (now()::timestamp without time zone::timestamp with time zone - (( SELECT shipments.ship_date_time
-			FROM shipments
-			WHERE shipments.order_id = o.id AND shipments.shipped = true
-			ORDER BY shipments.ship_date_time DESC
-			LIMIT 1))::timestamp with time zone) > const_ord_mark_if_no_ship_time_val()::interval THEN TRUE
+				AND (
+					now()::timestamp without time zone::timestamp with time zone - (
+					(SELECT shipments.ship_date_time
+					FROM shipments
+					WHERE shipments.order_id = o.id AND shipments.shipped
+					ORDER BY shipments.ship_date_time DESC
+					LIMIT 1)
+					)::timestamp with time zone
+				) > const_ord_mark_if_no_ship_time_val() THEN TRUE
 			ELSE FALSE
 		END AS no_ship_mark,
 		

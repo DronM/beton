@@ -410,6 +410,12 @@ class Shipment_Controller extends ControllerSQL{
 				
 	$opts=array();
 	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('shipment_id',$opts));
+	
+				
+	$opts=array();
+	
 		$opts['length']=500;
 		$opts['required']=TRUE;				
 		$pm->addParam(new FieldExtString('comment_text',$opts));
@@ -420,6 +426,25 @@ class Shipment_Controller extends ControllerSQL{
 			
 		$pm = new PublicMethod('delete_assigned');
 		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('shipment_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('owner_set_agreed');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('shipment_id',$opts));
+	
+			
 		$this->addPublicMethod($pm);
 
 		
@@ -850,8 +875,111 @@ class Shipment_Controller extends ControllerSQL{
 	}
 	
 	public function delete_shipped($pm){
+		$l = $this->getDbLinkMaster();		
+		try{
+			$l->query("BEGIN");
+
+			$l->query(
+				sprintf(
+					"INSERT INTO shipment_cancelations
+					(order_id,vehicle_schedule_id,comment_text,user_id,date_time,ship_date_time,assign_date_time,quant)
+					(SELECT
+						sh.order_id,
+						sh.vehicle_schedule_id,
+						%s,
+						%d,
+						now(),
+						sh.ship_date_time,
+						sh.date_time,
+						sh.quant
+						
+					FROM shipments AS sh
+					WHERE sh.id=%d
+					)",
+					$this->getExtDbVal($pm,"comment_text"),
+					$_SESSION['user_id'],					
+					$this->getExtDbVal($pm,"shipment_id")
+				)
+			);
+
+			self::do_delete_shipment($l,$this->getExtDbVal($pm,"shipment_id"));
+			
+			$l->query("COMMIT");
+		}
+		catch (Exception $e){
+			$l->query("ROLLBACK");
+			throw $e;
+	
+		}
 	}
+	
+	public static function do_delete_shipment($link,$shipmentId){
+		
+		$link->query(
+			sprintf(
+				"DELETE FROM vehicle_schedule_states WHERE shipment_id=%d",
+				$shipmentId
+			)
+		);		
+		
+		$link->query(
+			sprintf(
+				"DELETE FROM shipments WHERE id=%d",
+				$shipmentId
+			)
+		);		
+		
+	}
+	
 	public function delete_assigned($pm){
+		$l = $this->getDbLinkMaster();		
+		try{
+			$l->query("BEGIN");
+
+			self::do_delete_shipment($l,$this->getExtDbVal($pm,"shipment_id"));
+			
+			$l->query("COMMIT");
+		}
+		catch (Exception $e){
+			$l->query("ROLLBACK");
+			throw $e;
+		}		
+	}
+
+	function owner_set_agreed($pm){
+	
+		$shipment_id = $this->getExtDbVal($pm,"shipment_id");			
+		
+		if($_SESSION['role_id']=='vehicle_owner'){
+			//check
+			$ar = $this->getDbLinkMaster()->query_first(
+				sprintf(
+					"SELECT v.vehicle_owner_id
+					FROM shipments AS sh
+					LEFT JOIN vehicle_schedules AS sch ON sch.id=sh.vehicle_schedule_id
+					LEFT JOIN vehicles AS v ON v.id=sch.vehicle_id
+					WHERE sh.id=%d",
+					$shipment_id
+				)
+			);
+			if(!is_array($ar) || !count($ar) || $ar['vehicle_owner_id']!=$_SESSION['global_vehicle_owner_id']){
+				throw new Exception('Permission denied!');
+			}
+		}
+		else if($_SESSION['role_id']=='owner'){
+			throw new Exception('Permission denied!');
+		}
+		
+		$this->getDbLinkMaster()->query(
+			sprintf(
+				"UPDATE shipments
+				SET
+					owner_agreed=TRUE,
+					owner_agreed_date_time=now()
+				WHERE id=%d",
+				$shipment_id
+			)
+		);
 	}
 	
 }

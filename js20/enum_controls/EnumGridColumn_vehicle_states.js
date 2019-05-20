@@ -37,8 +37,14 @@ function EnumGridColumn_vehicle_states(options){
 	options.multyLangValues["ru"]["out"] = "сошёл";
 
 	options.multyLangValues["ru"]["shift_added"] = "доб.смена";
-EnumGridColumn_vehicle_states.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_vehicle_states;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_vehicle_states.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_vehicle_states,GridColumnEnum);
 

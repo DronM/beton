@@ -57,6 +57,12 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -84,6 +90,12 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldInt("client_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("user_id",options);
 	
 	pm.addField(field);
 	
@@ -124,6 +136,9 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("clients_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("users_ref",f_opts));
 }
 
 			VehicleOwner_Controller.prototype.addGetObject = function(){

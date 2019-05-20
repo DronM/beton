@@ -12,10 +12,13 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 		
 		vehicles_ref(v) AS vehicles_ref,
 		
+		/*
 		CASE
 			WHEN v.vehicle_owner_id IS NULL THEN v.owner
 			ELSE v_own.name
-		END AS owner,
+		END
+		*/
+		v_own.name::text AS owner,
 		
 		drivers_ref(d) AS drivers_ref,
 		d.phone_cel::text AS driver_phone_cel,

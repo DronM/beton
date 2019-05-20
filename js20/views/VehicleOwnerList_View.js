@@ -52,6 +52,20 @@ function VehicleOwnerList_View(id,options){
 							],
 							"sortable":true
 						})
+						,new GridCellHead(id+":grid:head:users_ref",{
+							"value":"Аккаунт",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("users_ref"),
+									"ctrlClass":UserEditRef,
+									"ctrlBindFieldId":"user_id",
+									"ctrlOptions":{
+										"labelCaption":""
+									}
+								})
+							],
+							"sortable":true
+						})
 						
 					]
 				})

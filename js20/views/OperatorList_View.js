@@ -88,6 +88,7 @@ function OperatorList_View(id,options){
 		})
 		,new GridCellHead(id+":grid:head:concrete_types_ref",{
 			"value":"Марка",
+			"colAttrs":{"align":"right"},
 			"columns":[
 				new GridColumnRef({
 					"field":model.getField("concrete_types_ref")
@@ -96,9 +97,22 @@ function OperatorList_View(id,options){
 		})
 		,new GridCellHead(id+":grid:head:vehicles_ref",{
 			"value":"ТС",
+			"colAttrs":{"align":"center"},
 			"columns":[
 				new GridColumnRef({
-					"field":model.getField("vehicles_ref")
+					"field":model.getField("vehicles_ref"),
+					"formatFunction":function(f){
+						var v = (f&&f.vehicles_ref&&!f.vehicles_ref.isNull())? f.vehicles_ref.getValue().getDescr():"";
+						var res = "";
+						var ch;
+						for(var i=0;i<v.length;i++){
+							ch = v.charCodeAt(i);
+							if(ch>=48 && ch<=57){
+								res+=v[i];
+							}
+						}
+						return res;
+					}
 				})
 			]
 		})
@@ -116,7 +130,7 @@ function OperatorList_View(id,options){
 			"colSpan":"6"
 		})												
 		,new GridCellFoot(id+":features_grid:foot:tot_quant",{
-			"attrs":{"align":"right"},
+			"colAttrs":{"align":"right"},
 			"calcOper":"sum",
 			"calcFieldId":"quant",
 			"gridColumn":new GridColumnFloat({
@@ -131,7 +145,7 @@ function OperatorList_View(id,options){
 		elements.push(
 			new GridCellHead(id+":grid:head:ship_norm_min",{
 				"value":"Норма отгр.",
-				"attrs":{"align":"right"},
+				"colAttrs":{"align":"right"},
 				"columns":[
 					new GridColumnFloat({
 						"field":model.getField("ship_norm_min")
@@ -142,7 +156,7 @@ function OperatorList_View(id,options){
 		elements.push(
 			new GridCellHead(id+":grid:head:ship_fact_min",{
 				"value":"Норма факт.",
-				"attrs":{"align":"right"},
+				"colAttrs":{"align":"right"},
 				"columns":[
 					new GridColumnFloat({
 						"field":model.getField("ship_fact_min")
@@ -153,7 +167,7 @@ function OperatorList_View(id,options){
 		elements.push(
 			new GridCellHead(id+":grid:head:ship_bal_min",{
 				"value":"Ост.",
-				"attrs":{"align":"right"},
+				"colAttrs":{"align":"right"},
 				"columns":[
 					new GridColumnFloat({
 						"field":model.getField("ship_bal_min")

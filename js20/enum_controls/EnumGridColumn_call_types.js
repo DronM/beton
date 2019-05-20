@@ -21,8 +21,14 @@ function EnumGridColumn_call_types(options){
 	options.multyLangValues["ru"]["in"] = "Входящий";
 
 	options.multyLangValues["ru"]["out"] = "Исходящий";
-EnumGridColumn_call_types.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_call_types;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_call_types.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_call_types,GridColumnEnum);
 

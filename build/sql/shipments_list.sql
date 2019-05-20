@@ -91,7 +91,9 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
 		vehicle_owners_ref(pvh_own) AS pump_vehicles_owners_ref,
 		pvh.vehicle_id AS pump_vehicle_id,
-		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id
+		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time
 		
 		
 	FROM shipments sh

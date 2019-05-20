@@ -21,8 +21,14 @@ function EnumGridColumn_doc_types(options){
 	options.multyLangValues["ru"]["material_procuremen"] = "Поступление материалов";
 
 	options.multyLangValues["ru"]["shipment"] = "Отгрузка";
-EnumGridColumn_doc_types.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_doc_types;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_doc_types.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_doc_types,GridColumnEnum);
 

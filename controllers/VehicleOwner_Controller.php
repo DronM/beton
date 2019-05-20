@@ -33,6 +33,9 @@ class VehicleOwner_Controller extends ControllerSQL{
 		$param = new FieldExtInt('client_id'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtInt('user_id'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -56,6 +59,10 @@ class VehicleOwner_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtInt('client_id'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('user_id'
 				,array(
 			));
 			$pm->addParam($param);

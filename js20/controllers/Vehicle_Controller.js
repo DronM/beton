@@ -242,6 +242,9 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSONB("vehicle_owners_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("vehicle_owner_id",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){

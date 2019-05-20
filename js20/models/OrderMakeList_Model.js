@@ -182,7 +182,7 @@ function OrderMakeList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.no_ship_mark = new FieldString("no_ship_mark",filed_options);
+	options.fields.no_ship_mark = new FieldBool("no_ship_mark",filed_options);
 	
 				
 	

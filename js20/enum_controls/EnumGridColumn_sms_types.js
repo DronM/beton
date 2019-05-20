@@ -43,8 +43,14 @@ function EnumGridColumn_sms_types(options){
 	options.multyLangValues["ru"]["efficiency_warn"] = "Низская эффективность";
 
 	options.multyLangValues["ru"]["material_balance"] = "Остатки материалов";
-EnumGridColumn_sms_types.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_sms_types;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_sms_types.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_sms_types,GridColumnEnum);
 

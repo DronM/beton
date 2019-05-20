@@ -16,7 +16,9 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 		sh.demurrage,
 		sh.blanks_exist,
 		production_sites_ref(ps) AS production_sites_ref,
-		sh.acc_comment
+		sh.acc_comment,
+		
+		v.vehicle_owner_id
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id

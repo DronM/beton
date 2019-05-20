@@ -36,7 +36,7 @@ RawMaterialProcurUpload_View.prototype.HEAD_TITLE = "Загрузка посту
 
 RawMaterialList_View.prototype.HEAD_TITLE = "Материалы";
 
-VehicleStopsReport_View.prototype.HEAD_TITLE = "Стоянки ТС на карте";
+VehicleStopsReport_View.prototype.HEAD_TITLE = "Стоянки ТС";
 DriverCheatReport_View.prototype.HEAD_TITLE = "Повторные поездки по самовывозу";
 RouteToDestAvgTimeRep_View.prototype.HEAD_TITLE = "Среднее время до объектов";
 VehicleEfficiency_View.prototype.HEAD_TITLE = "Эффективность работы ТС";
@@ -95,3 +95,5 @@ ShipmentForOwnerCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы по д
 ConcreteCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы на бетон";
 
 VehicleOwnerList_View.prototype.HEAD_TITLE = "Владельцы транспортных средств";
+
+ShipmentCancelationList_View.prototype.HEAD_TITLE = "Отмененные отгрузки";

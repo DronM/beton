@@ -77,3 +77,14 @@ function VehicleDialog_View(id,options){
 	
 }
 extend(VehicleDialog_View,ViewObjectAjx);
+
+VehicleDialog_View.prototype.onGetData = function(resp,cmd){
+	VehicleDialog_View.superclass.onGetData.call(this,resp,cmd);
+	
+	if(window.getApp().getServVar("role_id")=="vehicle_owner"){
+		this.setEnabled(false);
+		this.getControlOK().setEnabled(true);
+		this.getControlSave().setEnabled(true);
+		this.getControlCancel().setEnabled(true);
+	}
+}

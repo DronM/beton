@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-16 06:27:10</lastBuild></version>
+		<lastBuild>2019-05-20 05:57:26</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -32,7 +32,11 @@
 		<version dateOpen="2019-05-13 10:05:21" dateClose="2019-05-13 11:05:08">1.00126</version>
 		<version dateOpen="2019-05-13 11:05:21" dateClose="2019-05-14 06:05:03">1.00127</version>
 		<version dateOpen="2019-05-14 06:05:03" dateClose="2019-05-16 06:05:27">1.00128</version>
+		<version dateOpen="2019-05-17 05:05:48" dateClose="2019-05-20 05:05:57">1.00129</version>
 	</versions>
+	<globalFilters>
+		<field id="vehicle_owner_id"/>
+	</globalFilters>
 	<enums>
 		<enum id="locales">
 			<value id="ru">
@@ -536,6 +540,8 @@
 			<field id="sim_number" dataType="String" alias="Номер телефона SIM карты"/>
 			<field id="tracker_last_dt" dataType="DateTimeTZ"/>
 			<field id="vehicle_owners_ref" dataType="JSONB"/>
+			<field id="vehicle_owner_id" dataType="Int"/>
+			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="Driver" parent="ModelSQLBeton" dataTable="drivers" virtual="FALSE">
 			<defaultOrder>
@@ -653,6 +659,8 @@
 			<field id="deleted" dataType="Bool"/>
 			<field id="pump_length" dataType="Int"/>
 			<field id="comment_text" dataType="String"/>
+			<field id="vehicle_owner_id" dataType="Int"/>
+			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="PumpVehicleWorkList" parent="ModelSQLBeton" dataTable="pump_veh_work_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -792,7 +800,7 @@
 			<field id="quant_shipped_before_now" dataType="Float"/>
 			<field id="quant_shipped_day_before_now" dataType="Float"/>
 			<field id="quant_ordered_day" dataType="Float"/>
-			<field id="no_ship_mark" dataType="String"/>
+			<field id="no_ship_mark" dataType="Bool"/>
 			<field id="payed" dataType="Bool"/>
 			<field id="under_control" dataType="Bool"/>
 			<field id="pay_cash" dataType="Bool"/>
@@ -898,7 +906,10 @@
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 			<field id="users_ref" dataType="JSON" alias="Автор"/>
+			<field id="owner_agreed" dataType="Bool" alias="Согласовано собственником ТС"/>
+			<field id="owner_agreed_date_time" dataType="DateTimeTZ"/>
 			<sql/>
+			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="ShipmentDialog" parent="ModelSQLBeton" dataTable="shipments_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
@@ -914,7 +925,9 @@
 			<field id="demurrage" dataType="String" alias="Простой"/>
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
+			<field id="vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
 			<sql/>
+			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="ShipmentForOrderList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
@@ -931,15 +944,18 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
 			<field id="date_time" dataType="DateTimeTZ" alias="Дата" dbRequired="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
 			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата отгрузки" dbRequired="TRUE"/>
+			<field id="assign_date_time" dataType="DateTimeTZ" alias="Дата назначения" dbRequired="TRUE"/>
 			<field id="order_id" dataType="Int" required="TRUE" refTable="orders" refField="id" alias="Заявка"/>
 			<field id="vehicle_schedule_id" dataType="Int" required="TRUE" refTable="vehicle_schedules" refField="id" alias="Экипаж"/>
 			<field id="comment_text" dataType="Text" required="TRUE" alias="Комментарий"/>
 			<field id="user_id" dataType="Int" dbRequired="TRUE" refTable="users" refField="id" alias="Пользователь"/>
+			<field id="quant" dataType="Float" length="19" precision="2" alias="Количество"/>
 		</model>
 		<model id="ShipmentCancelationList" parent="ModelSQLBeton" dataTable="shipment_cancelations_list" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="date_time" dataType="DateTimeTZ" alias="Дата"/>
 			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата отгрузки"/>
+			<field id="assign_date_time" dataType="DateTimeTZ" alias="Дата назначения"/>
 			<field id="order_id" dataType="Int" sysCol="TRUE"/>
 			<field id="orders_ref" dataType="JSON" alias="Заявка"/>
 			<field id="vehicle_schedule_id" dataType="Int" sysCol="TRUE"/>
@@ -947,6 +963,7 @@
 			<field id="comment_text" dataType="Text" alias="Комментарий"/>
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 			<field id="users_ref" dataType="JSON" alias="Пользователь"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
 		</model>
 		<model id="OperatorList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE" server="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
@@ -2130,6 +2147,7 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="name" dataType="String" length="150" required="TRUE"/>
 			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
 			<index id="vehicle_owners_name_idx">
 				<expression>lower(name)</expression>
 			</index>
@@ -2138,6 +2156,7 @@
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="name" dataType="String"/>
 			<field id="clients_ref" dataType="JSON"/>
+			<field id="users_ref" dataType="JSON"/>
 		</model>
 	</models>
 	<constants>
@@ -2473,9 +2492,15 @@
 				<field id="barcode" dataType="String" length="13"/>
 			</publicMethod>
 			<publicMethod id="delete_shipped">
+				<field id="shipment_id" dataType="Int" required="TRUE"/>
 				<field id="comment_text" dataType="String" length="500" required="TRUE"/>
 			</publicMethod>
-			<publicMethod id="delete_assigned"/>
+			<publicMethod id="delete_assigned">
+				<field id="shipment_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="owner_set_agreed">
+				<field id="shipment_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
 		</controller>
 		<controller id="User" parentId="ControllerSQL" state="TRUE" noState="TRUE">
 			<publicMethod id="insert" modelId="User"/>
@@ -3067,7 +3092,30 @@
 		<permission type="allow" controllerId="User" methodId="login_ext" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="User" methodId="logged" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="User" methodId="logout" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="logout_html" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="get_profile" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="update" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Captcha" methodId="get" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Shipment" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Shipment" methodId="owner_set_agreed" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Vehicle" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Vehicle" methodId="get_object" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Vehicle" methodId="vehicles_with_trackers" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Vehicle" methodId="get_current_position" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Vehicle" methodId="get_current_position_all" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Vehicle" methodId="get_track" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Vehicle" methodId="get_stops_at_dest" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Vehicle" methodId="complete" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="PumpVehicle" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="PumpVehicle" methodId="get_object" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Constant" methodId="get_values" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Weather" methodId="get_current" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="ConcreteType" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="ConcreteType" methodId="complete" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Destination" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Destination" methodId="complete_dest" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Driver" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="ProductionSite" methodId="get_list" roleId="vehicle_owner"/>
 	</permissions>
 	<views>
 		<view id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи"/>
@@ -3118,7 +3166,7 @@
 		<view id="30010" c="EmployeeWorkTimeSchedule_Controller" t="EmployeeWorkTimeScheduleList" f="get_list" section="Формы" descr="Табель рабочего времени"/>
 		<view id="30011" c="ClientValidDuplicate_Controller" t="ClientValidDuplicateList" f="get_list" section="Формы" descr="Разрешенные повторы контрагентов"/>
 		<view id="30012" c="ShipmentCancelation_Controller" t="ShipmentCancelationList" f="get_list" section="Формы" descr="Отмененные отгрузки"/>
-		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС на карте"/>
+		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
 		<view id="50004" t="DriverCheatReport" section="Отчеты" descr="Повторные поездки по самовывозу"/>
@@ -3780,6 +3828,7 @@
 		<jsScript file="custom_controls/VehicleScheduleGridCmdShowPosition.js"/>
 		<jsScript file="custom_controls/PrintInvoiceBtn.js"/>
 		<jsScript file="custom_controls/ShipmentGridCmdPrintInvoice.js"/>
+		<jsScript file="custom_controls/ShipmentGridCmdDelete.js"/>
 		<jsScript file="custom_controls/RawMaterialConsRateCalcBtn.js"/>
 		<jsScript file="custom_controls/RawMaterialConsRateDateGridCmd.js"/>
 		<jsScript file="custom_controls/RawMaterialConsRateGrid.js"/>
@@ -3799,6 +3848,7 @@
 		<jsScript file="custom_controls/VehicleDriverForSchedGenGrid.js"/>
 		<jsScript file="custom_controls/EmployeeWorkTimeScheduleGrid.js"/>
 		<jsScript file="custom_controls/QuarryEdit.js"/>
+		<jsScript file="custom_controls/OrderEdit.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->

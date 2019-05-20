@@ -79,8 +79,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			LEFT JOIN destination_list_view dest ON dest.id=o.destination_id
 			WHERE o.client_id=%d
 			ORDER BY o.destination_id,o.date_time DESC",
-			$this->getExtDbVal($pm,'client_id'),
-			$name_cond
+			$this->getExtDbVal($pm,'client_id')
 			),
 			'DestinationList_Model');
 		}

@@ -11,6 +11,8 @@ function PumpVehicleList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
+	var is_v_owner = (window.getApp().getServVar("role_id")=="vehicle_owner");
+	
 	var filters = {
 		"make":{
 			"binding":new CommandBinding({
@@ -48,7 +50,11 @@ function PumpVehicleList_View(id,options){
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdFilter":true,
 			"filters":filters,
-			"variantStorage":options.variantStorage
+			"variantStorage":options.variantStorage,
+			"cmdDelete":!is_v_owner,
+			"cmdInsert":!is_v_owner,
+			"cmdCopy":!is_v_owner,
+			"cmdEdit":!is_v_owner			
 		}),
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
@@ -82,7 +88,7 @@ function PumpVehicleList_View(id,options){
 							"sort":"asc",
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:vehicle_owner",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:vehicle_owner",{
 							"value":"Владелец",
 							"columns":[
 								new GridColumnRef({
@@ -105,7 +111,7 @@ function PumpVehicleList_View(id,options){
 									})
 							]
 						})						
-						,new GridCellHead(id+":grid:head:pump_prices_ref",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_prices_ref",{
 							"value":"Ценовая схема",
 							"columns":[
 								new GridColumnRef({
@@ -130,7 +136,7 @@ function PumpVehicleList_View(id,options){
 								})
 							]
 						})						
-						,new GridCellHead(id+":grid:head:comment_text",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:comment_text",{
 							"value":"Комментарий",
 							"columns":[
 								new GridColumn({
@@ -144,7 +150,7 @@ function PumpVehicleList_View(id,options){
 							]
 						})						
 												
-						,new GridCellHead(id+":grid:head:deleted",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:deleted",{
 							"value":"Удален",
 							"columns":[
 								new GridColumnBool({

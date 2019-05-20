@@ -57,6 +57,12 @@ extend(ShipmentCancelation_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Дата назначения";
+	var field = new FieldDateTimeTZ("assign_date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Заявка";options.required = true;
 	var field = new FieldInt("order_id",options);
 	
@@ -77,6 +83,12 @@ extend(ShipmentCancelation_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Пользователь";
 	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Количество";
+	var field = new FieldFloat("quant",options);
 	
 	pm.addField(field);
 	
@@ -111,6 +123,12 @@ extend(ShipmentCancelation_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Дата назначения";
+	var field = new FieldDateTimeTZ("assign_date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Заявка";
 	var field = new FieldInt("order_id",options);
 	
@@ -131,6 +149,12 @@ extend(ShipmentCancelation_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Пользователь";
 	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Количество";
+	var field = new FieldFloat("quant",options);
 	
 	pm.addField(field);
 	
@@ -172,6 +196,9 @@ extend(ShipmentCancelation_Controller,ControllerObjServer);
 	f_opts.alias = "Дата отгрузки";
 	pm.addField(new FieldDateTimeTZ("ship_date_time",f_opts));
 	var f_opts = {};
+	f_opts.alias = "Дата назначения";
+	pm.addField(new FieldDateTimeTZ("assign_date_time",f_opts));
+	var f_opts = {};
 	
 	pm.addField(new FieldInt("order_id",f_opts));
 	var f_opts = {};
@@ -192,6 +219,9 @@ extend(ShipmentCancelation_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Пользователь";
 	pm.addField(new FieldJSON("users_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Количество";
+	pm.addField(new FieldFloat("quant",f_opts));
 }
 
 			ShipmentCancelation_Controller.prototype.addGetObject = function(){

@@ -42,6 +42,7 @@ function Shipment_Controller(options){
 	this.add_set_blanks_exist();
 	this.add_delete_shipped();
 	this.add_delete_assigned();
+	this.add_owner_set_agreed();
 		
 }
 extend(Shipment_Controller,ControllerObjServer);
@@ -340,6 +341,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Автор";
 	pm.addField(new FieldJSON("users_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Согласовано собственником ТС";
+	pm.addField(new FieldBool("owner_agreed",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldDateTimeTZ("owner_agreed_date_time",f_opts));
 }
 
 			Shipment_Controller.prototype.add_get_list_for_order = function(){
@@ -561,6 +568,14 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 		options.required = true;
 	
+		pm.addField(new FieldInt("shipment_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
 		options.maxlength = "500";
 	
 		pm.addField(new FieldString("comment_text",options));
@@ -573,6 +588,31 @@ extend(Shipment_Controller,ControllerObjServer);
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('delete_assigned',opts);
 	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("shipment_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_owner_set_agreed = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('owner_set_agreed',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("shipment_id",options));
+	
+			
 	this.addPublicMethod(pm);
 }
 

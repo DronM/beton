@@ -166,7 +166,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['id']="no_ship_mark";
 				
-		$f_no_ship_mark=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"no_ship_mark",$f_opts);
+		$f_no_ship_mark=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"no_ship_mark",$f_opts);
 		$this->addField($f_no_ship_mark);
 		//********************
 		

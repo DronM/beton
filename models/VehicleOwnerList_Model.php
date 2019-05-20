@@ -44,6 +44,14 @@ class VehicleOwnerList_Model extends ModelSQLBeton{
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************
+		
+		//*** Field users_ref ***
+		$f_opts = array();
+		$f_opts['id']="users_ref";
+				
+		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
+		$this->addField($f_users_ref);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

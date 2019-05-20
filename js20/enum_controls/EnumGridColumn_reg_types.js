@@ -21,8 +21,14 @@ function EnumGridColumn_reg_types(options){
 	options.multyLangValues["ru"]["material"] = "Учет материалов";
 
 	options.multyLangValues["ru"]["material_consumption"] = "Расход материалов";
-EnumGridColumn_reg_types.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_reg_types;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_reg_types.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_reg_types,GridColumnEnum);
 

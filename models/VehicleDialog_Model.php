@@ -129,6 +129,14 @@ class VehicleDialog_Model extends ModelSQLBeton{
 		$f_vehicle_owners_ref=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
 		$this->addField($f_vehicle_owners_ref);
 		//********************
+		
+		//*** Field vehicle_owner_id ***
+		$f_opts = array();
+		$f_opts['id']="vehicle_owner_id";
+				
+		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
+		$this->addField($f_vehicle_owner_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

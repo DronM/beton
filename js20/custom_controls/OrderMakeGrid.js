@@ -61,8 +61,8 @@ function OrderMakeGrid(id,options){
 				opts.className+= (opts.className.length? " ":"")+"order_started";
 			}
 			
-			if (m.getFieldValue("no_ship_mark")&&quant_rest&&quant_rest!=quant){
-			//
+			//&&quant_rest&&quant_rest!=quant
+			if (m.getFieldValue("no_ship_mark")){
 				opts.className+= (opts.className.length? " ":"")+"order_no_ship_for_long";
 			}
 			
@@ -387,6 +387,7 @@ OrderMakeGrid.prototype.onGetData = function(){
 		var prev_time_m,init_time_m;
 		var future_shift;
 		var now_m = now.getHours()*60 + now.getMinutes();
+		debugger
 		//console.log("shift_start_time="+shift_start_time)
 		if(now.getTime() < shift_start_time.getTime()){
 			//future shift

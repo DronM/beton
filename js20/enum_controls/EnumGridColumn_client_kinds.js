@@ -23,8 +23,14 @@ function EnumGridColumn_client_kinds(options){
 	options.multyLangValues["ru"]["acc"] = "Бухгалтерия";
 
 	options.multyLangValues["ru"]["else"] = "Прочие";
-EnumGridColumn_client_kinds.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_client_kinds;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_client_kinds.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_client_kinds,GridColumnEnum);
 

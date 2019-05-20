@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
@@ -49,6 +50,16 @@ class ShipmentCancelationList_Model extends ModelSQLBeton{
 				
 		$f_ship_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
 		$this->addField($f_ship_date_time);
+		//********************
+		
+		//*** Field assign_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Дата назначения';
+		$f_opts['id']="assign_date_time";
+				
+		$f_assign_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"assign_date_time",$f_opts);
+		$this->addField($f_assign_date_time);
 		//********************
 		
 		//*** Field order_id ***
@@ -116,6 +127,16 @@ class ShipmentCancelationList_Model extends ModelSQLBeton{
 				
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
+		//********************
+		
+		//*** Field quant ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Количество';
+		$f_opts['id']="quant";
+				
+		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
+		$this->addField($f_quant);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

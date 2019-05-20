@@ -197,6 +197,9 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldString("comment_text",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("vehicle_owner_id",f_opts));
 }
 
 			PumpVehicle_Controller.prototype.add_get_work_list = function(){

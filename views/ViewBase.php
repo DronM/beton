@@ -1331,6 +1331,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleGridCmdShowPosition.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PrintInvoiceBtn.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentGridCmdPrintInvoice.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentGridCmdDelete.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateCalcBtn.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateDateGridCmd.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateGrid.js'));
@@ -1350,6 +1351,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleDriverForSchedGenGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EmployeeWorkTimeScheduleGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/QuarryEdit.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OrderEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		

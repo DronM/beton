@@ -1789,6 +1789,13 @@
 <h2>delete_shipped</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
+<h3>shipment_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
 <h3>comment_text</h3>
 <p></p>
 <div class="content_item content_item3">
@@ -1800,7 +1807,26 @@
 </div>
 <h2>delete_assigned</h2>
 <p>Arguments:</p>
-<div class="content_item content_item2"></div>
+<div class="content_item content_item2">
+<h3>shipment_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>owner_set_agreed</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>shipment_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
 </div>
 </div>
 <div id="ShipmentCancelation_Controller" class="content_box">
@@ -6277,7 +6303,7 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>no_ship_mark</h2>
-<div>Type:String</div>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -6680,6 +6706,12 @@
 <div>Precision:</div>
 <h2>comment_text</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_owner_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -7992,6 +8024,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>assign_date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>order_id</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
@@ -8016,6 +8054,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
 </div>
 </div>
 <div id="ShipmentCancelationList_Model" class="content_box">
@@ -8035,6 +8079,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>ship_date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>assign_date_time</h2>
 <div>Type:DateTimeTZ</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -8078,6 +8128,12 @@
 <div>Precision:</div>
 <h2>users_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -8246,6 +8302,12 @@
 <div>Precision:</div>
 <h2>acc_comment</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_owner_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -8594,6 +8656,18 @@
 <div>Precision:</div>
 <h2>users_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>owner_agreed</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>owner_agreed_date_time</h2>
+<div>Type:DateTimeTZ</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -10014,6 +10088,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>vehicle_owner_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleDriverForSchedGen_Model" class="content_box">
@@ -10086,6 +10166,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleOwnerList_Model" class="content_box">
@@ -10105,6 +10191,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>

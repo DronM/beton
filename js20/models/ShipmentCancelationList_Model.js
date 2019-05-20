@@ -53,6 +53,15 @@ function ShipmentCancelationList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата назначения';
+	filed_options.autoInc = false;	
+	
+	options.fields.assign_date_time = new FieldDateTimeTZ("assign_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
@@ -111,6 +120,15 @@ function ShipmentCancelationList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Количество';
+	filed_options.autoInc = false;	
+	
+	options.fields.quant = new FieldFloat("quant",filed_options);
 	
 		ShipmentCancelationList_Model.superclass.constructor.call(this,id,options);
 }

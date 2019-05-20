@@ -51,11 +51,25 @@ function AssignedVehicleGrid(id,options){
 						"columns":[
 							new GridColumn({
 								"id":"driver",
-								"formatFunction":function(f){
-									var res = (f&&f.vehicles_ref&&!f.vehicles_ref.isNull())? f.vehicles_ref.getValue().getDescr():"";
+								"formatFunction":function(f,cell){
+									var v = (f&&f.vehicles_ref&&!f.vehicles_ref.isNull())? f.vehicles_ref.getValue().getDescr():"";
+									
+									var res = "";
+									if(self.m_shortDescriptions){
+										var ch;
+										for(var i=0;i<v.length;i++){
+											ch = v.charCodeAt(i);
+											if(ch>=48 && ch<=57){
+												res+=v[i];
+											}
+										}
+									}
+									else{
+										res = v+" ";
+									}
 									res+= (f&&f.drivers_ref&&!f.drivers_ref.isNull())? ","+f.drivers_ref.getValue().getDescr():"";
 									if(self.m_shortDescriptions){
-										res = window.getApp().formatCellStr(res,cell,VehicleScheduleMakeOrderList_View.prototype.COL_DEST_LEN);
+										res = window.getApp().formatCellStr(res,cell,10);
 									}
 									
 									return res;

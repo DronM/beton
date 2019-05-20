@@ -19,8 +19,14 @@ function EnumGridColumn_data_types(options){
 	options.multyLangValues["ru"] = {};
 
 	options.multyLangValues["ru"]["users"] = "Пользователи";
-EnumGridColumn_data_types.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_data_types;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_data_types.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_data_types,GridColumnEnum);
 

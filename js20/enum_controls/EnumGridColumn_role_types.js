@@ -19,8 +19,14 @@ function EnumGridColumn_role_types(options){
 	options.multyLangValues["ru"] = {};
 
 	options.multyLangValues["ru"]["admin"] = "Администратор";
-EnumGridColumn_role_types.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_role_types;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_role_types.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_role_types,GridColumnEnum);
 
@@ -67,8 +73,14 @@ function EnumGridColumn_role_types(options){
 	options.multyLangValues["ru"]["supervisor"] = "Смотрящий";
 
 	options.multyLangValues["ru"]["vehicle_owner"] = "Владелец траспорта";
-EnumGridColumn_role_types.superclass.constructor.call(this,options);
+
 	
+	options.ctrlClass = options.ctrlClass || Enum_role_types;
+	options.searchOptions = options.searchOptions || {};
+	options.searchOptions.searchType = options.searchOptions.searchType || "on_match";
+	options.searchOptions.typeChange = (options.searchOptions.typeChange!=undefined)? options.searchOptions.typeChange:false;
+	
+	EnumGridColumn_role_types.superclass.constructor.call(this,options);		
 }
 extend(EnumGridColumn_role_types,GridColumnEnum);
 

@@ -11,6 +11,8 @@ function VehicleList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
+	var is_v_owner = (window.getApp().getServVar("role_id")=="vehicle_owner");
+	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
@@ -18,7 +20,12 @@ function VehicleList_View(id,options){
 		"controller":contr,
 		"editInline":false,
 		"editWinClass":VehicleDialog_Form,
-		"commands":new GridCmdContainerAjx(id+":grid:cmd"),		
+		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"cmdDelete":!is_v_owner,
+			"cmdInsert":!is_v_owner,
+			"cmdCopy":!is_v_owner,
+			"cmdEdit":!is_v_owner
+		}),		
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
@@ -26,6 +33,7 @@ function VehicleList_View(id,options){
 					"elements":[
 						new GridCellHead(id+":grid:head:plate",{
 							"value":"Рег.номер",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumn({
 									"field":model.getField("plate")
@@ -36,6 +44,7 @@ function VehicleList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:make",{
 							"value":"Марка",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumn({
 									"field":model.getField("make")
@@ -45,6 +54,7 @@ function VehicleList_View(id,options){
 						})						
 						,new GridCellHead(id+":grid:head:load_capacity",{
 							"value":"Грузоподъемность",
+							"colAttrs":{"align":"right"},
 							"columns":[
 								new GridColumn({									
 									"field":model.getField("load_capacity")
@@ -52,7 +62,7 @@ function VehicleList_View(id,options){
 							],
 							"sortable":true
 						})						
-						,new GridCellHead(id+":grid:head:vehicle_owner",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:vehicle_owner",{
 							"value":"Владелец",
 							"columns":[
 								new GridColumnRef({
@@ -61,7 +71,7 @@ function VehicleList_View(id,options){
 							],
 							"sortable":true
 						})						
-						,new GridCellHead(id+":grid:head:feature",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:feature",{
 							"value":"Свойство",
 							"columns":[
 								new GridColumn({

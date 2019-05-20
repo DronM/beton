@@ -150,6 +150,15 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
 		$this->addField($f_acc_comment);
 		//********************
+		
+		//*** Field vehicle_owner_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="vehicle_owner_id";
+				
+		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
+		$this->addField($f_vehicle_owner_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

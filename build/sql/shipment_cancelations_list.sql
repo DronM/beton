@@ -12,7 +12,10 @@ CREATE OR REPLACE VIEW shipment_cancelations_list AS
 		vehicle_schedules_ref(vsch,vh,dr) AS vehicle_schedules_ref,
 		sh.comment_text,
 		sh.user_id,
-		users_ref(u) AS users_ref
+		users_ref(u) AS users_ref,
+		sh.assign_date_time,
+		sh.ship_date_time
+		
 	FROM shipment_cancelations AS sh
 	LEFT JOIN orders o ON o.id=sh.order_id
 	LEFT JOIN vehicle_schedules vsch ON vsch.id=sh.vehicle_schedule_id

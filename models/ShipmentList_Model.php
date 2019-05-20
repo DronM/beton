@@ -13,6 +13,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ShipmentList_Model extends ModelSQLBeton{
@@ -323,6 +324,24 @@ class ShipmentList_Model extends ModelSQLBeton{
 				
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
+		//********************
+		
+		//*** Field owner_agreed ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Согласовано собственником ТС';
+		$f_opts['id']="owner_agreed";
+				
+		$f_owner_agreed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_agreed",$f_opts);
+		$this->addField($f_owner_agreed);
+		//********************
+		
+		//*** Field owner_agreed_date_time ***
+		$f_opts = array();
+		$f_opts['id']="owner_agreed_date_time";
+				
+		$f_owner_agreed_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_agreed_date_time",$f_opts);
+		$this->addField($f_owner_agreed_date_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
