@@ -274,6 +274,8 @@ $permissions = array();
 				
 					$permissions['Shipment_Controller_owner_set_agreed']=TRUE;
 				
+					$permissions['Shipment_Controller_owner_set_pump_agreed']=TRUE;
+				
 					$permissions['User_Controller_insert']=TRUE;
 				
 					$permissions['User_Controller_update']=TRUE;

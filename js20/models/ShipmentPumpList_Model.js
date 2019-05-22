@@ -25,11 +25,38 @@ function ShipmentPumpList_Model(options){
 				
 	
 	var filed_options = {};
+	filed_options.primaryKey = true;	
+	filed_options.alias = 'Номер';
+	filed_options.autoInc = false;	
+	
+	options.fields.id = new FieldInt("id",filed_options);
+	
+				
+	
+	var filed_options = {};
 	filed_options.primaryKey = false;	
 	filed_options.alias = 'Дата отгрузки';
 	filed_options.autoInc = false;	
 	
 	options.fields.ship_date_time = new FieldDateTime("ship_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Завод';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
 	
 				
 	
@@ -47,7 +74,16 @@ function ShipmentPumpList_Model(options){
 	filed_options.alias = 'Клиент';
 	filed_options.autoInc = false;	
 	
-	options.fields.client_descr = new FieldString("client_descr",filed_options);
+	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Объект';
+	filed_options.autoInc = false;	
+	
+	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
 	
 				
 	
@@ -62,10 +98,19 @@ function ShipmentPumpList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Объект';
+	filed_options.alias = 'Марка';
 	filed_options.autoInc = false;	
 	
-	options.fields.destination_descr = new FieldString("destination_descr",filed_options);
+	options.fields.concrete_types_ref = new FieldJSON("concrete_types_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.concrete_type_id = new FieldInt("concrete_type_id",filed_options);
 	
 				
 	
@@ -80,28 +125,19 @@ function ShipmentPumpList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Цена насоса';
+	filed_options.alias = 'Автомобиль';
 	filed_options.autoInc = false;	
 	
-	options.fields.pump_price = new FieldFloat("pump_price",filed_options);
+	options.fields.vehicles_ref = new FieldJSON("vehicles_ref",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Владелец';
+	
 	filed_options.autoInc = false;	
 	
-	options.fields.vehicle_owners_ref = new FieldString("vehicle_owners_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Гос.номер';
-	filed_options.autoInc = false;	
-	
-	options.fields.plate = new FieldString("plate",filed_options);
+	options.fields.vehicle_id = new FieldInt("vehicle_id",filed_options);
 	
 				
 	
@@ -110,7 +146,43 @@ function ShipmentPumpList_Model(options){
 	filed_options.alias = 'Водитель';
 	filed_options.autoInc = false;	
 	
-	options.fields.driver_descr = new FieldString("driver_descr",filed_options);
+	options.fields.drivers_ref = new FieldJSON("drivers_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.driver_id = new FieldInt("driver_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Владелец';
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owners_ref = new FieldJSON("vehicle_owners_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Комментарий бухгалетрии';
+	filed_options.autoInc = false;	
+	
+	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
 	
 				
 	
@@ -125,11 +197,148 @@ function ShipmentPumpList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Бланки';
+	filed_options.alias = 'Стоимость доставки';
 	filed_options.autoInc = false;	
 	
-	options.fields.blanks_exist = new FieldString("blanks_exist",filed_options);
+	options.fields.cost = new FieldFloat("cost",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стомость простоя';
+	filed_options.autoInc = false;	
+	
+	options.fields.demurrage_cost = new FieldFloat("demurrage_cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_cost = new FieldFloat("pump_cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicles_ref = new FieldJSON("pump_vehicles_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'TRUE';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_id = new FieldInt("pump_vehicle_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Насос,владелец';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicles_owners_ref = new FieldJSON("pump_vehicles_owners_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'TRUE';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_owner_id = new FieldInt("pump_vehicle_owner_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.shipped = new FieldBool("shipped",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Оценка';
+	filed_options.autoInc = false;	
+	
+	options.fields.client_mark = new FieldInt("client_mark",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Наличие бланков';
+	filed_options.autoInc = false;	
+	
+	options.fields.blanks_exist = new FieldBool("blanks_exist",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.user_id = new FieldInt("user_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Автор';
+	filed_options.autoInc = false;	
+	
+	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Согласовано миксер';
+	filed_options.autoInc = false;	
+	
+	options.fields.owner_agreed = new FieldBool("owner_agreed",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата согласования миксер';
+	filed_options.autoInc = false;	
+	
+	options.fields.owner_agreed_date_time = new FieldDateTimeTZ("owner_agreed_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Согласовано насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.owner_pump_agreed = new FieldBool("owner_pump_agreed",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата согласования насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.owner_pump_agreed_date_time = new FieldDateTimeTZ("owner_pump_agreed_date_time",filed_options);
+	
+			
+			
 		ShipmentPumpList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ShipmentPumpList_Model,ModelXML);

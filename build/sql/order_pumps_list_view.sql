@@ -1,6 +1,6 @@
 -- View: public.order_pumps_list_view
 
--- DROP VIEW public.order_pumps_list_view;
+ DROP VIEW public.order_pumps_list_view;
 
 CREATE OR REPLACE VIEW public.order_pumps_list_view AS 
 	SELECT
@@ -20,7 +20,14 @@ CREATE OR REPLACE VIEW public.order_pumps_list_view AS
 		op.viewed,
 		op.comment,
 		users_ref(u) AS users_ref,
-		o.user_id
+		o.user_id,
+		o.phone_cel,
+		
+		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
+		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		pvh.vehicle_id AS pump_vehicle_id,
+		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id
+		
 		
 	FROM orders o
 	LEFT JOIN order_pumps op ON o.id = op.order_id
@@ -28,6 +35,10 @@ CREATE OR REPLACE VIEW public.order_pumps_list_view AS
 	LEFT JOIN destinations d ON d.id = o.destination_id
 	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
 	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	
 	WHERE o.pump_vehicle_id IS NOT NULL AND o.unload_type<>'none'
 	ORDER BY o.date_time DESC;
 

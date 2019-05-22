@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtPassword.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
@@ -445,6 +446,13 @@ class User_Controller extends ControllerSQL{
 			$filter->addField($field,'=');
 			GlobalFilter::set('PumpVehicleList_Model',$filter);
 						
+			$model = new OrderPumpList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById('pump_vehicle_owner_id');
+			$field->setValue($_SESSION['global_vehicle_owner_id']);
+			$filter->addField($field,'=');
+			GlobalFilter::set('OrderPumpList_Model',$filter);
+						
 			$model = new ShipmentList_Model($this->getDbLink());
 			$filter = new ModelWhereSQL();
 			$field = clone $model->getFieldById('vehicle_owner_id');
@@ -458,6 +466,13 @@ class User_Controller extends ControllerSQL{
 			$field->setValue($_SESSION['global_vehicle_owner_id']);
 			$filter->addField($field,'=');
 			GlobalFilter::set('ShipmentDialog_Model',$filter);
+						
+			$model = new ShipmentPumpList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById('pump_vehicle_owner_id');
+			$field->setValue($_SESSION['global_vehicle_owner_id']);
+			$filter->addField($field,'=');
+			GlobalFilter::set('ShipmentPumpList_Model',$filter);
 			
 		}
 		

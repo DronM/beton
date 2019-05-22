@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-20 05:57:26</lastBuild></version>
+		<lastBuild>2019-05-22 05:44:33</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -33,6 +33,7 @@
 		<version dateOpen="2019-05-13 11:05:21" dateClose="2019-05-14 06:05:03">1.00127</version>
 		<version dateOpen="2019-05-14 06:05:03" dateClose="2019-05-16 06:05:27">1.00128</version>
 		<version dateOpen="2019-05-17 05:05:48" dateClose="2019-05-20 05:05:57">1.00129</version>
+		<version dateOpen="2019-05-20 05:05:58" dateClose="2019-05-22 05:05:44">1.00130</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -755,6 +756,11 @@
 			<field id="comment" dataType="Text" alias="Комментарий"/>
 			<field id="users_ref" dataType="JSON" alias="Автор"/>
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="pump_vehicles_ref" dataType="JSON" alias="Насос"/>
+			<field id="pump_vehicle_id" dataType="Int" sysCol="TRUE"/>
+			<field id="pump_vehicle_owners_ref" dataType="JSON" alias="Владелец насоса"/>
+			<field id="pump_vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
+			<globalFilter id="vehicle_owner_id" fieldId="pump_vehicle_owner_id"/>
 		</model>
 		<model id="Offer" parent="ModelSQLBeton" dataTable="offer" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
@@ -859,11 +865,15 @@
 			<field id="user_id" dataType="Int" refTable="users" refField="id" alias="Автор"/>
 			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id" alias="Завод" required="FALSE"/>
 			<field id="client_mark" dataType="Int" alias="Баллы"/>
-			<field id="demurrage" dataType="Time" alias="Простой"/>
+			<field id="demurrage" dataType="Interval" alias="Простой"/>
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<field id="owner_agreed" dataType="Bool" defaultValue="FALSE"/>
 			<field id="owner_agreed_date_time" dataType="DateTimeTZ"/>
 			<field id="acc_comment" dataType="Text"/>
+			<field id="owner_pump_agreed" dataType="Bool" defaultValue="FALSE"/>
+			<field id="owner_pump_agreed_date_time" dataType="DateTimeTZ"/>
+			<field id="pump_cost" dataType="Float" length="2" precision="2"/>
+			<field id="pump_cost_edit" dataType="Bool" defaultValue="FALSE"/>
 			<index id="shipments_date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -893,7 +903,7 @@
 			<field id="vehicle_owner_id" dataType="Int" stsCol="TRUE"/>
 			<field id="vehicle_owners_ref" dataType="JSON" alias="Владелец"/>
 			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
-			<field id="demurrage" dataType="Time" alias="Простой"/>
+			<field id="demurrage" dataType="String" alias="Простой"/>
 			<field id="cost" dataType="Float" alias="Стоимость доставки"/>
 			<field id="demurrage_cost" dataType="Float" alias="Стомость простоя"/>
 			<field id="pump_cost" dataType="Float" alias="Стоимость насос"/>
@@ -906,8 +916,10 @@
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 			<field id="users_ref" dataType="JSON" alias="Автор"/>
-			<field id="owner_agreed" dataType="Bool" alias="Согласовано собственником ТС"/>
-			<field id="owner_agreed_date_time" dataType="DateTimeTZ"/>
+			<field id="owner_agreed" dataType="Bool" alias="Согласовано миксер"/>
+			<field id="owner_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования миксер"/>
+			<field id="owner_pump_agreed" dataType="Bool" alias="Согласовано насос"/>
+			<field id="owner_pump_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования насос"/>
 			<sql/>
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
@@ -926,8 +938,50 @@
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
 			<field id="vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
+			<field id="pump_cost" dataType="Float" alias="Стоимость насос"/>
+			<field id="pump_cost_edit" dataType="Bool"/>
+			<field id="pump_vehicles_ref" dataType="JSON" alias="Насос"/>
 			<sql/>
 			<globalFilter id="vehicle_owner_id"/>
+		</model>
+		<model id="ShipmentPumpList" parent="ModelSQLBeton" dataTable="shipments_pump_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
+			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
+			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="vehicles_ref" dataType="JSON" alias="Автомобиль"/>
+			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
+			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
+			<field id="driver_id" dataType="Int" sysCol="TRUE"/>
+			<field id="vehicle_owner_id" dataType="Int" stsCol="TRUE"/>
+			<field id="vehicle_owners_ref" dataType="JSON" alias="Владелец"/>
+			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
+			<field id="demurrage" dataType="String" alias="Простой"/>
+			<field id="cost" dataType="Float" alias="Стоимость доставки"/>
+			<field id="demurrage_cost" dataType="Float" alias="Стомость простоя"/>
+			<field id="pump_cost" dataType="Float" alias="Стоимость насос"/>
+			<field id="pump_vehicles_ref" dataType="JSON" alias="Насос"/>
+			<field id="pump_vehicle_id" dataType="Int" alias="TRUE"/>
+			<field id="pump_vehicles_owners_ref" dataType="JSON" alias="Насос,владелец"/>
+			<field id="pump_vehicle_owner_id" dataType="Int" alias="TRUE"/>
+			<field id="shipped" dataType="Bool" sysCol="TRUE"/>
+			<field id="client_mark" dataType="Int" alias="Оценка"/>
+			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
+			<field id="user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="users_ref" dataType="JSON" alias="Автор"/>
+			<field id="owner_agreed" dataType="Bool" alias="Согласовано миксер"/>
+			<field id="owner_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования миксер"/>
+			<field id="owner_pump_agreed" dataType="Bool" alias="Согласовано насос"/>
+			<field id="owner_pump_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования насос"/>
+			<sql/>
+			<globalFilter id="vehicle_owner_id" fieldId="pump_vehicle_owner_id"/>
 		</model>
 		<model id="ShipmentForOrderList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
@@ -991,20 +1045,6 @@
 			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
-		</model>
-		<model id="ShipmentPumpList" parent="ModelSQLBeton" dataTable="shipment_pumps_list" virtual="TRUE">
-			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
-			<field id="client_id" dataType="Int" sysCol="TRUE"/>
-			<field id="client_descr" dataType="String" alias="Клиент"/>
-			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
-			<field id="destination_descr" dataType="String" alias="Объект"/>
-			<field id="quant" dataType="Float" alias="Количество"/>
-			<field id="pump_price" dataType="Float" alias="Цена насоса"/>
-			<field id="vehicle_owners_ref" dataType="String" alias="Владелец"/>
-			<field id="plate" dataType="String" alias="Гос.номер"/>
-			<field id="driver_descr" dataType="String" alias="Водитель"/>
-			<field id="demurrage" dataType="String" alias="Простой"/>
-			<field id="blanks_exist" dataType="String" alias="Бланки"/>
 		</model>
 		<model id="ShipmentDateList" parent="ModelSQLBeton" dataTable="shipment_dates_list" virtual="TRUE">
 			<field id="ship_date" dataType="DateTime" alias="Дата"/>
@@ -2501,6 +2541,9 @@
 			<publicMethod id="owner_set_agreed">
 				<field id="shipment_id" dataType="Int" required="TRUE"/>
 			</publicMethod>
+			<publicMethod id="owner_set_pump_agreed">
+				<field id="shipment_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
 		</controller>
 		<controller id="User" parentId="ControllerSQL" state="TRUE" noState="TRUE">
 			<publicMethod id="insert" modelId="User"/>
@@ -3097,7 +3140,9 @@
 		<permission type="allow" controllerId="User" methodId="update" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Captcha" methodId="get" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Shipment" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Shipment" methodId="get_pump_list" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Shipment" methodId="owner_set_agreed" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Shipment" methodId="owner_set_pump_agreed" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Vehicle" methodId="get_list" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Vehicle" methodId="get_object" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Vehicle" methodId="vehicles_with_trackers" roleId="vehicle_owner"/>
@@ -3116,6 +3161,7 @@
 		<permission type="allow" controllerId="Destination" methodId="complete_dest" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Driver" methodId="get_list" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="ProductionSite" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="OrderPump" methodId="get_list" roleId="vehicle_owner"/>
 	</permissions>
 	<views>
 		<view id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи"/>
@@ -3154,6 +3200,7 @@
 		<view id="20005" c="RAMaterialConsumption_Controller" t="RAMaterialConsumptionDateList" f="get_dates_list" section="Документы" descr="Расход материалов"/>
 		<view id="20006" c="SandQuarryVal_Controller" t="SandQuarryValList" f="get_list" section="Документы" descr="Журнал по песку"/>
 		<view id="20007" c="StoneQuarryVal_Controller" t="StoneQuarryValList" f="get_list" section="Документы" descr="Журнал по щебню"/>
+		<view id="20008" c="Shipment_Controller" t="ShipmentPumpList" f="get_pump_list" section="Документы" descr="Отгрузки (насосы)"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -3194,6 +3241,7 @@
 		<serverTemplate id="EmployeeList"/>
 		<serverTemplate id="ClientComeFromList"/>
 		<serverTemplate id="ShipmentTimeNormList"/>
+		<serverTemplate id="ShipmentPumpList"/>
 		<serverTemplate id="DriverList"/>
 		<serverTemplate id="VehicleList"/>
 		<serverTemplate id="SupplierList"/>
@@ -3758,6 +3806,7 @@
 		<jsScript file="views/ConcreteCostList_View.js"/>
 		<jsScript file="views/VehicleOwnerList_View.js"/>
 		<jsScript file="views/ShipmentCancelationList.js"/>
+		<jsScript file="views/ShipmentPumpList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>

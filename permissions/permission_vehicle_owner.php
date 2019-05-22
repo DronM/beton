@@ -28,7 +28,11 @@ $permissions = array();
 		
 			$permissions['Shipment_Controller_get_list']=TRUE;
 		
+			$permissions['Shipment_Controller_get_pump_list']=TRUE;
+		
 			$permissions['Shipment_Controller_owner_set_agreed']=TRUE;
+		
+			$permissions['Shipment_Controller_owner_set_pump_agreed']=TRUE;
 		
 			$permissions['Vehicle_Controller_get_list']=TRUE;
 		
@@ -65,6 +69,8 @@ $permissions = array();
 			$permissions['Driver_Controller_get_list']=TRUE;
 		
 			$permissions['ProductionSite_Controller_get_list']=TRUE;
+		
+			$permissions['OrderPump_Controller_get_list']=TRUE;
 		
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

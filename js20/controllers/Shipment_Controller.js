@@ -43,6 +43,7 @@ function Shipment_Controller(options){
 	this.add_delete_shipped();
 	this.add_delete_assigned();
 	this.add_owner_set_agreed();
+	this.add_owner_set_pump_agreed();
 		
 }
 extend(Shipment_Controller,ControllerObjServer);
@@ -102,7 +103,7 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	var options = {};
 	options.alias = "Простой";
-	var field = new FieldTime("demurrage",options);
+	var field = new FieldInterval("demurrage",options);
 	
 	pm.addField(field);
 	
@@ -127,6 +128,30 @@ extend(Shipment_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldText("acc_comment",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("owner_pump_agreed",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldDateTimeTZ("owner_pump_agreed_date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("pump_cost",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("pump_cost_edit",options);
 	
 	pm.addField(field);
 	
@@ -192,7 +217,7 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	var options = {};
 	options.alias = "Простой";
-	var field = new FieldTime("demurrage",options);
+	var field = new FieldInterval("demurrage",options);
 	
 	pm.addField(field);
 	
@@ -217,6 +242,30 @@ extend(Shipment_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldText("acc_comment",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("owner_pump_agreed",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldDateTimeTZ("owner_pump_agreed_date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("pump_cost",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("pump_cost_edit",options);
 	
 	pm.addField(field);
 	
@@ -304,7 +353,7 @@ extend(Shipment_Controller,ControllerObjServer);
 	pm.addField(new FieldText("acc_comment",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Простой";
-	pm.addField(new FieldTime("demurrage",f_opts));
+	pm.addField(new FieldString("demurrage",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Стоимость доставки";
 	pm.addField(new FieldFloat("cost",f_opts));
@@ -342,11 +391,17 @@ extend(Shipment_Controller,ControllerObjServer);
 	f_opts.alias = "Автор";
 	pm.addField(new FieldJSON("users_ref",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Согласовано собственником ТС";
+	f_opts.alias = "Согласовано миксер";
 	pm.addField(new FieldBool("owner_agreed",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Дата согласования миксер";
 	pm.addField(new FieldDateTimeTZ("owner_agreed_date_time",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Согласовано насос";
+	pm.addField(new FieldBool("owner_pump_agreed",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Дата согласования насос";
+	pm.addField(new FieldDateTimeTZ("owner_pump_agreed_date_time",f_opts));
 }
 
 			Shipment_Controller.prototype.add_get_list_for_order = function(){
@@ -603,6 +658,22 @@ extend(Shipment_Controller,ControllerObjServer);
 			Shipment_Controller.prototype.add_owner_set_agreed = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('owner_set_agreed',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("shipment_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_owner_set_pump_agreed = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('owner_set_pump_agreed',opts);
 	
 				
 	

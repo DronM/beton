@@ -184,6 +184,43 @@ function OrderPumpList_Model(options){
 	
 	options.fields.user_id = new FieldInt("user_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicles_ref = new FieldJSON("pump_vehicles_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_id = new FieldInt("pump_vehicle_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Владелец насоса';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_owners_ref = new FieldJSON("pump_vehicle_owners_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_owner_id = new FieldInt("pump_vehicle_owner_id",filed_options);
+	
+			
 		OrderPumpList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderPumpList_Model,ModelXML);

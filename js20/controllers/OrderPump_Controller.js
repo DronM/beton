@@ -166,6 +166,18 @@ extend(OrderPump_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("user_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Насос";
+	pm.addField(new FieldJSON("pump_vehicles_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("pump_vehicle_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Владелец насоса";
+	pm.addField(new FieldJSON("pump_vehicle_owners_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("pump_vehicle_owner_id",f_opts));
 }
 
 			OrderPump_Controller.prototype.addGetObject = function(){

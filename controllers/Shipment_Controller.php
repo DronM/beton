@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtPassword.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
@@ -82,7 +83,7 @@ class Shipment_Controller extends ControllerSQL{
 				'alias'=>'Баллы'
 			));
 		$pm->addParam($param);
-		$param = new FieldExtTime('demurrage'
+		$param = new FieldExtInterval('demurrage'
 				,array(
 				'alias'=>'Простой'
 			));
@@ -99,6 +100,18 @@ class Shipment_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		$param = new FieldExtText('acc_comment'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtBool('owner_pump_agreed'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('owner_pump_agreed_date_time'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtFloat('pump_cost'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtBool('pump_cost_edit'
 				,array());
 		$pm->addParam($param);
 		
@@ -163,7 +176,7 @@ class Shipment_Controller extends ControllerSQL{
 				'alias'=>'Баллы'
 			));
 			$pm->addParam($param);
-		$param = new FieldExtTime('demurrage'
+		$param = new FieldExtInterval('demurrage'
 				,array(
 			
 				'alias'=>'Простой'
@@ -184,6 +197,22 @@ class Shipment_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtText('acc_comment'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('owner_pump_agreed'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('owner_pump_agreed_date_time'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('pump_cost'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('pump_cost_edit'
 				,array(
 			));
 			$pm->addParam($param);
@@ -437,6 +466,18 @@ class Shipment_Controller extends ControllerSQL{
 
 			
 		$pm = new PublicMethod('owner_set_agreed');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('shipment_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('owner_set_pump_agreed');
 		
 				
 	$opts=array();
@@ -946,21 +987,24 @@ class Shipment_Controller extends ControllerSQL{
 		}		
 	}
 
-	function owner_set_agreed($pm){
+	private function update_owner_agreed_field($shipmentId,$isPump){
 	
-		$shipment_id = $this->getExtDbVal($pm,"shipment_id");			
-		
 		if($_SESSION['role_id']=='vehicle_owner'){
 			//check
-			$ar = $this->getDbLinkMaster()->query_first(
-				sprintf(
-					"SELECT v.vehicle_owner_id
+			if($isPump){
+				$q = "SELECT sh.pump_vehicle_owner_id AS vehicle_owner_id
+					FROM shipments_pump_list AS sh
+					WHERE sh.id=%d";			
+			}
+			else{
+				$q = "SELECT v.vehicle_owner_id
 					FROM shipments AS sh
 					LEFT JOIN vehicle_schedules AS sch ON sch.id=sh.vehicle_schedule_id
 					LEFT JOIN vehicles AS v ON v.id=sch.vehicle_id
-					WHERE sh.id=%d",
-					$shipment_id
-				)
+					WHERE sh.id=%d";
+			}			
+			$ar = $this->getDbLinkMaster()->query_first(
+				sprintf($q,$shipmentId)
 			);
 			if(!is_array($ar) || !count($ar) || $ar['vehicle_owner_id']!=$_SESSION['global_vehicle_owner_id']){
 				throw new Exception('Permission denied!');
@@ -970,16 +1014,26 @@ class Shipment_Controller extends ControllerSQL{
 			throw new Exception('Permission denied!');
 		}
 		
+		$set_field_id = $isPump? 'owner_pump_agreed':'owner_agreed';
 		$this->getDbLinkMaster()->query(
 			sprintf(
 				"UPDATE shipments
 				SET
-					owner_agreed=TRUE,
-					owner_agreed_date_time=now()
+					%s=TRUE,
+					%s_date_time=now()
 				WHERE id=%d",
-				$shipment_id
+				$set_field_id,$set_field_id,				
+				$shipmentId
 			)
 		);
+	}
+	
+	function owner_set_agreed($pm){
+		$this->update_owner_agreed_field($this->getExtDbVal($pm,'shipment_id'),FALSE);
+	}
+	
+	function owner_set_pump_agreed($pm){
+		$this->update_owner_agreed_field($this->getExtDbVal($pm,'shipment_id'),TRUE);
 	}
 	
 }

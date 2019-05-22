@@ -7,5 +7,5 @@ CREATE OR REPLACE VIEW public.shipments_pump_list AS
 	WHERE pump_vehicle_id IS NOT NULL
 	;
 ALTER TABLE public.shipments_pump_list
-  OWNER TO beton;
+  OWNER TO ;
 

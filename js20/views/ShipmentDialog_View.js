@@ -20,6 +20,8 @@ function ShipmentDialog_View(id,options){
 	options.controller = new Shipment_Controller();
 	options.model = options.models.ShipmentDialog_Model;
 	
+	var self = this;
+	
 	options.addElement = function(){
 		this.addElement(new EditInt(id+":id",{
 			"inline":true,
@@ -75,7 +77,20 @@ function ShipmentDialog_View(id,options){
 
 		this.addElement(new EditText(id+":acc_comment",{
 			"labelCaption":"Комментарий бухгалтерии:"
-		}));	
+		}));
+		
+		this.addElement(new EditMoneyEditable(id+":pump_cost",{
+			"className":"form-control orderMoneyField",
+			"labelCaption":"Стомисоть насос:",
+			"value":0,
+			"enabled":false
+			,"onToggleEditable":function(){
+				if(!self.getElement("pump_cost").getEditAllowed()){
+					self.getElement("pump_cost").setValue(0);
+				}
+			}
+		}));
+			
 
 	}
 	
@@ -95,15 +110,60 @@ function ShipmentDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("blanks_exist")})
 		,new DataBinding({"control":this.getElement("demurrage")})
 		,new DataBinding({"control":this.getElement("acc_comment")})
+		,new DataBinding({"control":this.getElement("pump_cost")})
 	]);
 	
 	//write
 	this.setWriteBindings([
-		new CommandBinding({"control":this.getElement("client_mark")})
+		new CommandBinding({
+			"func":function(pm){
+				if(self.getPumpCostEditModified()){
+					var pump_cost_edit = !self.m_model.getFieldValue("pump_cost_edit");
+					pm.setFieldValue("pump_cost_edit",pump_cost_edit);
+					if(pump_cost_edit){
+						pm.setFieldValue("pump_cost",this.getElement("pump_cost").getValue());
+					}
+					else{
+						pm.unsetFieldValue("pump_cost");
+					}
+				}
+				else{
+					pm.unsetFieldValue("pump_cost_edit");
+				}
+			}
+		})
+	
+		,new CommandBinding({"control":this.getElement("client_mark")})
 		,new CommandBinding({"control":this.getElement("blanks_exist")})
 		,new CommandBinding({"control":this.getElement("demurrage")})
 		,new CommandBinding({"control":this.getElement("acc_comment")})
+		,new CommandBinding({"control":this.getElement("pump_cost")})
 	]);
 	
 }
 extend(ShipmentDialog_View,ViewObjectAjx);
+
+ShipmentDialog_View.prototype.getModified = function(cmd){
+	return (
+		ShipmentDialog_View.superclass.getModified.call(this,cmd) || this.getPumpCostEditModified()|| this.getElement("pump_cost").getModified()
+	);
+}
+
+ShipmentDialog_View.prototype.getPumpCostEditModified = function(pm){
+	return (this.getElement("pump_cost").getEditAllowed()!=this.m_model.getFieldValue("pump_cost_edit"));
+}
+
+ShipmentDialog_View.prototype.onGetData = function(resp,cmd){
+	ShipmentDialog_View.superclass.onGetData.call(this,resp,cmd);
+	
+	var m = this.getModel();
+
+	var pv = m.getFieldValue("pump_vehicles_ref");
+	if(!pv || pv.isNull()){
+		this.getElement("pump_cost").setVisible(false);
+	}
+	else{
+		this.getElement("pump_cost").setEditAllowed(m.getFieldValue("pump_cost_edit"));	
+	}
+
+}

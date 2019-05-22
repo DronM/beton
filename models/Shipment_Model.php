@@ -11,8 +11,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
  
 class Shipment_Model extends ModelSQLBeton{
@@ -114,7 +114,7 @@ class Shipment_Model extends ModelSQLBeton{
 		$f_opts['alias']='Простой';
 		$f_opts['id']="demurrage";
 				
-		$f_demurrage=new FieldSQLTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage",$f_opts);
+		$f_demurrage=new FieldSQLInterval($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage",$f_opts);
 		$this->addField($f_demurrage);
 		//********************
 		
@@ -151,6 +151,41 @@ class Shipment_Model extends ModelSQLBeton{
 				
 		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
 		$this->addField($f_acc_comment);
+		//********************
+		
+		//*** Field owner_pump_agreed ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="owner_pump_agreed";
+				
+		$f_owner_pump_agreed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_pump_agreed",$f_opts);
+		$this->addField($f_owner_pump_agreed);
+		//********************
+		
+		//*** Field owner_pump_agreed_date_time ***
+		$f_opts = array();
+		$f_opts['id']="owner_pump_agreed_date_time";
+				
+		$f_owner_pump_agreed_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_pump_agreed_date_time",$f_opts);
+		$this->addField($f_owner_pump_agreed_date_time);
+		//********************
+		
+		//*** Field pump_cost ***
+		$f_opts = array();
+		$f_opts['length']=2;
+		$f_opts['id']="pump_cost";
+				
+		$f_pump_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost",$f_opts);
+		$this->addField($f_pump_cost);
+		//********************
+		
+		//*** Field pump_cost_edit ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="pump_cost_edit";
+				
+		$f_pump_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost_edit",$f_opts);
+		$this->addField($f_pump_cost_edit);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

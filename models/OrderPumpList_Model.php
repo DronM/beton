@@ -198,6 +198,44 @@ class OrderPumpList_Model extends ModelSQLBeton{
 		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
 		$this->addField($f_user_id);
 		//********************
+		
+		//*** Field pump_vehicles_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Насос';
+		$f_opts['id']="pump_vehicles_ref";
+				
+		$f_pump_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicles_ref",$f_opts);
+		$this->addField($f_pump_vehicles_ref);
+		//********************
+		
+		//*** Field pump_vehicle_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="pump_vehicle_id";
+				
+		$f_pump_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_id",$f_opts);
+		$this->addField($f_pump_vehicle_id);
+		//********************
+		
+		//*** Field pump_vehicle_owners_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Владелец насоса';
+		$f_opts['id']="pump_vehicle_owners_ref";
+				
+		$f_pump_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owners_ref",$f_opts);
+		$this->addField($f_pump_vehicle_owners_ref);
+		//********************
+		
+		//*** Field pump_vehicle_owner_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="pump_vehicle_owner_id";
+				
+		$f_pump_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owner_id",$f_opts);
+		$this->addField($f_pump_vehicle_owner_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

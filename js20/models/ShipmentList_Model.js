@@ -191,7 +191,7 @@ function ShipmentList_Model(options){
 	filed_options.alias = 'Простой';
 	filed_options.autoInc = false;	
 	
-	options.fields.demurrage = new FieldTime("demurrage",filed_options);
+	options.fields.demurrage = new FieldString("demurrage",filed_options);
 	
 				
 	
@@ -305,7 +305,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Согласовано собственником ТС';
+	filed_options.alias = 'Согласовано миксер';
 	filed_options.autoInc = false;	
 	
 	options.fields.owner_agreed = new FieldBool("owner_agreed",filed_options);
@@ -314,10 +314,28 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Дата согласования миксер';
 	filed_options.autoInc = false;	
 	
 	options.fields.owner_agreed_date_time = new FieldDateTimeTZ("owner_agreed_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Согласовано насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.owner_pump_agreed = new FieldBool("owner_pump_agreed",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата согласования насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.owner_pump_agreed_date_time = new FieldDateTimeTZ("owner_pump_agreed_date_time",filed_options);
 	
 			
 			

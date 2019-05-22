@@ -8,10 +8,10 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
@@ -204,7 +204,7 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Простой';
 		$f_opts['id']="demurrage";
 				
-		$f_demurrage=new FieldSQLTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage",$f_opts);
+		$f_demurrage=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage",$f_opts);
 		$this->addField($f_demurrage);
 		//********************
 		
@@ -329,7 +329,7 @@ class ShipmentList_Model extends ModelSQLBeton{
 		//*** Field owner_agreed ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Согласовано собственником ТС';
+		$f_opts['alias']='Согласовано миксер';
 		$f_opts['id']="owner_agreed";
 				
 		$f_owner_agreed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_agreed",$f_opts);
@@ -338,10 +338,32 @@ class ShipmentList_Model extends ModelSQLBeton{
 		
 		//*** Field owner_agreed_date_time ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Дата согласования миксер';
 		$f_opts['id']="owner_agreed_date_time";
 				
 		$f_owner_agreed_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_agreed_date_time",$f_opts);
 		$this->addField($f_owner_agreed_date_time);
+		//********************
+		
+		//*** Field owner_pump_agreed ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Согласовано насос';
+		$f_opts['id']="owner_pump_agreed";
+				
+		$f_owner_pump_agreed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_pump_agreed",$f_opts);
+		$this->addField($f_owner_pump_agreed);
+		//********************
+		
+		//*** Field owner_pump_agreed_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Дата согласования насос';
+		$f_opts['id']="owner_pump_agreed_date_time";
+				
+		$f_owner_pump_agreed_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_pump_agreed_date_time",$f_opts);
+		$this->addField($f_owner_pump_agreed_date_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

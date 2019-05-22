@@ -67,6 +67,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		
 		CASE
 			WHEN o.pump_vehicle_id IS NULL THEN 0
+			WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost
 			--last ship only!!!
 			WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
 			THEN
@@ -93,7 +94,10 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		pvh.vehicle_id AS pump_vehicle_id,
 		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
 		sh.owner_agreed,
-		sh.owner_agreed_date_time
+		sh.owner_agreed_date_time,
+		sh.owner_pump_agreed,
+		sh.owner_pump_agreed_date_time
+		
 		
 		
 	FROM shipments sh

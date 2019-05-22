@@ -159,6 +159,34 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
 		$this->addField($f_vehicle_owner_id);
 		//********************
+		
+		//*** Field pump_cost ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость насос';
+		$f_opts['id']="pump_cost";
+				
+		$f_pump_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost",$f_opts);
+		$this->addField($f_pump_cost);
+		//********************
+		
+		//*** Field pump_cost_edit ***
+		$f_opts = array();
+		$f_opts['id']="pump_cost_edit";
+				
+		$f_pump_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost_edit",$f_opts);
+		$this->addField($f_pump_cost_edit);
+		//********************
+		
+		//*** Field pump_vehicles_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Насос';
+		$f_opts['id']="pump_vehicles_ref";
+				
+		$f_pump_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicles_ref",$f_opts);
+		$this->addField($f_pump_vehicles_ref);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

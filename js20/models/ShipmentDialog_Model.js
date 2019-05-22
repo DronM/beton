@@ -148,6 +148,33 @@ function ShipmentDialog_Model(options){
 	
 	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_cost = new FieldFloat("pump_cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_cost_edit = new FieldBool("pump_cost_edit",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Насос';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicles_ref = new FieldJSON("pump_vehicles_ref",filed_options);
+	
 			
 			
 		ShipmentDialog_Model.superclass.constructor.call(this,id,options);
