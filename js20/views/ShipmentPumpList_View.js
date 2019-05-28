@@ -19,7 +19,7 @@ function ShipmentPumpList_View(id,options){
 	window.getApp().getConstantManager().get(constants);
 
 	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
-		"field":new FieldDateTime("ship_date_time")
+		"field":new FieldDateTime("date_time")
 	});
 
 	var filters = {
@@ -75,25 +75,6 @@ function ShipmentPumpList_View(id,options){
 					"field":new FieldInt("client_id")}),
 				"sign":"e"		
 			};
-			filters.driver = {
-				"binding":new CommandBinding({
-					"control":new DriverEditRef(id+":filter-ctrl-driver",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Водитель:"
-					}),
-					"field":new FieldInt("driver_id")}),
-				"sign":"e"		
-			}
-			filters.vehicle = {
-				"binding":new CommandBinding({
-					"control":new VehicleEdit(id+":filter-ctrl-vehicle",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"ТС:"
-					}),
-					"field":new FieldInt("vehicle_id")}),
-				"sign":"e"		
-			};
-	
 			filters.destination = {
 				"binding":new CommandBinding({
 					"control":new DestinationEdit(id+":filter-ctrl-destination",{
@@ -128,6 +109,7 @@ function ShipmentPumpList_View(id,options){
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
 		"model":model,
+		"keyIds":["last_ship_id"],
 		"readPublicMethod":contr.getPublicMethod("get_pump_list"),
 		"editInline":false,
 		"editWinClass":ShipmentDialog_Form,
@@ -145,25 +127,30 @@ function ShipmentPumpList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:ship_date_time",{
+						new GridCellHead(id+":grid:head:date_time",{
 							"value":"Дата",
 							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDate({
-									"field":model.getField("ship_date_time"),
-									"dateFormat":"d/m/y H:i"
+									"field":model.getField("date_time"),
+									"dateFormat":"d/m/y H:i",
+									"ctrlClass":EditDate,
+									"searchOptions":{
+										"field":new FieldDate("date_time"),
+										"searchType":"on_beg"
+									}																		
 								})
 							],
 							"sortable":true,
 							"sort":"desc"
 						})
 					
-						,new GridCellHead(id+":grid:head:id",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:order_number",{
 							"value":"Номер",
 							"colAttrs":{"clign":"center"},
 							"columns":[
 								new GridColumn({
-									"field":model.getField("id")
+									"field":model.getField("order_number")
 								})
 							],
 							"sortable":true
@@ -182,7 +169,7 @@ function ShipmentPumpList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:clients_ref",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:clients_ref",{
 							"value":"Контрагент",
 							"columns":[
 								new GridColumnRef({
@@ -203,10 +190,11 @@ function ShipmentPumpList_View(id,options){
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
 									"form":(is_v_owner? null:Destination_Form),
-									"ctrlClass":DestinationEdit,
+									"ctrlClass":is_v_owner? EditString:DestinationEdit,
 									"searchOptions":{
-										"field":new FieldInt("destination_id"),
-										"searchType":"on_match"
+										"field":is_v_owner? (new FieldString("destinations_ref->descr")) : (new FieldInt("destination_id")),
+										"searchType":is_v_owner? "on_part":"on_match",
+										"typeChange":is_v_owner
 									}
 								})
 							],
@@ -222,108 +210,14 @@ function ShipmentPumpList_View(id,options){
 									"ctrlClass":ConcreteTypeEdit,
 									"searchOptions":{
 										"field":new FieldInt("concrete_type_id"),
-										"searchType":"on_match"
+										"searchType":"on_match",
+										"typeChange":false
 									}									
 								})
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:quant",{
-							"value":"Количество",
-							"colAttrs":{"align":"right"},
-							"columns":[
-								new GridColumn({
-									"field":model.getField("quant")
-								})
-							]
-						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:vehicles_ref",{
-							"value":"ТС",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("vehicles_ref"),
-									"ctrlClass":VehicleEdit,
-									"searchOptions":{
-										"field":new FieldInt("vehicle_id"),
-										"searchType":"on_match"
-									},
-									"form":VehicleDialog_Form									
-								})
-							],
-							"sortable":true
-						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:drivers_ref",{
-							"value":"Водитель",
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("drivers_ref"),
-									"ctrlClass":DriverEditRef,
-									"searchOptions":{
-										"field":new FieldInt("driver_id"),
-										"searchType":"on_match"
-									}									
-								})
-							],
-							"sortable":true
-						})
-						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:vehicle_owners_ref",{
-							"value":"Владелец ТС",
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("vehicle_owners_ref")
-								})
-							],
-							"sortable":true
-						})
-						,new GridCellHead(id+":grid:head:acc_comment",{
-							"value":"Бух.коммент.",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("acc_comment")
-								})
-							]
-						})						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:demurrage",{
-							"value":"Время простоя",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumn({
-									"field":model.getField("demurrage")
-								})
-							]
-						})
-						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:cost",{
-							"value":"Доставка",
-							"colAttrs":{"align":"right"},
-							"columns":[
-								new GridColumnFloat({
-									"field":model.getField("cost"),
-									"precision":2
-								})
-							]
-						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:demurrage_cost",{
-							"value":"За простой",
-							"colAttrs":{"align":"right"},
-							"columns":[
-								new GridColumnFloat({
-									"field":model.getField("demurrage_cost")									
-								})
-							]
-						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_cost",{
-							"value":"Стоим.насос",
-							"colAttrs":{"align":"right"},
-							"columns":[
-								new GridColumnFloat({
-									"field":model.getField("pump_cost")									
-								})
-							]
-						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_vehicles_ref",{
+						,new GridCellHead(id+":grid:head:pump_vehicles_ref",{
 							"value":"Насос",
 							"columns":[
 								new GridColumnRef({
@@ -337,11 +231,11 @@ function ShipmentPumpList_View(id,options){
 							],
 							"sortable":true
 						})						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_vehicles_owners_ref",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_vehicle_owners_ref",{
 							"value":"Насос,влад.",
 							"columns":[
 								new GridColumnRef({
-									"field":model.getField("pump_vehicles_owners_ref"),
+									"field":model.getField("pump_vehicle_owners_ref"),
 									"ctrlClass":VehicleOwnerEdit,
 									"searchOptions":{
 										"field":new FieldInt("pump_vehicle_owner_id"),
@@ -352,61 +246,42 @@ function ShipmentPumpList_View(id,options){
 							"sortable":true
 						})						
 						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:client_mark",{
-							"value":"Баллы",
-							"colAttrs":{"align":"center"},
+						,new GridCellHead(id+":grid:head:quant",{
+							"value":"Количество",
+							"colAttrs":{"align":"right"},
 							"columns":[
-								new GridColumn({
-									"field":model.getField("client_mark")									
+								new GridColumnFloat({
+									"field":model.getField("quant")
 								})
 							]
 						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:blanks_exist",{
-							"value":"Бланки",
-							"colAttrs":{"align":"center"},
+						,new GridCellHead(id+":grid:head:pump_cost",{
+							"value":"Стоим.насос",
+							"colAttrs":{"align":"right"},
 							"columns":[
-								new GridColumnBool({
-									"field":model.getField("blanks_exist")									
+								new GridColumnFloat({
+									"field":model.getField("pump_cost")									
 								})
-							],
-							"sortable":true
+							]
 						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:users_ref",{
-							"value":"Автор",
+						
+						,new GridCellHead(id+":grid:head:acc_comment",{
+							"value":"Комментарий",
+							"colAttrs":{"align":"right"},
 							"columns":[
-								new GridColumnRef({
-									"field":model.getField("users_ref"),
-									"ctrlClass":UserEditRef,
-									"searchOptions":{
-										"field":new FieldInt("user_id"),
-										"searchType":"on_match"
-									}																										
+								new GridColumn({
+									"field":model.getField("acc_comment")
 								})
-							],
-							"sortable":true
+							]
 						})
+						
 						,(is_v_owner?
-							null
-							:
-							new GridCellHead(id+":grid:head:owner_pump_agreed_date_time",{
-							"value":"Согл.насос",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumnDate({
-									"field":model.getField("owner_pump_agreed_date_time"),
-									"dateFormat":"d/m/y"
-								})
-								]
-							})							
-						)
-												
-						,(is_v_owner?
-							new GridCellHead(id+":grid:head:owner_agreed",{
+							new GridCellHead(id+":grid:head:owner_pump_agreed",{
 							"value":"Согласование",
 							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumn({
-									"id":model.getField("owner_agreed"),
+									"id":model.getField("owner_pump_agreed"),
 									"cellOptions":function(column,row){
 										return (function(column,row){
 											var res = {};
@@ -431,17 +306,33 @@ function ShipmentPumpList_View(id,options){
 								]
 							})					
 							:
-							new GridCellHead(id+":grid:head:owner_agreed_date_time",{
+							new GridCellHead(id+":grid:head:owner_pump_agreed_date_time",{
 							"value":"Согл.миксер",
 							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDate({
-									"field":model.getField("owner_agreed_date_time"),
+									"field":model.getField("owner_pump_agreed_date_time"),
 									"dateFormat":"d/m/y"
 								})
 								]
 							})
 						)
+						
+						,is_v_owner? null:new GridCellHead(id+":grid:head:users_ref",{
+							"value":"Автор",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("users_ref"),
+									"ctrlClass":UserEditRef,
+									"searchOptions":{
+										"field":new FieldInt("user_id"),
+										"searchType":"on_match"
+									}																										
+								})
+							],
+							"sortable":true
+						})
+						
 					]
 				})
 			]
@@ -452,7 +343,7 @@ function ShipmentPumpList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":is_v_owner? "5":"6"
+							"colSpan":is_v_owner? "4":"8"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
@@ -460,32 +351,15 @@ function ShipmentPumpList_View(id,options){
 							"calcFieldId":"quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
-						,new GridCell(id+":grid:foot:total_sp2",{
-							"colSpan":"5"
-						})											
-						
-						,new GridCellFoot(id+":grid:foot:tot_cost",{
-							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"cost",
-							"gridColumn":new GridColumnFloat({"id":"tot_cost"})
-						})						
-											
-						,new GridCellFoot(id+":grid:foot:tot_demurrage_cost",{
-							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"demurrage_cost",
-							"gridColumn":new GridColumnFloat({"id":"tot_demurrage_cost"})
-						})						
-						,is_v_owner? null:new GridCellFoot(id+":grid:foot:tot_pump_cost",{
+						,new GridCellFoot(id+":grid:foot:tot_pump_cost",{
 							"attrs":{"align":"right"},
 							"calcOper":"sum",
 							"calcFieldId":"pump_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_pump_cost"})
 						})						
-					
+											
 						,new GridCell(id+":grid:foot:total_sp3",{
-							"colSpan":is_v_owner? "2":"7"
+							"colSpan":is_v_owner? "1":"3"
 						})						
 					]
 				})		
@@ -507,7 +381,7 @@ ShipmentPumpList_View.prototype.setOwnerAgreed = function(btn){
 	var keys = CommonHelper.unserialize(row.getAttr("keys"));
 	
 	var pm = this.getElement("grid").getReadPublicMethod().getController().getPublicMethod("owner_set_pump_agreed");
-	pm.setFieldValue("shipment_id",keys.id);
+	pm.setFieldValue("shipment_id",keys.last_ship_id);
 	var slef = this;
 	pm.run({
 		"ok":function(resp){

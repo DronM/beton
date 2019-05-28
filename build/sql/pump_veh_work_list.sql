@@ -14,7 +14,8 @@ CREATE OR REPLACE VIEW public.pump_veh_work_list AS
 		v.feature,
 		v.plate,
 		pv.pump_length,
-		vehicle_owners_ref(v_own) AS vehicle_owners_ref
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		v.vehicle_owner_id AS pump_vehicle_owner_id
 		
 	FROM pump_vehicles pv
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id

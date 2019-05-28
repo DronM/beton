@@ -1,5 +1,6 @@
 -- View: public.shipments_list
 
+-- DROP VIEW shipment_dates_list;
 -- DROP VIEW public.shipments_list;
 
 CREATE OR REPLACE VIEW public.shipments_list AS 
@@ -8,6 +9,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		sh.ship_date_time,
 		sh.quant,
 		--calc_ship_cost(sh.*, dest.*, true) AS cost,
+		/*
 		CASE
 			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
 			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
@@ -30,7 +32,8 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 					WHEN dest.distance<=60 THEN greatest(5,sh.quant)
 					ELSE 7
 				END
-		END AS cost,
+		END*/
+		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
 		
 		sh.shipped,
 		concrete_types_ref(concr) AS concrete_types_ref,
@@ -48,7 +51,8 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		
 		clients_ref(cl) As clients_ref,
 		o.client_id,
-		calc_demurrage_cost(sh.demurrage::interval) AS demurrage_cost,
+		
+		shipments_demurrage_cost(sh.demurrage::interval) AS demurrage_cost,
 		sh.demurrage,
 		
 		sh.client_mark,
@@ -65,6 +69,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		sh.acc_comment,
 		v_own.id AS vehicle_owner_id,
 		
+		/*
 		CASE
 			WHEN o.pump_vehicle_id IS NULL THEN 0
 			WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost
@@ -81,13 +86,14 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 							END
 						FROM pump_prices_values AS pr_vals
 						WHERE pr_vals.pump_price_id = pvh.pump_price_id
-							AND dest.distance<=pr_vals.quant_from
-						ORDER BY pr_vals.quant_from ASC
+							AND dest.distance<=pr_vals.quant_to
+						ORDER BY pr_vals.quant_to ASC
 						LIMIT 1
 						)
 				END
 			ELSE 0	
-		END AS pump_cost,
+		END*/
+		shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
 		
 		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
 		vehicle_owners_ref(pvh_own) AS pump_vehicles_owners_ref,

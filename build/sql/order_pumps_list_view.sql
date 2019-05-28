@@ -38,8 +38,17 @@ CREATE OR REPLACE VIEW public.order_pumps_list_view AS
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
 	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	LEFT JOIN (
+		SELECT
+			t.order_id,
+			sum(t.quant) AS quant
+		FROM shipments t
+		GROUP BY t.order_id
+	) AS ships ON ships.order_id = o.id
 	
-	WHERE o.pump_vehicle_id IS NOT NULL AND o.unload_type<>'none'
+	WHERE o.pump_vehicle_id IS NOT NULL
+		AND o.unload_type<>'none'
+		AND coalesce(o.quant,0) - ships.quant <> 0
 	ORDER BY o.date_time DESC;
 
 ALTER TABLE public.order_pumps_list_view

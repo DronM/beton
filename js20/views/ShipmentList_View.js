@@ -210,14 +210,19 @@ function ShipmentList_View(id,options){
 							"columns":[
 								new GridColumnDate({
 									"field":model.getField("ship_date_time"),
-									"dateFormat":"d/m/y H:i"
+									"dateFormat":"d/m/y H:i",
+									"ctrlClass":EditDate,
+									"searchOptions":{
+										"field":new FieldDate("ship_date_time"),
+										"searchType":"on_beg"
+									}																		
 								})
 							],
 							"sortable":true,
 							"sort":"desc"
 						})
 					
-						,new GridCellHead(id+":grid:head:id",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:id",{
 							"value":"Номер",
 							"colAttrs":{"clign":"center"},
 							"columns":[
@@ -241,7 +246,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:clients_ref",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:clients_ref",{
 							"value":"Контрагент",
 							"columns":[
 								new GridColumnRef({
@@ -262,10 +267,11 @@ function ShipmentList_View(id,options){
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
 									"form":(is_v_owner? null:Destination_Form),
-									"ctrlClass":DestinationEdit,
+									"ctrlClass":is_v_owner? EditString:DestinationEdit,
 									"searchOptions":{
-										"field":new FieldInt("destination_id"),
-										"searchType":"on_match"
+										"field":is_v_owner? (new FieldString("destinations_ref->descr")) : (new FieldInt("destination_id")),
+										"searchType":is_v_owner? "on_part":"on_match",
+										"typeChange":is_v_owner
 									}
 								})
 							],
@@ -281,7 +287,8 @@ function ShipmentList_View(id,options){
 									"ctrlClass":ConcreteTypeEdit,
 									"searchOptions":{
 										"field":new FieldInt("concrete_type_id"),
-										"searchType":"on_match"
+										"searchType":"on_match",
+										"typeChange":false
 									}									
 								})
 							],
@@ -305,7 +312,8 @@ function ShipmentList_View(id,options){
 									"ctrlClass":VehicleEdit,
 									"searchOptions":{
 										"field":new FieldInt("vehicle_id"),
-										"searchType":"on_match"
+										"searchType":"on_match",
+										"typeChange":false
 									},
 									"form":VehicleDialog_Form									
 								})
@@ -317,11 +325,12 @@ function ShipmentList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("drivers_ref"),
-									"ctrlClass":DriverEditRef,
+									"ctrlClass":is_v_owner? EditString:DriverEditRef,
 									"searchOptions":{
-										"field":new FieldInt("driver_id"),
-										"searchType":"on_match"
-									}									
+										"field":is_v_owner? (new FieldString("drivers_ref->descr")) : (new FieldInt("driver_id")),
+										"searchType":is_v_owner? "on_part":"on_match",
+										"typeChange":is_v_owner
+									}
 								})
 							],
 							"sortable":true
@@ -343,17 +352,7 @@ function ShipmentList_View(id,options){
 									"field":model.getField("acc_comment")
 								})
 							]
-						})						
-						,new GridCellHead(id+":grid:head:demurrage",{
-							"value":"Время простоя",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumn({
-									"field":model.getField("demurrage")
-								})
-							]
-						})
-						
+						})	
 						,new GridCellHead(id+":grid:head:cost",{
 							"value":"Доставка",
 							"colAttrs":{"align":"right"},
@@ -364,6 +363,17 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
+											
+						,new GridCellHead(id+":grid:head:demurrage",{
+							"value":"Время простоя",
+							"colAttrs":{"align":"center"},
+							"columns":[
+								new GridColumn({
+									"field":model.getField("demurrage")
+								})
+							]
+						})
+						
 						,new GridCellHead(id+":grid:head:demurrage_cost",{
 							"value":"За простой",
 							"colAttrs":{"align":"right"},
@@ -396,11 +406,11 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_vehicles_owners_ref",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_vehicle_owners_ref",{
 							"value":"Насос,влад.",
 							"columns":[
 								new GridColumnRef({
-									"field":model.getField("pump_vehicles_owners_ref"),
+									"field":model.getField("pump_vehicle_owners_ref"),
 									"ctrlClass":VehicleOwnerEdit,
 									"searchOptions":{
 										"field":new FieldInt("pump_vehicle_owner_id"),
@@ -511,7 +521,7 @@ function ShipmentList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":is_v_owner? "5":"6"
+							"colSpan":is_v_owner? "3":"6"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
@@ -520,7 +530,7 @@ function ShipmentList_View(id,options){
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCell(id+":grid:foot:total_sp2",{
-							"colSpan":"5"
+							"colSpan":is_v_owner? "4":"4"
 						})											
 						
 						,new GridCellFoot(id+":grid:foot:tot_cost",{
@@ -529,6 +539,9 @@ function ShipmentList_View(id,options){
 							"calcFieldId":"cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost"})
 						})						
+						,new GridCell(id+":grid:foot:total_sp4",{
+							"colSpan":"1"
+						})											
 											
 						,new GridCellFoot(id+":grid:foot:tot_demurrage_cost",{
 							"attrs":{"align":"right"},
@@ -544,7 +557,7 @@ function ShipmentList_View(id,options){
 						})						
 					
 						,new GridCell(id+":grid:foot:total_sp3",{
-							"colSpan":is_v_owner? "2":"7"
+							"colSpan":is_v_owner? "1":"7"
 						})						
 					]
 				})		

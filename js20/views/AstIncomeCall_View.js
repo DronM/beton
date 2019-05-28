@@ -122,7 +122,10 @@ function AstIncomeCall_View(id,options){
 			"caption":"Оформить заявку  ",
 			"glyph":"glyphicon-plus",
 			"onClick":function(){
-					self.m_onMakeOrder();
+					//update first
+					self.onSave(function(){
+						self.m_onMakeOrder();
+					});					
 				}
 			})
 		);			

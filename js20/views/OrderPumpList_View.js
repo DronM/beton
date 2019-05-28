@@ -17,75 +17,78 @@ function OrderPumpList_View(id,options){
 	
 	var is_v_owner = (window.getApp().getServVar("role_id")=="vehicle_owner");	
 	
-	var filters = {
-		"period":{
-			"binding":new CommandBinding({
-				"control":period_ctrl,
-				"field":period_ctrl.getField()
-			}),
-			"bindings":[
-				{"binding":new CommandBinding({
-					"control":period_ctrl.getControlFrom(),
+	var filters;
+	if(!is_v_owner){
+		filters = {
+			"period":{
+				"binding":new CommandBinding({
+					"control":period_ctrl,
 					"field":period_ctrl.getField()
+				}),
+				"bindings":[
+					{"binding":new CommandBinding({
+						"control":period_ctrl.getControlFrom(),
+						"field":period_ctrl.getField()
+						}),
+					"sign":"ge"
+					},
+					{"binding":new CommandBinding({
+						"control":period_ctrl.getControlTo(),
+						"field":period_ctrl.getField()
+						}),
+					"sign":"le"
+					}
+				]
+			}
+			,"unload_type":{
+				"binding":new CommandBinding({
+					"control":new Enum_unload_types(id+":filter-ctrl-unload_type",{
+						"contClassName":"form-group-filter",
+						"labelCaption":"Подача:"
 					}),
-				"sign":"ge"
-				},
-				{"binding":new CommandBinding({
-					"control":period_ctrl.getControlTo(),
-					"field":period_ctrl.getField()
+					"field":new FieldString("unload_type")}),
+				"sign":"e"		
+			}		
+			,"client":{
+				"binding":new CommandBinding({
+					"control":new ClientEdit(id+":filter-ctrl-client",{
+						"contClassName":"form-group-filter",
+						"labelCaption":"Контрагент:"
 					}),
-				"sign":"le"
-				}
-			]
-		}
-		,"unload_type":{
-			"binding":new CommandBinding({
-				"control":new Enum_unload_types(id+":filter-ctrl-unload_type",{
-					"contClassName":"form-group-filter",
-					"labelCaption":"Подача:"
-				}),
-				"field":new FieldString("unload_type")}),
-			"sign":"e"		
-		}		
-		,"client":is_v_owner? null:{
-			"binding":new CommandBinding({
-				"control":new ClientEdit(id+":filter-ctrl-client",{
-					"contClassName":"form-group-filter",
-					"labelCaption":"Контрагент:"
-				}),
-				"field":new FieldInt("client_id")}),
-			"sign":"e"		
-		}
+					"field":new FieldInt("client_id")}),
+				"sign":"e"		
+			}
 		
-		,"destination":is_v_owner? null:{
-			"binding":new CommandBinding({
-				"control":new DestinationEdit(id+":filter-ctrl-destination",{
-					"contClassName":"form-group-filter",
-					"labelCaption":"Объект:"
-				}),
-				"field":new FieldInt("destination_id")}),
-			"sign":"e"		
-		}
-		,"concrete_type":{
-			"binding":new CommandBinding({
-				"control":new ConcreteTypeEdit(id+":filter-ctrl-concrete_type",{
-					"contClassName":"form-group-filter",
-					"labelCaption":"Марка:"
-				}),
-				"field":new FieldInt("concrete_type_id")}),
-			"sign":"e"		
-		}
-		,"user":is_v_owner? null:{
-			"binding":new CommandBinding({
-				"control":new UserEditRef(id+":filter-ctrl-user",{
-					"contClassName":"form-group-filter",
-					"labelCaption":"Автор:"
-				}),
-				"field":new FieldInt("user_id")}),
-			"sign":"e"		
-		}
+			,"destination":{
+				"binding":new CommandBinding({
+					"control":new DestinationEdit(id+":filter-ctrl-destination",{
+						"contClassName":"form-group-filter",
+						"labelCaption":"Объект:"
+					}),
+					"field":new FieldInt("destination_id")}),
+				"sign":"e"		
+			}
+			,"concrete_type":{
+				"binding":new CommandBinding({
+					"control":new ConcreteTypeEdit(id+":filter-ctrl-concrete_type",{
+						"contClassName":"form-group-filter",
+						"labelCaption":"Марка:"
+					}),
+					"field":new FieldInt("concrete_type_id")}),
+				"sign":"e"		
+			}
+			,"user":{
+				"binding":new CommandBinding({
+					"control":new UserEditRef(id+":filter-ctrl-user",{
+						"contClassName":"form-group-filter",
+						"labelCaption":"Автор:"
+					}),
+					"field":new FieldInt("user_id")}),
+				"sign":"e"		
+			}
 		
-	};
+		};
+	}
 	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
@@ -100,9 +103,11 @@ function OrderPumpList_View(id,options){
 			"cmdDelete":!is_v_owner,
 			"cmdCopy":!is_v_owner,
 			"cmdEdit":!is_v_owner,
-			"cmdFilter":true,
-			"filters":filters,
-			"variantStorage":options.variantStorage
+			"cmdFilter":!is_v_owner,
+			"cmdAllCommands":!is_v_owner,
+			"cmdSearch":!is_v_owner,
+			"filters":!is_v_owner? filters:null,
+			"variantStorage":!is_v_owner? options.variantStorage:null
 		}),
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
@@ -126,7 +131,7 @@ function OrderPumpList_View(id,options){
 							"sort":"desc"
 						})
 					
-						,new GridCellHead(id+":grid:head:number",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:number",{
 							"value":"Номер",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -136,7 +141,7 @@ function OrderPumpList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:clients_ref",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:clients_ref",{
 							"value":"Контрагент",
 							"columns":[
 								new GridColumnRef({
@@ -188,7 +193,7 @@ function OrderPumpList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:unload_type",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:unload_type",{
 							"value":"Подача",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -204,7 +209,7 @@ function OrderPumpList_View(id,options){
 							]
 						})
 						
-						,new GridCellHead(id+":grid:head:comment_text",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:comment_text",{
 							"value":"Комментарий",
 							"columns":[
 								new GridColumn({
@@ -212,6 +217,21 @@ function OrderPumpList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:pump_vehicles_ref",{
+							"value":"Насос",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("pump_vehicles_ref"),
+									"ctrlClass":PumpVehicleEdit,
+									"searchOptions":{
+										"field":new FieldInt("pump_vehicle_id"),
+										"searchType":"on_match"
+									}																										
+								})
+							],
+							"sortable":true
+						})
+						
 						,new GridCellHead(id+":grid:head:phone_cel",{
 							"value":"Телефон",
 							"columns":[
@@ -230,21 +250,7 @@ function OrderPumpList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:pump_vehicles_ref",{
-							"value":"Насос",
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("pump_vehicles_ref"),
-									"ctrlClass":PumpVehicleEdit,
-									"searchOptions":{
-										"field":new FieldInt("pump_vehicle_id"),
-										"searchType":"on_match"
-									}																										
-								})
-							],
-							"sortable":true
-						})
-						,new GridCellHead(id+":grid:head:pump_vehicle_owners_ref",{
+						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_vehicle_owners_ref",{
 							"value":"Владелец насоса",
 							"columns":[
 								new GridColumnRef({
@@ -284,7 +290,7 @@ function OrderPumpList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":"4"
+							"colSpan":is_v_owner? "2":"4"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
@@ -293,7 +299,7 @@ function OrderPumpList_View(id,options){
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCell(id+":grid:foot:total_sp2",{
-							"colSpan":is_v_owner, "8":"7"
+							"colSpan":is_v_owner? "4":"8"
 						})											
 					]
 				})		

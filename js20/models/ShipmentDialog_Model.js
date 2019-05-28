@@ -164,7 +164,46 @@ function ShipmentDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.pump_cost_default = new FieldFloat("pump_cost_default",filed_options);
+	options.fields.pump_cost_default.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.pump_cost_edit = new FieldBool("pump_cost_edit",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ship_cost = new FieldFloat("ship_cost",filed_options);
+	options.fields.ship_cost.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ship_cost_default = new FieldFloat("ship_cost_default",filed_options);
+	options.fields.ship_cost_default.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ship_cost_edit = new FieldBool("ship_cost_edit",filed_options);
 	
 				
 	
@@ -174,6 +213,15 @@ function ShipmentDialog_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.pump_vehicles_ref = new FieldJSON("pump_vehicles_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.order_last_shipment = new FieldBool("order_last_shipment",filed_options);
 	
 			
 			

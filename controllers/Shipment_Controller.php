@@ -114,6 +114,12 @@ class Shipment_Controller extends ControllerSQL{
 		$param = new FieldExtBool('pump_cost_edit'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtFloat('ship_cost'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtBool('ship_cost_edit'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -213,6 +219,14 @@ class Shipment_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtBool('pump_cost_edit'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('ship_cost'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('ship_cost_edit'
 				,array(
 			));
 			$pm->addParam($param);
@@ -881,8 +895,10 @@ class Shipment_Controller extends ControllerSQL{
 		);
 	}
 	public function get_pump_list($pm){
+	
 		$this->modelGetList(new ShipmentPumpList_Model($this->getDbLink()),$pm);
 	}
+	
 	public function get_shipment_date_list($pm){
 		$this->modelGetList(new ShipmentDateList_Model($this->getDbLink()),$pm);
 	}
@@ -994,7 +1010,7 @@ class Shipment_Controller extends ControllerSQL{
 			if($isPump){
 				$q = "SELECT sh.pump_vehicle_owner_id AS vehicle_owner_id
 					FROM shipments_pump_list AS sh
-					WHERE sh.id=%d";			
+					WHERE sh.last_ship_id=%d";			
 			}
 			else{
 				$q = "SELECT v.vehicle_owner_id

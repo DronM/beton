@@ -171,7 +171,7 @@ function Shipment_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.pump_cost = new FieldFloat("pump_cost",filed_options);
-	options.fields.pump_cost.getValidator().setMaxLength('2');
+	options.fields.pump_cost.getValidator().setMaxLength('15');
 	
 				
 	
@@ -182,6 +182,26 @@ function Shipment_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.pump_cost_edit = new FieldBool("pump_cost_edit",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ship_cost = new FieldFloat("ship_cost",filed_options);
+	options.fields.ship_cost.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ship_cost_edit = new FieldBool("ship_cost_edit",filed_options);
 	
 			
 			

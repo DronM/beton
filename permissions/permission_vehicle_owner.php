@@ -54,6 +54,8 @@ $permissions = array();
 		
 			$permissions['PumpVehicle_Controller_get_object']=TRUE;
 		
+			$permissions['PumpVehicle_Controller_get_work_list']=TRUE;
+		
 			$permissions['Constant_Controller_get_values']=TRUE;
 		
 			$permissions['Weather_Controller_get_current']=TRUE;
@@ -61,8 +63,6 @@ $permissions = array();
 			$permissions['ConcreteType_Controller_get_list']=TRUE;
 		
 			$permissions['ConcreteType_Controller_complete']=TRUE;
-		
-			$permissions['Destination_Controller_get_list']=TRUE;
 		
 			$permissions['Destination_Controller_complete_dest']=TRUE;
 		

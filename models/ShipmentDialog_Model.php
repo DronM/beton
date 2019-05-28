@@ -170,12 +170,47 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$this->addField($f_pump_cost);
 		//********************
 		
+		//*** Field pump_cost_default ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="pump_cost_default";
+				
+		$f_pump_cost_default=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost_default",$f_opts);
+		$this->addField($f_pump_cost_default);
+		//********************
+		
 		//*** Field pump_cost_edit ***
 		$f_opts = array();
 		$f_opts['id']="pump_cost_edit";
 				
 		$f_pump_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost_edit",$f_opts);
 		$this->addField($f_pump_cost_edit);
+		//********************
+		
+		//*** Field ship_cost ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="ship_cost";
+				
+		$f_ship_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_cost",$f_opts);
+		$this->addField($f_ship_cost);
+		//********************
+		
+		//*** Field ship_cost_default ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="ship_cost_default";
+				
+		$f_ship_cost_default=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_cost_default",$f_opts);
+		$this->addField($f_ship_cost_default);
+		//********************
+		
+		//*** Field ship_cost_edit ***
+		$f_opts = array();
+		$f_opts['id']="ship_cost_edit";
+				
+		$f_ship_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_cost_edit",$f_opts);
+		$this->addField($f_ship_cost_edit);
 		//********************
 		
 		//*** Field pump_vehicles_ref ***
@@ -186,6 +221,14 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 				
 		$f_pump_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicles_ref",$f_opts);
 		$this->addField($f_pump_vehicles_ref);
+		//********************
+		
+		//*** Field order_last_shipment ***
+		$f_opts = array();
+		$f_opts['id']="order_last_shipment";
+				
+		$f_order_last_shipment=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_last_shipment",$f_opts);
+		$this->addField($f_order_last_shipment);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

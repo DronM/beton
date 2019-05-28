@@ -422,6 +422,9 @@ class User_Controller extends ControllerSQL{
 			$_SESSION['production_site_id']	= intval(json_decode($ar['production_sites_ref'])->keys->id);
 		}		
 		
+		$_SESSION['first_shift_start_time'] = $ar['first_shift_start_time'];
+		$_SESSION['first_shift_end_time'] = $ar['first_shift_end_time'];
+		
 		//global filters				
 		if ($ar['role_id']=='vehicle_owner'){
 			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
@@ -445,6 +448,13 @@ class User_Controller extends ControllerSQL{
 			$field->setValue($_SESSION['global_vehicle_owner_id']);
 			$filter->addField($field,'=');
 			GlobalFilter::set('PumpVehicleList_Model',$filter);
+						
+			$model = new PumpVehicleWorkList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById('pump_vehicle_owner_id');
+			$field->setValue($_SESSION['global_vehicle_owner_id']);
+			$filter->addField($field,'=');
+			GlobalFilter::set('PumpVehicleWorkList_Model',$filter);
 						
 			$model = new OrderPumpList_Model($this->getDbLink());
 			$filter = new ModelWhereSQL();
@@ -518,7 +528,16 @@ class User_Controller extends ControllerSQL{
 		$ar = $this->getDbLink()->query_first(
 			sprintf(
 			"SELECT 
-				ud.*
+				ud.*,
+				const_first_shift_start_time_val() AS first_shift_start_time,
+				CASE
+					WHEN const_shift_length_time_val()>='24 hours'::interval THEN
+						const_first_shift_start_time_val()::interval + 
+						const_shift_length_time_val()::interval-'24 hours 1 second'::interval
+					ELSE
+						const_first_shift_start_time_val()::interval + 
+						const_shift_length_time_val()::interval-'1 second'::interval
+				END AS first_shift_end_time				
 			FROM users AS u
 			LEFT JOIN users_dialog AS ud ON ud.id=u.id
 			WHERE (u.name=%s OR u.email=%s) AND u.pwd=md5(%s)",
@@ -788,7 +807,16 @@ class User_Controller extends ControllerSQL{
 			$ar = $this->getDbLink()->query_first(
 				sprintf(
 				"SELECT 
-					u.*
+					u.*,
+					const_first_shift_start_time_val() AS first_shift_start_time,
+					CASE
+						WHEN const_shift_length_time_val()>='24 hours'::interval THEN
+							const_first_shift_start_time_val()::interval + 
+							const_shift_length_time_val()::interval-'24 hours 1 second'::interval
+						ELSE
+							const_first_shift_start_time_val()::interval + 
+							const_shift_length_time_val()::interval-'1 second'::interval
+					END AS first_shift_end_time				
 				FROM users_dialog AS u
 				WHERE u.id=%d",
 				$inserted_id_ar['id']

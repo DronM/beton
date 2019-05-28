@@ -97,3 +97,5 @@ ConcreteCostHeaderList_View.prototype.HEAD_TITLE = "Прайсы на бетон
 VehicleOwnerList_View.prototype.HEAD_TITLE = "Владельцы транспортных средств";
 
 ShipmentCancelationList_View.prototype.HEAD_TITLE = "Отмененные отгрузки";
+
+ShipmentPumpList_View.prototype.HEAD_TITLE = "Отгрузки (насосы)";

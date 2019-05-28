@@ -258,14 +258,14 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_pump_vehicle_id);
 		//********************
 		
-		//*** Field pump_vehicles_owners_ref ***
+		//*** Field pump_vehicle_owners_ref ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Насос,владелец';
-		$f_opts['id']="pump_vehicles_owners_ref";
+		$f_opts['id']="pump_vehicle_owners_ref";
 				
-		$f_pump_vehicles_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicles_owners_ref",$f_opts);
-		$this->addField($f_pump_vehicles_owners_ref);
+		$f_pump_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owners_ref",$f_opts);
+		$this->addField($f_pump_vehicle_owners_ref);
 		//********************
 		
 		//*** Field pump_vehicle_owner_id ***

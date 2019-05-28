@@ -155,6 +155,18 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldFloat("ship_cost",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("ship_cost_edit",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -269,6 +281,18 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldFloat("ship_cost",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("ship_cost_edit",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -371,7 +395,7 @@ extend(Shipment_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("pump_vehicle_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Насос,владелец";
-	pm.addField(new FieldJSON("pump_vehicles_owners_ref",f_opts));
+	pm.addField(new FieldJSON("pump_vehicle_owners_ref",f_opts));
 	var f_opts = {};
 	f_opts.alias = "TRUE";
 	pm.addField(new FieldInt("pump_vehicle_owner_id",f_opts));

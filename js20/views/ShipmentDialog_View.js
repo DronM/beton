@@ -70,9 +70,10 @@ function ShipmentDialog_View(id,options){
 			"labelCaption":"Бланки:"
 		}));	
 
-		this.addElement(new EditTime(id+":demurrage",{
+		this.addElement(new EditInterval(id+":demurrage",{
 			"editContClassName":("input-group "+window.getBsCol(3)),
-			"labelCaption":"Простой:"
+			"labelCaption":"Простой:",
+			"editMask":"99:99"
 		}));	
 
 		this.addElement(new EditText(id+":acc_comment",{
@@ -86,7 +87,19 @@ function ShipmentDialog_View(id,options){
 			"enabled":false
 			,"onToggleEditable":function(){
 				if(!self.getElement("pump_cost").getEditAllowed()){
-					self.getElement("pump_cost").setValue(0);
+					self.getElement("pump_cost").setValue(self.getModel().getFieldValue("pump_cost_default"));
+				}
+			}
+		}));
+
+		this.addElement(new EditMoneyEditable(id+":ship_cost",{
+			"className":"form-control orderMoneyField",
+			"labelCaption":"Стомисоть доставки:",
+			"value":0,
+			"enabled":false
+			,"onToggleEditable":function(){
+				if(!self.getElement("ship_cost").getEditAllowed()){
+					self.getElement("ship_cost").setValue(self.getModel().getFieldValue("ship_cost_default"));
 				}
 			}
 		}));
@@ -111,6 +124,7 @@ function ShipmentDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("demurrage")})
 		,new DataBinding({"control":this.getElement("acc_comment")})
 		,new DataBinding({"control":this.getElement("pump_cost")})
+		,new DataBinding({"control":this.getElement("ship_cost")})
 	]);
 	
 	//write
@@ -130,6 +144,21 @@ function ShipmentDialog_View(id,options){
 				else{
 					pm.unsetFieldValue("pump_cost_edit");
 				}
+				
+				if(self.getShipCostEditModified()){
+					var ship_cost_edit = !self.m_model.getFieldValue("ship_cost_edit");
+					pm.setFieldValue("ship_cost_edit",ship_cost_edit);
+					if(ship_cost_edit){
+						pm.setFieldValue("ship_cost",this.getElement("ship_cost").getValue());
+					}
+					else{
+						pm.unsetFieldValue("ship_cost");
+					}
+				}
+				else{
+					pm.unsetFieldValue("ship_cost_edit");
+				}
+				
 			}
 		})
 	
@@ -138,6 +167,7 @@ function ShipmentDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("demurrage")})
 		,new CommandBinding({"control":this.getElement("acc_comment")})
 		,new CommandBinding({"control":this.getElement("pump_cost")})
+		,new CommandBinding({"control":this.getElement("ship_cost")})
 	]);
 	
 }
@@ -145,12 +175,20 @@ extend(ShipmentDialog_View,ViewObjectAjx);
 
 ShipmentDialog_View.prototype.getModified = function(cmd){
 	return (
-		ShipmentDialog_View.superclass.getModified.call(this,cmd) || this.getPumpCostEditModified()|| this.getElement("pump_cost").getModified()
+		ShipmentDialog_View.superclass.getModified.call(this,cmd)
+		|| this.getPumpCostEditModified()
+		|| this.getElement("pump_cost").getModified()
+		|| this.getShipCostEditModified()
+		|| this.getElement("ship_cost").getModified()		
 	);
 }
 
 ShipmentDialog_View.prototype.getPumpCostEditModified = function(pm){
 	return (this.getElement("pump_cost").getEditAllowed()!=this.m_model.getFieldValue("pump_cost_edit"));
+}
+
+ShipmentDialog_View.prototype.getShipCostEditModified = function(pm){
+	return (this.getElement("ship_cost").getEditAllowed()!=this.m_model.getFieldValue("ship_cost_edit"));
 }
 
 ShipmentDialog_View.prototype.onGetData = function(resp,cmd){
@@ -159,11 +197,10 @@ ShipmentDialog_View.prototype.onGetData = function(resp,cmd){
 	var m = this.getModel();
 
 	var pv = m.getFieldValue("pump_vehicles_ref");
-	if(!pv || pv.isNull()){
+	if(!pv || pv.isNull() || !m.getFieldValue("order_last_shipment")){
 		this.getElement("pump_cost").setVisible(false);
 	}
 	else{
-		this.getElement("pump_cost").setEditAllowed(m.getFieldValue("pump_cost_edit"));	
+		this.getElement("pump_cost").setEditAllowed(m.getFieldValue("pump_cost_edit"));
 	}
-
 }

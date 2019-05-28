@@ -245,7 +245,7 @@ function ShipmentList_Model(options){
 	filed_options.alias = 'Насос,владелец';
 	filed_options.autoInc = false;	
 	
-	options.fields.pump_vehicles_owners_ref = new FieldJSON("pump_vehicles_owners_ref",filed_options);
+	options.fields.pump_vehicle_owners_ref = new FieldJSON("pump_vehicle_owners_ref",filed_options);
 	
 				
 	

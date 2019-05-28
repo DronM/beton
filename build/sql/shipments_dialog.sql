@@ -20,6 +20,7 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 		
 		v.vehicle_owner_id,
 		
+		/*
 		CASE
 			WHEN o.pump_vehicle_id IS NULL THEN 0
 			WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost
@@ -42,10 +43,19 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 						)
 				END
 			ELSE 0	
-		END AS pump_cost,
+		END*/
+		shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
 		sh.pump_cost_edit,
 		
-		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref
+		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
+		
+		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS ship_cost,
+		sh.ship_cost_edit,
+		
+		sh_last.id AS order_last_shipment,
+		
+		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,FALSE) AS ship_cost_default,
+		shipments_pump_cost(sh,o,dest,pvh,FALSE) AS pump_cost_default
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id
@@ -57,6 +67,22 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN (
+		SELECT
+			max(sh.ship_date_time) AS ship_date_time,
+			sh.order_id,
+			sum(sh.quant) AS quant
+		FROM shipments AS sh
+		GROUP BY sh.order_id
+	) AS sh_t ON sh_t.order_id = sh.order_id
+	LEFT JOIN (
+		SELECT
+			t.id,
+			t.order_id,
+			t.ship_date_time
+		FROM shipments AS t
+	) AS sh_last ON sh_last.order_id = sh_t.order_id AND sh_last.ship_date_time = sh_t.ship_date_time
+	
 	ORDER BY sh.date_time;
 
 ALTER TABLE public.shipments_dialog

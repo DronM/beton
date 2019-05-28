@@ -6781,6 +6781,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>pump_vehicle_owner_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>vehicle_owners_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
@@ -8051,9 +8057,21 @@
 <div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
-<div>Length:2</div>
+<div>Length:15</div>
 <div>Precision:2</div>
 <h2>pump_cost_edit</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ship_cost</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>ship_cost_edit</h2>
 <div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -8377,7 +8395,31 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>pump_cost_default</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
 <h2>pump_cost_edit</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ship_cost</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>ship_cost_default</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>ship_cost_edit</h2>
 <div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -8385,6 +8427,12 @@
 <div>Precision:</div>
 <h2>pump_vehicles_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>order_last_shipment</h2>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -8695,7 +8743,7 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>pump_vehicles_owners_ref</h2>
+<h2>pump_vehicle_owners_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -8839,13 +8887,25 @@
 <h1>ShipmentPumpList_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
-<h2>id</h2>
+<h2>order_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>last_ship_id</h2>
 <div>Type:Int</div>
 <div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>ship_date_time</h2>
+<h2>order_number</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
 <div>Type:DateTime</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -8905,66 +8965,6 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>vehicles_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>vehicle_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>drivers_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>driver_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>vehicle_owner_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>vehicle_owners_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>acc_comment</h2>
-<div>Type:Text</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>demurrage</h2>
-<div>Type:String</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>cost</h2>
-<div>Type:Float</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>demurrage_cost</h2>
-<div>Type:Float</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
 <h2>pump_cost</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
@@ -8983,56 +8983,20 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>pump_vehicles_owners_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
 <h2>pump_vehicle_owner_id</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>shipped</h2>
-<div>Type:Bool</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>client_mark</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>blanks_exist</h2>
-<div>Type:Bool</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>user_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>users_ref</h2>
+<h2>pump_vehicle_owners_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>owner_agreed</h2>
-<div>Type:Bool</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>owner_agreed_date_time</h2>
-<div>Type:DateTimeTZ</div>
+<h2>acc_comment</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -9045,6 +9009,18 @@
 <div>Precision:</div>
 <h2>owner_pump_agreed_date_time</h2>
 <div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
