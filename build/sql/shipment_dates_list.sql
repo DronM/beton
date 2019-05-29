@@ -1,6 +1,6 @@
 -- View: shipment_dates_list
 
- DROP VIEW shipment_dates_list;
+-- DROP VIEW shipment_dates_list;
 
 CREATE OR REPLACE VIEW shipment_dates_list AS 
 	SELECT

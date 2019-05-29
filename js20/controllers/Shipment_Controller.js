@@ -373,14 +373,14 @@ extend(Shipment_Controller,ControllerObjServer);
 	f_opts.alias = "Владелец";
 	pm.addField(new FieldJSON("vehicle_owners_ref",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Комментарий бухгалетрии";
-	pm.addField(new FieldText("acc_comment",f_opts));
-	var f_opts = {};
-	f_opts.alias = "Простой";
-	pm.addField(new FieldString("demurrage",f_opts));
+	f_opts.alias = "Цена доставки";
+	pm.addField(new FieldFloat("ship_price",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Стоимость доставки";
 	pm.addField(new FieldFloat("cost",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Простой";
+	pm.addField(new FieldString("demurrage",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Стомость простоя";
 	pm.addField(new FieldFloat("demurrage_cost",f_opts));
@@ -391,13 +391,16 @@ extend(Shipment_Controller,ControllerObjServer);
 	f_opts.alias = "Насос";
 	pm.addField(new FieldJSON("pump_vehicles_ref",f_opts));
 	var f_opts = {};
-	f_opts.alias = "TRUE";
+	
 	pm.addField(new FieldInt("pump_vehicle_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Насос,владелец";
 	pm.addField(new FieldJSON("pump_vehicle_owners_ref",f_opts));
 	var f_opts = {};
-	f_opts.alias = "TRUE";
+	f_opts.alias = "Комментарий бухгалетрии";
+	pm.addField(new FieldText("acc_comment",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldInt("pump_vehicle_owner_id",f_opts));
 	var f_opts = {};
 	

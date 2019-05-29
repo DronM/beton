@@ -345,14 +345,6 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:acc_comment",{
-							"value":"Бух.коммент.",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("acc_comment")
-								})
-							]
-						})	
 						,new GridCellHead(id+":grid:head:cost",{
 							"value":"Доставка",
 							"colAttrs":{"align":"right"},
@@ -420,6 +412,14 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})						
+						,new GridCellHead(id+":grid:head:acc_comment",{
+							"value":"Бух.коммент.",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("acc_comment")
+								})
+							]
+						})	
 						
 						,is_v_owner? null:new GridCellHead(id+":grid:head:client_mark",{
 							"value":"Баллы",

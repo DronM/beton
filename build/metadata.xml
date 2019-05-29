@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-05-28 05:27:18</lastBuild></version>
+		<lastBuild>2019-05-29 05:43:55</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -35,6 +35,7 @@
 		<version dateOpen="2019-05-17 05:05:48" dateClose="2019-05-20 05:05:57">1.00129</version>
 		<version dateOpen="2019-05-20 05:05:58" dateClose="2019-05-22 05:05:44">1.00130</version>
 		<version dateOpen="2019-05-24 08:05:31" dateClose="2019-05-28 05:05:27">1.00131</version>
+		<version dateOpen="2019-05-28 05:05:27" dateClose="2019-05-29 05:05:44">1.00132</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -890,7 +891,7 @@
 			</index>
 		</model>
 		<model id="ShipmentList" parent="ModelSQLBeton" dataTable="shipments_list" virtual="TRUE">
-			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
@@ -905,17 +906,18 @@
 			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
 			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
 			<field id="driver_id" dataType="Int" sysCol="TRUE"/>
-			<field id="vehicle_owner_id" dataType="Int" stsCol="TRUE"/>
+			<field id="vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
 			<field id="vehicle_owners_ref" dataType="JSON" alias="Владелец"/>
-			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
-			<field id="demurrage" dataType="String" alias="Простой"/>
+			<field id="ship_price" dataType="Float" alias="Цена доставки"/>
 			<field id="cost" dataType="Float" alias="Стоимость доставки"/>
+			<field id="demurrage" dataType="String" alias="Простой"/>
 			<field id="demurrage_cost" dataType="Float" alias="Стомость простоя"/>
 			<field id="pump_cost" dataType="Float" alias="Стоимость насос"/>
 			<field id="pump_vehicles_ref" dataType="JSON" alias="Насос"/>
-			<field id="pump_vehicle_id" dataType="Int" alias="TRUE"/>
+			<field id="pump_vehicle_id" dataType="Int" sysCol="TRUE"/>
 			<field id="pump_vehicle_owners_ref" dataType="JSON" alias="Насос,владелец"/>
-			<field id="pump_vehicle_owner_id" dataType="Int" alias="TRUE"/>
+			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
+			<field id="pump_vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
 			<field id="shipped" dataType="Bool" sysCol="TRUE"/>
 			<field id="client_mark" dataType="Int" alias="Оценка"/>
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>

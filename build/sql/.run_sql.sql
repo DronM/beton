@@ -1,29 +1,49 @@
--- View: public.pump_veh_work_list
+-- View: shipment_dates_list
 
--- DROP VIEW public.pump_veh_work_list CASCADE;
+ DROP VIEW shipment_dates_list;
 
-CREATE OR REPLACE VIEW public.pump_veh_work_list AS 
+CREATE OR REPLACE VIEW shipment_dates_list AS 
 	SELECT
-		pv.id,
-		pv.phone_cel,
-		vehicles_ref(v) AS pump_vehicles_ref,
-		pump_prices_ref(ppr) AS pump_prices_ref,
+		sh.ship_date_time::date AS ship_date,
 		
-		v.make,
-		v.owner,
-		v.feature,
-		v.plate,
-		pv.pump_length,
-		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
-		v.vehicle_owner_id AS pump_vehicle_owner_id
+		sh.concrete_type_id,
+		sh.concrete_types_ref::text,
 		
-	FROM pump_vehicles pv
-	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
-	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
-	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
-	WHERE coalesce(pv.deleted,FALSE)=FALSE	
-	ORDER BY v.plate;
+		sh.destination_id,
+		sh.destinations_ref::text,
+		
+		sh.client_id,
+		sh.clients_ref::text,
+		
+		sh.production_site_id,
+		sh.production_sites_ref::text,
+		
+		sum(sh.quant) AS quant,
+		sum(sh.cost) AS ship_cost,
+		
+		sum(sh.demurrage) AS demurrage,
+		sum(sh.demurrage_cost) AS demurrage_cost
+		
+	FROM shipments_list sh
+	/*LEFT JOIN shipments sh_t ON sh_t.id = sh.id
+	LEFT JOIN orders o ON o.id = sh_t.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	*/
+	GROUP BY
+		sh.ship_date_time::date,
+		sh.concrete_type_id,
+		sh.concrete_types_ref::text,
+		sh.destination_id,
+		sh.destinations_ref::text,
+		sh.client_id,
+		sh.clients_ref::text,
+		sh.production_site_id,
+		sh.production_sites_ref::text
+		
+	ORDER BY sh.ship_date_time::date DESC;
 
-ALTER TABLE public.pump_veh_work_list
+ALTER TABLE shipment_dates_list
   OWNER TO beton;
 

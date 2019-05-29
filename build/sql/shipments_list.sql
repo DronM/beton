@@ -96,14 +96,19 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
 		
 		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
-		vehicle_owners_ref(pvh_own) AS pump_vehicles_owners_ref,
 		pvh.vehicle_id AS pump_vehicle_id,
 		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
 		sh.owner_agreed,
 		sh.owner_agreed_date_time,
 		sh.owner_pump_agreed,
-		sh.owner_pump_agreed_date_time
+		sh.owner_pump_agreed_date_time,
 		
+		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		
+		CASE
+			WHEN coalesce(sh.quant,0)=0 THEN 0
+			ELSE  round(shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE)::numeric/sh.quant::numeric,2)
+		END AS ship_price		
 		
 		
 	FROM shipments sh

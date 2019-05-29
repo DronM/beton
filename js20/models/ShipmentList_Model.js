@@ -179,19 +179,10 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Комментарий бухгалетрии';
+	filed_options.alias = 'Цена доставки';
 	filed_options.autoInc = false;	
 	
-	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Простой';
-	filed_options.autoInc = false;	
-	
-	options.fields.demurrage = new FieldString("demurrage",filed_options);
+	options.fields.ship_price = new FieldFloat("ship_price",filed_options);
 	
 				
 	
@@ -201,6 +192,15 @@ function ShipmentList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.cost = new FieldFloat("cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Простой';
+	filed_options.autoInc = false;	
+	
+	options.fields.demurrage = new FieldString("demurrage",filed_options);
 	
 				
 	
@@ -233,7 +233,7 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'TRUE';
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.pump_vehicle_id = new FieldInt("pump_vehicle_id",filed_options);
@@ -251,7 +251,16 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'TRUE';
+	filed_options.alias = 'Комментарий бухгалетрии';
+	filed_options.autoInc = false;	
+	
+	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
 	filed_options.autoInc = false;	
 	
 	options.fields.pump_vehicle_owner_id = new FieldInt("pump_vehicle_owner_id",filed_options);

@@ -23,8 +23,8 @@ $$
 							END
 						FROM pump_prices_values AS pr_vals
 						WHERE pr_vals.pump_price_id = in_pump_vehicles.pump_price_id
-							AND in_destinations.distance<=pr_vals.quant_from
-						ORDER BY pr_vals.quant_from ASC
+							AND in_orders.quant<=pr_vals.quant_to
+						ORDER BY pr_vals.quant_to ASC
 						LIMIT 1
 						)::numeric(15,2)
 				END

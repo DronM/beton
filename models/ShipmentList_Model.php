@@ -30,6 +30,7 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		
 		$f_opts['alias']='Номер';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="id";
 				
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
@@ -172,6 +173,7 @@ class ShipmentList_Model extends ModelSQLBeton{
 		
 		//*** Field vehicle_owner_id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="vehicle_owner_id";
 				
 		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
@@ -188,24 +190,14 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_vehicle_owners_ref);
 		//********************
 		
-		//*** Field acc_comment ***
+		//*** Field ship_price ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Комментарий бухгалетрии';
-		$f_opts['id']="acc_comment";
+		$f_opts['alias']='Цена доставки';
+		$f_opts['id']="ship_price";
 				
-		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
-		$this->addField($f_acc_comment);
-		//********************
-		
-		//*** Field demurrage ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Простой';
-		$f_opts['id']="demurrage";
-				
-		$f_demurrage=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage",$f_opts);
-		$this->addField($f_demurrage);
+		$f_ship_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_price",$f_opts);
+		$this->addField($f_ship_price);
 		//********************
 		
 		//*** Field cost ***
@@ -216,6 +208,16 @@ class ShipmentList_Model extends ModelSQLBeton{
 				
 		$f_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost",$f_opts);
 		$this->addField($f_cost);
+		//********************
+		
+		//*** Field demurrage ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Простой';
+		$f_opts['id']="demurrage";
+				
+		$f_demurrage=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage",$f_opts);
+		$this->addField($f_demurrage);
 		//********************
 		
 		//*** Field demurrage_cost ***
@@ -250,8 +252,7 @@ class ShipmentList_Model extends ModelSQLBeton{
 		
 		//*** Field pump_vehicle_id ***
 		$f_opts = array();
-		
-		$f_opts['alias']='TRUE';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="pump_vehicle_id";
 				
 		$f_pump_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_id",$f_opts);
@@ -268,10 +269,19 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_pump_vehicle_owners_ref);
 		//********************
 		
-		//*** Field pump_vehicle_owner_id ***
+		//*** Field acc_comment ***
 		$f_opts = array();
 		
-		$f_opts['alias']='TRUE';
+		$f_opts['alias']='Комментарий бухгалетрии';
+		$f_opts['id']="acc_comment";
+				
+		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
+		$this->addField($f_acc_comment);
+		//********************
+		
+		//*** Field pump_vehicle_owner_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="pump_vehicle_owner_id";
 				
 		$f_pump_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owner_id",$f_opts);

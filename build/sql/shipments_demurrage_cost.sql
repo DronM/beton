@@ -22,7 +22,7 @@ $BODY$
 			ELSE 0
 		END;
 $BODY$
-  LANGUAGE sql VOLATILE
+  LANGUAGE sql IMMUTABLE
   COST 100;
 ALTER FUNCTION public.shipments_demurrage_cost(interval)
   OWNER TO beton;
