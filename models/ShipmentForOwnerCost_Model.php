@@ -25,7 +25,7 @@ class ShipmentForOwnerCost_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -33,7 +33,7 @@ class ShipmentForOwnerCost_Model extends ModelSQLBeton{
 		//*** Field date ***
 		$f_opts = array();
 		$f_opts['id']="date";
-				
+						
 		$f_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date",$f_opts);
 		$this->addField($f_date);
 		//********************
@@ -42,7 +42,7 @@ class ShipmentForOwnerCost_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=19;
 		$f_opts['id']="distance_to";
-				
+						
 		$f_distance_to=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"distance_to",$f_opts);
 		$this->addField($f_distance_to);
 		//********************
@@ -51,7 +51,7 @@ class ShipmentForOwnerCost_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="price";
-				
+						
 		$f_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price",$f_opts);
 		$this->addField($f_price);
 		//********************

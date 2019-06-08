@@ -23,7 +23,7 @@ class TrackerZoneControl_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -31,7 +31,7 @@ class TrackerZoneControl_Model extends ModelSQLBeton{
 		//*** Field destination_id ***
 		$f_opts = array();
 		$f_opts['id']="destination_id";
-				
+						
 		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
 		$this->addField($f_destination_id);
 		//********************

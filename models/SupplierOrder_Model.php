@@ -26,7 +26,7 @@ class SupplierOrder_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="date";
-				
+						
 		$f_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date",$f_opts);
 		$this->addField($f_date);
 		//********************
@@ -35,7 +35,7 @@ class SupplierOrder_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="supplier_id";
-				
+						
 		$f_supplier_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"supplier_id",$f_opts);
 		$this->addField($f_supplier_id);
 		//********************
@@ -44,7 +44,7 @@ class SupplierOrder_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -53,7 +53,7 @@ class SupplierOrder_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -61,7 +61,7 @@ class SupplierOrder_Model extends ModelSQLBeton{
 		//*** Field vehicles ***
 		$f_opts = array();
 		$f_opts['id']="vehicles";
-				
+						
 		$f_vehicles=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicles",$f_opts);
 		$this->addField($f_vehicles);
 		//********************
@@ -69,7 +69,7 @@ class SupplierOrder_Model extends ModelSQLBeton{
 		//*** Field sms_id ***
 		$f_opts = array();
 		$f_opts['id']="sms_id";
-				
+						
 		$f_sms_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_id",$f_opts);
 		$this->addField($f_sms_id);
 		//********************
@@ -77,7 +77,7 @@ class SupplierOrder_Model extends ModelSQLBeton{
 		//*** Field sms_confirmed ***
 		$f_opts = array();
 		$f_opts['id']="sms_confirmed";
-				
+						
 		$f_sms_confirmed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_confirmed",$f_opts);
 		$this->addField($f_sms_confirmed);
 		//********************

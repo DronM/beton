@@ -32,7 +32,7 @@ $$
 		END)::numeric(15,2)
 	;
 $$
-  LANGUAGE sql VOLATILE
+  LANGUAGE sql VOLATILE --IMMUTABLE VOLATILE
   COST 100;
 ALTER FUNCTION shipments_cost(destinations, int, date, shipments, bool) OWNER TO ;
 

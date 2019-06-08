@@ -25,7 +25,7 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -33,7 +33,7 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		//*** Field vehicle_id ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_id";
-				
+						
 		$f_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);
 		$this->addField($f_vehicle_id);
 		//********************
@@ -41,7 +41,7 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		//*** Field pump_price_id ***
 		$f_opts = array();
 		$f_opts['id']="pump_price_id";
-				
+						
 		$f_pump_price_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_price_id",$f_opts);
 		$this->addField($f_pump_price_id);
 		//********************
@@ -50,7 +50,7 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="phone_cel";
-				
+						
 		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
 		//********************
@@ -58,7 +58,7 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		//*** Field pump_length ***
 		$f_opts = array();
 		$f_opts['id']="pump_length";
-				
+						
 		$f_pump_length=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_length",$f_opts);
 		$this->addField($f_pump_length);
 		//********************
@@ -67,7 +67,7 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['defaultValue']='FALSE';
 		$f_opts['id']="deleted";
-				
+						
 		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
 		$this->addField($f_deleted);
 		//********************
@@ -76,7 +76,7 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=100;
 		$f_opts['id']="comment_text";
-				
+						
 		$f_comment_text=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
 		$this->addField($f_comment_text);
 		//********************

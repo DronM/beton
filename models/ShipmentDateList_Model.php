@@ -26,7 +26,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="ship_date";
-				
+						
 		$f_ship_date=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date",$f_opts);
 		$this->addField($f_ship_date);
 		//********************
@@ -35,7 +35,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="client_id";
-				
+						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
 		//********************
@@ -45,7 +45,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Клиент';
 		$f_opts['id']="clients_ref";
-				
+						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************
@@ -54,7 +54,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="concrete_type_id";
-				
+						
 		$f_concrete_type_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_id",$f_opts);
 		$this->addField($f_concrete_type_id);
 		//********************
@@ -64,7 +64,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Марка';
 		$f_opts['id']="concrete_types_ref";
-				
+						
 		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
 		$this->addField($f_concrete_types_ref);
 		//********************
@@ -73,7 +73,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="destination_id";
-				
+						
 		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
 		$this->addField($f_destination_id);
 		//********************
@@ -83,7 +83,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Объект';
 		$f_opts['id']="destinations_ref";
-				
+						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
 		$this->addField($f_destinations_ref);
 		//********************
@@ -92,7 +92,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="production_site_id";
-				
+						
 		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
 		$this->addField($f_production_site_id);
 		//********************
@@ -102,7 +102,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Завод';
 		$f_opts['id']="production_sites_ref";
-				
+						
 		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
 		$this->addField($f_production_sites_ref);
 		//********************
@@ -112,7 +112,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Количество';
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -122,7 +122,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Стоимость доставки';
 		$f_opts['id']="ship_cost";
-				
+						
 		$f_ship_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_cost",$f_opts);
 		$this->addField($f_ship_cost);
 		//********************
@@ -132,7 +132,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Простой';
 		$f_opts['id']="demurrage";
-				
+						
 		$f_demurrage=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage",$f_opts);
 		$this->addField($f_demurrage);
 		//********************
@@ -142,7 +142,7 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='За простой';
 		$f_opts['id']="demurrage_cost";
-				
+						
 		$f_demurrage_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage_cost",$f_opts);
 		$this->addField($f_demurrage_cost);
 		//********************

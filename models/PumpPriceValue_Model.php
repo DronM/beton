@@ -24,7 +24,7 @@ class PumpPriceValue_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -33,7 +33,7 @@ class PumpPriceValue_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="pump_price_id";
-				
+						
 		$f_pump_price_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_price_id",$f_opts);
 		$this->addField($f_pump_price_id);
 		//********************
@@ -42,7 +42,7 @@ class PumpPriceValue_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=19;
 		$f_opts['id']="quant_from";
-				
+						
 		$f_quant_from=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_from",$f_opts);
 		$this->addField($f_quant_from);
 		//********************
@@ -51,7 +51,7 @@ class PumpPriceValue_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=19;
 		$f_opts['id']="quant_to";
-				
+						
 		$f_quant_to=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_to",$f_opts);
 		$this->addField($f_quant_to);
 		//********************
@@ -60,7 +60,7 @@ class PumpPriceValue_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="price_m";
-				
+						
 		$f_price_m=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price_m",$f_opts);
 		$this->addField($f_price_m);
 		//********************
@@ -69,7 +69,7 @@ class PumpPriceValue_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="price_fixed";
-				
+						
 		$f_price_fixed=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price_fixed",$f_opts);
 		$this->addField($f_price_fixed);
 		//********************

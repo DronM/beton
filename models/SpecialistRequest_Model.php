@@ -27,7 +27,7 @@ class SpecialistRequest_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -35,7 +35,7 @@ class SpecialistRequest_Model extends ModelSQLBeton{
 		//*** Field date_time ***
 		$f_opts = array();
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -43,7 +43,7 @@ class SpecialistRequest_Model extends ModelSQLBeton{
 		//*** Field name ***
 		$f_opts = array();
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -51,7 +51,7 @@ class SpecialistRequest_Model extends ModelSQLBeton{
 		//*** Field comment ***
 		$f_opts = array();
 		$f_opts['id']="comment";
-				
+						
 		$f_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment",$f_opts);
 		$this->addField($f_comment);
 		//********************
@@ -59,7 +59,7 @@ class SpecialistRequest_Model extends ModelSQLBeton{
 		//*** Field tel ***
 		$f_opts = array();
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -68,7 +68,7 @@ class SpecialistRequest_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['defaultValue']='FALSE';
 		$f_opts['id']="viewed";
-				
+						
 		$f_viewed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"viewed",$f_opts);
 		$this->addField($f_viewed);
 		//********************
@@ -76,7 +76,7 @@ class SpecialistRequest_Model extends ModelSQLBeton{
 		//*** Field client_id ***
 		$f_opts = array();
 		$f_opts['id']="client_id";
-				
+						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
 		//********************
@@ -84,7 +84,7 @@ class SpecialistRequest_Model extends ModelSQLBeton{
 		//*** Field manager_comment ***
 		$f_opts = array();
 		$f_opts['id']="manager_comment";
-				
+						
 		$f_manager_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"manager_comment",$f_opts);
 		$this->addField($f_manager_comment);
 		//********************

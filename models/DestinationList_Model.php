@@ -27,7 +27,7 @@ class DestinationList_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -36,7 +36,7 @@ class DestinationList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=100;
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -44,7 +44,7 @@ class DestinationList_Model extends ModelSQLBeton{
 		//*** Field distance ***
 		$f_opts = array();
 		$f_opts['id']="distance";
-				
+						
 		$f_distance=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"distance",$f_opts);
 		$this->addField($f_distance);
 		//********************
@@ -52,7 +52,7 @@ class DestinationList_Model extends ModelSQLBeton{
 		//*** Field time_route ***
 		$f_opts = array();
 		$f_opts['id']="time_route";
-				
+						
 		$f_time_route=new FieldSQLTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"time_route",$f_opts);
 		$this->addField($f_time_route);
 		//********************
@@ -60,7 +60,7 @@ class DestinationList_Model extends ModelSQLBeton{
 		//*** Field special_price ***
 		$f_opts = array();
 		$f_opts['id']="special_price";
-				
+						
 		$f_special_price=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"special_price",$f_opts);
 		$this->addField($f_special_price);
 		//********************
@@ -68,7 +68,7 @@ class DestinationList_Model extends ModelSQLBeton{
 		//*** Field price ***
 		$f_opts = array();
 		$f_opts['id']="price";
-				
+						
 		$f_price=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price",$f_opts);
 		$this->addField($f_price);
 		//********************
@@ -76,7 +76,7 @@ class DestinationList_Model extends ModelSQLBeton{
 		//*** Field special_price ***
 		$f_opts = array();
 		$f_opts['id']="special_price";
-				
+						
 		$f_special_price=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"special_price",$f_opts);
 		$this->addField($f_special_price);
 		//********************

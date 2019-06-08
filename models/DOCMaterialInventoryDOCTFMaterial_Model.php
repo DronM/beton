@@ -23,7 +23,7 @@ class DOCMaterialInventoryDOCTFMaterial_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="doc_id";
-				
+						
 		$f_doc_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"doc_id",$f_opts);
 		$this->addField($f_doc_id);
 		//********************
@@ -32,7 +32,7 @@ class DOCMaterialInventoryDOCTFMaterial_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="line_number";
-				
+						
 		$f_line_number=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"line_number",$f_opts);
 		$this->addField($f_line_number);
 		//********************
@@ -42,7 +42,7 @@ class DOCMaterialInventoryDOCTFMaterial_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Материал';
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -53,7 +53,7 @@ class DOCMaterialInventoryDOCTFMaterial_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество';
 		$f_opts['length']=19;
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************

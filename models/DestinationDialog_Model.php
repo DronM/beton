@@ -25,7 +25,7 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -33,7 +33,7 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		//*** Field name ***
 		$f_opts = array();
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -41,7 +41,7 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		//*** Field distance ***
 		$f_opts = array();
 		$f_opts['id']="distance";
-				
+						
 		$f_distance=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"distance",$f_opts);
 		$this->addField($f_distance);
 		//********************
@@ -49,7 +49,7 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		//*** Field time_route ***
 		$f_opts = array();
 		$f_opts['id']="time_route";
-				
+						
 		$f_time_route=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"time_route",$f_opts);
 		$this->addField($f_time_route);
 		//********************
@@ -57,7 +57,7 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		//*** Field price ***
 		$f_opts = array();
 		$f_opts['id']="price";
-				
+						
 		$f_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price",$f_opts);
 		$this->addField($f_price);
 		//********************
@@ -65,7 +65,7 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		//*** Field zone_str ***
 		$f_opts = array();
 		$f_opts['id']="zone_str";
-				
+						
 		$f_zone_str=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"zone_str",$f_opts);
 		$this->addField($f_zone_str);
 		//********************
@@ -73,7 +73,7 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		//*** Field zone_center_str ***
 		$f_opts = array();
 		$f_opts['id']="zone_center_str";
-				
+						
 		$f_zone_center_str=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"zone_center_str",$f_opts);
 		$this->addField($f_zone_center_str);
 		//********************
@@ -81,7 +81,7 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		//*** Field special_price ***
 		$f_opts = array();
 		$f_opts['id']="special_price";
-				
+						
 		$f_special_price=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"special_price",$f_opts);
 		$this->addField($f_special_price);
 		//********************

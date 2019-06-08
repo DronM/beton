@@ -26,9 +26,9 @@ $permissions = array();
 		
 			$permissions['Captcha_Controller_get']=TRUE;
 		
-			$permissions['Shipment_Controller_get_list']=TRUE;
+			$permissions['Shipment_Controller_get_list_for_veh_owner']=TRUE;
 		
-			$permissions['Shipment_Controller_get_pump_list']=TRUE;
+			$permissions['Shipment_Controller_get_pump_list_for_veh_owner']=TRUE;
 		
 			$permissions['Shipment_Controller_owner_set_agreed']=TRUE;
 		

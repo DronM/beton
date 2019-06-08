@@ -24,7 +24,7 @@ class Weather_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=FALSE;
 		$f_opts['id']="update_dt";
-				
+						
 		$f_update_dt=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"update_dt",$f_opts);
 		$this->addField($f_update_dt);
 		//********************
@@ -32,7 +32,7 @@ class Weather_Model extends ModelSQLBeton{
 		//*** Field content ***
 		$f_opts = array();
 		$f_opts['id']="content";
-				
+						
 		$f_content=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"content",$f_opts);
 		$this->addField($f_content);
 		//********************
@@ -40,7 +40,7 @@ class Weather_Model extends ModelSQLBeton{
 		//*** Field content_details ***
 		$f_opts = array();
 		$f_opts['id']="content_details";
-				
+						
 		$f_content_details=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"content_details",$f_opts);
 		$this->addField($f_content_details);
 		//********************

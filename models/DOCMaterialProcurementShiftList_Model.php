@@ -24,7 +24,7 @@ class DOCMaterialProcurementShiftList_Model extends ModelSQLDOC{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -32,7 +32,7 @@ class DOCMaterialProcurementShiftList_Model extends ModelSQLDOC{
 		//*** Field shift_date_time ***
 		$f_opts = array();
 		$f_opts['id']="shift_date_time";
-				
+						
 		$f_shift_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shift_date_time",$f_opts);
 		$this->addField($f_shift_date_time);
 		//********************
@@ -40,7 +40,7 @@ class DOCMaterialProcurementShiftList_Model extends ModelSQLDOC{
 		//*** Field shift_date_time_end ***
 		$f_opts = array();
 		$f_opts['id']="shift_date_time_end";
-				
+						
 		$f_shift_date_time_end=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shift_date_time_end",$f_opts);
 		$this->addField($f_shift_date_time_end);
 		//********************
@@ -48,7 +48,7 @@ class DOCMaterialProcurementShiftList_Model extends ModelSQLDOC{
 		//*** Field material_id ***
 		$f_opts = array();
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -56,7 +56,7 @@ class DOCMaterialProcurementShiftList_Model extends ModelSQLDOC{
 		//*** Field quant ***
 		$f_opts = array();
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************

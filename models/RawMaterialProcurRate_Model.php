@@ -24,7 +24,7 @@ class RawMaterialProcurRate_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=FALSE;
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -34,7 +34,7 @@ class RawMaterialProcurRate_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=FALSE;
 		$f_opts['id']="supplier_id";
-				
+						
 		$f_supplier_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"supplier_id",$f_opts);
 		$this->addField($f_supplier_id);
 		//********************
@@ -43,7 +43,7 @@ class RawMaterialProcurRate_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=19;
 		$f_opts['id']="rate";
-				
+						
 		$f_rate=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"rate",$f_opts);
 		$this->addField($f_rate);
 		//********************

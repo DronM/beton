@@ -27,7 +27,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -37,7 +37,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Имя';
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -47,7 +47,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Эл.почта';
 		$f_opts['id']="email";
-				
+						
 		$f_email=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"email",$f_opts);
 		$this->addField($f_email);
 		//********************
@@ -55,7 +55,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		//*** Field role_id ***
 		$f_opts = array();
 		$f_opts['id']="role_id";
-				
+						
 		$f_role_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"role_id",$f_opts);
 		$this->addField($f_role_id);
 		//********************
@@ -63,7 +63,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		//*** Field phone_cel ***
 		$f_opts = array();
 		$f_opts['id']="phone_cel";
-				
+						
 		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
 		//********************
@@ -71,7 +71,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		//*** Field tel_ext ***
 		$f_opts = array();
 		$f_opts['id']="tel_ext";
-				
+						
 		$f_tel_ext=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel_ext",$f_opts);
 		$this->addField($f_tel_ext);
 		//********************
@@ -79,7 +79,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		//*** Field banned ***
 		$f_opts = array();
 		$f_opts['id']="banned";
-				
+						
 		$f_banned=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"banned",$f_opts);
 		$this->addField($f_banned);
 		//********************
@@ -87,7 +87,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		//*** Field user_time_locale ***
 		$f_opts = array();
 		$f_opts['id']="user_time_locale";
-				
+						
 		$f_user_time_locale=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_time_locale",$f_opts);
 		$this->addField($f_user_time_locale);
 		//********************
@@ -95,7 +95,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		//*** Field production_sites_ref ***
 		$f_opts = array();
 		$f_opts['id']="production_sites_ref";
-				
+						
 		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
 		$this->addField($f_production_sites_ref);
 		//********************

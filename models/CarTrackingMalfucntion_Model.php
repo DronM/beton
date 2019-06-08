@@ -24,7 +24,7 @@ class CarTrackingMalfucntion_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="dt";
-				
+						
 		$f_dt=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dt",$f_opts);
 		$this->addField($f_dt);
 		//********************
@@ -34,7 +34,7 @@ class CarTrackingMalfucntion_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['length']=15;
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -44,7 +44,7 @@ class CarTrackingMalfucntion_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['length']=15;
 		$f_opts['id']="tracker_id";
-				
+						
 		$f_tracker_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tracker_id",$f_opts);
 		$this->addField($f_tracker_id);
 		//********************

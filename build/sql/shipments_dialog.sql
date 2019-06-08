@@ -52,7 +52,7 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS ship_cost,
 		sh.ship_cost_edit,
 		
-		sh_last.id AS order_last_shipment,
+		(sh_last.id=sh.id) AS order_last_shipment,
 		
 		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,FALSE) AS ship_cost_default,
 		shipments_pump_cost(sh,o,dest,pvh,FALSE) AS pump_cost_default

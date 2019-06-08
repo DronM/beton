@@ -24,7 +24,7 @@ class ShipmentTimeNorm_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Объем';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -34,7 +34,7 @@ class ShipmentTimeNorm_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Норма минут';
 		$f_opts['id']="norm_min";
-				
+						
 		$f_norm_min=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"norm_min",$f_opts);
 		$this->addField($f_norm_min);
 		//********************

@@ -25,7 +25,7 @@ class ConcreteCostList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -33,7 +33,7 @@ class ConcreteCostList_Model extends ModelSQLBeton{
 		//*** Field date ***
 		$f_opts = array();
 		$f_opts['id']="date";
-				
+						
 		$f_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date",$f_opts);
 		$this->addField($f_date);
 		//********************
@@ -41,7 +41,7 @@ class ConcreteCostList_Model extends ModelSQLBeton{
 		//*** Field concrete_types_ref ***
 		$f_opts = array();
 		$f_opts['id']="concrete_types_ref";
-				
+						
 		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
 		$this->addField($f_concrete_types_ref);
 		//********************
@@ -50,7 +50,7 @@ class ConcreteCostList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="price";
-				
+						
 		$f_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price",$f_opts);
 		$this->addField($f_price);
 		//********************

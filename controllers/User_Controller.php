@@ -470,6 +470,13 @@ class User_Controller extends ControllerSQL{
 			$filter->addField($field,'=');
 			GlobalFilter::set('ShipmentList_Model',$filter);
 						
+			$model = new ShipmentForVehOwnerList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById('vehicle_owner_id');
+			$field->setValue($_SESSION['global_vehicle_owner_id']);
+			$filter->addField($field,'=');
+			GlobalFilter::set('ShipmentForVehOwnerList_Model',$filter);
+						
 			$model = new ShipmentDialog_Model($this->getDbLink());
 			$filter = new ModelWhereSQL();
 			$field = clone $model->getFieldById('vehicle_owner_id');
@@ -483,6 +490,13 @@ class User_Controller extends ControllerSQL{
 			$field->setValue($_SESSION['global_vehicle_owner_id']);
 			$filter->addField($field,'=');
 			GlobalFilter::set('ShipmentPumpList_Model',$filter);
+						
+			$model = new ShipmentPumpForVehOwnerList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById('pump_vehicle_owner_id');
+			$field->setValue($_SESSION['global_vehicle_owner_id']);
+			$filter->addField($field,'=');
+			GlobalFilter::set('ShipmentPumpForVehOwnerList_Model',$filter);
 			
 		}
 		
@@ -893,16 +907,30 @@ class User_Controller extends ControllerSQL{
 		$k = NULL;
 		FieldSQLString::formatForDb($link,$pm->getParamValue('k'),$k);
 		
-		$ar = $link->query_first(
-			sprintf(
-			"SELECT 
+		/*
 				u.name,
 				u.role_id,
 				u.id,
 				get_role_types_descr(u.role_id) AS role_descr,
-				u.tel_ext
+				u.tel_ext,
+		
+		*/
+		$ar = $link->query_first(
+			sprintf(
+			"SELECT 
+				u.*,
+				const_first_shift_start_time_val() AS first_shift_start_time,
+				CASE
+					WHEN const_shift_length_time_val()>='24 hours'::interval THEN
+						const_first_shift_start_time_val()::interval + 
+						const_shift_length_time_val()::interval-'24 hours 1 second'::interval
+					ELSE
+						const_first_shift_start_time_val()::interval + 
+						const_shift_length_time_val()::interval-'1 second'::interval
+				END AS first_shift_end_time				
+				
 			FROM user_mac_addresses AS ma
-			LEFT JOIN users AS u ON u.id=ma.user_id
+			LEFT JOIN users_dialog AS u ON u.id=ma.user_id
 			WHERE ma.mac_address=%s",
 			$k));
 			

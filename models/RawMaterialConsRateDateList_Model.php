@@ -25,7 +25,7 @@ class RawMaterialConsRateDateList_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -34,7 +34,7 @@ class RawMaterialConsRateDateList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="dt";
-				
+						
 		$f_dt=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dt",$f_opts);
 		$this->addField($f_dt);
 		//********************
@@ -44,7 +44,7 @@ class RawMaterialConsRateDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Период';
 		$f_opts['id']="period";
-				
+						
 		$f_period=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"period",$f_opts);
 		$this->addField($f_period);
 		//********************
@@ -54,7 +54,7 @@ class RawMaterialConsRateDateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************

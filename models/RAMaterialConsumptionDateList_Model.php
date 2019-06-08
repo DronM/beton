@@ -24,7 +24,7 @@ class RAMaterialConsumptionDateList_Model extends {
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="shift";
-				
+						
 		$f_shift=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shift",$f_opts);
 		$this->addField($f_shift);
 		//********************
@@ -32,7 +32,7 @@ class RAMaterialConsumptionDateList_Model extends {
 		//*** Field shift_descr ***
 		$f_opts = array();
 		$f_opts['id']="shift_descr";
-				
+						
 		$f_shift_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shift_descr",$f_opts);
 		$this->addField($f_shift_descr);
 		//********************
@@ -40,7 +40,7 @@ class RAMaterialConsumptionDateList_Model extends {
 		//*** Field shift_from_descr ***
 		$f_opts = array();
 		$f_opts['id']="shift_from_descr";
-				
+						
 		$f_shift_from_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shift_from_descr",$f_opts);
 		$this->addField($f_shift_from_descr);
 		//********************
@@ -48,7 +48,7 @@ class RAMaterialConsumptionDateList_Model extends {
 		//*** Field shift_to_descr ***
 		$f_opts = array();
 		$f_opts['id']="shift_to_descr";
-				
+						
 		$f_shift_to_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shift_to_descr",$f_opts);
 		$this->addField($f_shift_to_descr);
 		//********************
@@ -56,7 +56,7 @@ class RAMaterialConsumptionDateList_Model extends {
 		//*** Field concrete_quant ***
 		$f_opts = array();
 		$f_opts['id']="concrete_quant";
-				
+						
 		$f_concrete_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_quant",$f_opts);
 		$this->addField($f_concrete_quant);
 		//********************

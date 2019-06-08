@@ -25,7 +25,7 @@ class UserProfile_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -35,7 +35,7 @@ class UserProfile_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Имя';
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -45,7 +45,7 @@ class UserProfile_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Эл.почта';
 		$f_opts['id']="email";
-				
+						
 		$f_email=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"email",$f_opts);
 		$this->addField($f_email);
 		//********************
@@ -56,7 +56,7 @@ class UserProfile_Model extends ModelSQLBeton{
 		$f_opts['alias']='Моб.телефон';
 		$f_opts['length']=11;
 		$f_opts['id']="phone_cel";
-				
+						
 		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
 		//********************

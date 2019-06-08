@@ -26,7 +26,7 @@ class SupplierList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -37,7 +37,7 @@ class SupplierList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Наименование';
 		$f_opts['length']=100;
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -48,7 +48,7 @@ class SupplierList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Телефон';
 		$f_opts['length']=15;
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -59,7 +59,7 @@ class SupplierList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Телефон';
 		$f_opts['length']=15;
 		$f_opts['id']="tel2";
-				
+						
 		$f_tel2=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel2",$f_opts);
 		$this->addField($f_tel2);
 		//********************

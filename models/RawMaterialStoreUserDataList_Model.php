@@ -24,7 +24,7 @@ class RawMaterialStoreUserDataList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -32,7 +32,7 @@ class RawMaterialStoreUserDataList_Model extends ModelSQLBeton{
 		//*** Field material_descr ***
 		$f_opts = array();
 		$f_opts['id']="material_descr";
-				
+						
 		$f_material_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_descr",$f_opts);
 		$this->addField($f_material_descr);
 		//********************
@@ -41,7 +41,7 @@ class RawMaterialStoreUserDataList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************

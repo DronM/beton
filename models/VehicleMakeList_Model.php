@@ -21,7 +21,7 @@ class VehicleMakeList_Model extends ModelSQLBeton{
 		//*** Field make ***
 		$f_opts = array();
 		$f_opts['id']="make";
-				
+						
 		$f_make=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"make",$f_opts);
 		$this->addField($f_make);
 		//********************

@@ -26,7 +26,7 @@ class SiteFeedBackList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -35,7 +35,7 @@ class SiteFeedBackList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -45,7 +45,7 @@ class SiteFeedBackList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="date_time_descr";
-				
+						
 		$f_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time_descr",$f_opts);
 		$this->addField($f_date_time_descr);
 		//********************
@@ -55,7 +55,7 @@ class SiteFeedBackList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='ФИО';
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -65,7 +65,7 @@ class SiteFeedBackList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="comment";
-				
+						
 		$f_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment",$f_opts);
 		$this->addField($f_comment);
 		//********************
@@ -75,7 +75,7 @@ class SiteFeedBackList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Email';
 		$f_opts['id']="email";
-				
+						
 		$f_email=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"email",$f_opts);
 		$this->addField($f_email);
 		//********************
@@ -84,7 +84,7 @@ class SiteFeedBackList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="viewed";
-				
+						
 		$f_viewed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"viewed",$f_opts);
 		$this->addField($f_viewed);
 		//********************
@@ -94,7 +94,7 @@ class SiteFeedBackList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Просмотрено';
 		$f_opts['id']="viewed_descr";
-				
+						
 		$f_viewed_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"viewed_descr",$f_opts);
 		$this->addField($f_viewed_descr);
 		//********************

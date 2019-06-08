@@ -25,7 +25,7 @@ class OrderClient_Model extends {
 		//*** Field id ***
 		$f_opts = array();
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -33,7 +33,7 @@ class OrderClient_Model extends {
 		//*** Field name ***
 		$f_opts = array();
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -41,7 +41,7 @@ class OrderClient_Model extends {
 		//*** Field descr ***
 		$f_opts = array();
 		$f_opts['id']="descr";
-				
+						
 		$f_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"descr",$f_opts);
 		$this->addField($f_descr);
 		//********************
@@ -49,7 +49,7 @@ class OrderClient_Model extends {
 		//*** Field phone_cel ***
 		$f_opts = array();
 		$f_opts['id']="phone_cel";
-				
+						
 		$f_phone_cel=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
 		//********************
@@ -57,7 +57,7 @@ class OrderClient_Model extends {
 		//*** Field concrete_types_ref ***
 		$f_opts = array();
 		$f_opts['id']="concrete_types_ref";
-				
+						
 		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
 		$this->addField($f_concrete_types_ref);
 		//********************
@@ -65,7 +65,7 @@ class OrderClient_Model extends {
 		//*** Field destinations_ref ***
 		$f_opts = array();
 		$f_opts['id']="destinations_ref";
-				
+						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
 		$this->addField($f_destinations_ref);
 		//********************
@@ -73,7 +73,7 @@ class OrderClient_Model extends {
 		//*** Field quant ***
 		$f_opts = array();
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -81,7 +81,7 @@ class OrderClient_Model extends {
 		//*** Field date_time ***
 		$f_opts = array();
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************

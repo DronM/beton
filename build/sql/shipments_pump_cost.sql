@@ -14,7 +14,7 @@ $$
 			WHEN in_shipments.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=in_orders.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
 			THEN
 				CASE
-					WHEN coalesce(in_orders.unload_price,0)>0 THEN in_orders.unload_price::numeric(15,2)
+					WHEN coalesce(in_orders.total_edit,FALSE) AND coalesce(in_orders.unload_price,0)>0 THEN in_orders.unload_price::numeric(15,2)
 					ELSE
 						(SELECT
 							CASE

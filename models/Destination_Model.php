@@ -23,7 +23,7 @@ class Destination_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -34,7 +34,7 @@ class Destination_Model extends ModelSQLBeton{
 		$f_opts['alias']='Наименование';
 		$f_opts['length']=100;
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -45,7 +45,7 @@ class Destination_Model extends ModelSQLBeton{
 		$f_opts['alias']='Расстояние';
 		$f_opts['length']=15;
 		$f_opts['id']="distance";
-				
+						
 		$f_distance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"distance",$f_opts);
 		$this->addField($f_distance);
 		//********************
@@ -55,7 +55,7 @@ class Destination_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Время';
 		$f_opts['id']="time_route";
-				
+						
 		$f_time_route=new FieldSQLTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"time_route",$f_opts);
 		$this->addField($f_time_route);
 		//********************
@@ -65,7 +65,7 @@ class Destination_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Стоимость';
 		$f_opts['id']="price";
-				
+						
 		$f_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price",$f_opts);
 		$this->addField($f_price);
 		//********************
@@ -73,7 +73,7 @@ class Destination_Model extends ModelSQLBeton{
 		//*** Field zone ***
 		$f_opts = array();
 		$f_opts['id']="zone";
-				
+						
 		$f_zone=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"zone",$f_opts);
 		$this->addField($f_zone);
 		//********************
@@ -82,7 +82,7 @@ class Destination_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['defaultValue']='FALSE';
 		$f_opts['id']="special_price";
-				
+						
 		$f_special_price=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"special_price",$f_opts);
 		$this->addField($f_special_price);
 		//********************

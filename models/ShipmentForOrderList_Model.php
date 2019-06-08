@@ -29,7 +29,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Номер';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -39,7 +39,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Назначен';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -49,7 +49,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгружен';
 		$f_opts['id']="ship_date_time";
-				
+						
 		$f_ship_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
 		$this->addField($f_ship_date_time);
 		//********************
@@ -59,7 +59,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Количество';
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -69,7 +69,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Экипаж';
 		$f_opts['id']="vehicle_schedules_ref";
-				
+						
 		$f_vehicle_schedules_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_schedules_ref",$f_opts);
 		$this->addField($f_vehicle_schedules_ref);
 		//********************
@@ -79,7 +79,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Завод';
 		$f_opts['id']="production_sites_ref";
-				
+						
 		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
 		$this->addField($f_production_sites_ref);
 		//********************
@@ -89,7 +89,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Статус';
 		$f_opts['id']="vs_state";
-				
+						
 		$f_vs_state=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vs_state",$f_opts);
 		$this->addField($f_vs_state);
 		//********************
@@ -99,7 +99,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгружен';
 		$f_opts['id']="shipped";
-				
+						
 		$f_shipped=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipped",$f_opts);
 		$this->addField($f_shipped);
 		//********************
@@ -108,7 +108,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="order_id";
-				
+						
 		$f_order_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_id",$f_opts);
 		$this->addField($f_order_id);
 		//********************

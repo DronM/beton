@@ -26,7 +26,7 @@ class VehicleSchedule_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -36,7 +36,7 @@ class VehicleSchedule_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="schedule_date";
-				
+						
 		$f_schedule_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"schedule_date",$f_opts);
 		$this->addField($f_schedule_date);
 		//********************
@@ -46,7 +46,7 @@ class VehicleSchedule_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Автомобиль';
 		$f_opts['id']="vehicle_id";
-				
+						
 		$f_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);
 		$this->addField($f_vehicle_id);
 		//********************
@@ -56,7 +56,7 @@ class VehicleSchedule_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Водитель';
 		$f_opts['id']="driver_id";
-				
+						
 		$f_driver_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_id",$f_opts);
 		$this->addField($f_driver_id);
 		//********************

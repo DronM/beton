@@ -29,7 +29,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -37,7 +37,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		//*** Field date_time ***
 		$f_opts = array();
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -45,7 +45,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		//*** Field name ***
 		$f_opts = array();
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -54,7 +54,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -63,7 +63,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="concrete_type";
-				
+						
 		$f_concrete_type=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type",$f_opts);
 		$this->addField($f_concrete_type);
 		//********************
@@ -71,7 +71,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		//*** Field dest ***
 		$f_opts = array();
 		$f_opts['id']="dest";
-				
+						
 		$f_dest=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dest",$f_opts);
 		$this->addField($f_dest);
 		//********************
@@ -80,7 +80,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="total";
-				
+						
 		$f_total=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"total",$f_opts);
 		$this->addField($f_total);
 		//********************
@@ -89,7 +89,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -98,7 +98,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['defaultValue']='false';
 		$f_opts['id']="pump";
-				
+						
 		$f_pump=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump",$f_opts);
 		$this->addField($f_pump);
 		//********************
@@ -106,7 +106,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		//*** Field comment_text ***
 		$f_opts = array();
 		$f_opts['id']="comment_text";
-				
+						
 		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
 		$this->addField($f_comment_text);
 		//********************
@@ -114,7 +114,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		//*** Field closed ***
 		$f_opts = array();
 		$f_opts['id']="closed";
-				
+						
 		$f_closed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"closed",$f_opts);
 		$this->addField($f_closed);
 		//********************
@@ -122,7 +122,7 @@ class OrderFromClient_Model extends ModelSQLBeton{
 		//*** Field viewed ***
 		$f_opts = array();
 		$f_opts['id']="viewed";
-				
+						
 		$f_viewed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"viewed",$f_opts);
 		$this->addField($f_viewed);
 		//********************

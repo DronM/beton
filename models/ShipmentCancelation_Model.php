@@ -28,7 +28,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -39,7 +39,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		$f_opts['alias']='Дата';
 		$f_opts['defaultValue']='CURRENT_TIMESTAMP';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -49,7 +49,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата отгрузки';
 		$f_opts['id']="ship_date_time";
-				
+						
 		$f_ship_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
 		$this->addField($f_ship_date_time);
 		//********************
@@ -59,7 +59,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата назначения';
 		$f_opts['id']="assign_date_time";
-				
+						
 		$f_assign_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"assign_date_time",$f_opts);
 		$this->addField($f_assign_date_time);
 		//********************
@@ -69,7 +69,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Заявка';
 		$f_opts['id']="order_id";
-				
+						
 		$f_order_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_id",$f_opts);
 		$this->addField($f_order_id);
 		//********************
@@ -79,7 +79,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Экипаж';
 		$f_opts['id']="vehicle_schedule_id";
-				
+						
 		$f_vehicle_schedule_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_schedule_id",$f_opts);
 		$this->addField($f_vehicle_schedule_id);
 		//********************
@@ -89,7 +89,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="comment_text";
-				
+						
 		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
 		$this->addField($f_comment_text);
 		//********************
@@ -99,7 +99,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Пользователь';
 		$f_opts['id']="user_id";
-				
+						
 		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
 		$this->addField($f_user_id);
 		//********************
@@ -110,7 +110,7 @@ class ShipmentCancelation_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество';
 		$f_opts['length']=19;
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************

@@ -23,7 +23,7 @@ class ClientDebt_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="client_id";
-				
+						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
 		//********************
@@ -32,7 +32,7 @@ class ClientDebt_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="debt";
-				
+						
 		$f_debt=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"debt",$f_opts);
 		$this->addField($f_debt);
 		//********************

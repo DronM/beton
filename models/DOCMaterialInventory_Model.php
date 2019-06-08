@@ -26,7 +26,7 @@ class DOCMaterialInventory_Model extends ModelSQLDOC{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -36,7 +36,7 @@ class DOCMaterialInventory_Model extends ModelSQLDOC{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -46,7 +46,7 @@ class DOCMaterialInventory_Model extends ModelSQLDOC{
 		
 		$f_opts['alias']='Номер';
 		$f_opts['id']="number";
-				
+						
 		$f_number=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"number",$f_opts);
 		$this->addField($f_number);
 		//********************
@@ -56,7 +56,7 @@ class DOCMaterialInventory_Model extends ModelSQLDOC{
 		
 		$f_opts['alias']='Проведен';
 		$f_opts['id']="processed";
-				
+						
 		$f_processed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"processed",$f_opts);
 		$this->addField($f_processed);
 		//********************

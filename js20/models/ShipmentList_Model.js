@@ -197,6 +197,24 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость доставки отредактирована';
+	filed_options.autoInc = false;	
+	
+	options.fields.ship_cost_edit = new FieldBool("ship_cost_edit",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость насоса отредактирована';
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_cost_edit = new FieldBool("pump_cost_edit",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Простой';
 	filed_options.autoInc = false;	
 	

@@ -26,7 +26,7 @@ class ClientTelList_Model extends ModelSQL{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -34,7 +34,7 @@ class ClientTelList_Model extends ModelSQL{
 		//*** Field client_id ***
 		$f_opts = array();
 		$f_opts['id']="client_id";
-				
+						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
 		//********************
@@ -42,7 +42,7 @@ class ClientTelList_Model extends ModelSQL{
 		//*** Field clients_ref ***
 		$f_opts = array();
 		$f_opts['id']="clients_ref";
-				
+						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************
@@ -52,7 +52,7 @@ class ClientTelList_Model extends ModelSQL{
 		
 		$f_opts['alias']='ФИО';
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -62,7 +62,7 @@ class ClientTelList_Model extends ModelSQL{
 		
 		$f_opts['alias']='Телефон';
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -72,7 +72,7 @@ class ClientTelList_Model extends ModelSQL{
 		
 		$f_opts['alias']='Эл.почта';
 		$f_opts['id']="email";
-				
+						
 		$f_email=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"email",$f_opts);
 		$this->addField($f_email);
 		//********************
@@ -82,7 +82,7 @@ class ClientTelList_Model extends ModelSQL{
 		
 		$f_opts['alias']='Должность';
 		$f_opts['id']="post";
-				
+						
 		$f_post=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"post",$f_opts);
 		$this->addField($f_post);
 		//********************

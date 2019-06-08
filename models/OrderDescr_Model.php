@@ -23,7 +23,7 @@ class OrderDescr_Model extends {
 		//*** Field descr ***
 		$f_opts = array();
 		$f_opts['id']="descr";
-				
+						
 		$f_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"descr",$f_opts);
 		$this->addField($f_descr);
 		//********************
@@ -31,7 +31,7 @@ class OrderDescr_Model extends {
 		//*** Field phone_cel ***
 		$f_opts = array();
 		$f_opts['id']="phone_cel";
-				
+						
 		$f_phone_cel=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
 		//********************
@@ -39,7 +39,7 @@ class OrderDescr_Model extends {
 		//*** Field langs_ref ***
 		$f_opts = array();
 		$f_opts['id']="langs_ref";
-				
+						
 		$f_langs_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"langs_ref",$f_opts);
 		$this->addField($f_langs_ref);
 		//********************
@@ -47,7 +47,7 @@ class OrderDescr_Model extends {
 		//*** Field clients_ref ***
 		$f_opts = array();
 		$f_opts['id']="clients_ref";
-				
+						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************

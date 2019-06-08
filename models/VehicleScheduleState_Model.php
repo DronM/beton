@@ -27,7 +27,7 @@ class VehicleScheduleState_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -37,7 +37,7 @@ class VehicleScheduleState_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -47,7 +47,7 @@ class VehicleScheduleState_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Состояние';
 		$f_opts['id']="state";
-				
+						
 		$f_state=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"state",$f_opts);
 		$this->addField($f_state);
 		//********************
@@ -57,7 +57,7 @@ class VehicleScheduleState_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Расписание';
 		$f_opts['id']="schedule_id";
-				
+						
 		$f_schedule_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"schedule_id",$f_opts);
 		$this->addField($f_schedule_id);
 		//********************
@@ -67,7 +67,7 @@ class VehicleScheduleState_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгрузка';
 		$f_opts['id']="shipment_id";
-				
+						
 		$f_shipment_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_id",$f_opts);
 		$this->addField($f_shipment_id);
 		//********************

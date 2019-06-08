@@ -26,7 +26,7 @@ class OutComment_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -34,7 +34,7 @@ class OutComment_Model extends ModelSQLBeton{
 		//*** Field vehicle_schedule_id ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_schedule_id";
-				
+						
 		$f_vehicle_schedule_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_schedule_id",$f_opts);
 		$this->addField($f_vehicle_schedule_id);
 		//********************
@@ -44,7 +44,7 @@ class OutComment_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="comment_text";
-				
+						
 		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
 		$this->addField($f_comment_text);
 		//********************

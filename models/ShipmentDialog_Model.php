@@ -30,7 +30,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -40,7 +40,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Клиент';
 		$f_opts['id']="clients_ref";
-				
+						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************
@@ -50,7 +50,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Объект';
 		$f_opts['id']="destinations_ref";
-				
+						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
 		$this->addField($f_destinations_ref);
 		//********************
@@ -58,7 +58,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		//*** Field date_time ***
 		$f_opts = array();
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -66,7 +66,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		//*** Field ship_date_time ***
 		$f_opts = array();
 		$f_opts['id']="ship_date_time";
-				
+						
 		$f_ship_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
 		$this->addField($f_ship_date_time);
 		//********************
@@ -76,7 +76,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Количество';
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -86,7 +86,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Экипаж';
 		$f_opts['id']="vehicle_schedules_ref";
-				
+						
 		$f_vehicle_schedules_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_schedules_ref",$f_opts);
 		$this->addField($f_vehicle_schedules_ref);
 		//********************
@@ -96,7 +96,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Завод';
 		$f_opts['id']="production_sites_ref";
-				
+						
 		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
 		$this->addField($f_production_sites_ref);
 		//********************
@@ -106,7 +106,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгружен';
 		$f_opts['id']="shipped";
-				
+						
 		$f_shipped=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipped",$f_opts);
 		$this->addField($f_shipped);
 		//********************
@@ -116,7 +116,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Оценка';
 		$f_opts['id']="client_mark";
-				
+						
 		$f_client_mark=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_mark",$f_opts);
 		$this->addField($f_client_mark);
 		//********************
@@ -126,7 +126,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Простой';
 		$f_opts['id']="demurrage";
-				
+						
 		$f_demurrage=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"demurrage",$f_opts);
 		$this->addField($f_demurrage);
 		//********************
@@ -136,7 +136,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Наличие бланков';
 		$f_opts['id']="blanks_exist";
-				
+						
 		$f_blanks_exist=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"blanks_exist",$f_opts);
 		$this->addField($f_blanks_exist);
 		//********************
@@ -146,7 +146,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий бухгалетрии';
 		$f_opts['id']="acc_comment";
-				
+						
 		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
 		$this->addField($f_acc_comment);
 		//********************
@@ -155,7 +155,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="vehicle_owner_id";
-				
+						
 		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
 		$this->addField($f_vehicle_owner_id);
 		//********************
@@ -165,7 +165,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Стоимость насос';
 		$f_opts['id']="pump_cost";
-				
+						
 		$f_pump_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost",$f_opts);
 		$this->addField($f_pump_cost);
 		//********************
@@ -174,7 +174,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="pump_cost_default";
-				
+						
 		$f_pump_cost_default=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost_default",$f_opts);
 		$this->addField($f_pump_cost_default);
 		//********************
@@ -182,7 +182,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		//*** Field pump_cost_edit ***
 		$f_opts = array();
 		$f_opts['id']="pump_cost_edit";
-				
+						
 		$f_pump_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost_edit",$f_opts);
 		$this->addField($f_pump_cost_edit);
 		//********************
@@ -191,7 +191,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="ship_cost";
-				
+						
 		$f_ship_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_cost",$f_opts);
 		$this->addField($f_ship_cost);
 		//********************
@@ -200,7 +200,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="ship_cost_default";
-				
+						
 		$f_ship_cost_default=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_cost_default",$f_opts);
 		$this->addField($f_ship_cost_default);
 		//********************
@@ -208,7 +208,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		//*** Field ship_cost_edit ***
 		$f_opts = array();
 		$f_opts['id']="ship_cost_edit";
-				
+						
 		$f_ship_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_cost_edit",$f_opts);
 		$this->addField($f_ship_cost_edit);
 		//********************
@@ -218,7 +218,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Насос';
 		$f_opts['id']="pump_vehicles_ref";
-				
+						
 		$f_pump_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicles_ref",$f_opts);
 		$this->addField($f_pump_vehicles_ref);
 		//********************
@@ -226,7 +226,7 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		//*** Field order_last_shipment ***
 		$f_opts = array();
 		$f_opts['id']="order_last_shipment";
-				
+						
 		$f_order_last_shipment=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_last_shipment",$f_opts);
 		$this->addField($f_order_last_shipment);
 		//********************

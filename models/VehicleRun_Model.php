@@ -23,7 +23,7 @@ class VehicleRun_Model extends {
 		//*** Field veh_id ***
 		$f_opts = array();
 		$f_opts['id']="veh_id";
-				
+						
 		$f_veh_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"veh_id",$f_opts);
 		$this->addField($f_veh_id);
 		//********************
@@ -31,7 +31,7 @@ class VehicleRun_Model extends {
 		//*** Field st_free_start ***
 		$f_opts = array();
 		$f_opts['id']="st_free_start";
-				
+						
 		$f_st_free_start=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"st_free_start",$f_opts);
 		$this->addField($f_st_free_start);
 		//********************
@@ -39,7 +39,7 @@ class VehicleRun_Model extends {
 		//*** Field st_assigned ***
 		$f_opts = array();
 		$f_opts['id']="st_assigned";
-				
+						
 		$f_st_assigned=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"st_assigned",$f_opts);
 		$this->addField($f_st_assigned);
 		//********************
@@ -47,7 +47,7 @@ class VehicleRun_Model extends {
 		//*** Field st_shipped ***
 		$f_opts = array();
 		$f_opts['id']="st_shipped";
-				
+						
 		$f_st_shipped=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"st_shipped",$f_opts);
 		$this->addField($f_st_shipped);
 		//********************
@@ -55,7 +55,7 @@ class VehicleRun_Model extends {
 		//*** Field st_at_dest ***
 		$f_opts = array();
 		$f_opts['id']="st_at_dest";
-				
+						
 		$f_st_at_dest=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"st_at_dest",$f_opts);
 		$this->addField($f_st_at_dest);
 		//********************
@@ -63,7 +63,7 @@ class VehicleRun_Model extends {
 		//*** Field st_left_for_base ***
 		$f_opts = array();
 		$f_opts['id']="st_left_for_base";
-				
+						
 		$f_st_left_for_base=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"st_left_for_base",$f_opts);
 		$this->addField($f_st_left_for_base);
 		//********************
@@ -71,7 +71,7 @@ class VehicleRun_Model extends {
 		//*** Field st_free_end ***
 		$f_opts = array();
 		$f_opts['id']="st_free_end";
-				
+						
 		$f_st_free_end=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"st_free_end",$f_opts);
 		$this->addField($f_st_free_end);
 		//********************
@@ -79,7 +79,7 @@ class VehicleRun_Model extends {
 		//*** Field destinations_ref ***
 		$f_opts = array();
 		$f_opts['id']="destinations_ref";
-				
+						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
 		$this->addField($f_destinations_ref);
 		//********************
@@ -87,7 +87,7 @@ class VehicleRun_Model extends {
 		//*** Field run_time ***
 		$f_opts = array();
 		$f_opts['id']="run_time";
-				
+						
 		$f_run_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"run_time",$f_opts);
 		$this->addField($f_run_time);
 		//********************

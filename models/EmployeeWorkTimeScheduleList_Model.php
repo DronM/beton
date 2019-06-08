@@ -25,7 +25,7 @@ class EmployeeWorkTimeScheduleList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -34,7 +34,7 @@ class EmployeeWorkTimeScheduleList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="employee_id";
-				
+						
 		$f_employee_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"employee_id",$f_opts);
 		$this->addField($f_employee_id);
 		//********************
@@ -44,7 +44,7 @@ class EmployeeWorkTimeScheduleList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Сотрудник';
 		$f_opts['id']="employee_descr";
-				
+						
 		$f_employee_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"employee_descr",$f_opts);
 		$this->addField($f_employee_descr);
 		//********************
@@ -53,7 +53,7 @@ class EmployeeWorkTimeScheduleList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="day";
-				
+						
 		$f_day=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"day",$f_opts);
 		$this->addField($f_day);
 		//********************
@@ -61,7 +61,7 @@ class EmployeeWorkTimeScheduleList_Model extends ModelSQLBeton{
 		//*** Field day_off ***
 		$f_opts = array();
 		$f_opts['id']="day_off";
-				
+						
 		$f_day_off=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"day_off",$f_opts);
 		$this->addField($f_day_off);
 		//********************
@@ -71,7 +71,7 @@ class EmployeeWorkTimeScheduleList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Часы';
 		$f_opts['id']="hours";
-				
+						
 		$f_hours=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"hours",$f_opts);
 		$this->addField($f_hours);
 		//********************

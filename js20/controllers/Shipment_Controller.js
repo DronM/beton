@@ -28,8 +28,10 @@ function Shipment_Controller(options){
 	this.addUpdate();
 	this.addDelete();
 	this.addGetList();
+	this.add_get_list_for_veh_owner();
 	this.add_get_list_for_order();
 	this.add_get_pump_list();
+	this.add_get_pump_list_for_veh_owner();
 	this.add_get_shipment_date_list();
 	this.addGetObject();
 	this.add_get_assigned_vehicle_list();
@@ -379,6 +381,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	f_opts.alias = "Стоимость доставки";
 	pm.addField(new FieldFloat("cost",f_opts));
 	var f_opts = {};
+	f_opts.alias = "Стоимость доставки отредактирована";
+	pm.addField(new FieldBool("ship_cost_edit",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Стоимость насоса отредактирована";
+	pm.addField(new FieldBool("pump_cost_edit",f_opts));
+	var f_opts = {};
 	f_opts.alias = "Простой";
 	pm.addField(new FieldString("demurrage",f_opts));
 	var f_opts = {};
@@ -431,6 +439,23 @@ extend(Shipment_Controller,ControllerObjServer);
 	pm.addField(new FieldDateTimeTZ("owner_pump_agreed_date_time",f_opts));
 }
 
+			Shipment_Controller.prototype.add_get_list_for_veh_owner = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_list_for_veh_owner',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+
+	this.addPublicMethod(pm);
+}
+
 			Shipment_Controller.prototype.add_get_list_for_order = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_list_for_order',opts);
@@ -451,6 +476,23 @@ extend(Shipment_Controller,ControllerObjServer);
 			Shipment_Controller.prototype.add_get_pump_list = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_pump_list',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_get_pump_list_for_veh_owner = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_pump_list_for_veh_owner',opts);
 	
 	pm.addField(new FieldInt(this.PARAM_COUNT));
 	pm.addField(new FieldInt(this.PARAM_FROM));

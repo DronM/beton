@@ -23,7 +23,7 @@ class RawMaterialConsRate_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="rate_date_id";
-				
+						
 		$f_rate_date_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"rate_date_id",$f_opts);
 		$this->addField($f_rate_date_id);
 		//********************
@@ -34,7 +34,7 @@ class RawMaterialConsRate_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Марка бетона';
 		$f_opts['id']="concrete_type_id";
-				
+						
 		$f_concrete_type_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_id",$f_opts);
 		$this->addField($f_concrete_type_id);
 		//********************
@@ -45,7 +45,7 @@ class RawMaterialConsRate_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Материал';
 		$f_opts['id']="raw_material_id";
-				
+						
 		$f_raw_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"raw_material_id",$f_opts);
 		$this->addField($f_raw_material_id);
 		//********************
@@ -56,7 +56,7 @@ class RawMaterialConsRate_Model extends ModelSQLBeton{
 		$f_opts['alias']='Расход';
 		$f_opts['length']=19;
 		$f_opts['id']="rate";
-				
+						
 		$f_rate=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"rate",$f_opts);
 		$this->addField($f_rate);
 		//********************

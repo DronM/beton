@@ -29,7 +29,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -37,7 +37,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field clients_ref ***
 		$f_opts = array();
 		$f_opts['id']="clients_ref";
-				
+						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************
@@ -45,7 +45,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field destinations_ref ***
 		$f_opts = array();
 		$f_opts['id']="destinations_ref";
-				
+						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
 		$this->addField($f_destinations_ref);
 		//********************
@@ -53,7 +53,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field concrete_types_ref ***
 		$f_opts = array();
 		$f_opts['id']="concrete_types_ref";
-				
+						
 		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
 		$this->addField($f_concrete_types_ref);
 		//********************
@@ -61,7 +61,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field unload_type ***
 		$f_opts = array();
 		$f_opts['id']="unload_type";
-				
+						
 		$f_unload_type=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"unload_type",$f_opts);
 		$this->addField($f_unload_type);
 		//********************
@@ -69,7 +69,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field comment_text ***
 		$f_opts = array();
 		$f_opts['id']="comment_text";
-				
+						
 		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
 		$this->addField($f_comment_text);
 		//********************
@@ -77,7 +77,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field descr ***
 		$f_opts = array();
 		$f_opts['id']="descr";
-				
+						
 		$f_descr=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"descr",$f_opts);
 		$this->addField($f_descr);
 		//********************
@@ -85,7 +85,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field phone_cel ***
 		$f_opts = array();
 		$f_opts['id']="phone_cel";
-				
+						
 		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
 		//********************
@@ -93,7 +93,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field unload_speed ***
 		$f_opts = array();
 		$f_opts['id']="unload_speed";
-				
+						
 		$f_unload_speed=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"unload_speed",$f_opts);
 		$this->addField($f_unload_speed);
 		//********************
@@ -101,7 +101,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field date_time ***
 		$f_opts = array();
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -109,7 +109,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field date_time_to ***
 		$f_opts = array();
 		$f_opts['id']="date_time_to";
-				
+						
 		$f_date_time_to=new FieldSQLTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time_to",$f_opts);
 		$this->addField($f_date_time_to);
 		//********************
@@ -117,7 +117,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field quant ***
 		$f_opts = array();
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -125,7 +125,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field quant_rest ***
 		$f_opts = array();
 		$f_opts['id']="quant_rest";
-				
+						
 		$f_quant_rest=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_rest",$f_opts);
 		$this->addField($f_quant_rest);
 		//********************
@@ -133,7 +133,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field quant_ordered_before_now ***
 		$f_opts = array();
 		$f_opts['id']="quant_ordered_before_now";
-				
+						
 		$f_quant_ordered_before_now=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_ordered_before_now",$f_opts);
 		$this->addField($f_quant_ordered_before_now);
 		//********************
@@ -141,7 +141,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field quant_shipped_before_now ***
 		$f_opts = array();
 		$f_opts['id']="quant_shipped_before_now";
-				
+						
 		$f_quant_shipped_before_now=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_shipped_before_now",$f_opts);
 		$this->addField($f_quant_shipped_before_now);
 		//********************
@@ -149,7 +149,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field quant_shipped_day_before_now ***
 		$f_opts = array();
 		$f_opts['id']="quant_shipped_day_before_now";
-				
+						
 		$f_quant_shipped_day_before_now=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_shipped_day_before_now",$f_opts);
 		$this->addField($f_quant_shipped_day_before_now);
 		//********************
@@ -157,7 +157,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field quant_ordered_day ***
 		$f_opts = array();
 		$f_opts['id']="quant_ordered_day";
-				
+						
 		$f_quant_ordered_day=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_ordered_day",$f_opts);
 		$this->addField($f_quant_ordered_day);
 		//********************
@@ -165,7 +165,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field no_ship_mark ***
 		$f_opts = array();
 		$f_opts['id']="no_ship_mark";
-				
+						
 		$f_no_ship_mark=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"no_ship_mark",$f_opts);
 		$this->addField($f_no_ship_mark);
 		//********************
@@ -173,7 +173,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field payed ***
 		$f_opts = array();
 		$f_opts['id']="payed";
-				
+						
 		$f_payed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"payed",$f_opts);
 		$this->addField($f_payed);
 		//********************
@@ -181,7 +181,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field under_control ***
 		$f_opts = array();
 		$f_opts['id']="under_control";
-				
+						
 		$f_under_control=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"under_control",$f_opts);
 		$this->addField($f_under_control);
 		//********************
@@ -189,7 +189,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field pay_cash ***
 		$f_opts = array();
 		$f_opts['id']="pay_cash";
-				
+						
 		$f_pay_cash=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pay_cash",$f_opts);
 		$this->addField($f_pay_cash);
 		//********************
@@ -197,7 +197,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field pump_vehicle_owners_ref ***
 		$f_opts = array();
 		$f_opts['id']="pump_vehicle_owners_ref";
-				
+						
 		$f_pump_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owners_ref",$f_opts);
 		$this->addField($f_pump_vehicle_owners_ref);
 		//********************
@@ -205,7 +205,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field total ***
 		$f_opts = array();
 		$f_opts['id']="total";
-				
+						
 		$f_total=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"total",$f_opts);
 		$this->addField($f_total);
 		//********************
@@ -213,7 +213,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field pump_vehicle_length ***
 		$f_opts = array();
 		$f_opts['id']="pump_vehicle_length";
-				
+						
 		$f_pump_vehicle_length=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_length",$f_opts);
 		$this->addField($f_pump_vehicle_length);
 		//********************
@@ -221,7 +221,7 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		//*** Field pump_vehicle_comment ***
 		$f_opts = array();
 		$f_opts['id']="pump_vehicle_comment";
-				
+						
 		$f_pump_vehicle_comment=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_comment",$f_opts);
 		$this->addField($f_pump_vehicle_comment);
 		//********************

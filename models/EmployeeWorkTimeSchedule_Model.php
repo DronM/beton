@@ -24,7 +24,7 @@ class EmployeeWorkTimeSchedule_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -32,7 +32,7 @@ class EmployeeWorkTimeSchedule_Model extends ModelSQLBeton{
 		//*** Field employee_id ***
 		$f_opts = array();
 		$f_opts['id']="employee_id";
-				
+						
 		$f_employee_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"employee_id",$f_opts);
 		$this->addField($f_employee_id);
 		//********************
@@ -40,7 +40,7 @@ class EmployeeWorkTimeSchedule_Model extends ModelSQLBeton{
 		//*** Field day ***
 		$f_opts = array();
 		$f_opts['id']="day";
-				
+						
 		$f_day=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"day",$f_opts);
 		$this->addField($f_day);
 		//********************
@@ -49,7 +49,7 @@ class EmployeeWorkTimeSchedule_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['defaultValue']='0';
 		$f_opts['id']="hours";
-				
+						
 		$f_hours=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"hours",$f_opts);
 		$this->addField($f_hours);
 		//********************

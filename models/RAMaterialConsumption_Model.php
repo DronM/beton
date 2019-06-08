@@ -29,7 +29,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -39,7 +39,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -49,7 +49,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Вид документа';
 		$f_opts['id']="doc_type";
-				
+						
 		$f_doc_type=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"doc_type",$f_opts);
 		$this->addField($f_doc_type);
 		//********************
@@ -57,7 +57,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		//*** Field doc_id ***
 		$f_opts = array();
 		$f_opts['id']="doc_id";
-				
+						
 		$f_doc_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"doc_id",$f_opts);
 		$this->addField($f_doc_id);
 		//********************
@@ -67,7 +67,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Бетон';
 		$f_opts['id']="concrete_type_id";
-				
+						
 		$f_concrete_type_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_id",$f_opts);
 		$this->addField($f_concrete_type_id);
 		//********************
@@ -77,7 +77,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='ТС';
 		$f_opts['id']="vehicle_id";
-				
+						
 		$f_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);
 		$this->addField($f_vehicle_id);
 		//********************
@@ -87,7 +87,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Водитель';
 		$f_opts['id']="driver_id";
-				
+						
 		$f_driver_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_id",$f_opts);
 		$this->addField($f_driver_id);
 		//********************
@@ -97,7 +97,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Материал';
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -108,7 +108,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество бетона';
 		$f_opts['length']=19;
 		$f_opts['id']="concrete_quant";
-				
+						
 		$f_concrete_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_quant",$f_opts);
 		$this->addField($f_concrete_quant);
 		//********************
@@ -119,7 +119,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество материалов';
 		$f_opts['length']=19;
 		$f_opts['id']="material_quant";
-				
+						
 		$f_material_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant",$f_opts);
 		$this->addField($f_material_quant);
 		//********************
@@ -130,7 +130,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество материалов';
 		$f_opts['length']=19;
 		$f_opts['id']="material_quant_norm";
-				
+						
 		$f_material_quant_norm=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant_norm",$f_opts);
 		$this->addField($f_material_quant_norm);
 		//********************
@@ -141,7 +141,7 @@ class RAMaterialConsumption_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество материалов';
 		$f_opts['length']=19;
 		$f_opts['id']="material_quant_corrected";
-				
+						
 		$f_material_quant_corrected=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant_corrected",$f_opts);
 		$this->addField($f_material_quant_corrected);
 		//********************

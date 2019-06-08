@@ -27,7 +27,7 @@ class SMSPatternUserPhoneList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -35,7 +35,7 @@ class SMSPatternUserPhoneList_Model extends ModelSQLBeton{
 		//*** Field sms_pattern_id ***
 		$f_opts = array();
 		$f_opts['id']="sms_pattern_id";
-				
+						
 		$f_sms_pattern_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_pattern_id",$f_opts);
 		$this->addField($f_sms_pattern_id);
 		//********************
@@ -43,7 +43,7 @@ class SMSPatternUserPhoneList_Model extends ModelSQLBeton{
 		//*** Field users_ref ***
 		$f_opts = array();
 		$f_opts['id']="users_ref";
-				
+						
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
 		//********************
@@ -51,7 +51,7 @@ class SMSPatternUserPhoneList_Model extends ModelSQLBeton{
 		//*** Field user_tel ***
 		$f_opts = array();
 		$f_opts['id']="user_tel";
-				
+						
 		$f_user_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_tel",$f_opts);
 		$this->addField($f_user_tel);
 		//********************

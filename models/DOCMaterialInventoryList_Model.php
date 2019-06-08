@@ -24,7 +24,7 @@ class DOCMaterialInventoryList_Model extends ModelSQLDOC{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -32,7 +32,7 @@ class DOCMaterialInventoryList_Model extends ModelSQLDOC{
 		//*** Field date_time ***
 		$f_opts = array();
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -40,7 +40,7 @@ class DOCMaterialInventoryList_Model extends ModelSQLDOC{
 		//*** Field date_time_descr ***
 		$f_opts = array();
 		$f_opts['id']="date_time_descr";
-				
+						
 		$f_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time_descr",$f_opts);
 		$this->addField($f_date_time_descr);
 		//********************
@@ -48,7 +48,7 @@ class DOCMaterialInventoryList_Model extends ModelSQLDOC{
 		//*** Field number ***
 		$f_opts = array();
 		$f_opts['id']="number";
-				
+						
 		$f_number=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"number",$f_opts);
 		$this->addField($f_number);
 		//********************
@@ -56,7 +56,7 @@ class DOCMaterialInventoryList_Model extends ModelSQLDOC{
 		//*** Field processed ***
 		$f_opts = array();
 		$f_opts['id']="processed";
-				
+						
 		$f_processed=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"processed",$f_opts);
 		$this->addField($f_processed);
 		//********************

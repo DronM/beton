@@ -25,7 +25,7 @@ class LabEntryDetail_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгрузка';
 		$f_opts['id']="shipment_id";
-				
+						
 		$f_shipment_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_id",$f_opts);
 		$this->addField($f_shipment_id);
 		//********************
@@ -35,7 +35,7 @@ class LabEntryDetail_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=FALSE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -45,7 +45,7 @@ class LabEntryDetail_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='ОК';
 		$f_opts['id']="ok";
-				
+						
 		$f_ok=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ok",$f_opts);
 		$this->addField($f_ok);
 		//********************
@@ -55,7 +55,7 @@ class LabEntryDetail_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Масса';
 		$f_opts['id']="weight";
-				
+						
 		$f_weight=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"weight",$f_opts);
 		$this->addField($f_weight);
 		//********************
@@ -65,7 +65,7 @@ class LabEntryDetail_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='КН';
 		$f_opts['id']="kn";
-				
+						
 		$f_kn=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"kn",$f_opts);
 		$this->addField($f_kn);
 		//********************

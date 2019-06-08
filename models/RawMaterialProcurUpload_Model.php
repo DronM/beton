@@ -27,7 +27,7 @@ class RawMaterialProcurUpload_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -37,7 +37,7 @@ class RawMaterialProcurUpload_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Описание ошибки';
 		$f_opts['id']="descr";
-				
+						
 		$f_descr=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"descr",$f_opts);
 		$this->addField($f_descr);
 		//********************
@@ -47,7 +47,7 @@ class RawMaterialProcurUpload_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Результат';
 		$f_opts['id']="result";
-				
+						
 		$f_result=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"result",$f_opts);
 		$this->addField($f_result);
 		//********************
@@ -57,7 +57,7 @@ class RawMaterialProcurUpload_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Кол-во документов';
 		$f_opts['id']="doc_count";
-				
+						
 		$f_doc_count=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"doc_count",$f_opts);
 		$this->addField($f_doc_count);
 		//********************

@@ -29,7 +29,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Номер';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -39,7 +39,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Назначен';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -49,7 +49,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгружен';
 		$f_opts['id']="ship_date_time";
-				
+						
 		$f_ship_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
 		$this->addField($f_ship_date_time);
 		//********************
@@ -59,7 +59,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Клиент';
 		$f_opts['id']="clients_ref";
-				
+						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************
@@ -69,7 +69,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Завод';
 		$f_opts['id']="production_sites_ref";
-				
+						
 		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
 		$this->addField($f_production_sites_ref);
 		//********************
@@ -79,7 +79,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Объект';
 		$f_opts['id']="destinations_ref";
-				
+						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
 		$this->addField($f_destinations_ref);
 		//********************
@@ -89,7 +89,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Опреатор';
 		$f_opts['id']="operators_ref";
-				
+						
 		$f_operators_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"operators_ref",$f_opts);
 		$this->addField($f_operators_ref);
 		//********************
@@ -99,7 +99,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Водитель';
 		$f_opts['id']="drivers_ref";
-				
+						
 		$f_drivers_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"drivers_ref",$f_opts);
 		$this->addField($f_drivers_ref);
 		//********************
@@ -109,7 +109,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='ТС';
 		$f_opts['id']="vehicles_ref";
-				
+						
 		$f_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicles_ref",$f_opts);
 		$this->addField($f_vehicles_ref);
 		//********************
@@ -119,7 +119,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="comment_text";
-				
+						
 		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
 		$this->addField($f_comment_text);
 		//********************
@@ -129,7 +129,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Марка';
 		$f_opts['id']="concrete_types_ref";
-				
+						
 		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
 		$this->addField($f_concrete_types_ref);
 		//********************
@@ -139,7 +139,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Количество';
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -149,7 +149,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгружен';
 		$f_opts['id']="shipped";
-				
+						
 		$f_shipped=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipped",$f_opts);
 		$this->addField($f_shipped);
 		//********************
@@ -159,7 +159,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Норма отгр.';
 		$f_opts['id']="ship_norm_min";
-				
+						
 		$f_ship_norm_min=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_norm_min",$f_opts);
 		$this->addField($f_ship_norm_min);
 		//********************
@@ -169,7 +169,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Норма факт.';
 		$f_opts['id']="ship_fact_min";
-				
+						
 		$f_ship_fact_min=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_fact_min",$f_opts);
 		$this->addField($f_ship_fact_min);
 		//********************
@@ -179,7 +179,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Остаток';
 		$f_opts['id']="ship_bal_min";
-				
+						
 		$f_ship_bal_min=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_bal_min",$f_opts);
 		$this->addField($f_ship_bal_min);
 		//********************

@@ -25,7 +25,7 @@ class AstCallClientCallHistoryList_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="unique_id";
-				
+						
 		$f_unique_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"unique_id",$f_opts);
 		$this->addField($f_unique_id);
 		//********************
@@ -33,7 +33,7 @@ class AstCallClientCallHistoryList_Model extends ModelSQLBeton{
 		//*** Field client_id ***
 		$f_opts = array();
 		$f_opts['id']="client_id";
-				
+						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
 		//********************
@@ -43,7 +43,7 @@ class AstCallClientCallHistoryList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Время';
 		$f_opts['id']="dt";
-				
+						
 		$f_dt=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dt",$f_opts);
 		$this->addField($f_dt);
 		//********************
@@ -53,7 +53,7 @@ class AstCallClientCallHistoryList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="manager_comment";
-				
+						
 		$f_manager_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"manager_comment",$f_opts);
 		$this->addField($f_manager_comment);
 		//********************

@@ -28,7 +28,7 @@ class SMSPattern_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -40,7 +40,7 @@ class SMSPattern_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Язык';
 		$f_opts['id']="lang_id";
-				
+						
 		$f_lang_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"lang_id",$f_opts);
 		$this->addField($f_lang_id);
 		//********************
@@ -52,7 +52,7 @@ class SMSPattern_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Тип SMS';
 		$f_opts['id']="sms_type";
-				
+						
 		$f_sms_type=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_type",$f_opts);
 		$this->addField($f_sms_type);
 		//********************
@@ -62,7 +62,7 @@ class SMSPattern_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Шаблон';
 		$f_opts['id']="pattern";
-				
+						
 		$f_pattern=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pattern",$f_opts);
 		$this->addField($f_pattern);
 		//********************

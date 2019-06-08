@@ -27,7 +27,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгрузка';
 		$f_opts['id']="shipment_id";
-				
+						
 		$f_shipment_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_id",$f_opts);
 		$this->addField($f_shipment_id);
 		//********************
@@ -37,7 +37,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='ОК см';
 		$f_opts['id']="ok_sm";
-				
+						
 		$f_ok_sm=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ok_sm",$f_opts);
 		$this->addField($f_ok_sm);
 		//********************
@@ -47,7 +47,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='масса';
 		$f_opts['id']="weight";
-				
+						
 		$f_weight=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"weight",$f_opts);
 		$this->addField($f_weight);
 		//********************
@@ -57,7 +57,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='масса норм';
 		$f_opts['id']="weight_norm";
-				
+						
 		$f_weight_norm=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"weight_norm",$f_opts);
 		$this->addField($f_weight_norm);
 		//********************
@@ -67,7 +67,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='%';
 		$f_opts['id']="percent_1";
-				
+						
 		$f_percent_1=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"percent_1",$f_opts);
 		$this->addField($f_percent_1);
 		//********************
@@ -77,7 +77,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='p1';
 		$f_opts['id']="p_1";
-				
+						
 		$f_p_1=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_1",$f_opts);
 		$this->addField($f_p_1);
 		//********************
@@ -87,7 +87,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='p2';
 		$f_opts['id']="p_2";
-				
+						
 		$f_p_2=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_2",$f_opts);
 		$this->addField($f_p_2);
 		//********************
@@ -97,7 +97,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='p3';
 		$f_opts['id']="p_3";
-				
+						
 		$f_p_3=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_3",$f_opts);
 		$this->addField($f_p_3);
 		//********************
@@ -107,7 +107,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='p4';
 		$f_opts['id']="p_4";
-				
+						
 		$f_p_4=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_4",$f_opts);
 		$this->addField($f_p_4);
 		//********************
@@ -117,7 +117,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='p7';
 		$f_opts['id']="p_7";
-				
+						
 		$f_p_7=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_7",$f_opts);
 		$this->addField($f_p_7);
 		//********************
@@ -127,7 +127,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='p28';
 		$f_opts['id']="p_28";
-				
+						
 		$f_p_28=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_28",$f_opts);
 		$this->addField($f_p_28);
 		//********************
@@ -137,7 +137,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='p_norm';
 		$f_opts['id']="p_norm";
-				
+						
 		$f_p_norm=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_norm",$f_opts);
 		$this->addField($f_p_norm);
 		//********************
@@ -147,7 +147,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='percent_2';
 		$f_opts['id']="percent_2";
-				
+						
 		$f_percent_2=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"percent_2",$f_opts);
 		$this->addField($f_percent_2);
 		//********************
@@ -157,7 +157,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="lab_comment";
-				
+						
 		$f_lab_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"lab_comment",$f_opts);
 		$this->addField($f_lab_comment);
 		//********************
@@ -167,7 +167,7 @@ class LabData_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='№';
 		$f_opts['id']="num";
-				
+						
 		$f_num=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"num",$f_opts);
 		$this->addField($f_num);
 		//********************

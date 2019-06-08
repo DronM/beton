@@ -203,4 +203,11 @@ ShipmentDialog_View.prototype.onGetData = function(resp,cmd){
 	else{
 		this.getElement("pump_cost").setEditAllowed(m.getFieldValue("pump_cost_edit"));
 	}
+	if(!m.getFieldValue("order_last_shipment")){
+		this.getElement("ship_cost").setVisible(false);
+	}
+	else{
+		this.getElement("ship_cost").setEditAllowed(m.getFieldValue("ship_cost_edit"));
+	}
+	
 }

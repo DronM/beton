@@ -28,7 +28,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -36,7 +36,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field schedule_date ***
 		$f_opts = array();
 		$f_opts['id']="schedule_date";
-				
+						
 		$f_schedule_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"schedule_date",$f_opts);
 		$this->addField($f_schedule_date);
 		//********************
@@ -44,7 +44,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field vehicle_id ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_id";
-				
+						
 		$f_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);
 		$this->addField($f_vehicle_id);
 		//********************
@@ -52,7 +52,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field vehicles_ref ***
 		$f_opts = array();
 		$f_opts['id']="vehicles_ref";
-				
+						
 		$f_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicles_ref",$f_opts);
 		$this->addField($f_vehicles_ref);
 		//********************
@@ -60,7 +60,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field driver_id ***
 		$f_opts = array();
 		$f_opts['id']="driver_id";
-				
+						
 		$f_driver_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_id",$f_opts);
 		$this->addField($f_driver_id);
 		//********************
@@ -68,7 +68,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field drivers_ref ***
 		$f_opts = array();
 		$f_opts['id']="drivers_ref";
-				
+						
 		$f_drivers_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"drivers_ref",$f_opts);
 		$this->addField($f_drivers_ref);
 		//********************
@@ -76,7 +76,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field state ***
 		$f_opts = array();
 		$f_opts['id']="state";
-				
+						
 		$f_state=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"state",$f_opts);
 		$this->addField($f_state);
 		//********************
@@ -84,7 +84,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field state_date_time ***
 		$f_opts = array();
 		$f_opts['id']="state_date_time";
-				
+						
 		$f_state_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"state_date_time",$f_opts);
 		$this->addField($f_state_date_time);
 		//********************
@@ -92,7 +92,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field out_comment ***
 		$f_opts = array();
 		$f_opts['id']="out_comment";
-				
+						
 		$f_out_comment=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"out_comment",$f_opts);
 		$this->addField($f_out_comment);
 		//********************
@@ -100,7 +100,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field load_capacity ***
 		$f_opts = array();
 		$f_opts['id']="load_capacity";
-				
+						
 		$f_load_capacity=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"load_capacity",$f_opts);
 		$this->addField($f_load_capacity);
 		//********************
@@ -108,7 +108,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field vehicle_owners_ref ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_owners_ref";
-				
+						
 		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
 		$this->addField($f_vehicle_owners_ref);
 		//********************
@@ -116,7 +116,7 @@ class VehicleScheduleList_Model extends ModelSQLBeton{
 		//*** Field phone_cel ***
 		$f_opts = array();
 		$f_opts['id']="phone_cel";
-				
+						
 		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
 		//********************

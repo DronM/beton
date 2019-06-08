@@ -25,7 +25,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		//*** Field ship_date_time ***
 		$f_opts = array();
 		$f_opts['id']="ship_date_time";
-				
+						
 		$f_ship_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
 		$this->addField($f_ship_date_time);
 		//********************
@@ -35,7 +35,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Смена';
 		$f_opts['id']="shift_descr";
-				
+						
 		$f_shift_descr=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shift_descr",$f_opts);
 		$this->addField($f_shift_descr);
 		//********************
@@ -43,7 +43,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		//*** Field concrete_id ***
 		$f_opts = array();
 		$f_opts['id']="concrete_id";
-				
+						
 		$f_concrete_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_id",$f_opts);
 		$this->addField($f_concrete_id);
 		//********************
@@ -53,7 +53,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Марка бетона';
 		$f_opts['id']="concrete_descr";
-				
+						
 		$f_concrete_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_descr",$f_opts);
 		$this->addField($f_concrete_descr);
 		//********************
@@ -61,7 +61,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		//*** Field client_id ***
 		$f_opts = array();
 		$f_opts['id']="client_id";
-				
+						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
 		//********************
@@ -71,7 +71,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Клиент';
 		$f_opts['id']="client_descr";
-				
+						
 		$f_client_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_descr",$f_opts);
 		$this->addField($f_client_descr);
 		//********************
@@ -79,7 +79,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		//*** Field destination_id ***
 		$f_opts = array();
 		$f_opts['id']="destination_id";
-				
+						
 		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
 		$this->addField($f_destination_id);
 		//********************
@@ -89,7 +89,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Объект';
 		$f_opts['id']="destination_descr";
-				
+						
 		$f_destination_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_descr",$f_opts);
 		$this->addField($f_destination_descr);
 		//********************
@@ -97,7 +97,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		//*** Field driver_id ***
 		$f_opts = array();
 		$f_opts['id']="driver_id";
-				
+						
 		$f_driver_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_id",$f_opts);
 		$this->addField($f_driver_id);
 		//********************
@@ -107,7 +107,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Водитель';
 		$f_opts['id']="driver_descr";
-				
+						
 		$f_driver_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_descr",$f_opts);
 		$this->addField($f_driver_descr);
 		//********************
@@ -115,7 +115,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		//*** Field vehicle_id ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_id";
-				
+						
 		$f_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);
 		$this->addField($f_vehicle_id);
 		//********************
@@ -125,7 +125,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Автомобиль';
 		$f_opts['id']="vehicle_descr";
-				
+						
 		$f_vehicle_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_descr",$f_opts);
 		$this->addField($f_vehicle_descr);
 		//********************
@@ -135,7 +135,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Свойство автом.';
 		$f_opts['id']="vehicle_feature";
-				
+						
 		$f_vehicle_feature=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_feature",$f_opts);
 		$this->addField($f_vehicle_feature);
 		//********************
@@ -145,7 +145,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Владелец автом.';
 		$f_opts['id']="vehicle_owner";
-				
+						
 		$f_vehicle_owner=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner",$f_opts);
 		$this->addField($f_vehicle_owner);
 		//********************
@@ -155,7 +155,7 @@ class ShipmentRep_Model extends ModelReportSQL{
 		
 		$f_opts['alias']='Количество';
 		$f_opts['id']="quant_shipped";
-				
+						
 		$f_quant_shipped=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_shipped",$f_opts);
 		$this->addField($f_quant_shipped);
 		//********************

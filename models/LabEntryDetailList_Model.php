@@ -23,7 +23,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="shipment_id";
-				
+						
 		$f_shipment_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_id",$f_opts);
 		$this->addField($f_shipment_id);
 		//********************
@@ -32,7 +32,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -40,7 +40,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		//*** Field code ***
 		$f_opts = array();
 		$f_opts['id']="code";
-				
+						
 		$f_code=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"code",$f_opts);
 		$this->addField($f_code);
 		//********************
@@ -50,7 +50,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="ship_date_time_descr";
-				
+						
 		$f_ship_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time_descr",$f_opts);
 		$this->addField($f_ship_date_time_descr);
 		//********************
@@ -60,7 +60,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Марка';
 		$f_opts['id']="concrete_type_descr";
-				
+						
 		$f_concrete_type_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_descr",$f_opts);
 		$this->addField($f_concrete_type_descr);
 		//********************
@@ -70,7 +70,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='ОК';
 		$f_opts['id']="ok";
-				
+						
 		$f_ok=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ok",$f_opts);
 		$this->addField($f_ok);
 		//********************
@@ -80,7 +80,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Масса';
 		$f_opts['id']="weight";
-				
+						
 		$f_weight=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"weight",$f_opts);
 		$this->addField($f_weight);
 		//********************
@@ -90,7 +90,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='П7%';
 		$f_opts['id']="p7";
-				
+						
 		$f_p7=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p7",$f_opts);
 		$this->addField($f_p7);
 		//********************
@@ -100,7 +100,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='П28%';
 		$f_opts['id']="p28";
-				
+						
 		$f_p28=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p28",$f_opts);
 		$this->addField($f_p28);
 		//********************
@@ -110,7 +110,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="p_date_descr";
-				
+						
 		$f_p_date_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_date_descr",$f_opts);
 		$this->addField($f_p_date_descr);
 		//********************
@@ -118,7 +118,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		//*** Field kn ***
 		$f_opts = array();
 		$f_opts['id']="kn";
-				
+						
 		$f_kn=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"kn",$f_opts);
 		$this->addField($f_kn);
 		//********************
@@ -126,7 +126,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		//*** Field mpa ***
 		$f_opts = array();
 		$f_opts['id']="mpa";
-				
+						
 		$f_mpa=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mpa",$f_opts);
 		$this->addField($f_mpa);
 		//********************
@@ -134,7 +134,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		//*** Field mpa_avg ***
 		$f_opts = array();
 		$f_opts['id']="mpa_avg";
-				
+						
 		$f_mpa_avg=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mpa_avg",$f_opts);
 		$this->addField($f_mpa_avg);
 		//********************
@@ -142,7 +142,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		//*** Field pres_norm ***
 		$f_opts = array();
 		$f_opts['id']="pres_norm";
-				
+						
 		$f_pres_norm=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pres_norm",$f_opts);
 		$this->addField($f_pres_norm);
 		//********************

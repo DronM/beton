@@ -23,7 +23,7 @@ class VehicleScheduleComplete_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -31,7 +31,7 @@ class VehicleScheduleComplete_Model extends ModelSQLBeton{
 		//*** Field vehicle_schedule_descr ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_schedule_descr";
-				
+						
 		$f_vehicle_schedule_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_schedule_descr",$f_opts);
 		$this->addField($f_vehicle_schedule_descr);
 		//********************

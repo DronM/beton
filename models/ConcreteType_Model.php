@@ -28,7 +28,7 @@ class ConcreteType_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -39,7 +39,7 @@ class ConcreteType_Model extends ModelSQLBeton{
 		$f_opts['alias']='Наименование';
 		$f_opts['length']=100;
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -50,7 +50,7 @@ class ConcreteType_Model extends ModelSQLBeton{
 		$f_opts['alias']='Код 1С';
 		$f_opts['length']=11;
 		$f_opts['id']="code_1c";
-				
+						
 		$f_code_1c=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"code_1c",$f_opts);
 		$this->addField($f_code_1c);
 		//********************
@@ -61,7 +61,7 @@ class ConcreteType_Model extends ModelSQLBeton{
 		$f_opts['alias']='Норма давл.';
 		$f_opts['length']=15;
 		$f_opts['id']="pres_norm";
-				
+						
 		$f_pres_norm=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pres_norm",$f_opts);
 		$this->addField($f_pres_norm);
 		//********************
@@ -72,7 +72,7 @@ class ConcreteType_Model extends ModelSQLBeton{
 		$f_opts['alias']='Кф.МПА';
 		$f_opts['length']=19;
 		$f_opts['id']="mpa_ratio";
-				
+						
 		$f_mpa_ratio=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mpa_ratio",$f_opts);
 		$this->addField($f_mpa_ratio);
 		//********************
@@ -83,7 +83,7 @@ class ConcreteType_Model extends ModelSQLBeton{
 		$f_opts['alias']='Цена';
 		$f_opts['length']=15;
 		$f_opts['id']="price";
-				
+						
 		$f_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price",$f_opts);
 		$this->addField($f_price);
 		//********************

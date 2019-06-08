@@ -3,36 +3,29 @@
  */
 function ShipmentList_View(id,options){	
 
-	var is_v_owner = (window.getApp().getServVar("role_id")=="vehicle_owner");	
-	
-	options.templateOptions = options.templateOptions || {};
-	options.templateOptions.notVehicleOwner = !is_v_owner;
-
 	ShipmentList_View.superclass.constructor.call(this,id,options);
 	
 	var self = this;
 	
-	if(!is_v_owner){
-		this.addElement(new EditString(id+":barcode",{
-			"labelCaption":"Штрих код бланка:",
-			"maxLength":13,
-			"autofocus":true,
-			"events":{
-				"keypress":function(e){
-					e = EventHelper.fixKeyEvent(e);
-					if (e.keyCode==13){
-						self.findDoc(e.target.value);
-					}								
-				}
-				,"input":function(e){
-					e = EventHelper.fixKeyEvent(e);
-					if (e.keyCode==13){
-						self.findDoc(e.target.value);
-					}								
-				}				
+	this.addElement(new EditString(id+":barcode",{
+		"labelCaption":"Штрих код бланка:",
+		"maxLength":13,
+		"autofocus":true,
+		"events":{
+			"keypress":function(e){
+				e = EventHelper.fixKeyEvent(e);
+				if (e.keyCode==13){
+					self.findDoc(e.target.value);
+				}								
 			}
-		}));
-	}
+			,"input":function(e){
+				e = EventHelper.fixKeyEvent(e);
+				if (e.keyCode==13){
+					self.findDoc(e.target.value);
+				}								
+			}				
+		}
+	}));
 	
 	var model = options.models.ShipmentList_Model;
 	var contr = new Shipment_Controller();
@@ -67,138 +60,106 @@ function ShipmentList_View(id,options){
 		}
 	};
 	
-	if(is_v_owner){
-			/*filters.client = {
-				"binding":new CommandBinding({
-					"control":new ClientEdit(id+":filter-ctrl-client",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Контрагент:"
-					}),
-					"field":new FieldInt("client_id")}),
-				"sign":"e"		
-			};*/
-			filters.driver = {
-				"binding":new CommandBinding({
-					"control":new DriverEditRef(id+":filter-ctrl-driver",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Водитель:"
-					}),
-					"field":new FieldInt("driver_id")}),
-				"sign":"e"		
-			}
-			filters.vehicle = {
-				"binding":new CommandBinding({
-					"control":new VehicleEdit(id+":filter-ctrl-vehicle",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"ТС:"
-					}),
-					"field":new FieldInt("vehicle_id")}),
-				"sign":"e"		
-			};
-	
-			/*filters.destination = {
-				"binding":new CommandBinding({
-					"control":new DestinationEdit(id+":filter-ctrl-destination",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Объект:"
-					}),
-					"field":new FieldInt("destination_id")}),
-				"sign":"e"		
-			};*/
-			filters.concrete_type = {
-				"binding":new CommandBinding({
-					"control":new ConcreteTypeEdit(id+":filter-ctrl-concrete_type",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Марка:"
-					}),
-					"field":new FieldInt("concrete_type_id")}),
-				"sign":"e"		
-			};	
-	}
-	else{
-			filters.production_site = {
-				"binding":new CommandBinding({
-					"control":new ProductionSiteEdit(id+":filter-ctrl-production_site",{
-						"contClassName":"form-group-filter"
-					}),
-					"field":new FieldInt("production_site_id")}),
-				"sign":"e"		
-			};
-	
-			filters.client = {
-				"binding":new CommandBinding({
-					"control":new ClientEdit(id+":filter-ctrl-client",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Контрагент:"
-					}),
-					"field":new FieldInt("client_id")}),
-				"sign":"e"		
-			};
-			filters.driver = {
-				"binding":new CommandBinding({
-					"control":new DriverEditRef(id+":filter-ctrl-driver",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Водитель:"
-					}),
-					"field":new FieldInt("driver_id")}),
-				"sign":"e"		
-			}
-			filters.vehicle = {
-				"binding":new CommandBinding({
-					"control":new VehicleEdit(id+":filter-ctrl-vehicle",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"ТС:"
-					}),
-					"field":new FieldInt("vehicle_id")}),
-				"sign":"e"		
-			};
-	
-			filters.destination = {
-				"binding":new CommandBinding({
-					"control":new DestinationEdit(id+":filter-ctrl-destination",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Объект:"
-					}),
-					"field":new FieldInt("destination_id")}),
-				"sign":"e"		
-			};
-			filters.concrete_type = {
-				"binding":new CommandBinding({
-					"control":new ConcreteTypeEdit(id+":filter-ctrl-concrete_type",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Марка:"
-					}),
-					"field":new FieldInt("concrete_type_id")}),
-				"sign":"e"		
-			};
-			
-			filters.user = {
-				"binding":new CommandBinding({
-					"control":new UserEditRef(id+":filter-ctrl-user",{
-						"contClassName":"form-group-filter",
-						"labelCaption":"Автор:"
-					}),
-					"field":new FieldInt("user_id")}),
-				"sign":"e"		
-			};	
+	filters.production_site = {
+		"binding":new CommandBinding({
+			"control":new ProductionSiteEdit(id+":filter-ctrl-production_site",{
+				"contClassName":"form-group-filter"
+			}),
+			"field":new FieldInt("production_site_id")}),
+		"sign":"e"		
 	};
+
+	filters.client = {
+		"binding":new CommandBinding({
+			"control":new ClientEdit(id+":filter-ctrl-client",{
+				"contClassName":"form-group-filter",
+				"labelCaption":"Контрагент:"
+			}),
+			"field":new FieldInt("client_id")}),
+		"sign":"e"		
+	};
+	filters.driver = {
+		"binding":new CommandBinding({
+			"control":new DriverEditRef(id+":filter-ctrl-driver",{
+				"contClassName":"form-group-filter",
+				"labelCaption":"Водитель:"
+			}),
+			"field":new FieldInt("driver_id")}),
+		"sign":"e"		
+	}
+	filters.vehicle = {
+		"binding":new CommandBinding({
+			"control":new VehicleEdit(id+":filter-ctrl-vehicle",{
+				"contClassName":"form-group-filter",
+				"labelCaption":"ТС:"
+			}),
+			"field":new FieldInt("vehicle_id")}),
+		"sign":"e"		
+	};
+
+	filters.destination = {
+		"binding":new CommandBinding({
+			"control":new DestinationEdit(id+":filter-ctrl-destination",{
+				"contClassName":"form-group-filter",
+				"labelCaption":"Объект:"
+			}),
+			"field":new FieldInt("destination_id")}),
+		"sign":"e"		
+	};
+	filters.concrete_type = {
+		"binding":new CommandBinding({
+			"control":new ConcreteTypeEdit(id+":filter-ctrl-concrete_type",{
+				"contClassName":"form-group-filter",
+				"labelCaption":"Марка:"
+			}),
+			"field":new FieldInt("concrete_type_id")}),
+		"sign":"e"		
+	};
+	
+	filters.user = {
+		"binding":new CommandBinding({
+			"control":new UserEditRef(id+":filter-ctrl-user",{
+				"contClassName":"form-group-filter",
+				"labelCaption":"Автор:"
+			}),
+			"field":new FieldInt("user_id")}),
+		"sign":"e"		
+	};	
 	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
 		"model":model,
 		"controller":contr,
+		"readPublicMethod":contr.getPublicMethod("get_list"),
 		"editInline":false,
 		"editWinClass":ShipmentDialog_Form,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdInsert":false,
-			"cmdEdit":!is_v_owner,
+			"cmdEdit":true,
 			"cmdDelete":false,
 			"cmdFilter":true,
 			"filters":filters,
 			"variantStorage":options.variantStorage
 			//"cmdExport":!is_v_owner
 		}),
+		"onEventSetCellOptions":function(opts){
+			if(opts.gridColumn.getId()=="cost"){
+				opts.className = opts.className||"";
+				if(this.getModel().getFieldValue("ship_cost_edit")){
+					opts.title="Значение отредактирована вручную";
+					opts.className+=(opts.className.length? " ":"")+"cost_edit";
+				}
+			}				
+			else if(opts.gridColumn.getId()=="pump_cost"){
+				opts.className = opts.className||"";
+				if(this.getModel().getFieldValue("pump_cost_edit")){
+					opts.title="Значение отредактирована вручную";
+					opts.className+=(opts.className.length? " ":"")+"cost_edit";
+				}
+			}				
+			
+		},
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
@@ -220,9 +181,8 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true,
 							"sort":"desc"
-						})
-					
-						,is_v_owner? null:new GridCellHead(id+":grid:head:id",{
+						})					
+						,new GridCellHead(id+":grid:head:id",{
 							"value":"Номер",
 							"colAttrs":{"clign":"center"},
 							"columns":[
@@ -232,7 +192,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:production_sites_ref",{
+						,new GridCellHead(id+":grid:head:production_sites_ref",{
 							"value":"Завод",
 							"columns":[
 								new GridColumnRef({
@@ -246,12 +206,12 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:clients_ref",{
+						,new GridCellHead(id+":grid:head:clients_ref",{
 							"value":"Контрагент",
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("clients_ref"),
-									"form":(is_v_owner? null:ClientDialog_Form),
+									"form":ClientDialog_Form,
 									"ctrlClass":ClientEdit,
 									"searchOptions":{
 										"field":new FieldInt("client_id"),
@@ -266,12 +226,12 @@ function ShipmentList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
-									"form":(is_v_owner? null:Destination_Form),
-									"ctrlClass":is_v_owner? EditString:DestinationEdit,
+									"form":Destination_Form,
+									"ctrlClass":DestinationEdit,
 									"searchOptions":{
-										"field":is_v_owner? (new FieldString("destinations_ref->descr")) : (new FieldInt("destination_id")),
-										"searchType":is_v_owner? "on_part":"on_match",
-										"typeChange":is_v_owner
+										"field":(new FieldInt("destination_id")),
+										"searchType":"on_match",
+										"typeChange":false
 									}
 								})
 							],
@@ -325,11 +285,11 @@ function ShipmentList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("drivers_ref"),
-									"ctrlClass":is_v_owner? EditString:DriverEditRef,
+									"ctrlClass":DriverEditRef,
 									"searchOptions":{
-										"field":is_v_owner? (new FieldString("drivers_ref->descr")) : (new FieldInt("driver_id")),
-										"searchType":is_v_owner? "on_part":"on_match",
-										"typeChange":is_v_owner
+										"field":(new FieldInt("driver_id")),
+										"searchType":"on_match",
+										"typeChange":false
 									}
 								})
 							],
@@ -375,7 +335,7 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_cost",{
+						,new GridCellHead(id+":grid:head:pump_cost",{
 							"value":"Стоим.насос",
 							"colAttrs":{"align":"right"},
 							"columns":[
@@ -384,7 +344,7 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_vehicles_ref",{
+						,new GridCellHead(id+":grid:head:pump_vehicles_ref",{
 							"value":"Насос",
 							"columns":[
 								new GridColumnRef({
@@ -398,7 +358,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_vehicle_owners_ref",{
+						,new GridCellHead(id+":grid:head:pump_vehicle_owners_ref",{
 							"value":"Насос,влад.",
 							"columns":[
 								new GridColumnRef({
@@ -419,9 +379,8 @@ function ShipmentList_View(id,options){
 									"field":model.getField("acc_comment")
 								})
 							]
-						})	
-						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:client_mark",{
+						})							
+						,new GridCellHead(id+":grid:head:client_mark",{
 							"value":"Баллы",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -430,7 +389,7 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:blanks_exist",{
+						,new GridCellHead(id+":grid:head:blanks_exist",{
 							"value":"Бланки",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -440,7 +399,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,is_v_owner? null:new GridCellHead(id+":grid:head:users_ref",{
+						,new GridCellHead(id+":grid:head:users_ref",{
 							"value":"Автор",
 							"columns":[
 								new GridColumnRef({
@@ -454,10 +413,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,(is_v_owner?
-							null
-							:
-							new GridCellHead(id+":grid:head:owner_pump_agreed_date_time",{
+						,new GridCellHead(id+":grid:head:owner_pump_agreed_date_time",{
 							"value":"Согл.насос",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -466,51 +422,17 @@ function ShipmentList_View(id,options){
 									"dateFormat":"d/m/y"
 								})
 								]
-							})							
-						)
-												
-						,(is_v_owner?
-							new GridCellHead(id+":grid:head:owner_agreed",{
-							"value":"Согласование",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumn({
-									"id":model.getField("owner_agreed"),
-									"cellOptions":function(column,row){
-										return (function(column,row){
-											var res = {};
-											var m = self.getElement("grid").getModel();
-											if(m.getFieldValue("owner_agreed")){
-												res.value = DateHelper.format(m.getFieldValue("owner_agreed_date_time"),"d/m/y");
-											}
-											else{
-												var ctrl = new ButtonCmd(null,{
-													"caption":"Согласовать",
-													"onClick":function(){
-														self.setOwnerAgreed(this);
-													}
-												});
-												ctrl.m_row = row;
-												res.elements = [ctrl];
-											}
-											return res;
-										})(column,row)
-									}
-								})
-								]
-							})					
-							:
-							new GridCellHead(id+":grid:head:owner_agreed_date_time",{
-							"value":"Согл.миксер",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumnDate({
-									"field":model.getField("owner_agreed_date_time"),
-									"dateFormat":"d/m/y"
-								})
-								]
+						})
+						,new GridCellHead(id+":grid:head:owner_agreed_date_time",{
+						"value":"Согл.миксер",
+						"colAttrs":{"align":"center"},
+						"columns":[
+							new GridColumnDate({
+								"field":model.getField("owner_agreed_date_time"),
+								"dateFormat":"d/m/y"
 							})
-						)
+							]
+						})
 					]
 				})
 			]
@@ -521,7 +443,7 @@ function ShipmentList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":is_v_owner? "3":"6"
+							"colSpan":"6"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
@@ -530,7 +452,7 @@ function ShipmentList_View(id,options){
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCell(id+":grid:foot:total_sp2",{
-							"colSpan":is_v_owner? "4":"4"
+							"colSpan":"3"
 						})											
 						
 						,new GridCellFoot(id+":grid:foot:tot_cost",{
@@ -549,7 +471,7 @@ function ShipmentList_View(id,options){
 							"calcFieldId":"demurrage_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_demurrage_cost"})
 						})						
-						,is_v_owner? null:new GridCellFoot(id+":grid:foot:tot_pump_cost",{
+						,new GridCellFoot(id+":grid:foot:tot_pump_cost",{
 							"attrs":{"align":"right"},
 							"calcOper":"sum",
 							"calcFieldId":"pump_cost",
@@ -557,7 +479,7 @@ function ShipmentList_View(id,options){
 						})						
 					
 						,new GridCell(id+":grid:foot:total_sp3",{
-							"colSpan":is_v_owner? "1":"7"
+							"colSpan":"7"
 						})						
 					]
 				})		
@@ -566,7 +488,7 @@ function ShipmentList_View(id,options){
 		"pagination":new pagClass(id+"_page",
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
 		"autoRefresh":false,
-		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
+		"refreshInterval":0,//constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true
 	}));		
@@ -589,20 +511,3 @@ ShipmentList_View.prototype.findDoc = function(barcode){
 	})
 }
 
-ShipmentList_View.prototype.setOwnerAgreed = function(btn){
-	var row = btn.m_row;
-	var val = btn.getValue();
-	var keys = CommonHelper.unserialize(row.getAttr("keys"));
-	
-	var pm = this.getElement("grid").getReadPublicMethod().getController().getPublicMethod("owner_set_agreed");
-	pm.setFieldValue("shipment_id",keys.id);
-	var slef = this;
-	pm.run({
-		"ok":function(resp){
-			slef.getElement("grid").onRefresh(function(){
-				window.showTempNote("Отгрузка согласована",null,2000);
-			});
-		}
-	})
-	
-}

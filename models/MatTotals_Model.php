@@ -23,7 +23,7 @@ class MatTotals_Model extends {
 		//*** Field material_id ***
 		$f_opts = array();
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -31,7 +31,7 @@ class MatTotals_Model extends {
 		//*** Field material_descr ***
 		$f_opts = array();
 		$f_opts['id']="material_descr";
-				
+						
 		$f_material_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_descr",$f_opts);
 		$this->addField($f_material_descr);
 		//********************
@@ -40,7 +40,7 @@ class MatTotals_Model extends {
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="quant_ordered";
-				
+						
 		$f_quant_ordered=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_ordered",$f_opts);
 		$this->addField($f_quant_ordered);
 		//********************
@@ -49,7 +49,7 @@ class MatTotals_Model extends {
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="quant_procured";
-				
+						
 		$f_quant_procured=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_procured",$f_opts);
 		$this->addField($f_quant_procured);
 		//********************
@@ -58,7 +58,7 @@ class MatTotals_Model extends {
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="quant_balance";
-				
+						
 		$f_quant_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_balance",$f_opts);
 		$this->addField($f_quant_balance);
 		//********************
@@ -67,7 +67,7 @@ class MatTotals_Model extends {
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="quant_morn_balance";
-				
+						
 		$f_quant_morn_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_morn_balance",$f_opts);
 		$this->addField($f_quant_morn_balance);
 		//********************

@@ -26,7 +26,7 @@ class Shift_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="date";
-				
+						
 		$f_date=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date",$f_opts);
 		$this->addField($f_date);
 		//********************
@@ -38,7 +38,7 @@ class Shift_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Закрыта';
 		$f_opts['id']="closed";
-				
+						
 		$f_closed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"closed",$f_opts);
 		$this->addField($f_closed);
 		//********************
@@ -50,7 +50,7 @@ class Shift_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата закрытия';
 		$f_opts['id']="close_date_time";
-				
+						
 		$f_close_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"close_date_time",$f_opts);
 		$this->addField($f_close_date_time);
 		//********************

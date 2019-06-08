@@ -26,7 +26,7 @@ class LabEntry_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Отгрузка';
 		$f_opts['id']="shipment_id";
-				
+						
 		$f_shipment_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_id",$f_opts);
 		$this->addField($f_shipment_id);
 		//********************
@@ -36,7 +36,7 @@ class LabEntry_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Подборы';
 		$f_opts['id']="samples";
-				
+						
 		$f_samples=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"samples",$f_opts);
 		$this->addField($f_samples);
 		//********************
@@ -46,7 +46,7 @@ class LabEntry_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Материалы';
 		$f_opts['id']="materials";
-				
+						
 		$f_materials=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"materials",$f_opts);
 		$this->addField($f_materials);
 		//********************
@@ -56,7 +56,7 @@ class LabEntry_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='OK2';
 		$f_opts['id']="ok2";
-				
+						
 		$f_ok2=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ok2",$f_opts);
 		$this->addField($f_ok2);
 		//********************
@@ -66,7 +66,7 @@ class LabEntry_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Время';
 		$f_opts['id']="time";
-				
+						
 		$f_time=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"time",$f_opts);
 		$this->addField($f_time);
 		//********************

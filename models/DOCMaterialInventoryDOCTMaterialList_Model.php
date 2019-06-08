@@ -23,7 +23,7 @@ class DOCMaterialInventoryDOCTMaterialList_Model extends ModelSQLDOCT{
 		//*** Field login_id ***
 		$f_opts = array();
 		$f_opts['id']="login_id";
-				
+						
 		$f_login_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"login_id",$f_opts);
 		$this->addField($f_login_id);
 		//********************
@@ -34,7 +34,7 @@ class DOCMaterialInventoryDOCTMaterialList_Model extends ModelSQLDOCT{
 		
 		$f_opts['alias']='№';
 		$f_opts['id']="line_number";
-				
+						
 		$f_line_number=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"line_number",$f_opts);
 		$this->addField($f_line_number);
 		//********************
@@ -42,7 +42,7 @@ class DOCMaterialInventoryDOCTMaterialList_Model extends ModelSQLDOCT{
 		//*** Field material_id ***
 		$f_opts = array();
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -50,7 +50,7 @@ class DOCMaterialInventoryDOCTMaterialList_Model extends ModelSQLDOCT{
 		//*** Field material_descr ***
 		$f_opts = array();
 		$f_opts['id']="material_descr";
-				
+						
 		$f_material_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_descr",$f_opts);
 		$this->addField($f_material_descr);
 		//********************
@@ -58,7 +58,7 @@ class DOCMaterialInventoryDOCTMaterialList_Model extends ModelSQLDOCT{
 		//*** Field quant ***
 		$f_opts = array();
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************

@@ -27,7 +27,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -35,7 +35,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		//*** Field day ***
 		$f_opts = array();
 		$f_opts['id']="day";
-				
+						
 		$f_day=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"day",$f_opts);
 		$this->addField($f_day);
 		//********************
@@ -43,7 +43,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		//*** Field quarry_id ***
 		$f_opts = array();
 		$f_opts['id']="quarry_id";
-				
+						
 		$f_quarry_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quarry_id",$f_opts);
 		$this->addField($f_quarry_id);
 		//********************
@@ -52,7 +52,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="v_nasip";
-				
+						
 		$f_v_nasip=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"v_nasip",$f_opts);
 		$this->addField($f_v_nasip);
 		//********************
@@ -61,7 +61,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="v_istin";
-				
+						
 		$f_v_istin=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"v_istin",$f_opts);
 		$this->addField($f_v_istin);
 		//********************
@@ -70,7 +70,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="v_dust";
-				
+						
 		$f_v_dust=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"v_dust",$f_opts);
 		$this->addField($f_v_dust);
 		//********************
@@ -79,7 +79,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="v_humid";
-				
+						
 		$f_v_humid=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"v_humid",$f_opts);
 		$this->addField($f_v_humid);
 		//********************
@@ -88,7 +88,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="v_void";
-				
+						
 		$f_v_void=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"v_void",$f_opts);
 		$this->addField($f_v_void);
 		//********************
@@ -96,7 +96,7 @@ class StoneQuarryVal_Model extends ModelSQLBeton{
 		//*** Field v_comment ***
 		$f_opts = array();
 		$f_opts['id']="v_comment";
-				
+						
 		$f_v_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"v_comment",$f_opts);
 		$this->addField($f_v_comment);
 		//********************

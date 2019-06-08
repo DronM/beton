@@ -25,7 +25,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -33,7 +33,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field clients_ref ***
 		$f_opts = array();
 		$f_opts['id']="clients_ref";
-				
+						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************
@@ -41,7 +41,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field destinations_ref ***
 		$f_opts = array();
 		$f_opts['id']="destinations_ref";
-				
+						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
 		$this->addField($f_destinations_ref);
 		//********************
@@ -49,7 +49,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field concrete_types_ref ***
 		$f_opts = array();
 		$f_opts['id']="concrete_types_ref";
-				
+						
 		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
 		$this->addField($f_concrete_types_ref);
 		//********************
@@ -57,7 +57,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field vehicles_ref ***
 		$f_opts = array();
 		$f_opts['id']="vehicles_ref";
-				
+						
 		$f_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicles_ref",$f_opts);
 		$this->addField($f_vehicles_ref);
 		//********************
@@ -65,7 +65,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field drivers_ref ***
 		$f_opts = array();
 		$f_opts['id']="drivers_ref";
-				
+						
 		$f_drivers_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"drivers_ref",$f_opts);
 		$this->addField($f_drivers_ref);
 		//********************
@@ -73,7 +73,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field quant ***
 		$f_opts = array();
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -81,7 +81,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field shipped ***
 		$f_opts = array();
 		$f_opts['id']="shipped";
-				
+						
 		$f_shipped=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipped",$f_opts);
 		$this->addField($f_shipped);
 		//********************
@@ -89,7 +89,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field ship_norm_min ***
 		$f_opts = array();
 		$f_opts['id']="ship_norm_min";
-				
+						
 		$f_ship_norm_min=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_norm_min",$f_opts);
 		$this->addField($f_ship_norm_min);
 		//********************
@@ -97,7 +97,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field ship_fact_min ***
 		$f_opts = array();
 		$f_opts['id']="ship_fact_min";
-				
+						
 		$f_ship_fact_min=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_fact_min",$f_opts);
 		$this->addField($f_ship_fact_min);
 		//********************
@@ -105,7 +105,7 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		//*** Field ship_bal_min ***
 		$f_opts = array();
 		$f_opts['id']="ship_bal_min";
-				
+						
 		$f_ship_bal_min=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_bal_min",$f_opts);
 		$this->addField($f_ship_bal_min);
 		//********************

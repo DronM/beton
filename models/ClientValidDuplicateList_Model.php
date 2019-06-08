@@ -25,7 +25,7 @@ class ClientValidDuplicateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Телефон';
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -35,7 +35,7 @@ class ClientValidDuplicateList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Клиент';
 		$f_opts['id']="clients";
-				
+						
 		$f_clients=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients",$f_opts);
 		$this->addField($f_clients);
 		//********************

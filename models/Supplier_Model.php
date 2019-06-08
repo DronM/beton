@@ -28,7 +28,7 @@ class Supplier_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -39,7 +39,7 @@ class Supplier_Model extends ModelSQLBeton{
 		$f_opts['alias']='Наименование';
 		$f_opts['length']=100;
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -49,7 +49,7 @@ class Supplier_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Полное наименование';
 		$f_opts['id']="name_full";
-				
+						
 		$f_name_full=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name_full",$f_opts);
 		$this->addField($f_name_full);
 		//********************
@@ -60,7 +60,7 @@ class Supplier_Model extends ModelSQLBeton{
 		$f_opts['alias']='Мобильный телефон';
 		$f_opts['length']=15;
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -71,7 +71,7 @@ class Supplier_Model extends ModelSQLBeton{
 		$f_opts['alias']='Мобильный телефон';
 		$f_opts['length']=15;
 		$f_opts['id']="tel2";
-				
+						
 		$f_tel2=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel2",$f_opts);
 		$this->addField($f_tel2);
 		//********************
@@ -79,7 +79,7 @@ class Supplier_Model extends ModelSQLBeton{
 		//*** Field lang_id ***
 		$f_opts = array();
 		$f_opts['id']="lang_id";
-				
+						
 		$f_lang_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"lang_id",$f_opts);
 		$this->addField($f_lang_id);
 		//********************
@@ -88,7 +88,7 @@ class Supplier_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=36;
 		$f_opts['id']="ext_ref_scales";
-				
+						
 		$f_ext_ref_scales=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ext_ref_scales",$f_opts);
 		$this->addField($f_ext_ref_scales);
 		//********************

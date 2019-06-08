@@ -23,7 +23,7 @@ class UserMacAddressList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -31,7 +31,7 @@ class UserMacAddressList_Model extends ModelSQLBeton{
 		//*** Field user_id ***
 		$f_opts = array();
 		$f_opts['id']="user_id";
-				
+						
 		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
 		$this->addField($f_user_id);
 		//********************
@@ -39,7 +39,7 @@ class UserMacAddressList_Model extends ModelSQLBeton{
 		//*** Field user_descr ***
 		$f_opts = array();
 		$f_opts['id']="user_descr";
-				
+						
 		$f_user_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_descr",$f_opts);
 		$this->addField($f_user_descr);
 		//********************
@@ -48,7 +48,7 @@ class UserMacAddressList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=17;
 		$f_opts['id']="mac_address";
-				
+						
 		$f_mac_address=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mac_address",$f_opts);
 		$this->addField($f_mac_address);
 		//********************

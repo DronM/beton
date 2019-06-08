@@ -22,7 +22,7 @@ class OrderAvailSpots_Model extends {
 		//*** Field avail_date_time ***
 		$f_opts = array();
 		$f_opts['id']="avail_date_time";
-				
+						
 		$f_avail_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"avail_date_time",$f_opts);
 		$this->addField($f_avail_date_time);
 		//********************
@@ -30,7 +30,7 @@ class OrderAvailSpots_Model extends {
 		//*** Field avail_speed ***
 		$f_opts = array();
 		$f_opts['id']="avail_speed";
-				
+						
 		$f_avail_speed=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"avail_speed",$f_opts);
 		$this->addField($f_avail_speed);
 		//********************

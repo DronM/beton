@@ -25,7 +25,7 @@ class ShipQuantForCostGrade_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -35,7 +35,7 @@ class ShipQuantForCostGrade_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Объем';
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -43,7 +43,7 @@ class ShipQuantForCostGrade_Model extends ModelSQLBeton{
 		//*** Field quant_to ***
 		$f_opts = array();
 		$f_opts['id']="quant_to";
-				
+						
 		$f_quant_to=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_to",$f_opts);
 		$this->addField($f_quant_to);
 		//********************
@@ -52,7 +52,7 @@ class ShipQuantForCostGrade_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=12;
 		$f_opts['id']="distance_from";
-				
+						
 		$f_distance_from=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"distance_from",$f_opts);
 		$this->addField($f_distance_from);
 		//********************
@@ -61,7 +61,7 @@ class ShipQuantForCostGrade_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=12;
 		$f_opts['id']="distance_to";
-				
+						
 		$f_distance_to=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"distance_to",$f_opts);
 		$this->addField($f_distance_to);
 		//********************

@@ -21,7 +21,7 @@ class VehicleFeatureList_Model extends ModelSQLBeton{
 		//*** Field feature ***
 		$f_opts = array();
 		$f_opts['id']="feature";
-				
+						
 		$f_feature=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"feature",$f_opts);
 		$this->addField($f_feature);
 		//********************

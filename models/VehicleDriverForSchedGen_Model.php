@@ -24,7 +24,7 @@ class VehicleDriverForSchedGen_Model extends {
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -32,7 +32,7 @@ class VehicleDriverForSchedGen_Model extends {
 		//*** Field vehicle ***
 		$f_opts = array();
 		$f_opts['id']="vehicle";
-				
+						
 		$f_vehicle=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle",$f_opts);
 		$this->addField($f_vehicle);
 		//********************
@@ -40,7 +40,7 @@ class VehicleDriverForSchedGen_Model extends {
 		//*** Field driver ***
 		$f_opts = array();
 		$f_opts['id']="driver";
-				
+						
 		$f_driver=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver",$f_opts);
 		$this->addField($f_driver);
 		//********************

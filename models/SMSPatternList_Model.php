@@ -25,7 +25,7 @@ class SMSPatternList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -33,7 +33,7 @@ class SMSPatternList_Model extends ModelSQLBeton{
 		//*** Field sms_type ***
 		$f_opts = array();
 		$f_opts['id']="sms_type";
-				
+						
 		$f_sms_type=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_type",$f_opts);
 		$this->addField($f_sms_type);
 		//********************
@@ -41,7 +41,7 @@ class SMSPatternList_Model extends ModelSQLBeton{
 		//*** Field langs_ref ***
 		$f_opts = array();
 		$f_opts['id']="langs_ref";
-				
+						
 		$f_langs_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"langs_ref",$f_opts);
 		$this->addField($f_langs_ref);
 		//********************
@@ -49,7 +49,7 @@ class SMSPatternList_Model extends ModelSQLBeton{
 		//*** Field pattern ***
 		$f_opts = array();
 		$f_opts['id']="pattern";
-				
+						
 		$f_pattern=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pattern",$f_opts);
 		$this->addField($f_pattern);
 		//********************
@@ -57,7 +57,7 @@ class SMSPatternList_Model extends ModelSQLBeton{
 		//*** Field user_list ***
 		$f_opts = array();
 		$f_opts['id']="user_list";
-				
+						
 		$f_user_list=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_list",$f_opts);
 		$this->addField($f_user_list);
 		//********************

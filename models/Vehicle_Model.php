@@ -27,7 +27,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		$f_opts['autoInc']=TRUE;
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -38,7 +38,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		$f_opts['alias']='Номер';
 		$f_opts['length']=6;
 		$f_opts['id']="plate";
-				
+						
 		$f_plate=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"plate",$f_opts);
 		$this->addField($f_plate);
 		//********************
@@ -49,7 +49,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		$f_opts['alias']='Грузоподъемность';
 		$f_opts['length']=15;
 		$f_opts['id']="load_capacity";
-				
+						
 		$f_load_capacity=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"load_capacity",$f_opts);
 		$this->addField($f_load_capacity);
 		//********************
@@ -60,7 +60,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		$f_opts['alias']='Марка';
 		$f_opts['length']=20;
 		$f_opts['id']="make";
-				
+						
 		$f_make=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"make",$f_opts);
 		$this->addField($f_make);
 		//********************
@@ -69,7 +69,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="driver_id";
-				
+						
 		$f_driver_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_id",$f_opts);
 		$this->addField($f_driver_id);
 		//********************
@@ -80,7 +80,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		$f_opts['alias']='Свойство';
 		$f_opts['length']=50;
 		$f_opts['id']="feature";
-				
+						
 		$f_feature=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"feature",$f_opts);
 		$this->addField($f_feature);
 		//********************
@@ -90,7 +90,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Трэкер';
 		$f_opts['id']="tracker_id";
-				
+						
 		$f_tracker_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tracker_id",$f_opts);
 		$this->addField($f_tracker_id);
 		//********************
@@ -100,7 +100,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Идентификатор SIM карты';
 		$f_opts['id']="sim_id";
-				
+						
 		$f_sim_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sim_id",$f_opts);
 		$this->addField($f_sim_id);
 		//********************
@@ -110,7 +110,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Номер телефона SIM карты';
 		$f_opts['id']="sim_number";
-				
+						
 		$f_sim_number=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sim_number",$f_opts);
 		$this->addField($f_sim_number);
 		//********************
@@ -120,7 +120,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Номер телефона SIM карты';
 		$f_opts['id']="vehicle_owner_id";
-				
+						
 		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
 		$this->addField($f_vehicle_owner_id);
 		//********************

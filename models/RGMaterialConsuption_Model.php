@@ -28,7 +28,7 @@ class RGMaterialConsuption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -38,7 +38,7 @@ class RGMaterialConsuption_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Период';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -46,7 +46,7 @@ class RGMaterialConsuption_Model extends ModelSQLBeton{
 		//*** Field concrete_type_id ***
 		$f_opts = array();
 		$f_opts['id']="concrete_type_id";
-				
+						
 		$f_concrete_type_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_id",$f_opts);
 		$this->addField($f_concrete_type_id);
 		//********************
@@ -54,7 +54,7 @@ class RGMaterialConsuption_Model extends ModelSQLBeton{
 		//*** Field vehicle_id ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_id";
-				
+						
 		$f_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);
 		$this->addField($f_vehicle_id);
 		//********************
@@ -62,7 +62,7 @@ class RGMaterialConsuption_Model extends ModelSQLBeton{
 		//*** Field driver_id ***
 		$f_opts = array();
 		$f_opts['id']="driver_id";
-				
+						
 		$f_driver_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_id",$f_opts);
 		$this->addField($f_driver_id);
 		//********************
@@ -70,7 +70,7 @@ class RGMaterialConsuption_Model extends ModelSQLBeton{
 		//*** Field material_id ***
 		$f_opts = array();
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -81,7 +81,7 @@ class RGMaterialConsuption_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество бетона';
 		$f_opts['length']=19;
 		$f_opts['id']="concrete_quant";
-				
+						
 		$f_concrete_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_quant",$f_opts);
 		$this->addField($f_concrete_quant);
 		//********************
@@ -92,7 +92,7 @@ class RGMaterialConsuption_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество материалов';
 		$f_opts['length']=19;
 		$f_opts['id']="material_quant";
-				
+						
 		$f_material_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant",$f_opts);
 		$this->addField($f_material_quant);
 		//********************

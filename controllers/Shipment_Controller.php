@@ -272,6 +272,21 @@ class Shipment_Controller extends ControllerSQL{
 		$this->setListModelId('ShipmentList_Model');
 		
 			
+		$pm = new PublicMethod('get_list_for_veh_owner');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_list_for_order');
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -288,6 +303,21 @@ class Shipment_Controller extends ControllerSQL{
 
 			
 		$pm = new PublicMethod('get_pump_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_pump_list_for_veh_owner');
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));
@@ -894,9 +924,207 @@ class Shipment_Controller extends ControllerSQL{
 			$this->getPublicMethod('get_list_for_order')
 		);
 	}
+
+	private function get_list_query(){
+		return 
+			"SELECT
+				shipments.id,
+				shipments.ship_date_time,
+				shipments.quant,
+		
+				shipments_cost(dest,o.concrete_type_id,o.date_time::date,shipments,TRUE) AS cost,
+		
+				shipments.shipped,
+				concrete_types_ref(concr) AS concrete_types_ref,
+				o.concrete_type_id,		
+				v.owner,
+		
+				vehicles_ref(v) AS vehicles_ref,
+				vs.vehicle_id,
+		
+				drivers_ref(d) AS drivers_ref,
+				vs.driver_id,
+		
+				destinations_ref(dest) As destinations_ref,
+				o.destination_id,
+		
+				clients_ref(cl) As clients_ref,
+				o.client_id,
+		
+				shipments_demurrage_cost(shipments.demurrage::interval) AS demurrage_cost,
+				shipments.demurrage,
+		
+				shipments.client_mark,
+				shipments.blanks_exist,
+		
+				users_ref(u) As users_ref,
+				o.user_id,
+		
+				production_sites_ref(ps) AS production_sites_ref,
+				shipments.production_site_id,
+		
+				vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		
+				shipments.acc_comment,
+				v_own.id AS vehicle_owner_id,
+		
+				shipments_pump_cost(shipments,o,dest,pvh,TRUE) AS pump_cost,
+		
+				pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
+				pvh.vehicle_id AS pump_vehicle_id,
+				pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
+				shipments.owner_agreed,
+				shipments.owner_agreed_date_time,
+				shipments.owner_pump_agreed,
+				shipments.owner_pump_agreed_date_time,
+		
+				vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+					coalesce(dest.price,0))			
+				END AS ship_price,
+		
+				coalesce(shipments.ship_cost_edit,FALSE) AS ship_cost_edit,
+				coalesce(shipments.pump_cost_edit,FALSE) AS pump_cost_edit
+		
+			FROM shipments
+			LEFT JOIN orders o ON o.id = shipments.order_id
+			LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+			LEFT JOIN clients cl ON cl.id = o.client_id
+			LEFT JOIN vehicle_schedules vs ON vs.id = shipments.vehicle_schedule_id
+			LEFT JOIN destinations dest ON dest.id = o.destination_id
+			LEFT JOIN drivers d ON d.id = vs.driver_id
+			LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+			LEFT JOIN users u ON u.id = shipments.user_id
+			LEFT JOIN production_sites ps ON ps.id = shipments.production_site_id
+			LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+			LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+			LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+			LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id";	
+	}
+
+	private function get_list_for_veh_owner_query(){
+		return 
+			"SELECT
+				shipments.id,
+				shipments.ship_date_time,
+				shipments.quant,
+				shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
+				concrete_types_ref(concr) AS concrete_types_ref,
+				o.concrete_type_id,				
+				vehicles_ref(v) AS vehicles_ref,
+				vs.vehicle_id,
+				destinations_ref(dest) AS destinations_ref,
+				o.destination_id,
+				shipments_demurrage_cost(shipments.demurrage::interval) AS demurrage_cost,
+				shipments.demurrage,
+				vehicle_owners_ref(v_own) AS vehicle_owners_ref,		
+				shipments.acc_comment,
+				v_own.id AS vehicle_owner_id,		
+				shipments.owner_agreed,
+				shipments.owner_agreed_date_time
+				coalesce(shipments.ship_cost_edit,FALSE) AS ship_cost_edit		
+			FROM shipments
+			LEFT JOIN orders o ON o.id = sh.order_id
+			LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+			LEFT JOIN vehicle_schedules vs ON vs.id = shipments.vehicle_schedule_id
+			LEFT JOIN destinations dest ON dest.id = o.destination_id
+			LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id";	
+	}
+
+	public function get_list($pm){
+		/*
+		$model = new ShipmentList_Model($this->getDbLink());
+		$is_insert = NULL;
+		$where = NULL;
+		$order = NULL;
+		$limit = NULL;
+		$fields = NULL;
+		$grp_fields = NULL;
+		$agg_fields = NULL;
+		$calc_total = NULL;
+		$this->setQueryOptionsFromParams($model,$pm,$is_insert,$where,$order,
+			$limit,$fields,$grp_fields,$agg_fields,$calc_total
+		);	
+		
+		if(!$order){
+			$order = new ModelOrderSQL();
+			$order->addField($model->getFieldById('ship_date_time'),'DESC');
+		}
+		
+		$join = NULL;$group = NULL;
+		$q = $this->get_list_query();
+		$model->addParamsToSelectQuery(
+			$q,
+			$where,
+			$order,
+			$limit,
+			$join,$group,
+			$calc_total
+		);
+		$model->selectQuery($q,$calc_total,$where,NULL,TRUE);
+		
+		//
+		$this->addModel($model);
+		*/
+		$this->modelGetList(new ShipmentList_Model($this->getDbLink()),$pm);
+	}	
+
+	public function get_list_for_veh_owner($pm){	
+		/*
+		$model = new ShipmentForVehOwnerList_Model($this->getDbLink());
+		$is_insert = NULL;
+		$where = NULL;
+		$order = NULL;
+		$limit = NULL;
+		$fields = NULL;
+		$grp_fields = NULL;
+		$agg_fields = NULL;
+		$calc_total = NULL;
+		$this->setQueryOptionsFromParams($model,$pm,$is_insert,$where,$order,
+			$limit,$fields,$grp_fields,$agg_fields,$calc_total
+		);	
+		
+		if(!$order){
+			$order = new ModelOrderSQL();
+			$order->addField($model->getFieldById('ship_date_time'),'DESC');
+		}
+		
+		$q = $this->get_list_for_veh_owner_query();
+		$join = NULL;$group = NULL;
+		$model->addParamsToSelectQuery(
+			$q,
+			$where,
+			$order,
+			$limit,
+			$join,$group,
+			$calc_total
+		);
+		$model->selectQuery($q,$calc_total,$where,NULL,TRUE);
+		
+		//
+		$this->addModel($model);
+		*/
+		$this->modelGetList(new ShipmentForVehOwnerList_Model($this->getDbLink()),$pm);
+	}
+	
 	public function get_pump_list($pm){
 	
 		$this->modelGetList(new ShipmentPumpList_Model($this->getDbLink()),$pm);
+	}
+
+	public function get_pump_list_for_veh_owner($pm){
+	
+		$this->modelGetList(new ShipmentPumpForVehOwnerList_Model($this->getDbLink()),$pm);
 	}
 	
 	public function get_shipment_date_list($pm){

@@ -28,7 +28,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['autoInc']=TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -37,7 +37,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['length']=15;
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -45,7 +45,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		//*** Field body ***
 		$f_opts = array();
 		$f_opts['id']="body";
-				
+						
 		$f_body=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"body",$f_opts);
 		$this->addField($f_body);
 		//********************
@@ -54,7 +54,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['defaultValue']='current_timestamp';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -63,7 +63,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['defaultValue']='false';
 		$f_opts['id']="sent";
-				
+						
 		$f_sent=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sent",$f_opts);
 		$this->addField($f_sent);
 		//********************
@@ -71,7 +71,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		//*** Field sent_date_time ***
 		$f_opts = array();
 		$f_opts['id']="sent_date_time";
-				
+						
 		$f_sent_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sent_date_time",$f_opts);
 		$this->addField($f_sent_date_time);
 		//********************
@@ -80,7 +80,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['defaultValue']='false';
 		$f_opts['id']="delivered";
-				
+						
 		$f_delivered=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"delivered",$f_opts);
 		$this->addField($f_delivered);
 		//********************
@@ -88,7 +88,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		//*** Field delivered_date_time ***
 		$f_opts = array();
 		$f_opts['id']="delivered_date_time";
-				
+						
 		$f_delivered_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"delivered_date_time",$f_opts);
 		$this->addField($f_delivered_date_time);
 		//********************
@@ -96,7 +96,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		//*** Field sms_type ***
 		$f_opts = array();
 		$f_opts['id']="sms_type";
-				
+						
 		$f_sms_type=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_type",$f_opts);
 		$this->addField($f_sms_type);
 		//********************
@@ -104,7 +104,7 @@ class SMSForSending_Model extends ModelSQLBeton{
 		//*** Field sms_id ***
 		$f_opts = array();
 		$f_opts['id']="sms_id";
-				
+						
 		$f_sms_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_id",$f_opts);
 		$this->addField($f_sms_id);
 		//********************

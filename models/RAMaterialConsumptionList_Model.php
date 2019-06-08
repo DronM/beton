@@ -23,7 +23,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -31,7 +31,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field date_time ***
 		$f_opts = array();
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -39,7 +39,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field date_time_descr ***
 		$f_opts = array();
 		$f_opts['id']="date_time_descr";
-				
+						
 		$f_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time_descr",$f_opts);
 		$this->addField($f_date_time_descr);
 		//********************
@@ -47,7 +47,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field concrete_type_id ***
 		$f_opts = array();
 		$f_opts['id']="concrete_type_id";
-				
+						
 		$f_concrete_type_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_id",$f_opts);
 		$this->addField($f_concrete_type_id);
 		//********************
@@ -55,7 +55,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field concrete_type_descr ***
 		$f_opts = array();
 		$f_opts['id']="concrete_type_descr";
-				
+						
 		$f_concrete_type_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_descr",$f_opts);
 		$this->addField($f_concrete_type_descr);
 		//********************
@@ -63,7 +63,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field vehicle_id ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_id";
-				
+						
 		$f_vehicle_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);
 		$this->addField($f_vehicle_id);
 		//********************
@@ -71,7 +71,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field vehicle_descr ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_descr";
-				
+						
 		$f_vehicle_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_descr",$f_opts);
 		$this->addField($f_vehicle_descr);
 		//********************
@@ -79,7 +79,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field driver_id ***
 		$f_opts = array();
 		$f_opts['id']="driver_id";
-				
+						
 		$f_driver_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_id",$f_opts);
 		$this->addField($f_driver_id);
 		//********************
@@ -87,7 +87,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field driver_descr ***
 		$f_opts = array();
 		$f_opts['id']="driver_descr";
-				
+						
 		$f_driver_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_descr",$f_opts);
 		$this->addField($f_driver_descr);
 		//********************
@@ -95,7 +95,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field material_id ***
 		$f_opts = array();
 		$f_opts['id']="material_id";
-				
+						
 		$f_material_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
 		$this->addField($f_material_id);
 		//********************
@@ -103,7 +103,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field material_descr ***
 		$f_opts = array();
 		$f_opts['id']="material_descr";
-				
+						
 		$f_material_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_descr",$f_opts);
 		$this->addField($f_material_descr);
 		//********************
@@ -111,7 +111,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field material_quant ***
 		$f_opts = array();
 		$f_opts['id']="material_quant";
-				
+						
 		$f_material_quant=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant",$f_opts);
 		$this->addField($f_material_quant);
 		//********************
@@ -119,7 +119,7 @@ class RAMaterialConsumptionList_Model extends ModelSQLBeton{
 		//*** Field concrete_quant ***
 		$f_opts = array();
 		$f_opts['id']="concrete_quant";
-				
+						
 		$f_concrete_quant=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_quant",$f_opts);
 		$this->addField($f_concrete_quant);
 		//********************

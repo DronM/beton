@@ -24,7 +24,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -32,7 +32,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field phone_cel ***
 		$f_opts = array();
 		$f_opts['id']="phone_cel";
-				
+						
 		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
 		$this->addField($f_phone_cel);
 		//********************
@@ -40,7 +40,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field pump_prices_ref ***
 		$f_opts = array();
 		$f_opts['id']="pump_prices_ref";
-				
+						
 		$f_pump_prices_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_prices_ref",$f_opts);
 		$this->addField($f_pump_prices_ref);
 		//********************
@@ -48,7 +48,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field pump_vehicles_ref ***
 		$f_opts = array();
 		$f_opts['id']="pump_vehicles_ref";
-				
+						
 		$f_pump_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicles_ref",$f_opts);
 		$this->addField($f_pump_vehicles_ref);
 		//********************
@@ -56,7 +56,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field pump_vehicle_owner_id ***
 		$f_opts = array();
 		$f_opts['id']="pump_vehicle_owner_id";
-				
+						
 		$f_pump_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owner_id",$f_opts);
 		$this->addField($f_pump_vehicle_owner_id);
 		//********************
@@ -64,7 +64,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field vehicle_owners_ref ***
 		$f_opts = array();
 		$f_opts['id']="vehicle_owners_ref";
-				
+						
 		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
 		$this->addField($f_vehicle_owners_ref);
 		//********************
@@ -72,7 +72,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field feature ***
 		$f_opts = array();
 		$f_opts['id']="feature";
-				
+						
 		$f_feature=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"feature",$f_opts);
 		$this->addField($f_feature);
 		//********************
@@ -80,7 +80,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field make ***
 		$f_opts = array();
 		$f_opts['id']="make";
-				
+						
 		$f_make=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"make",$f_opts);
 		$this->addField($f_make);
 		//********************
@@ -88,7 +88,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field plate ***
 		$f_opts = array();
 		$f_opts['id']="plate";
-				
+						
 		$f_plate=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"plate",$f_opts);
 		$this->addField($f_plate);
 		//********************
@@ -96,7 +96,7 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 		//*** Field pump_length ***
 		$f_opts = array();
 		$f_opts['id']="pump_length";
-				
+						
 		$f_pump_length=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_length",$f_opts);
 		$this->addField($f_pump_length);
 		//********************

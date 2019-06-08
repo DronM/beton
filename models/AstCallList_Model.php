@@ -30,7 +30,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="unique_id";
-				
+						
 		$f_unique_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"unique_id",$f_opts);
 		$this->addField($f_unique_id);
 		//********************
@@ -38,7 +38,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field client_id ***
 		$f_opts = array();
 		$f_opts['id']="client_id";
-				
+						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
 		//********************
@@ -46,7 +46,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field clients_ref ***
 		$f_opts = array();
 		$f_opts['id']="clients_ref";
-				
+						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
 		//********************
@@ -54,7 +54,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field user_id ***
 		$f_opts = array();
 		$f_opts['id']="user_id";
-				
+						
 		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
 		$this->addField($f_user_id);
 		//********************
@@ -62,7 +62,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field users_ref ***
 		$f_opts = array();
 		$f_opts['id']="users_ref";
-				
+						
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
 		//********************
@@ -70,7 +70,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field call_type ***
 		$f_opts = array();
 		$f_opts['id']="call_type";
-				
+						
 		$f_call_type=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"call_type",$f_opts);
 		$this->addField($f_call_type);
 		//********************
@@ -78,7 +78,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field start_time ***
 		$f_opts = array();
 		$f_opts['id']="start_time";
-				
+						
 		$f_start_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"start_time",$f_opts);
 		$this->addField($f_start_time);
 		//********************
@@ -86,7 +86,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field end_time ***
 		$f_opts = array();
 		$f_opts['id']="end_time";
-				
+						
 		$f_end_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"end_time",$f_opts);
 		$this->addField($f_end_time);
 		//********************
@@ -94,7 +94,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field dur_time ***
 		$f_opts = array();
 		$f_opts['id']="dur_time";
-				
+						
 		$f_dur_time=new FieldSQLTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dur_time",$f_opts);
 		$this->addField($f_dur_time);
 		//********************
@@ -104,7 +104,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="manager_comment";
-				
+						
 		$f_manager_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"manager_comment",$f_opts);
 		$this->addField($f_manager_comment);
 		//********************
@@ -112,7 +112,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field client_comment ***
 		$f_opts = array();
 		$f_opts['id']="client_comment";
-				
+						
 		$f_client_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_comment",$f_opts);
 		$this->addField($f_client_comment);
 		//********************
@@ -120,7 +120,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field client_create_date ***
 		$f_opts = array();
 		$f_opts['id']="client_create_date";
-				
+						
 		$f_client_create_date=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_create_date",$f_opts);
 		$this->addField($f_client_create_date);
 		//********************
@@ -128,7 +128,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field ours ***
 		$f_opts = array();
 		$f_opts['id']="ours";
-				
+						
 		$f_ours=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ours",$f_opts);
 		$this->addField($f_ours);
 		//********************
@@ -136,7 +136,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field client_type_id ***
 		$f_opts = array();
 		$f_opts['id']="client_type_id";
-				
+						
 		$f_client_type_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_type_id",$f_opts);
 		$this->addField($f_client_type_id);
 		//********************
@@ -144,7 +144,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field client_types_ref ***
 		$f_opts = array();
 		$f_opts['id']="client_types_ref";
-				
+						
 		$f_client_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_types_ref",$f_opts);
 		$this->addField($f_client_types_ref);
 		//********************
@@ -152,7 +152,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field client_come_from_id ***
 		$f_opts = array();
 		$f_opts['id']="client_come_from_id";
-				
+						
 		$f_client_come_from_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_come_from_id",$f_opts);
 		$this->addField($f_client_come_from_id);
 		//********************
@@ -160,7 +160,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field client_come_from_ref ***
 		$f_opts = array();
 		$f_opts['id']="client_come_from_ref";
-				
+						
 		$f_client_come_from_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_come_from_ref",$f_opts);
 		$this->addField($f_client_come_from_ref);
 		//********************
@@ -168,7 +168,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field client_kind ***
 		$f_opts = array();
 		$f_opts['id']="client_kind";
-				
+						
 		$f_client_kind=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_kind",$f_opts);
 		$this->addField($f_client_kind);
 		//********************
@@ -176,7 +176,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field caller_id_num ***
 		$f_opts = array();
 		$f_opts['id']="caller_id_num";
-				
+						
 		$f_caller_id_num=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"caller_id_num",$f_opts);
 		$this->addField($f_caller_id_num);
 		//********************
@@ -184,7 +184,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field ext ***
 		$f_opts = array();
 		$f_opts['id']="ext";
-				
+						
 		$f_ext=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ext",$f_opts);
 		$this->addField($f_ext);
 		//********************
@@ -192,7 +192,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field num ***
 		$f_opts = array();
 		$f_opts['id']="num";
-				
+						
 		$f_num=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"num",$f_opts);
 		$this->addField($f_num);
 		//********************
@@ -200,7 +200,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field offer_quant ***
 		$f_opts = array();
 		$f_opts['id']="offer_quant";
-				
+						
 		$f_offer_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"offer_quant",$f_opts);
 		$this->addField($f_offer_quant);
 		//********************
@@ -208,7 +208,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field offer_total ***
 		$f_opts = array();
 		$f_opts['id']="offer_total";
-				
+						
 		$f_offer_total=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"offer_total",$f_opts);
 		$this->addField($f_offer_total);
 		//********************
@@ -216,7 +216,7 @@ class AstCallList_Model extends ModelSQLBeton{
 		//*** Field offer_result ***
 		$f_opts = array();
 		$f_opts['id']="offer_result";
-				
+						
 		$f_offer_result=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"offer_result",$f_opts);
 		$this->addField($f_offer_result);
 		//********************

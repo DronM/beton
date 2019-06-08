@@ -28,7 +28,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Код';
 		$f_opts['id']="id";
-				
+						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
 		$this->addField($f_id);
 		//********************
@@ -38,7 +38,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="date_time";
-				
+						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
@@ -48,7 +48,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Дата';
 		$f_opts['id']="date_time_descr";
-				
+						
 		$f_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time_descr",$f_opts);
 		$this->addField($f_date_time_descr);
 		//********************
@@ -58,7 +58,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Клиент';
 		$f_opts['id']="name";
-				
+						
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
@@ -69,7 +69,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Телефон';
 		$f_opts['length']=15;
 		$f_opts['id']="tel";
-				
+						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);
 		$this->addField($f_tel);
 		//********************
@@ -80,7 +80,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Телефон';
 		$f_opts['length']=15;
 		$f_opts['id']="tel_descr";
-				
+						
 		$f_tel_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel_descr",$f_opts);
 		$this->addField($f_tel_descr);
 		//********************
@@ -91,7 +91,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Марка';
 		$f_opts['length']=15;
 		$f_opts['id']="concrete_type";
-				
+						
 		$f_concrete_type=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type",$f_opts);
 		$this->addField($f_concrete_type);
 		//********************
@@ -101,7 +101,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Объект';
 		$f_opts['id']="dest";
-				
+						
 		$f_dest=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dest",$f_opts);
 		$this->addField($f_dest);
 		//********************
@@ -112,7 +112,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Сумма';
 		$f_opts['length']=15;
 		$f_opts['id']="total";
-				
+						
 		$f_total=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"total",$f_opts);
 		$this->addField($f_total);
 		//********************
@@ -122,7 +122,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Сумма';
 		$f_opts['id']="total_descr";
-				
+						
 		$f_total_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"total_descr",$f_opts);
 		$this->addField($f_total_descr);
 		//********************
@@ -133,7 +133,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Количество';
 		$f_opts['length']=15;
 		$f_opts['id']="quant";
-				
+						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
@@ -144,7 +144,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Есть насос';
 		$f_opts['defaultValue']='false';
 		$f_opts['id']="pump";
-				
+						
 		$f_pump=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump",$f_opts);
 		$this->addField($f_pump);
 		//********************
@@ -154,7 +154,7 @@ class OrderFromClientList_Model extends ModelSQLBeton{
 		
 		$f_opts['alias']='Комментарий';
 		$f_opts['id']="comment_text";
-				
+						
 		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
 		$this->addField($f_comment_text);
 		//********************

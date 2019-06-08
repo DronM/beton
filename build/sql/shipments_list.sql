@@ -1,16 +1,18 @@
 -- View: public.shipments_list
 
--- DROP VIEW shipment_dates_list;
--- DROP VIEW public.shipments_list;
+ --DROP VIEW shipments_for_veh_owner_list;
+ --DROP VIEW shipment_dates_list;
+ --DROP VIEW public.shipments_list;
 
 CREATE OR REPLACE VIEW public.shipments_list AS 
 	SELECT
 		sh.id,
 		sh.ship_date_time,
 		sh.quant,
-		--calc_ship_cost(sh.*, dest.*, true) AS cost,
-		/*
-		CASE
+		
+		--shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
+		(CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
 			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
 			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
 			ELSE
@@ -32,8 +34,8 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 					WHEN dest.distance<=60 THEN greatest(5,sh.quant)
 					ELSE 7
 				END
-		END*/
-		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
+		END)::numeric(15,2)
+		AS cost,
 		
 		sh.shipped,
 		concrete_types_ref(concr) AS concrete_types_ref,
@@ -69,31 +71,32 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		sh.acc_comment,
 		v_own.id AS vehicle_owner_id,
 		
-		/*
-		CASE
-			WHEN o.pump_vehicle_id IS NULL THEN 0
-			WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost
-			--last ship only!!!
-			WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
-			THEN
-				CASE
-					WHEN coalesce(o.unload_price,0)>0 THEN o.unload_price
-					ELSE
-						(SELECT
-							CASE
-								WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
-								ELSE coalesce(pr_vals.price_m,0)*o.quant
-							END
-						FROM pump_prices_values AS pr_vals
-						WHERE pr_vals.pump_price_id = pvh.pump_price_id
-							AND dest.distance<=pr_vals.quant_to
-						ORDER BY pr_vals.quant_to ASC
-						LIMIT 1
-						)
-				END
-			ELSE 0	
-		END*/
-		shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
+		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_cost,
 		
 		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
 		pvh.vehicle_id AS pump_vehicle_id,
@@ -106,10 +109,20 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
 		
 		CASE
-			WHEN coalesce(sh.quant,0)=0 THEN 0
-			ELSE  round(shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE)::numeric/sh.quant::numeric,2)
-		END AS ship_price		
+			WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(dest.price,0))			
+		END AS ship_price,
 		
+		coalesce(sh.ship_cost_edit,FALSE) AS ship_cost_edit,
+		coalesce(sh.pump_cost_edit,FALSE) AS pump_cost_edit
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id
@@ -125,8 +138,9 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
 	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
-	ORDER BY sh.date_time DESC;
+	ORDER BY sh.date_time DESC
+	--LIMIT 60
+	;
 
-ALTER TABLE public.shipments_list
-  OWNER TO beton;
+ALTER TABLE public.shipments_list OWNER TO beton;
 
