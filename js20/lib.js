@@ -474,7 +474,7 @@ Model.prototype.recUndelete=function(keyFields){var row=this.recLocate(keyFields
 Model.prototype.recInsert=function(){for(var sid in this.m_sequences){if(this.m_fields[sid]&&!this.m_fields[sid].isSet()){this.m_sequences[sid]++;this.m_fields[sid].setValue(this.m_sequences[sid]);}}
 this.m_currentRow=this.makeRow();this.addRow(this.m_currentRow);this.m_rowIndex=this.getRowCount()-1;}
 Model.prototype.recUpdate=function(){this.updateRow(this.m_currentRow);}
-Model.prototype.locate=function(keyFields,unique){var res;this.setLocked(true);var cur_ind=this.getRowIndex();try{this.reset();var row_i=0;while(this.getNextRow()){var key_found=true;for(var fid in keyFields){if(this.fieldExists(fid)&&this.getFieldValue(fid)!=keyFields[fid].getValue()){key_found=false;break;}}
+Model.prototype.locate=function(keyFields,unique){var res;this.setLocked(true);var cur_ind=this.getRowIndex();try{this.reset();var row_i=0;while(this.getNextRow()){var key_found=true;for(var fid in keyFields){if(this.fieldExists(fid)){var dt=keyFields[fid].getDataType();var is_date=(dt==keyFields[fid].DT_DATETIME||dt==keyFields[fid].DT_DATE||dt==keyFields[fid].DT_DATETIMETZ);if((!is_date&&this.getFieldValue(fid)!=keyFields[fid].getValue())||(is_date&&this.getFieldValue(fid).getTime()!=keyFields[fid].getValue().getTime())){key_found=false;break;}}}
 if(key_found){if(!res){res=[];}
 res.push(row_i);if(unique){break;}}
 row_i++;}}
@@ -1113,14 +1113,18 @@ Calculator.prototype.refresh=function(){if(this.calcNode!=undefined){this.calcNo
 Calculator.prototype.getWinObjDocument=function(){if(this.m_winObj){return this.m_winObj.getWindowForm().document;}
 else{return window.document;}} 
 Calculator.prototype.TITLE="Калькулятор";Calculator.prototype.ER_NO_EDIT_CONTROL="Не задан контрол."; 
-function Button(id,options){options=options||{};this.m_colorClass=options.colorClass||this.DEF_COLOR_CLASS;options.className=options.className||this.DEF_CLASS;options.attrs=options.attrs||{};options.title=options.title||options.attrs.title||options.hint||this.DEF_TITLE;Button.superclass.constructor.call(this,id,(options.tagName||this.DEF_TAG_NAME),options);this.setCaption(options.caption);this.setGlyph(options.glyph||options.attrs.glyph);this.setGlyphPopUp(options.glyphPopUp);var self=this;this.m_clickFunc=function(e){if(self.getEnabled()&&self.m_onClick){e=EventHelper.fixMouseEvent(e);self.m_onClick.call(self,e);}}
+function Button(id,options){options=options||{};this.m_colorClass=options.colorClass||this.DEF_COLOR_CLASS;options.className=options.className||this.DEF_CLASS;options.attrs=options.attrs||{};options.title=options.title||options.attrs.title||options.hint||this.DEF_TITLE;Button.superclass.constructor.call(this,id,(options.tagName||this.DEF_TAG_NAME),options);this.setCaption(options.caption);this.setImageFontName(options.imageFontName||this.DEF_IMG_FONT_NAME);this.setImageClass(options.imageClass||options.glyph||options.attrs.glyph);this.setGlyphPopUp(options.glyphPopUp);var self=this;this.m_clickFunc=function(e){if(self.getEnabled()&&self.m_onClick){e=EventHelper.fixMouseEvent(e);self.m_onClick.call(self,e);}}
 if(options.onClick!=undefined){this.setOnClick(options.onClick);}}
-extend(Button,Control);Button.prototype.DEF_TAG_NAME="DIV";Button.prototype.DEF_CLASS="btn btn-default";Button.prototype.DEF_COLOR_CLASS="btn-default";Button.prototype.DEF_TITLE;Button.prototype.m_glyph;Button.prototype.m_glyphPopUp;Button.prototype.m_colorClass;Button.prototype.setCaption=function(caption){if(caption){if(this.m_node.childNodes.length==0){this.m_node.appendChild(document.createTextNode(caption));}
+extend(Button,Control);Button.prototype.DEF_TAG_NAME="DIV";Button.prototype.DEF_CLASS="btn btn-default";Button.prototype.DEF_COLOR_CLASS="btn-default";Button.prototype.DEF_TITLE;Button.prototype.DEF_IMG_FONT_NAME="glyphicon";Button.prototype.m_imageClass;Button.prototype.m_glyphPopUp;Button.prototype.m_colorClass;Button.prototype.m_imageFontName;Button.prototype.setCaption=function(caption){if(caption){if(this.m_node.childNodes.length==0){this.m_node.appendChild(document.createTextNode(caption));}
 else{this.m_node.childNodes[0].nodeValue=caption;}}}
 Button.prototype.getCaption=function(){return(this.m_node&&this.m_node.childNodes&&this.m_node.childNodes[0])?this.m_node.childNodes[0].nodeValue:"";}
-Button.prototype.getGlyph=function(){return this.m_glyph;}
-Button.prototype.setGlyph=function(glyph){this.m_glyph=glyph;if(glyph){var n;if(this.m_node){var ar=DOMHelper.getElementsByAttr("glyphicon",this.m_node,"class",true,"i");if(ar&&ar.length){n=ar[0];n.className="glyphicon "+glyph;}}
-if(!n){n=document.createElement("I");n.className=(glyph.indexOf("glyphicon-")>=0)?("glyphicon "+glyph):glyph;this.m_node.appendChild(n);}}}
+Button.prototype.getGlyph=function(){return this.m_imageClass;}
+Button.prototype.setGlyph=function(v){this.setImageClass(v);}
+Button.prototype.getImageFontName=function(){return this.m_imageFontName;}
+Button.prototype.setImageFontName=function(v){this.m_imageFontName=v;}
+Button.prototype.getImageClass=function(){return this.m_imageClass;}
+Button.prototype.setImageClass=function(v){this.m_imageClass=v;if(v){var fn=this.getImageFontName();var n;if(this.m_node){var ar=DOMHelper.getElementsByAttr(fn,this.m_node,"class",true,"i");if(ar&&ar.length){n=ar[0];n.className=fn+" "+v;}}
+if(!n){n=document.createElement("I");n.className=(v.indexOf(fn+"-")>=0)?(fn+" "+v):v;this.m_node.appendChild(n);}}}
 Button.prototype.getGlyphPopUp=function(){return this.m_glyphPopUp;}
 Button.prototype.setGlyphPopUp=function(v){this.m_glyphPopUp=v;}
 Button.prototype.setOnClick=function(onClick){var self=this;this.m_onClick=function(e){onClick.call(self,e);}
@@ -1982,7 +1986,9 @@ GridColumn.prototype.getGridCell=function(){return this.m_gridCell;}
 GridColumn.prototype.setGridCell=function(v){this.m_gridCell=v;} 
 function GridColumnBool(options){options=options||{};options.assocClassList={"true":"glyphicon glyphicon-ok","false":((options.showFalse==undefined||options.showFalse===true)?"glyphicon glyphicon-remove":null)};GridColumnBool.superclass.constructor.call(this,options);}
 extend(GridColumnBool,GridColumn); 
-function GridColumnPhone(options){options=options||{};options.mask=options.mask||window.getApp().getPhoneEditMask();options.ctrlClass=options.ctrlClass||EditPhone;options.cellClass=options.cellClass||GridCellPhone;options.cellOptions=options.cellOptions||{};options.cellOptions.telExt=options.cellOptions.telExt||options.telExt;options.cellOptions.onConnected=options.cellOptions.onConnected||options.onConnected;GridColumnPhone.superclass.constructor.call(this,options);}
+function GridColumnPhone(options){options=options||{};options.mask=options.mask||window.getApp().getPhoneEditMask();options.ctrlClass=options.ctrlClass||EditPhone;if(window.Caller_Controller){options.cellClass=options.cellClass||GridCellPhone;options.cellOptions=options.cellOptions||{};options.cellOptions.telExt=options.cellOptions.telExt||options.telExt;options.cellOptions.onConnected=options.cellOptions.onConnected||options.onConnected;}
+else{options.cellClass=options.cellClass||GridCell;}
+GridColumnPhone.superclass.constructor.call(this,options);}
 extend(GridColumnPhone,GridColumn); 
 function GridColumnEmail(options){options=options||{};GridColumnEmail.superclass.constructor.call(this,options);}
 extend(GridColumnEmail,GridColumn); 
@@ -3360,7 +3366,9 @@ WindowTempMessage.prototype.TP_ER="danger";WindowTempMessage.prototype.TP_WARN="
 else if(!mes_id){mes_id=this.m_messages[id].control.getId();deleted_top=this.m_messages[id].top;deleted_left=this.m_messages[id].left;}}
 mes_id=mes_id?mes_id:CommonHelper.uniqid();this.m_messages[mes_id]={"callBack":options.callBack};this.m_messages[mes_id].control=new ControlContainer(mes_id,"DIV",{"className":item_class,"attrs":{"style":"position:fixed;display:block;z-index:9999;width:"+(options.width||this.m_width)},"elements":[new Control(mes_id+":head","DIV",{"attrs":{"type":"button","class":"close","aria-hidden":"true","messageid":mes_id},"value":"×","events":{"click":options.onClickCancel||function(e){self.close(e.target.getAttribute("messageid"));}}}),new ControlContainer(mes_id+":title","DIV",(typeof(options.content)=="string")?{"value":options.content}:options.content)]});this.m_messages[mes_id].control.toDOM(document.body);var n=this.m_messages[mes_id].control.getNode();var top,left;if(!last_top){left=document.documentElement.clientWidth-n.offsetWidth-(options.margin||this.m_margin);top=document.documentElement.clientHeight-n.offsetHeight-(options.margin||this.m_margin);}
 else{var top=last_top-this.m_interval-last_height;var left=last_left;if(top<document.documentElement.clientHeight/2){top=document.documentElement.clientHeight-n.offsetHeight-(options.margin||this.m_margin);left=last_left-this.m_interval-last_width;if(!left){top=deleted_top;left=deleted_left;}}}
-n.style.top=top+"px";n.style.left=left+"px";this.m_messages[mes_id].top=top;this.m_messages[mes_id].height=n.offsetHeight;this.m_messages[mes_id].left=left;this.m_messages[mes_id].width=n.offsetWidth;this.m_messages[mes_id].flashTmerId=setTimeout(function(mesId){self.stopFlash(mesId);},(options.flashTime||this.m_flashTime),mes_id);this.m_messages[mes_id].timerId=setTimeout(function(mesId){self.close(mesId);},(options.timeout||this.m_timeout),mes_id);DOMHelper.show(n);}
+n.style.top=top+"px";n.style.left=left+"px";this.m_messages[mes_id].top=top;this.m_messages[mes_id].height=n.offsetHeight;this.m_messages[mes_id].left=left;this.m_messages[mes_id].width=n.offsetWidth;try{this.m_messages[mes_id].flashTmerId=setTimeout(function(mesId){self.stopFlash(mesId);},(options.flashTime||this.m_flashTime),mes_id);this.m_messages[mes_id].timerId=setTimeout(function(mesId){self.close(mesId);},(options.timeout||this.m_timeout),mes_id);}
+catch(e){}
+DOMHelper.show(n);}
 WindowTempMessage.prototype.stopFlash=function(mesId){if(this.m_messages[mesId]){DOMHelper.delClass(this.m_messages[mesId].control.getNode(),"flashit");}}
 WindowTempMessage.prototype.close=function(mesId){if(this.m_messages[mesId]){if(this.m_messages[mesId].flashTmerId)clearTimeout(this.m_messages[mesId].flashTmerId);if(this.m_messages[mesId].timerId)clearTimeout(this.m_messages[mesId].timerId);if(this.m_messages[mesId].control){var self=this;$(this.m_messages[mesId].control.getNode()).fadeOut("slow",function(){self.deleteObj(mesId);});}}}
 WindowTempMessage.prototype.deleteObj=function(mesId){if(this.m_messages&&this.m_messages[mesId]){if(this.m_messages[mesId].control){this.m_messages[mesId].control.delDOM();delete this.m_messages[mesId].control;}
@@ -4401,7 +4409,7 @@ if(self.getShipCostEditModified()){var ship_cost_edit=!self.m_model.getFieldValu
 else{pm.unsetFieldValue("ship_cost");}}
 else{pm.unsetFieldValue("ship_cost_edit");}}}),new CommandBinding({"control":this.getElement("client_mark")}),new CommandBinding({"control":this.getElement("blanks_exist")}),new CommandBinding({"control":this.getElement("demurrage")}),new CommandBinding({"control":this.getElement("acc_comment")}),new CommandBinding({"control":this.getElement("pump_cost")}),new CommandBinding({"control":this.getElement("ship_cost")})]);}
 extend(ShipmentDialog_View,ViewObjectAjx);ShipmentDialog_View.prototype.getModified=function(cmd){return(ShipmentDialog_View.superclass.getModified.call(this,cmd)||this.getPumpCostEditModified()||this.getElement("pump_cost").getModified()||this.getShipCostEditModified()||this.getElement("ship_cost").getModified());}
-ShipmentDialog_View.prototype.getPumpCostEditModified=function(pm){return(this.getElement("pump_cost").getEditAllowed()!=this.m_model.getFieldValue("pump_cost_edit"));}
+ShipmentDialog_View.prototype.getPumpCostEditModified=function(pm){return(this.getElement("pump_cost").getVisible()&&this.getElement("pump_cost").getEditAllowed()!=this.m_model.getFieldValue("pump_cost_edit"));}
 ShipmentDialog_View.prototype.getShipCostEditModified=function(pm){return(this.getElement("ship_cost").getEditAllowed()!=this.m_model.getFieldValue("ship_cost_edit"));}
 ShipmentDialog_View.prototype.onGetData=function(resp,cmd){ShipmentDialog_View.superclass.onGetData.call(this,resp,cmd);var m=this.getModel();var pv=m.getFieldValue("pump_vehicles_ref");if(!pv||pv.isNull()||!m.getFieldValue("order_last_shipment")){this.getElement("pump_cost").setVisible(false);}
 else{this.getElement("pump_cost").setEditAllowed(m.getFieldValue("pump_cost_edit"));}

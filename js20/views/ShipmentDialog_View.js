@@ -184,7 +184,7 @@ ShipmentDialog_View.prototype.getModified = function(cmd){
 }
 
 ShipmentDialog_View.prototype.getPumpCostEditModified = function(pm){
-	return (this.getElement("pump_cost").getEditAllowed()!=this.m_model.getFieldValue("pump_cost_edit"));
+	return (this.getElement("pump_cost").getVisible() && this.getElement("pump_cost").getEditAllowed()!=this.m_model.getFieldValue("pump_cost_edit"));
 }
 
 ShipmentDialog_View.prototype.getShipCostEditModified = function(pm){
