@@ -797,7 +797,7 @@ class Shipment_Controller extends ControllerSQL{
 		//totals
 		$this->addNewModel(sprintf(
 		"SELECT
-			coalesce((SELECT sum(quant) FROM shipments WHERE ship_date_time BETWEEN %s AND %s AND shipped),0) AS quant_shipped,
+			coalesce((SELECT sum(sh.quant) FROM shipments AS sh WHERE sh.ship_date_time BETWEEN %s AND %s AND sh.shipped".$operator_cond."),0) AS quant_shipped,
 			coalesce((SELECT sum(quant) FROM orders WHERE date_time BETWEEN %s AND %s),0) AS quant_ordered",
 		$date_from_db,
 		$date_to_db,

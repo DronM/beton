@@ -152,6 +152,15 @@ function ShipmentForVehOwnerList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость доставки для водителя';
+	filed_options.autoInc = false;	
+	
+	options.fields.cost_for_driver = new FieldFloat("cost_for_driver",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Стоимость доставки отредактирована';
 	filed_options.autoInc = false;	
 	

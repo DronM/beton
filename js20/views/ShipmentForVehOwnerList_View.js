@@ -212,6 +212,16 @@ function ShipmentForVehOwnerList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:cost_for_driver",{
+							"value":"Доставка для водителя",
+							"colAttrs":{"align":"right"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("cost_for_driver"),
+									"precision":2
+								})
+							]
+						})
 											
 						,new GridCellHead(id+":grid:head:demurrage",{
 							"value":"Время простоя",
@@ -289,14 +299,19 @@ function ShipmentForVehOwnerList_View(id,options){
 						})
 						,new GridCell(id+":grid:foot:total_sp2",{
 							"colSpan":"3"
-						})											
-						
+						})																	
 						,new GridCellFoot(id+":grid:foot:tot_cost",{
 							"attrs":{"align":"right"},
 							"calcOper":"sum",
 							"calcFieldId":"cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost"})
-						})						
+						})
+						,new GridCellFoot(id+":grid:foot:tot_cost_for_driver",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"cost_for_driver",
+							"gridColumn":new GridColumnFloat({"id":"tot_cost_for_driver"})
+						})												
 						,new GridCell(id+":grid:foot:total_sp4",{
 							"colSpan":"1"
 						})											

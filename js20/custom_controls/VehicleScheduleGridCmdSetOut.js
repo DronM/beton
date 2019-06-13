@@ -65,8 +65,8 @@ VehicleScheduleGridCmdSetOut.prototype.onCommand = function(){
 VehicleScheduleGridCmdSetOut.prototype.closeComment = function(){
 	this.m_view.delDOM()
 	this.m_form.delDOM();
-	delete self.m_view;
-	delete self.m_form;			
+	delete this.m_view;
+	delete this.m_form;			
 }
 
 VehicleScheduleGridCmdSetOut.prototype.setOutOnServer = function(commentText){
@@ -80,7 +80,7 @@ VehicleScheduleGridCmdSetOut.prototype.setOutOnServer = function(commentText){
 		"ok":function(resp){
 			self.m_grid.onRefresh(function(){
 				self.closeComment();
-				window.showNote("Выведен со смены");				
+				window.showTempNote("Выведен со смены",null,5000);				
 			});
 		}
 	})

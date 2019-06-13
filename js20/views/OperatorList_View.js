@@ -130,7 +130,7 @@ function OperatorList_View(id,options){
 			"colSpan":"6"
 		})												
 		,new GridCellFoot(id+":features_grid:foot:tot_quant",{
-			"colAttrs":{"align":"right"},
+			"attrs":{"align":"right"},
 			"calcOper":"sum",
 			"calcFieldId":"quant",
 			"gridColumn":new GridColumnFloat({

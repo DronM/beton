@@ -162,6 +162,16 @@ class ShipmentForVehOwnerList_Model extends ModelSQLBeton{
 		$this->addField($f_cost);
 		//********************
 		
+		//*** Field cost_for_driver ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость доставки для водителя';
+		$f_opts['id']="cost_for_driver";
+						
+		$f_cost_for_driver=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_for_driver",$f_opts);
+		$this->addField($f_cost_for_driver);
+		//********************
+		
 		//*** Field ship_cost_edit ***
 		$f_opts = array();
 		
