@@ -20,4 +20,4 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	FROM shipments_list sh
 	;
 	
-ALTER VIEW shipments_for_client_veh_owner_list OWNER TO beton;
+ALTER VIEW shipments_for_client_veh_owner_list OWNER TO ;

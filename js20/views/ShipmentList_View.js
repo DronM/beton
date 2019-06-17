@@ -506,7 +506,7 @@ ShipmentList_View.prototype.findDoc = function(barcode){
 			ctrl.reset();
 			ctrl.focus();
 			
-			window.showTempNote("Документ погашен!",1000);
+			window.showTempNote("Документ погашен!",null,1500);
 		}
 	})
 }

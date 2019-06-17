@@ -6,7 +6,8 @@ function OperatorList_View(id,options){
 	OperatorList_View.superclass.constructor.call(this,id,options);
 
 	var model = options.models.OperatorList_Model;
-	this.m_totInitModel = options.models.OperatorTotals_Model;
+	this.m_totModel = options.models.OperatorTotals_Model;
+	this.m_prodSiteModel = options.models.OperatorProductionSite_Model;
 	var contr = new Shipment_Controller();
 	
 	var constants = {"grid_refresh_interval":null};
@@ -283,20 +284,27 @@ function OperatorList_View(id,options){
 	
 	this.m_gridOnGetData = grid.onGetData;
 	grid.onGetData = function(resp){
-		var tot_m;
+		if(!document.getElementById(self.getId())){
+			return;
+		}
 		if(resp){		
-			tot_m = resp.getModel("OperatorTotals_Model");
+			self.m_totModel = resp.getModel("OperatorTotals_Model");
+			self.m_prodSiteModel = resp.getModel("OperatorProductionSite_Model");
 		}
-		else{
-			tot_m = self.m_totInitModel;
-		}
-		if(tot_m.getNextRow()){
-			var q_shipped = parseFloat(tot_m.getFieldValue("quant_shipped"));
-			var q_ordered = parseFloat(tot_m.getFieldValue("quant_ordered"));
+		if(self.m_totModel.getNextRow()){
+			var q_shipped = parseFloat(self.m_totModel.getFieldValue("quant_shipped"));
+			var q_ordered = parseFloat(self.m_totModel.getFieldValue("quant_ordered"));
 			document.getElementById("totShipped").value = q_shipped.toFixed(2);
 			document.getElementById("totOrdered").value = q_ordered.toFixed(2);
 			document.getElementById("totBalance").value = (q_ordered-q_shipped).toFixed(2);
 		}
+		var n = "";
+		while(self.m_prodSiteModel.getNextRow()){			
+			n+= (n=="")? "":", ";
+			n+= self.m_prodSiteModel.getFieldValue("name");			
+		}
+		DOMHelper.setText(document.getElementById(self.getId()+":prod_site_title"),n);
+		
 		self.m_gridOnGetData.call(self.getElement("grid"),resp);
 	}
 }

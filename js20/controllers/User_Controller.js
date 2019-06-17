@@ -42,6 +42,7 @@ function User_Controller(options){
 	this.addComplete();
 	this.add_get_profile();
 	this.add_password_recover();
+	this.add_get_user_operator_list();
 		
 }
 extend(User_Controller,ControllerObjServer);
@@ -473,6 +474,23 @@ extend(User_Controller,ControllerObjServer);
 		pm.addField(new FieldString("captcha_key",options));
 	
 			
+	this.addPublicMethod(pm);
+}
+
+			User_Controller.prototype.add_get_user_operator_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_user_operator_list',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+
 	this.addPublicMethod(pm);
 }
 

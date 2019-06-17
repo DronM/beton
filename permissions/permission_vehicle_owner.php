@@ -28,6 +28,8 @@ $permissions = array();
 		
 			$permissions['Shipment_Controller_get_list_for_veh_owner']=TRUE;
 		
+			$permissions['Shipment_Controller_get_list_for_client_veh_owner']=TRUE;
+		
 			$permissions['Shipment_Controller_get_pump_list_for_veh_owner']=TRUE;
 		
 			$permissions['Shipment_Controller_owner_set_agreed']=TRUE;

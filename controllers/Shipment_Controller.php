@@ -287,6 +287,21 @@ class Shipment_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('get_list_for_client_veh_owner');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_list_for_order');
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -708,9 +723,14 @@ class Shipment_Controller extends ControllerSQL{
 		$date_to_db = "'".date('Y-m-d H:i:s',$date_to)."'";
 	
 		$operator_cond = '';
+		$operator_cond_tot = '';
+		$operator_with = '';
 		$extra_cols_str = '';
-		if($_SESSION['role_id']=='operator' && isset($_SESSION['production_site_id']) ){
-			$operator_cond = sprintf(' AND sh.production_site_id=%d',$_SESSION['production_site_id']);
+		if($_SESSION['role_id']=='operator'){
+			$operator_with = sprintf('prod_site AS (SELECT u.production_site_id FROM users u WHERE u.id=%d),',$_SESSION['user_id']);
+			$operator_cond = ' AND sh.production_site_id=(SELECT prod_site.production_site_id FROM prod_site)';
+			$operator_cond_tot = sprintf(' AND sh.production_site_id=(SELECT u.production_site_id FROM users u WHERE u.id=%d)',$_SESSION['user_id']);
+			$extra_join = '';
 		}
 		else{
 			$extra_cols_str =
@@ -718,34 +738,25 @@ class Shipment_Controller extends ControllerSQL{
 			,(CASE
 				WHEN sh.shipped THEN
 					EXTRACT(EPOCH FROM
-						sh.ship_date_time-
-						(SELECT
-							vss.date_time
-						FROM vehicle_schedule_states AS vss
-						WHERE vss.shipment_id=sh.id
-						AND vss.state='assigned'
-						)
+						sh.ship_date_time-vs2.date_time
 					)/60
 				ELSE 0
 			END)::int AS ship_fact_min
 			,CASE
 				WHEN sh.shipped THEN
 					(EXTRACT(EPOCH FROM
-						sh.ship_date_time-
-						(SELECT
-							vss.date_time
-						FROM vehicle_schedule_states AS vss
-						WHERE vss.shipment_id=sh.id
-						AND vss.state='assigned'
-						)
+						sh.ship_date_time-vs2.date_time
 					)/60)::int - 
 					shipment_time_norm(sh.quant::numeric)
 				ELSE 0
 			END AS ship_bal_min";
+			$extra_join = "LEFT JOIN (SELECT t.shipment_id,t.date_time FROM vehicle_schedule_states t WHERE t.state='assigned' GROUP BY t.shipment_id,t.date_time) vs2 ON vs2.shipment_id = sh.id";
 		}
 		
 		$this->addNewModel(sprintf(
-		"WITH ships AS (
+		"WITH
+		%s
+		ships AS (
 		SELECT
 			sh.id,
 			clients_ref(cl) AS clients_ref,
@@ -772,6 +783,7 @@ class Shipment_Controller extends ControllerSQL{
 		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
 		LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
 		LEFT JOIN users AS op_u ON op_u.id=sh.operator_user_id
+		%s
 		WHERE (sh.shipped = FALSE OR (sh.ship_date_time BETWEEN %s AND %s))".$operator_cond."
 		)
 		--Все неотгруженные
@@ -787,7 +799,9 @@ class Shipment_Controller extends ControllerSQL{
 		FROM ships AS sh
 		WHERE (sh.shipped = TRUE)".$operator_cond."
 		ORDER BY sh.ship_date_time DESC)",
+		$operator_with,
 		$extra_cols_str,
+		$extra_join,
 		$date_from_db,
 		$date_to_db
 		),
@@ -797,7 +811,7 @@ class Shipment_Controller extends ControllerSQL{
 		//totals
 		$this->addNewModel(sprintf(
 		"SELECT
-			coalesce((SELECT sum(sh.quant) FROM shipments AS sh WHERE sh.ship_date_time BETWEEN %s AND %s AND sh.shipped".$operator_cond."),0) AS quant_shipped,
+			coalesce((SELECT sum(sh.quant) FROM shipments AS sh WHERE sh.ship_date_time BETWEEN %s AND %s AND sh.shipped".$operator_cond_tot."),0) AS quant_shipped,
 			coalesce((SELECT sum(quant) FROM orders WHERE date_time BETWEEN %s AND %s),0) AS quant_ordered",
 		$date_from_db,
 		$date_to_db,
@@ -805,6 +819,20 @@ class Shipment_Controller extends ControllerSQL{
 		$date_to_db		
 		),
 		'OperatorTotals_Model');
+		
+		//production site(s)
+		if($_SESSION['role_id']=='operator'){
+			$prod_site_q = sprintf(
+				'SELECT ps.name
+				FROM production_sites ps
+				WHERE ps.id=(SELECT u.production_site_id FROM users u WHERE u.id=%d)',
+				$_SESSION['user_id']
+			);
+		}
+		else{
+			$prod_site_q = 'SELECT ps.name FROM production_sites ps';
+		}
+		$this->addNewModel($prod_site_q,'OperatorProductionSite_Model');		
 	}
 	
 	public function set_shipped($pm){
@@ -1278,6 +1306,10 @@ class Shipment_Controller extends ControllerSQL{
 	
 	function owner_set_pump_agreed($pm){
 		$this->update_owner_agreed_field($this->getExtDbVal($pm,'shipment_id'),TRUE);
+	}
+	
+	public function get_list_for_client_veh_owner($pm){	
+		$this->modelGetList(new ShipmentForClientVehOwnerList_Model($this->getDbLink()),$pm);
 	}
 	
 }

@@ -120,9 +120,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		//global filters				
 		if ($ar['role_id']=='vehicle_owner'){
-			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
+			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id,client_id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
 			if(is_array($ar_veh_owner) &amp;&amp; count($ar_veh_owner)){
 				$_SESSION['global_vehicle_owner_id'] = $ar_veh_owner['id'];
+				$_SESSION['global_client_vehicle_owner_id'] = $ar_veh_owner['client_id'];
 			}
 			else{
 				$_SESSION['global_vehicle_owner_id'] = 0;
@@ -142,6 +143,23 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$filter->addField($field,'=');
 			GlobalFilter::set('<xsl:value-of select="$model_id"/>',$filter);
 			</xsl:for-each>
+			
+			<xsl:for-each select="/metadata/models/model/globalFilter[@id='client_vehicle_owner_id']">
+			<xsl:variable name="model_id" select="concat(../@id,'_Model')"/>
+			<xsl:variable name="field_id">
+				<xsl:choose>
+					<xsl:when test="@fieldId">'<xsl:value-of select="@fieldId"/>'</xsl:when>
+					<xsl:otherwise>'client_vehicle_owner_id'</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>			
+			$model = new <xsl:value-of select="$model_id"/>($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById(<xsl:value-of select="$field_id"/>);
+			$field->setValue($_SESSION['global_client_vehicle_owner_id']);
+			$filter->addField($field,'=');
+			GlobalFilter::set('<xsl:value-of select="$model_id"/>',$filter);
+			</xsl:for-each>
+			
 		}
 		
 		$log_ar = $this->getDbLinkMaster()->query_first(
@@ -635,6 +653,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			throw new Exception('Permission denied!');
 		}
 		parent::update($pm);
+	}
+	
+	public function get_user_operator_list($pm){
+		$model = new UserOperatorList_Model($this->getDbLink());
+		$model->query("SELECT * FROM user_operator_list",TRUE);
+		$this->addModel($model);
 	}
 	
 </xsl:template>

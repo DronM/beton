@@ -139,6 +139,7 @@
 <li><a href="#Shipment_Model">Shipment_Model</a></li>
 <li><a href="#ShipmentList_Model">ShipmentList_Model</a></li>
 <li><a href="#ShipmentForVehOwnerList_Model">ShipmentForVehOwnerList_Model</a></li>
+<li><a href="#ShipmentForClientVehOwnerList_Model">ShipmentForClientVehOwnerList_Model</a></li>
 <li><a href="#ShipmentDialog_Model">ShipmentDialog_Model</a></li>
 <li><a href="#ShipmentPumpList_Model">ShipmentPumpList_Model</a></li>
 <li><a href="#ShipmentPumpForVehOwnerList_Model">ShipmentPumpForVehOwnerList_Model</a></li>
@@ -247,6 +248,7 @@
 <li><a href="#ConcreteCostList_Model">ConcreteCostList_Model</a></li>
 <li><a href="#VehicleOwner_Model">VehicleOwner_Model</a></li>
 <li><a href="#VehicleOwnerList_Model">VehicleOwnerList_Model</a></li>
+<li><a href="#UserOperatorList_Model">UserOperatorList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1746,7 +1748,8 @@
 <a href="#Shipment_Model">Model: Shipment_Model</a><h2>delete</h2>
 <a href="#Shipment_Model">Model: Shipment_Model</a><h2>get_list</h2>
 <a href="#ShipmentList_Model">Model: ShipmentList_Model</a><h2>get_list_for_veh_owner</h2>
-<a href="#ShipmentForVehOwnerList_Model">Model: ShipmentForVehOwnerList_Model</a><h2>get_list_for_order</h2>
+<a href="#ShipmentForVehOwnerList_Model">Model: ShipmentForVehOwnerList_Model</a><h2>get_list_for_client_veh_owner</h2>
+<a href="#ShipmentForClientVehOwnerList_Model">Model: ShipmentForClientVehOwnerList_Model</a><h2>get_list_for_order</h2>
 <a href="#ShipmentForOrderList_Model">Model: ShipmentForOrderList_Model</a><h2>get_pump_list</h2>
 <a href="#ShipmentPumpList_Model">Model: ShipmentPumpList_Model</a><h2>get_pump_list_for_veh_owner</h2>
 <a href="#ShipmentPumpForVehOwnerList_Model">Model: ShipmentPumpForVehOwnerList_Model</a><h2>get_shipment_date_list</h2>
@@ -2151,6 +2154,8 @@
 <p>Length:10</p>
 </div>
 </div>
+<h2>get_user_operator_list</h2>
+<a href="#UserOperatorList_Model">Model: UserOperatorList_Model</a>
 </div>
 </div>
 <div id="UserMacAddress_Controller" class="content_box">
@@ -8443,6 +8448,84 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="ShipmentForClientVehOwnerList_Model" class="content_box">
+<h1>ShipmentForClientVehOwnerList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ship_date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>drivers_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>driver_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_owner_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_owners_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="ShipmentForDriverCost_Model" class="content_box">
 <h1>ShipmentForDriverCost_Model</h1>
 <div class="content_item">
@@ -10276,6 +10359,42 @@
 <div>Primary key:</div>
 <div>Required:TRUE</div>
 <div>Length:17</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="UserOperatorList_Model" class="content_box">
+<h1>UserOperatorList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>email</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>phone_cel</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
 <div>Precision:</div>
 </div>
 </div>

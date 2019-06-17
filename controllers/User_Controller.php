@@ -355,6 +355,21 @@ class User_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('get_user_operator_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+		$this->addPublicMethod($pm);
+
 		
 	}
 		
@@ -427,9 +442,10 @@ class User_Controller extends ControllerSQL{
 		
 		//global filters				
 		if ($ar['role_id']=='vehicle_owner'){
-			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
+			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id,client_id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
 			if(is_array($ar_veh_owner) && count($ar_veh_owner)){
 				$_SESSION['global_vehicle_owner_id'] = $ar_veh_owner['id'];
+				$_SESSION['global_client_vehicle_owner_id'] = $ar_veh_owner['client_id'];
 			}
 			else{
 				$_SESSION['global_vehicle_owner_id'] = 0;
@@ -497,6 +513,14 @@ class User_Controller extends ControllerSQL{
 			$field->setValue($_SESSION['global_vehicle_owner_id']);
 			$filter->addField($field,'=');
 			GlobalFilter::set('ShipmentPumpForVehOwnerList_Model',$filter);
+						
+			$model = new ShipmentForClientVehOwnerList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById('client_id');
+			$field->setValue($_SESSION['global_client_vehicle_owner_id']);
+			$filter->addField($field,'=');
+			GlobalFilter::set('ShipmentForClientVehOwnerList_Model',$filter);
+			
 			
 		}
 		
@@ -991,6 +1015,12 @@ class User_Controller extends ControllerSQL{
 			throw new Exception('Permission denied!');
 		}
 		parent::update($pm);
+	}
+	
+	public function get_user_operator_list($pm){
+		$model = new UserOperatorList_Model($this->getDbLink());
+		$model->query("SELECT * FROM user_operator_list",TRUE);
+		$this->addModel($model);
 	}
 	
 

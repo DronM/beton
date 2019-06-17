@@ -1194,6 +1194,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForVehOwnerList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForClientVehOwnerList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentTimeList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentDateList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallList_View.js'));
@@ -1264,6 +1265,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentCancelationList.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentPumpList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentPumpForVehOwnerList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserOperatorList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1582,6 +1584,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentCancelationList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentPumpForVehOwnerList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForVehOwnerList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/UserOperatorList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForClientVehOwnerList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

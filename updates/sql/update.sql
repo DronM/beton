@@ -3550,3 +3550,149 @@ CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
 	;
 	
 ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 14/06/2019 16:38:38 ******************
+-- VIEW: operator_list
+
+--DROP VIEW operator_list;
+
+CREATE OR REPLACE VIEW operator_list AS
+	SELECT
+		u.id,
+		u.name,
+		u.email,
+		u.phone_cel,
+		production_sites_ref(ps) AS production_sites_ref
+	FROM users AS u
+	LEFT JOIN production_sites AS ps ON ps.id=u.production_site_id
+	WHERE role_id='operator' AND NOT coalesce(banned,FALSE)
+	ORDER BY u.name
+	;
+	
+ALTER VIEW operator_list OWNER TO beton;
+
+
+-- ******************* update 14/06/2019 16:39:49 ******************
+-- VIEW: operator_list
+
+DROP VIEW operator_list;
+/*
+CREATE OR REPLACE VIEW operator_list AS
+	SELECT
+		u.id,
+		u.name,
+		u.email,
+		u.phone_cel,
+		production_sites_ref(ps) AS production_sites_ref
+	FROM users AS u
+	LEFT JOIN production_sites AS ps ON ps.id=u.production_site_id
+	WHERE role_id='operator' AND NOT coalesce(banned,FALSE)
+	ORDER BY u.name
+	;
+	
+ALTER VIEW operator_list OWNER TO beton;
+*/
+
+
+-- ******************* update 14/06/2019 16:40:50 ******************
+-- VIEW: user_operator_list
+
+--DROP VIEW user_operator_list;
+
+CREATE OR REPLACE VIEW user_operator_list AS
+	SELECT
+		u.id,
+		u.name,
+		u.email,
+		u.phone_cel,
+		production_sites_ref(ps) AS production_sites_ref
+	FROM users AS u
+	LEFT JOIN production_sites AS ps ON ps.id=u.production_site_id
+	WHERE role_id='operator' AND NOT coalesce(banned,FALSE)
+	ORDER BY u.name
+	;
+	
+ALTER VIEW user_operator_list OWNER TO beton;
+
+
+
+-- ******************* update 14/06/2019 16:59:17 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10028',
+		'User_Controller',
+		'get_list',
+		'UserOperatorList',
+		'Справочники',
+		'Список операторов',
+		FALSE
+		);
+	
+
+-- ******************* update 15/06/2019 08:23:59 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'20012',
+		'Shipment_Controller',
+		'get_list_for_client_veh_owner',
+		'ShipmentForClientVehOwnerList',
+		'Документы',
+		'Отгрузки по клиенту-владельцу ТС',
+		FALSE
+		);
+	
+
+-- ******************* update 15/06/2019 08:38:55 ******************
+-- VIEW: shipments_for_veh_client_owner_list
+
+--DROP VIEW shipments_for_client_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref
+		
+	FROM shipments_list sh
+	;
+	
+ALTER VIEW shipments_for_client_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 15/06/2019 08:52:19 ******************
+-- VIEW: shipments_for_veh_client_owner_list
+
+--DROP VIEW shipments_for_client_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.client_id
+		
+	FROM shipments_list sh
+	;
+	
+ALTER VIEW shipments_for_client_veh_owner_list OWNER TO beton;

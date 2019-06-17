@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-06-13 16:29:21</lastBuild></version>
+		<lastBuild>2019-06-17 05:50:29</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -40,9 +40,11 @@
 		<version dateOpen="2019-06-08 05:06:52" dateClose="2019-06-08 05:06:53">1.00134</version>
 		<version dateOpen="2019-06-08 06:06:22" dateClose="2019-06-10 06:06:03">1.00135</version>
 		<version dateOpen="2019-06-13 15:06:55" dateClose="2019-06-13 16:06:29">1.00136</version>
+		<version dateOpen="2019-06-14 16:06:57" dateClose="2019-06-17 05:06:50">1.00137</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
+		<field id="client_vehicle_owner_id"/>
 	</globalFilters>
 	<enums>
 		<enum id="locales">
@@ -960,6 +962,22 @@
 			<field id="owner_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования миксер"/>
 			<sql/>
 			<globalFilter id="vehicle_owner_id"/>
+		</model>
+		<model id="ShipmentForClientVehOwnerList" parent="ModelSQLBeton" dataTable="shipments_for_client_veh_owner_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="vehicles_ref" dataType="JSON" alias="Автомобиль"/>
+			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
+			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
+			<field id="driver_id" dataType="Int" sysCol="TRUE"/>
+			<field id="vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
+			<field id="vehicle_owners_ref" dataType="JSON" alias="Владелец"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
+			<sql/>
+			<globalFilter id="client_vehicle_owner_id" fieldId="client_id"/>
 		</model>
 		<model id="ShipmentDialog" parent="ModelSQLBeton" dataTable="shipments_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
@@ -2248,6 +2266,13 @@
 			<field id="clients_ref" dataType="JSON"/>
 			<field id="users_ref" dataType="JSON"/>
 		</model>
+		<model id="UserOperatorList" parent="ModelSQLBeton" dataTable="user_operator_list" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="name" dataType="String"/>
+			<field id="email" dataType="String"/>
+			<field id="phone_cel" dataType="String"/>
+			<field id="production_sites_ref" dataType="JSON"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -2553,6 +2578,7 @@
 			<publicMethod id="delete" modelId="Shipment"/>
 			<publicMethod id="get_list" modelId="ShipmentList"/>
 			<publicMethod id="get_list_for_veh_owner" modelId="ShipmentForVehOwnerList" condFields="TRUE"/>
+			<publicMethod id="get_list_for_client_veh_owner" modelId="ShipmentForClientVehOwnerList" condFields="TRUE"/>
 			<publicMethod id="get_list_for_order" modelId="ShipmentForOrderList" condFields="TRUE"/>
 			<publicMethod id="get_pump_list" modelId="ShipmentPumpList" condFields="TRUE"/>
 			<publicMethod id="get_pump_list_for_veh_owner" modelId="ShipmentPumpForVehOwnerList" condFields="TRUE"/>
@@ -2636,6 +2662,7 @@
 				<field id="email" dataType="String" required="TRUE" length="100"/>
 				<field id="captcha_key" dataType="String" required="TRUE" length="10"/>
 			</publicMethod>
+			<publicMethod id="get_user_operator_list" modelId="UserOperatorList" condFields="TRUE"/>
 		</controller>
 		<controller id="Constant" parentId="ControllerSQL">
 			<publicMethod id="set_value">
@@ -3192,6 +3219,7 @@
 		<permission type="allow" controllerId="User" methodId="update" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Captcha" methodId="get" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Shipment" methodId="get_list_for_veh_owner" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Shipment" methodId="get_list_for_client_veh_owner" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Shipment" methodId="get_pump_list_for_veh_owner" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Shipment" methodId="owner_set_agreed" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Shipment" methodId="owner_set_pump_agreed" roleId="vehicle_owner"/>
@@ -3244,6 +3272,7 @@
 		<view id="10025" c="ShipmentForOwnerCostHeader_Controller" t="ShipmentForOwnerCostHeaderList" f="get_list" section="Справочники" descr="Прайс доставки для собственников"/>
 		<view id="10026" c="ConcreteCostHeader_Controller" t="ConcreteCostHeaderList" f="get_list" section="Справочники" descr="Прайс бетон"/>
 		<view id="10027" c="VehicleOwner_Controller" t="VehicleOwnerList" f="get_list" section="Справочники" descr="Владельцы транспортных средств"/>
+		<view id="10028" c="User_Controller" t="UserOperatorList" f="get_user_operator_list" section="Справочники" descr="Список операторов"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -3255,6 +3284,7 @@
 		<view id="20008" c="Shipment_Controller" t="ShipmentPumpList" f="get_pump_list" section="Документы" descr="Отгрузки (насосы)"/>
 		<view id="20010" c="Shipment_Controller" t="ShipmentForVehOwnerList" f="get_list_for_veh_owner" section="Документы" descr="Отгрузки для владельцев ТС"/>
 		<view id="20011" c="Shipment_Controller" t="ShipmentPumpForVehOwnerList" f="get_pump_list_for_veh_owner" section="Документы" descr="Отгрузки (насосы) для владельцев ТС"/>
+		<view id="20012" c="Shipment_Controller" t="ShipmentForClientVehOwnerList" f="get_list_for_client_veh_owner" section="Документы" descr="Отгрузки по клиенту-владельцу ТС"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -3350,7 +3380,9 @@
 		<serverTemplate id="VehicleOwnerList"/>
 		<serverTemplate id="ShipmentCancelationList"/>
 		<serverTemplate id="ShipmentForVehOwnerList"/>
+		<serverTemplate id="ShipmentForClientVehOwnerList"/>
 		<serverTemplate id="ShipmentPumpForVehOwnerList"/>
+		<serverTemplate id="UserOperatorList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -3795,6 +3827,7 @@
 		<jsScript file="views/OrderList_View.js"/>
 		<jsScript file="views/ShipmentList_View.js"/>
 		<jsScript file="views/ShipmentForVehOwnerList_View.js"/>
+		<jsScript file="views/ShipmentForClientVehOwnerList_View.js"/>
 		<jsScript file="views/ShipmentTimeList_View.js"/>
 		<jsScript file="views/ShipmentDateList_View.js"/>
 		<jsScript file="views/AstCallList_View.js"/>
@@ -3865,6 +3898,7 @@
 		<jsScript file="views/ShipmentCancelationList.js"/>
 		<jsScript file="views/ShipmentPumpList_View.js"/>
 		<jsScript file="views/ShipmentPumpForVehOwnerList_View.js"/>
+		<jsScript file="views/UserOperatorList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -4183,6 +4217,8 @@
 		<jsScript file="models/ShipmentCancelationList_Model.js"/>
 		<jsScript file="models/ShipmentPumpForVehOwnerList_Model.js"/>
 		<jsScript file="models/ShipmentForVehOwnerList_Model.js"/>
+		<jsScript file="models/UserOperatorList_Model.js"/>
+		<jsScript file="models/ShipmentForClientVehOwnerList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

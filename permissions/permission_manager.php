@@ -246,6 +246,8 @@ $permissions = array();
 				
 					$permissions['Shipment_Controller_get_list_for_veh_owner']=TRUE;
 				
+					$permissions['Shipment_Controller_get_list_for_client_veh_owner']=TRUE;
+				
 					$permissions['Shipment_Controller_get_list_for_order']=TRUE;
 				
 					$permissions['Shipment_Controller_get_pump_list']=TRUE;
@@ -315,6 +317,8 @@ $permissions = array();
 					$permissions['User_Controller_get_profile']=TRUE;
 				
 					$permissions['User_Controller_password_recover']=TRUE;
+				
+					$permissions['User_Controller_get_user_operator_list']=TRUE;
 				
 					$permissions['Constant_Controller_set_value']=TRUE;
 				

@@ -1,6 +1,6 @@
 /** Copyright (c) 2019
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *	Andrey Mikhalevich, Katren ltd.
+ */
 function ClientList_View(id,options){	
 
 	ClientList_View.superclass.constructor.call(this,id,options);
