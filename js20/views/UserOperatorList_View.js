@@ -17,6 +17,7 @@ function UserOperatorList_View(id,options){
 		"model":model,
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_user_operator_list"),
+		"updatePublicMethod":contr.getPublicMethod("update_production_site"),
 		"editInline":true,
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{

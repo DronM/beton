@@ -654,6 +654,18 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 		parent::update($pm);
 	}
+
+	public function update_production_site($pm){
+		$this->getDbLinkMaster()->query(
+			sprintf(
+				"UPDATE users
+				SET production_site_id = %d
+				WHERE id=%d",
+				$this->getExtDbVal($pm,'production_site_id'),
+				$this->getExtDbVal($pm,'old_id')
+			)
+		);
+	}
 	
 	public function get_user_operator_list($pm){
 		$model = new UserOperatorList_Model($this->getDbLink());

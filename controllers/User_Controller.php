@@ -370,6 +370,24 @@ class User_Controller extends ControllerSQL{
 
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('update_production_site');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('old_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('production_site_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}
 		
@@ -1015,6 +1033,18 @@ class User_Controller extends ControllerSQL{
 			throw new Exception('Permission denied!');
 		}
 		parent::update($pm);
+	}
+
+	public function update_production_site($pm){
+		$this->getDbLinkMaster()->query(
+			sprintf(
+				"UPDATE users
+				SET production_site_id = %d
+				WHERE id=%d",
+				$this->getExtDbVal($pm,'production_site_id'),
+				$this->getExtDbVal($pm,'old_id')
+			)
+		);
 	}
 	
 	public function get_user_operator_list($pm){

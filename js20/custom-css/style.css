@@ -161,7 +161,7 @@ tr.grid_foot{
 	margin-right:3px;
 }
 
-.windowMessage{
+.windowMessageOverlap{
 	position:fixed;
 	top:0px;
 	left:80%;
@@ -173,7 +173,7 @@ tr.grid_foot{
 	height:100%;
 }
 
-.windowMessage:hover{
+.windowMessageOverlap:hover{
 	opacity:1;
 	filter: alpha(opacity=100);
 }

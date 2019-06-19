@@ -43,6 +43,7 @@ function User_Controller(options){
 	this.add_get_profile();
 	this.add_password_recover();
 	this.add_get_user_operator_list();
+	this.add_update_production_site();
 		
 }
 extend(User_Controller,ControllerObjServer);
@@ -491,6 +492,30 @@ extend(User_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
+	this.addPublicMethod(pm);
+}
+
+			User_Controller.prototype.add_update_production_site = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('update_production_site',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("old_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("production_site_id",options));
+	
+			
 	this.addPublicMethod(pm);
 }
 

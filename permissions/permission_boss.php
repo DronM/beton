@@ -320,6 +320,8 @@ $permissions = array();
 				
 					$permissions['User_Controller_get_user_operator_list']=TRUE;
 				
+					$permissions['User_Controller_update_production_site']=TRUE;
+				
 					$permissions['Constant_Controller_set_value']=TRUE;
 				
 					$permissions['Constant_Controller_get_list']=TRUE;
