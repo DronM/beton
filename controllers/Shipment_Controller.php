@@ -376,6 +376,12 @@ class Shipment_Controller extends ControllerSQL{
 			
 		$pm = new PublicMethod('get_assigned_vehicle_list');
 		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('production_site_id',$opts));
+	
+			
 		$this->addPublicMethod($pm);
 
 			
@@ -1176,15 +1182,19 @@ class Shipment_Controller extends ControllerSQL{
 		*/
 		$this->modelGetList(new ShipmentTimeList_Model($this->getDbLink()),$pm);
 	}
-	public static function getAssigningModel($dbLink){
+	public static function getAssigningModel($dbLink,$prodSiteId=0){
 		$model = new ModelSQL($dbLink,array('id'=>'AssignedVehicleList_Model'));
-		$model->query("SELECT * FROM assigned_vehicles_list",TRUE);
+		$cond = '';
+		if($prodSiteId){
+			$cond = sprintf(' WHERE production_site_id=%d',$prodSiteId);
+		}
+		$model->query("SELECT * FROM assigned_vehicles_list".$cond,TRUE);
 		return $model;	
 	
 	}
 	
 	public function get_assigned_vehicle_list($pm){
-		$this->addModel(self::getAssigningModel($this->getDbLink()));
+		$this->addModel(self::getAssigningModel($this->getDbLink()),$this->getExtDbVal($pm,'production_site_id'));
 	}
 	
 	public function delete_shipped($pm){

@@ -54,6 +54,14 @@ class VehicleOwner_Model extends ModelSQLBeton{
 		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
 		$this->addField($f_user_id);
 		//********************
+		
+		//*** Field concrete_costs_for_owner_h_id ***
+		$f_opts = array();
+		$f_opts['id']="concrete_costs_for_owner_h_id";
+						
+		$f_concrete_costs_for_owner_h_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_costs_for_owner_h_id",$f_opts);
+		$this->addField($f_concrete_costs_for_owner_h_id);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

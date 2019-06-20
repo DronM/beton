@@ -858,6 +858,26 @@ $permissions = array();
 				
 					$permissions['ConcreteCost_Controller_get_object']=TRUE;
 				
+					$permissions['ConcreteCostForOwnerHeader_Controller_insert']=TRUE;
+				
+					$permissions['ConcreteCostForOwnerHeader_Controller_update']=TRUE;
+				
+					$permissions['ConcreteCostForOwnerHeader_Controller_delete']=TRUE;
+				
+					$permissions['ConcreteCostForOwnerHeader_Controller_get_list']=TRUE;
+				
+					$permissions['ConcreteCostForOwnerHeader_Controller_get_object']=TRUE;
+				
+					$permissions['ConcreteCostForOwner_Controller_insert']=TRUE;
+				
+					$permissions['ConcreteCostForOwner_Controller_update']=TRUE;
+				
+					$permissions['ConcreteCostForOwner_Controller_delete']=TRUE;
+				
+					$permissions['ConcreteCostForOwner_Controller_get_list']=TRUE;
+				
+					$permissions['ConcreteCostForOwner_Controller_get_object']=TRUE;
+				
 					$permissions['VehicleOwner_Controller_insert']=TRUE;
 				
 					$permissions['VehicleOwner_Controller_update']=TRUE;

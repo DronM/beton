@@ -128,7 +128,7 @@ function OrderPumpList_View(id,options){
 								})
 							],
 							"sortable":true,
-							"sort":"desc"
+							"sort":"asc"
 						})
 					
 						,is_v_owner? null:new GridCellHead(id+":grid:head:number",{

@@ -49,7 +49,7 @@ CREATE OR REPLACE VIEW public.order_pumps_list_view AS
 	WHERE o.pump_vehicle_id IS NOT NULL
 		AND o.unload_type<>'none'
 		AND (coalesce(o.quant,0) - coalesce(ships.quant,0)) <> 0
-	ORDER BY o.date_time DESC;
+	ORDER BY o.date_time ASC;
 
 ALTER TABLE public.order_pumps_list_view
   OWNER TO beton;

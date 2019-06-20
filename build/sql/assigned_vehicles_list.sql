@@ -10,7 +10,9 @@ CREATE OR REPLACE VIEW assigned_vehicles_list AS
 		drivers_ref(dr) AS drivers_ref,
 		vehicles_ref(vh) AS vehicles_ref,
 		production_sites_ref(ps) AS production_sites_ref,
-		sh.quant
+		sh.quant,
+		sh.production_site_id AS production_site_id
+		
 	FROM shipments AS sh
 	LEFT JOIN orders o ON o.id=sh.order_id
 	LEFT JOIN destinations AS dest ON dest.id=o.destination_id

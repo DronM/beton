@@ -3816,3 +3816,253 @@ ALTER TABLE public.order_pumps_list_view
   OWNER TO beton;
 
 
+
+-- ******************* update 20/06/2019 05:39:22 ******************
+
+		CREATE TABLE concrete_costs_for_owner_h
+		(id serial NOT NULL,create_date date,comment_text text,CONSTRAINT concrete_costs_for_owner_h_pkey PRIMARY KEY (id)
+		);
+		ALTER TABLE concrete_costs_for_owner_h OWNER TO beton;
+		CREATE TABLE concrete_costs_for_owner
+		(id serial NOT NULL,header_id int NOT NULL REFERENCES concrete_costs_for_owner_h(id),concrete_type_id int REFERENCES concrete_types(id),price  numeric(15,2),CONSTRAINT concrete_costs_for_owner_pkey PRIMARY KEY (id)
+		);
+		ALTER TABLE concrete_costs_for_owner OWNER TO beton;
+		ALTER TABLE vehicle_owners ADD COLUMN concrete_costs_for_owner_h_id int REFERENCES concrete_costs_for_owner_h(id);
+
+
+
+-- ******************* update 20/06/2019 05:41:59 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10029',
+		'ConcreteCostForOwnerHeader_Controller',
+		'get_list',
+		'ConcreteCostForOwnerHeaderList',
+		'Справочники',
+		'Прайс бетон для владельцев',
+		FALSE
+		);
+	
+
+-- ******************* update 20/06/2019 05:56:34 ******************
+-- Function: public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h)
+
+-- DROP FUNCTION public.concrete_costs_for_owner_h(concrete_costs_for_owner_h);
+
+CREATE OR REPLACE FUNCTION public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',$1.comment_text||' ('||to_char($1.create_date,'DD/MM/YY')||')',
+		'dataType','concrete_costs_for_owner_h'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h) OWNER TO beton;
+
+
+
+-- ******************* update 20/06/2019 05:56:34 ******************
+-- Function: public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h)
+
+-- DROP FUNCTION public.concrete_costs_for_owner_h(concrete_costs_for_owner_h);
+
+CREATE OR REPLACE FUNCTION public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',$1.comment_text||' ('||to_char($1.create_date,'DD/MM/YY')||')',
+		'dataType','concrete_costs_for_owner_h'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h) OWNER TO beton;
+
+
+
+-- ******************* update 20/06/2019 05:56:40 ******************
+-- Function: public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h)
+
+-- DROP FUNCTION public.concrete_costs_for_owner_h(concrete_costs_for_owner_h);
+
+CREATE OR REPLACE FUNCTION public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',$1.comment_text||' ('||to_char($1.create_date,'DD/MM/YY')||')',
+		'dataType','concrete_costs_for_owner_h'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.concrete_costs_for_owner_h_ref(concrete_costs_for_owner_h) OWNER TO beton;
+
+
+
+-- ******************* update 20/06/2019 05:57:15 ******************
+-- Function: public.vehicles_ref(vehicles)
+
+-- DROP FUNCTION public.vehicles_ref(vehicles);
+
+CREATE OR REPLACE FUNCTION public.vehicles_ref(vehicles)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',$1.plate,
+		'dataType','vehicles'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.vehicles_ref(vehicles) OWNER TO beton;
+
+
+
+-- ******************* update 20/06/2019 06:13:28 ******************
+-- VIEW: concrete_costs_for_owner_list
+
+--DROP VIEW concrete_costs_for_owner_list;
+
+CREATE OR REPLACE VIEW concrete_costs_for_owner_list AS
+	SELECT
+		t.id,
+		t.header_id,
+		t.price,
+		t.concrete_type_id,
+		concrete_types_ref(ctp) AS concrete_types_ref
+	FROM concrete_costs_for_owner t
+	LEFT JOIN concrete_types AS ctp ON ctp.id=t.concrete_type_id
+	ORDER BY t.header_id,ctp.name
+	;
+	
+ALTER VIEW concrete_costs_for_owner_list OWNER TO beton;
+
+
+-- ******************* update 20/06/2019 06:14:47 ******************
+-- VIEW: vehicle_owners_list
+
+--DROP VIEW vehicle_owners_list;
+
+CREATE OR REPLACE VIEW vehicle_owners_list AS
+	SELECT
+		own.id,
+		own.name,
+		clients_ref(cl) AS clients_ref,
+		users_ref(u) AS users_ref,
+		concrete_costs_for_owner_h_ref(pr) AS concrete_costs_for_owner_h_ref
+		
+	FROM vehicle_owners AS own
+	LEFT JOIN clients AS cl ON cl.id=own.client_id
+	LEFT JOIN users AS u ON u.id=own.user_id
+	LEFT JOIN concrete_costs_for_owner_h AS pr ON pr.id=own.concrete_costs_for_owner_h_id
+	ORDER BY own.name
+	;
+	
+ALTER VIEW vehicle_owners_list OWNER TO beton;
+
+
+-- ******************* update 20/06/2019 06:59:43 ******************
+-- VIEW: assigned_vehicles_list
+
+--DROP VIEW assigned_vehicles_list;
+
+CREATE OR REPLACE VIEW assigned_vehicles_list AS
+	SELECT
+		sh.id,
+		sh.date_time,
+		destinations_ref(dest) AS destinations_ref,
+		drivers_ref(dr) AS drivers_ref,
+		vehicles_ref(vh) AS vehicles_ref,
+		production_sites_ref(ps) AS production_sites_ref,
+		sh.quant,
+		sh.production_site_id AS production_site_id
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id=sh.order_id
+	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_schedules AS vsc ON vsc.id=sh.vehicle_schedule_id
+	LEFT JOIN drivers AS dr ON dr.id=vsc.driver_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsc.vehicle_id
+	LEFT JOIN production_sites AS ps ON ps.id=sh.production_site_id
+	WHERE sh.ship_date_time IS NULL
+		AND sh.date_time BETWEEN get_shift_start(now()::timestamp) AND get_shift_end(get_shift_start(now()::timestamp))
+	ORDER BY ps.name,sh.date_time ASC
+	;
+	
+ALTER VIEW assigned_vehicles_list OWNER TO beton;
+
+
+-- ******************* update 20/06/2019 07:05:36 ******************
+-- View: public.order_pumps_list_view
+
+-- DROP VIEW public.order_pumps_list_view;
+
+CREATE OR REPLACE VIEW public.order_pumps_list_view AS 
+	SELECT
+		order_num(o.*) AS number,
+		clients_ref(cl) AS clients_ref,
+		o.client_id,
+		destinations_ref(d) AS destinations_ref,
+		o.destination_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,
+		o.unload_type,
+		o.comment_text AS comment_text,
+		o.descr AS descr,		
+		o.date_time,
+		o.quant,
+		o.id AS order_id,
+		op.viewed,
+		op.comment,
+		users_ref(u) AS users_ref,
+		o.user_id,
+		o.phone_cel,
+		
+		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
+		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		pvh.vehicle_id AS pump_vehicle_id,
+		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id
+		
+		
+	FROM orders o
+	LEFT JOIN order_pumps op ON o.id = op.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	LEFT JOIN (
+		SELECT
+			t.order_id,
+			sum(t.quant) AS quant
+		FROM shipments t
+		GROUP BY t.order_id
+	) AS ships ON ships.order_id = o.id
+	
+	WHERE o.pump_vehicle_id IS NOT NULL
+		AND o.unload_type<>'none'
+		AND (coalesce(o.quant,0) - coalesce(ships.quant,0)) <> 0
+	ORDER BY o.date_time ASC;
+
+ALTER TABLE public.order_pumps_list_view
+  OWNER TO beton;
+
+

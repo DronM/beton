@@ -13,8 +13,8 @@ function ShipmentForClientVehOwnerList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 
-	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
-		"field":new FieldDateTime("ship_date_time")
+	var period_ctrl = new EditPeriodDate(id+":filter-ctrl-period",{
+		"field":new FieldDateTime("ship_date")
 	});
 
 	var filters = {
@@ -100,22 +100,36 @@ function ShipmentForClientVehOwnerList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:ship_date_time",{
+						new GridCellHead(id+":grid:head:ship_date",{
 							"value":"Дата",
 							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDate({
-									"field":model.getField("ship_date_time"),
-									"dateFormat":"d/m/y H:i",
+									"field":model.getField("ship_date"),
+									"dateFormat":"d/m/y",
 									"ctrlClass":EditDate,
 									"searchOptions":{
-										"field":new FieldDate("ship_date_time"),
-										"searchType":"on_beg"
+										"field":new FieldDate("ship_date")
 									}																		
 								})
 							],
 							"sortable":true,
 							"sort":"desc"
+						})
+						,new GridCellHead(id+":grid:head:destinations_ref",{
+							"value":"Объект",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("destinations_ref"),
+									"ctrlClass":EditString,
+									"searchOptions":{
+										"field":new FieldString("destinations_ref->descr"),
+										"searchType":"on_part",
+										"typeChange":true
+									},
+									"form":null
+								})
+							]
 						})
 					
 						,new GridCellHead(id+":grid:head:concrete_types_ref",{
@@ -143,6 +157,25 @@ function ShipmentForClientVehOwnerList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:cost_shipment",{
+							"value":"Стоимость доставки",
+							"colAttrs":{"align":"right"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("cost_shipment")
+								})
+							]
+						})
+						,new GridCellHead(id+":grid:head:cost_concrete",{
+							"value":"Стоимость бетона",
+							"colAttrs":{"align":"right"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("cost_concrete")
+								})
+							]
+						})
+						
 						,new GridCellHead(id+":grid:head:vehicles_ref",{
 							"value":"ТС",
 							"colAttrs":{"align":"center"},
@@ -186,7 +219,7 @@ function ShipmentForClientVehOwnerList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":"2"
+							"colSpan":"3"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
@@ -194,6 +227,19 @@ function ShipmentForClientVehOwnerList_View(id,options){
 							"calcFieldId":"quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
+						,new GridCellFoot(id+":grid:foot:tot_cost_shipment",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"cost_shipment",
+							"gridColumn":new GridColumnFloat({"id":"tot_cost_shipment"})
+						})
+						,new GridCellFoot(id+":grid:foot:tot_cost_concrete",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"cost_concrete",
+							"gridColumn":new GridColumnFloat({"id":"tot_cost_concrete"})
+						})
+						
 						,new GridCell(id+":grid:foot:total_sp2",{
 							"colSpan":"2"
 						})																	

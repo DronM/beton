@@ -38,7 +38,25 @@ function ShipmentForClientVehOwnerList_Model(options){
 	filed_options.alias = 'Дата отгрузки';
 	filed_options.autoInc = false;	
 	
-	options.fields.ship_date_time = new FieldDateTime("ship_date_time",filed_options);
+	options.fields.ship_date = new FieldDate("ship_date",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Объект';
+	filed_options.autoInc = false;	
+	
+	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.destination_id = new FieldInt("destination_id",filed_options);
 	
 				
 	
@@ -129,6 +147,24 @@ function ShipmentForClientVehOwnerList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.client_id = new FieldInt("client_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость доставки';
+	filed_options.autoInc = false;	
+	
+	options.fields.cost_shipment = new FieldFloat("cost_shipment",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость бетон';
+	filed_options.autoInc = false;	
+	
+	options.fields.cost_concrete = new FieldFloat("cost_concrete",filed_options);
 	
 			
 			

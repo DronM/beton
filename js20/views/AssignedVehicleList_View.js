@@ -15,16 +15,15 @@ function AssignedVehicleList_View(id,options){
 	options = options || {};	
 	
 	options.templateOptions = {
-		"fullScreenl":(window.location.href.indexOf("v=Child")>=0)
+		"notFullScreen":(window.location.href.indexOf("v=Child")<0)
 	};
 	
 	var refresh_interval = null;
 	if (options.noAutoRefresh!==true){
-		var constants = {"grid_refresh_interval":null};
+		var constants = {"order_grid_refresh_interval":null};
 		window.getApp().getConstantManager().get(constants);	
-		refresh_interval = constants.grid_refresh_interval.getValue();
+		refresh_interval = constants.order_grid_refresh_interval.getValue() * 1000;
 	}
-	
 	var app = window.getApp();
 	if(!app.m_prodSite_Model){
 		(new ProductionSite_Controller()).getPublicMethod("get_list").run({

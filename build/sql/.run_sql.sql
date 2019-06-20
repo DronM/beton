@@ -1,23 +1,28 @@
--- VIEW: shipments_for_veh_client_owner_list
+-- VIEW: assigned_vehicles_list
 
---DROP VIEW shipments_for_client_veh_owner_list;
+--DROP VIEW assigned_vehicles_list;
 
-CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
+CREATE OR REPLACE VIEW assigned_vehicles_list AS
 	SELECT
 		sh.id,
-		sh.ship_date_time,
-		sh.concrete_type_id,
-		sh.concrete_types_ref,
+		sh.date_time,
+		destinations_ref(dest) AS destinations_ref,
+		drivers_ref(dr) AS drivers_ref,
+		vehicles_ref(vh) AS vehicles_ref,
+		production_sites_ref(ps) AS production_sites_ref,
 		sh.quant,
-		sh.vehicle_id,
-		sh.vehicles_ref,
-		sh.driver_id,
-		sh.drivers_ref,
-		sh.vehicle_owner_id,
-		sh.vehicle_owners_ref,
-		sh.client_id
+		sh.production_site_id AS production_site_id
 		
-	FROM shipments_list sh
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id=sh.order_id
+	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_schedules AS vsc ON vsc.id=sh.vehicle_schedule_id
+	LEFT JOIN drivers AS dr ON dr.id=vsc.driver_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsc.vehicle_id
+	LEFT JOIN production_sites AS ps ON ps.id=sh.production_site_id
+	WHERE sh.ship_date_time IS NULL
+		AND sh.date_time BETWEEN get_shift_start(now()::timestamp) AND get_shift_end(get_shift_start(now()::timestamp))
+	ORDER BY ps.name,sh.date_time ASC
 	;
 	
-ALTER VIEW shipments_for_client_veh_owner_list OWNER TO beton;
+ALTER VIEW assigned_vehicles_list OWNER TO beton;

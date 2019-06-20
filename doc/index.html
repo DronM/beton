@@ -22,6 +22,8 @@
 <li><a href="#ClientType_Controller">ClientType_Controller</a></li>
 <li><a href="#ClientValidDuplicate_Controller">ClientValidDuplicate_Controller</a></li>
 <li><a href="#ConcreteCost_Controller">ConcreteCost_Controller</a></li>
+<li><a href="#ConcreteCostForOwner_Controller">ConcreteCostForOwner_Controller</a></li>
+<li><a href="#ConcreteCostForOwnerHeader_Controller">ConcreteCostForOwnerHeader_Controller</a></li>
 <li><a href="#ConcreteCostHeader_Controller">ConcreteCostHeader_Controller</a></li>
 <li><a href="#ConcreteType_Controller">ConcreteType_Controller</a></li>
 <li><a href="#Constant_Controller">Constant_Controller</a></li>
@@ -246,6 +248,9 @@
 <li><a href="#ConcreteCostHeader_Model">ConcreteCostHeader_Model</a></li>
 <li><a href="#ConcreteCost_Model">ConcreteCost_Model</a></li>
 <li><a href="#ConcreteCostList_Model">ConcreteCostList_Model</a></li>
+<li><a href="#ConcreteCostForOwnerHeader_Model">ConcreteCostForOwnerHeader_Model</a></li>
+<li><a href="#ConcreteCostForOwner_Model">ConcreteCostForOwner_Model</a></li>
+<li><a href="#ConcreteCostForOwnerList_Model">ConcreteCostForOwnerList_Model</a></li>
 <li><a href="#VehicleOwner_Model">VehicleOwner_Model</a></li>
 <li><a href="#VehicleOwnerList_Model">VehicleOwnerList_Model</a></li>
 <li><a href="#UserOperatorList_Model">UserOperatorList_Model</a></li>
@@ -667,6 +672,32 @@
 <a href="#ConcreteCost_Model">Model: ConcreteCost_Model</a><h2>get_list</h2>
 <a href="#ConcreteCostList_Model">Model: ConcreteCostList_Model</a><h2>get_object</h2>
 <a href="#ConcreteCostList_Model">Model: ConcreteCostList_Model</a>
+</div>
+</div>
+<div id="ConcreteCostForOwner_Controller" class="content_box">
+<h1>ConcreteCostForOwner_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ConcreteCostForOwner_Model">Model: ConcreteCostForOwner_Model</a><h2>update</h2>
+<a href="#ConcreteCostForOwner_Model">Model: ConcreteCostForOwner_Model</a><h2>delete</h2>
+<a href="#ConcreteCostForOwner_Model">Model: ConcreteCostForOwner_Model</a><h2>get_list</h2>
+<a href="#ConcreteCostForOwnerList_Model">Model: ConcreteCostForOwnerList_Model</a><h2>get_object</h2>
+<a href="#ConcreteCostForOwnerList_Model">Model: ConcreteCostForOwnerList_Model</a>
+</div>
+</div>
+<div id="ConcreteCostForOwnerHeader_Controller" class="content_box">
+<h1>ConcreteCostForOwnerHeader_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ConcreteCostForOwnerHeader_Model">Model: ConcreteCostForOwnerHeader_Model</a><h2>update</h2>
+<a href="#ConcreteCostForOwnerHeader_Model">Model: ConcreteCostForOwnerHeader_Model</a><h2>delete</h2>
+<a href="#ConcreteCostForOwnerHeader_Model">Model: ConcreteCostForOwnerHeader_Model</a><h2>get_list</h2>
+<a href="#ConcreteCostForOwnerHeader_Model">Model: ConcreteCostForOwnerHeader_Model</a><h2>get_object</h2>
+<a href="#ConcreteCostForOwnerHeader_Model">Model: ConcreteCostForOwnerHeader_Model</a>
 </div>
 </div>
 <div id="ConcreteCostHeader_Controller" class="content_box">
@@ -3485,6 +3516,90 @@
 <div>Precision:</div>
 <h2>concrete_type_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="ConcreteCostForOwner_Model" class="content_box">
+<h1>ConcreteCostForOwner_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>header_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="ConcreteCostForOwnerHeader_Model" class="content_box">
+<h1>ConcreteCostForOwnerHeader_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>create_date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ConcreteCostForOwnerList_Model" class="content_box">
+<h1>ConcreteCostForOwnerList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>header_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -8475,8 +8590,20 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>ship_date_time</h2>
-<div>Type:DateTime</div>
+<h2>ship_date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destination_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -8537,6 +8664,18 @@
 <div>Precision:</div>
 <h2>client_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cost_shipment</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cost_concrete</h2>
+<div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -10761,6 +10900,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>concrete_costs_for_owner_h_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleOwnerList_Model" class="content_box">
@@ -10780,6 +10925,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_costs_for_owner_h_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>

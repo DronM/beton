@@ -1261,6 +1261,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForOwnerCostList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostHeaderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostForOwnerHeaderList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostForOwnerList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentCancelationList.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentPumpList_View.js'));
@@ -1357,6 +1359,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EmployeeWorkTimeScheduleGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/QuarryEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OrderEdit.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ConcreteCostForOwnerHeadEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1586,6 +1589,11 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForVehOwnerList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/UserOperatorList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForClientVehOwnerList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ConcreteCostForOwnerHeader_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ConcreteCostForOwner_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostForOwnerHeader_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostForOwner_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostForOwnerList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

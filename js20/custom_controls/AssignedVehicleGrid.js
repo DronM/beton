@@ -15,13 +15,18 @@ function AssignedVehicleGrid(id,options){
 	options = options || {};	
 	
 	options.className = OrderMakeList_View.prototype.TABLE_CLASS+" "+window.getApp().getBsCol(12);
-	
-	if(!options.refreshInterval)
+
+	if(!options.refreshInterval){
 		options.contClassName = window.getApp().getBsCol(5);
+	}
+	else{
+		options.readPublicMethod = (new Shipment_Controller()).getPublicMethod("get_assigned_vehicle_list");
+		options.readPublicMethod.setFieldValue("production_site_id",options.prodSiteId);		
+	}
 	
 	this.m_shortDescriptions = options.shortDescriptions;
 	var self = this;	
-	options.keyIds = ["id"];
+	options.keyIds = ["id"];	
 	options.editInline = false;
 	options.editWinClass = null;
 	options.commands = null;
@@ -108,7 +113,7 @@ function AssignedVehicleGrid(id,options){
 	AssignedVehicleGrid.superclass.constructor.call(this,id,options);
 }
 
-extend(AssignedVehicleGrid,Grid);
+extend(AssignedVehicleGrid,GridAjx);
 
 /* Constants */
 

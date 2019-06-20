@@ -9,7 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
@@ -33,14 +33,33 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$this->addField($f_id);
 		//********************
 		
-		//*** Field ship_date_time ***
+		//*** Field ship_date ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Дата отгрузки';
-		$f_opts['id']="ship_date_time";
+		$f_opts['id']="ship_date";
 						
-		$f_ship_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
-		$this->addField($f_ship_date_time);
+		$f_ship_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date",$f_opts);
+		$this->addField($f_ship_date);
+		//********************
+		
+		//*** Field destinations_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Объект';
+		$f_opts['id']="destinations_ref";
+						
+		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
+		$this->addField($f_destinations_ref);
+		//********************
+		
+		//*** Field destination_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="destination_id";
+						
+		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
+		$this->addField($f_destination_id);
 		//********************
 		
 		//*** Field concrete_types_ref ***
@@ -136,6 +155,26 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
+		//********************
+		
+		//*** Field cost_shipment ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость доставки';
+		$f_opts['id']="cost_shipment";
+						
+		$f_cost_shipment=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_shipment",$f_opts);
+		$this->addField($f_cost_shipment);
+		//********************
+		
+		//*** Field cost_concrete ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость бетон';
+		$f_opts['id']="cost_concrete";
+						
+		$f_cost_concrete=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_concrete",$f_opts);
+		$this->addField($f_cost_concrete);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

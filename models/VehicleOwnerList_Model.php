@@ -45,6 +45,14 @@ class VehicleOwnerList_Model extends ModelSQLBeton{
 		$this->addField($f_clients_ref);
 		//********************
 		
+		//*** Field concrete_costs_for_owner_h_ref ***
+		$f_opts = array();
+		$f_opts['id']="concrete_costs_for_owner_h_ref";
+						
+		$f_concrete_costs_for_owner_h_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_costs_for_owner_h_ref",$f_opts);
+		$this->addField($f_concrete_costs_for_owner_h_ref);
+		//********************
+		
 		//*** Field users_ref ***
 		$f_opts = array();
 		$f_opts['id']="users_ref";

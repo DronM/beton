@@ -557,6 +557,13 @@ extend(Shipment_Controller,ControllerObjServer);
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_assigned_vehicle_list',opts);
 	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("production_site_id",options));
+	
+			
 	this.addPublicMethod(pm);
 }
 
