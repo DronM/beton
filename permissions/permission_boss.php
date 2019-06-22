@@ -890,6 +890,26 @@ $permissions = array();
 				
 					$permissions['VehicleOwner_Controller_complete']=TRUE;
 				
+					$permissions['VehicleOwnerClient_Controller_insert']=TRUE;
+				
+					$permissions['VehicleOwnerClient_Controller_update']=TRUE;
+				
+					$permissions['VehicleOwnerClient_Controller_delete']=TRUE;
+				
+					$permissions['VehicleOwnerClient_Controller_get_list']=TRUE;
+				
+					$permissions['VehicleOwnerClient_Controller_get_object']=TRUE;
+				
+					$permissions['VehicleOwnerConcretePrice_Controller_insert']=TRUE;
+				
+					$permissions['VehicleOwnerConcretePrice_Controller_update']=TRUE;
+				
+					$permissions['VehicleOwnerConcretePrice_Controller_delete']=TRUE;
+				
+					$permissions['VehicleOwnerConcretePrice_Controller_get_list']=TRUE;
+				
+					$permissions['VehicleOwnerConcretePrice_Controller_get_object']=TRUE;
+				
 					$permissions['ShipmentCancelation_Controller_insert']=TRUE;
 				
 					$permissions['ShipmentCancelation_Controller_update']=TRUE;

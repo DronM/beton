@@ -52,25 +52,7 @@ function VehicleOwner_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.client_id = new FieldInt("client_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
 	options.fields.user_id = new FieldInt("user_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.concrete_costs_for_owner_h_id = new FieldInt("concrete_costs_for_owner_h_id",filed_options);
 	
 			
 		VehicleOwner_Model.superclass.constructor.call(this,id,options);

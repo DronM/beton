@@ -83,6 +83,8 @@
 <li><a href="#Vehicle_Controller">Vehicle_Controller</a></li>
 <li><a href="#VehicleDriverForSchedGen_Controller">VehicleDriverForSchedGen_Controller</a></li>
 <li><a href="#VehicleOwner_Controller">VehicleOwner_Controller</a></li>
+<li><a href="#VehicleOwnerClient_Controller">VehicleOwnerClient_Controller</a></li>
+<li><a href="#VehicleOwnerConcretePrice_Controller">VehicleOwnerConcretePrice_Controller</a></li>
 <li><a href="#VehicleSchedule_Controller">VehicleSchedule_Controller</a></li>
 <li><a href="#View_Controller">View_Controller</a></li>
 <li><a href="#Weather_Controller">Weather_Controller</a></li>
@@ -253,6 +255,10 @@
 <li><a href="#ConcreteCostForOwnerList_Model">ConcreteCostForOwnerList_Model</a></li>
 <li><a href="#VehicleOwner_Model">VehicleOwner_Model</a></li>
 <li><a href="#VehicleOwnerList_Model">VehicleOwnerList_Model</a></li>
+<li><a href="#VehicleOwnerClient_Model">VehicleOwnerClient_Model</a></li>
+<li><a href="#VehicleOwnerClientList_Model">VehicleOwnerClientList_Model</a></li>
+<li><a href="#VehicleOwnerConcretePrice_Model">VehicleOwnerConcretePrice_Model</a></li>
+<li><a href="#VehicleOwnerConcretePriceList_Model">VehicleOwnerConcretePriceList_Model</a></li>
 <li><a href="#UserOperatorList_Model">UserOperatorList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
@@ -2382,6 +2388,32 @@
 <a href="#VehicleOwnerList_Model">Model: VehicleOwnerList_Model</a><h2>get_object</h2>
 <a href="#VehicleOwnerList_Model">Model: VehicleOwnerList_Model</a><h2>complete</h2>
 <a href="#VehicleOwner_Model">Model: VehicleOwner_Model</a>
+</div>
+</div>
+<div id="VehicleOwnerClient_Controller" class="content_box">
+<h1>VehicleOwnerClient_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#VehicleOwnerClient_Model">Model: VehicleOwnerClient_Model</a><h2>update</h2>
+<a href="#VehicleOwnerClient_Model">Model: VehicleOwnerClient_Model</a><h2>delete</h2>
+<a href="#VehicleOwnerClient_Model">Model: VehicleOwnerClient_Model</a><h2>get_list</h2>
+<a href="#VehicleOwnerClientList_Model">Model: VehicleOwnerClientList_Model</a><h2>get_object</h2>
+<a href="#VehicleOwnerClientList_Model">Model: VehicleOwnerClientList_Model</a>
+</div>
+</div>
+<div id="VehicleOwnerConcretePrice_Controller" class="content_box">
+<h1>VehicleOwnerConcretePrice_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#VehicleOwnerConcretePrice_Model">Model: VehicleOwnerConcretePrice_Model</a><h2>update</h2>
+<a href="#VehicleOwnerConcretePrice_Model">Model: VehicleOwnerConcretePrice_Model</a><h2>delete</h2>
+<a href="#VehicleOwnerConcretePrice_Model">Model: VehicleOwnerConcretePrice_Model</a><h2>get_list</h2>
+<a href="#VehicleOwnerConcretePriceList_Model">Model: VehicleOwnerConcretePriceList_Model</a><h2>get_object</h2>
+<a href="#VehicleOwnerConcretePriceList_Model">Model: VehicleOwnerConcretePriceList_Model</a>
 </div>
 </div>
 <div id="VehicleSchedule_Controller" class="content_box">
@@ -8626,42 +8658,6 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>vehicles_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>vehicle_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>drivers_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>driver_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>vehicle_owner_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>vehicle_owners_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
 <h2>client_id</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
@@ -8675,6 +8671,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>cost_concrete</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cost_other_owner_pump</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -10888,20 +10890,110 @@
 <div>Required:TRUE</div>
 <div>Length:150</div>
 <div>Precision:</div>
-<h2>client_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
 <h2>user_id</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+</div>
+</div>
+<div id="VehicleOwnerClient_Model" class="content_box">
+<h1>VehicleOwnerClient_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>vehicle_owner_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="VehicleOwnerClientList_Model" class="content_box">
+<h1>VehicleOwnerClientList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>vehicle_owner_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_owners_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="VehicleOwnerConcretePrice_Model" class="content_box">
+<h1>VehicleOwnerConcretePrice_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>vehicle_owner_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>concrete_costs_for_owner_h_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="VehicleOwnerConcretePriceList_Model" class="content_box">
+<h1>VehicleOwnerConcretePriceList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>vehicle_owner_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date</h2>
+<div>Type:Date</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_owners_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_costs_for_owner_h_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -10924,19 +11016,19 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>clients_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>concrete_costs_for_owner_h_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
 <h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_list</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>last_concrete_costs_for_owner_h_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>

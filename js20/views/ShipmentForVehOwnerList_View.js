@@ -10,13 +10,30 @@ function ShipmentForVehOwnerList_View(id,options){
 	var model = options.models.ShipmentForVehOwnerList_Model;
 	var contr = new Shipment_Controller();
 
-	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
+	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null,"vehicle_owner_accord_from_day":null,"vehicle_owner_accord_to_day":null};
 	window.getApp().getConstantManager().get(constants);
 
 	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"field":new FieldDateTime("ship_date_time")
 	});
 
+	//расчет даты от/до согласования
+	var d = DateHelper.time();
+	var acc_start = new Date(d.getFullYear(),d.getMonth()+1,constants.vehicle_owner_accord_from_day.getValue());
+	var acc_start_time = acc_start.getTime();
+	var acc_start_descr = DateHelper.format(acc_start,"d/m/y");
+	/*
+	var acc_end = new Date(d.getFullYear(),d.getMonth()+1,constants.vehicle_owner_accord_to_day.getValue());
+	var acc_end_time = acc_end.getTime();
+	var acc_end_descr = DateHelper.format(acc_end,"d/m/y");	
+	var acc_year = d.getFullYear();
+	var acc_month = d.getMonth()-1;
+	if(acc_month<0){
+		acc_month = 11;
+		acc_year-= 1;
+	}
+	*/
+	
 	var filters = {
 		"period":{
 			"binding":new CommandBinding({
@@ -262,6 +279,9 @@ function ShipmentForVehOwnerList_View(id,options){
 											var m = self.getElement("grid").getModel();
 											if(m.getFieldValue("owner_agreed")){
 												res.value = DateHelper.format(m.getFieldValue("owner_agreed_date_time"),"d/m/y");
+											}
+											else if(m.getFieldValue("ship_date_time").getTime()<acc_start_time) {
+												res.value = "Разрешено с "+acc_start_descr;
 											}
 											else{
 												var ctrl = new ButtonCmd(null,{

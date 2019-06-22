@@ -89,60 +89,6 @@ function ShipmentForClientVehOwnerList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Автомобиль';
-	filed_options.autoInc = false;	
-	
-	options.fields.vehicles_ref = new FieldJSON("vehicles_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.vehicle_id = new FieldInt("vehicle_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Водитель';
-	filed_options.autoInc = false;	
-	
-	options.fields.drivers_ref = new FieldJSON("drivers_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.driver_id = new FieldInt("driver_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Владелец';
-	filed_options.autoInc = false;	
-	
-	options.fields.vehicle_owners_ref = new FieldJSON("vehicle_owners_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
@@ -165,6 +111,15 @@ function ShipmentForClientVehOwnerList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.cost_concrete = new FieldFloat("cost_concrete",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость чужего насоса';
+	filed_options.autoInc = false;	
+	
+	options.fields.cost_other_owner_pump = new FieldFloat("cost_other_owner_pump",filed_options);
 	
 			
 			

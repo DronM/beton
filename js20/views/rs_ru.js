@@ -104,3 +104,7 @@ ShipmentPumpList_View.prototype.HEAD_TITLE = "Отгрузки (насосы)";
 ShipmentPumpForVehOwnerList_View.prototype.HEAD_TITLE = "Отгрузки (насосы)";
 
 UserOperatorList_View.prototype.HEAD_TITLE = "Список операторов";
+
+VehicleOwnerConcretePriceList_View.prototype.HEAD_TITLE = "История прайсов по бетону для владельцев";
+
+VehicleOwnerClientList_View.prototype.HEAD_TITLE = "Клинеты владельцев ТС";

@@ -6,6 +6,7 @@ CREATE OR REPLACE FUNCTION shipments_cost(in_destinations destinations, in_concr
   RETURNS numeric(15,2) AS
 $$
 	SELECT
+		coalesce(
 		(CASE
 			WHEN in_editable AND coalesce(in_shipments.ship_cost_edit,FALSE) THEN in_shipments.ship_cost
 			WHEN in_destinations.id=const_self_ship_dest_id_val() THEN 0
@@ -30,6 +31,7 @@ $$
 					ELSE 7
 				END
 		END)::numeric(15,2)
+		,0)
 	;
 $$
   LANGUAGE sql VOLATILE --IMMUTABLE VOLATILE

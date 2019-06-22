@@ -60,6 +60,7 @@ function ConcreteCostForOwner_Model(options){
 	options.fields.price = new FieldFloat("price",filed_options);
 	options.fields.price.getValidator().setMaxLength('15');
 	
+			
 		ConcreteCostForOwner_Model.superclass.constructor.call(this,id,options);
 }
 extend(ConcreteCostForOwner_Model,ModelXML);

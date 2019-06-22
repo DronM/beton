@@ -91,63 +91,6 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$this->addField($f_quant);
 		//********************
 		
-		//*** Field vehicles_ref ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Автомобиль';
-		$f_opts['id']="vehicles_ref";
-						
-		$f_vehicles_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicles_ref",$f_opts);
-		$this->addField($f_vehicles_ref);
-		//********************
-		
-		//*** Field vehicle_id ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="vehicle_id";
-						
-		$f_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);
-		$this->addField($f_vehicle_id);
-		//********************
-		
-		//*** Field drivers_ref ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Водитель';
-		$f_opts['id']="drivers_ref";
-						
-		$f_drivers_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"drivers_ref",$f_opts);
-		$this->addField($f_drivers_ref);
-		//********************
-		
-		//*** Field driver_id ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="driver_id";
-						
-		$f_driver_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_id",$f_opts);
-		$this->addField($f_driver_id);
-		//********************
-		
-		//*** Field vehicle_owner_id ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="vehicle_owner_id";
-						
-		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
-		$this->addField($f_vehicle_owner_id);
-		//********************
-		
-		//*** Field vehicle_owners_ref ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Владелец';
-		$f_opts['id']="vehicle_owners_ref";
-						
-		$f_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
-		$this->addField($f_vehicle_owners_ref);
-		//********************
-		
 		//*** Field client_id ***
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;
@@ -175,6 +118,16 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 						
 		$f_cost_concrete=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_concrete",$f_opts);
 		$this->addField($f_cost_concrete);
+		//********************
+		
+		//*** Field cost_other_owner_pump ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость чужего насоса';
+		$f_opts['id']="cost_other_owner_pump";
+						
+		$f_cost_other_owner_pump=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_other_owner_pump",$f_opts);
+		$this->addField($f_cost_other_owner_pump);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

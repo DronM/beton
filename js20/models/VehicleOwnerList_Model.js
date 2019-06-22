@@ -47,25 +47,25 @@ function VehicleOwnerList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.concrete_costs_for_owner_h_ref = new FieldJSON("concrete_costs_for_owner_h_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_list = new FieldText("client_list",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.last_concrete_costs_for_owner_h_ref = new FieldJSON("last_concrete_costs_for_owner_h_ref",filed_options);
 	
 		VehicleOwnerList_Model.superclass.constructor.call(this,id,options);
 }

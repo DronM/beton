@@ -460,10 +460,24 @@ class User_Controller extends ControllerSQL{
 		
 		//global filters				
 		if ($ar['role_id']=='vehicle_owner'){
-			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id,client_id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
+			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
 			if(is_array($ar_veh_owner) && count($ar_veh_owner)){
 				$_SESSION['global_vehicle_owner_id'] = $ar_veh_owner['id'];
-				$_SESSION['global_client_vehicle_owner_id'] = $ar_veh_owner['client_id'];
+				$ar_clients = $this->getDbLink()->query_first(
+					sprintf(
+						"SELECT
+							string_agg(client_id::text,',') AS client_list
+						FROM vehicle_owner_clients
+						WHERE vehicle_owner_id = (SELECT id FROM vehicle_owners WHERE user_id=%d)",
+						$ar['id']
+					)
+				);
+				if(is_array($ar_clients) && count($ar_clients) && isset($ar_clients['client_list'])){
+					$_SESSION['global_vehicle_owner_client_list'] = $ar_clients['client_list'];
+				}
+				else{
+					$_SESSION['global_vehicle_owner_client_list'] = '0';
+				}
 			}
 			else{
 				$_SESSION['global_vehicle_owner_id'] = 0;
@@ -531,15 +545,22 @@ class User_Controller extends ControllerSQL{
 			$field->setValue($_SESSION['global_vehicle_owner_id']);
 			$filter->addField($field,'=');
 			GlobalFilter::set('ShipmentPumpForVehOwnerList_Model',$filter);
-						
-			$model = new ShipmentForClientVehOwnerList_Model($this->getDbLink());
+			
+			
+			$cl_ar = explode(',',$_SESSION['global_vehicle_owner_client_list']);
+			$cl_single = (count($cl_ar)==1);			
+			
+			//ALWAYS fieldId
 			$filter = new ModelWhereSQL();
-			$field = clone $model->getFieldById('client_id');
-			$field->setValue($_SESSION['global_client_vehicle_owner_id']);
-			$filter->addField($field,'=');
+			if($cl_single){
+				$expr = sprintf('client_id = %d',$_SESSION['global_vehicle_owner_client_list']);
+			}
+			else{
+				$expr = sprintf('client_id IN (%s)',$_SESSION['global_vehicle_owner_client_list']);
+			}
+			$filter->addExpression('vehicle_owner_client_list',$expr,'=');
 			GlobalFilter::set('ShipmentForClientVehOwnerList_Model',$filter);
-			
-			
+						
 		}
 		
 		$log_ar = $this->getDbLinkMaster()->query_first(

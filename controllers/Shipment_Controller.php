@@ -1272,14 +1272,24 @@ class Shipment_Controller extends ControllerSQL{
 	private function update_owner_agreed_field($shipmentId,$isPump){
 	
 		if($_SESSION['role_id']=='vehicle_owner'){
+			//а можно ли 			
+			
 			//check
 			if($isPump){
-				$q = "SELECT sh.pump_vehicle_owner_id AS vehicle_owner_id
+				$q = "SELECT
+						sh.pump_vehicle_owner_id AS vehicle_owner_id,
+						(
+							SELECT (now()::date BETWEEN d_from AND d_to) FROM shipment_accord_allowed(sh.date_time::date)	
+						) AS acc_allowed
 					FROM shipments_pump_list AS sh
 					WHERE sh.last_ship_id=%d";			
 			}
 			else{
-				$q = "SELECT v.vehicle_owner_id
+				$q = "SELECT
+						v.vehicle_owner_id,
+						(
+							SELECT (now()::date BETWEEN d_from AND d_to) FROM shipment_accord_allowed(sh.ship_date_time::date)
+						) AS acc_allowed
 					FROM shipments AS sh
 					LEFT JOIN vehicle_schedules AS sch ON sch.id=sh.vehicle_schedule_id
 					LEFT JOIN vehicles AS v ON v.id=sch.vehicle_id
@@ -1288,11 +1298,13 @@ class Shipment_Controller extends ControllerSQL{
 			$ar = $this->getDbLinkMaster()->query_first(
 				sprintf($q,$shipmentId)
 			);
-			if(!is_array($ar) || !count($ar) || $ar['vehicle_owner_id']!=$_SESSION['global_vehicle_owner_id']){
+			if(!is_array($ar) || !count($ar) || $ar['vehicle_owner_id']!=$_SESSION['global_vehicle_owner_id']
+			||$ar['acc_allowed']!='t'
+			){
 				throw new Exception('Permission denied!');
 			}
 		}
-		else if($_SESSION['role_id']=='owner'){
+		else if($_SESSION['role_id']!='owner'){
 			throw new Exception('Permission denied!');
 		}
 		

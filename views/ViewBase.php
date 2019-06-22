@@ -1264,6 +1264,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostForOwnerHeaderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteCostForOwnerList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerConcretePriceList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerClientList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentCancelationList.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentPumpList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentPumpForVehOwnerList_View.js'));
@@ -1594,6 +1596,12 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostForOwnerHeader_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostForOwner_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteCostForOwnerList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerConcretePrice_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleOwnerConcretePrice_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerConcretePriceList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerClient_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleOwnerClient_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerClientList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

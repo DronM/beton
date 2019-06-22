@@ -53,19 +53,7 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	
 	var options = {};
 	
-	var field = new FieldInt("client_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	
 	var field = new FieldInt("user_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	
-	var field = new FieldInt("concrete_costs_for_owner_h_id",options);
 	
 	pm.addField(field);
 	
@@ -95,19 +83,7 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	
 	var options = {};
 	
-	var field = new FieldInt("client_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	
 	var field = new FieldInt("user_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	
-	var field = new FieldInt("concrete_costs_for_owner_h_id",options);
 	
 	pm.addField(field);
 	
@@ -147,13 +123,13 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	pm.addField(new FieldString("name",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldJSON("clients_ref",f_opts));
-	var f_opts = {};
-	
-	pm.addField(new FieldJSON("concrete_costs_for_owner_h_ref",f_opts));
-	var f_opts = {};
-	
 	pm.addField(new FieldJSON("users_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("client_list",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("last_concrete_costs_for_owner_h_ref",f_opts));
 }
 
 			VehicleOwner_Controller.prototype.addGetObject = function(){

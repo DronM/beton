@@ -31,13 +31,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 		$param = new FieldExtString('name'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
-		$param = new FieldExtInt('client_id'
-				,array());
-		$pm->addParam($param);
 		$param = new FieldExtInt('user_id'
-				,array());
-		$pm->addParam($param);
-		$param = new FieldExtInt('concrete_costs_for_owner_h_id'
 				,array());
 		$pm->addParam($param);
 		
@@ -62,15 +56,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 				,array(
 			));
 			$pm->addParam($param);
-		$param = new FieldExtInt('client_id'
-				,array(
-			));
-			$pm->addParam($param);
 		$param = new FieldExtInt('user_id'
-				,array(
-			));
-			$pm->addParam($param);
-		$param = new FieldExtInt('concrete_costs_for_owner_h_id'
 				,array(
 			));
 			$pm->addParam($param);

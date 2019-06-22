@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-06-20 07:18:51</lastBuild></version>
+		<lastBuild>2019-06-22 06:11:16</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -43,10 +43,11 @@
 		<version dateOpen="2019-06-14 16:06:57" dateClose="2019-06-17 05:06:50">1.00137</version>
 		<version dateOpen="2019-06-19 10:06:36" dateClose="2019-06-19 10:06:55">1.00138</version>
 		<version dateOpen="2019-06-20 05:06:28" dateClose="2019-06-20 07:06:18">1.00139</version>
+		<version dateOpen="2019-06-20 09:06:19" dateClose="2019-06-22 06:06:11">1.00140</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
-		<field id="client_vehicle_owner_id"/>
+		<field id="vehicle_owner_client_list"/>
 	</globalFilters>
 	<enums>
 		<enum id="locales">
@@ -973,17 +974,12 @@
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
 			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
-			<field id="vehicles_ref" dataType="JSON" alias="Автомобиль"/>
-			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
-			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
-			<field id="driver_id" dataType="Int" sysCol="TRUE"/>
-			<field id="vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
-			<field id="vehicle_owners_ref" dataType="JSON" alias="Владелец"/>
 			<field id="client_id" dataType="Int" sysCol="TRUE"/>
 			<field id="cost_shipment" dataType="Float" alias="Стоимость доставки"/>
 			<field id="cost_concrete" dataType="Float" alias="Стоимость бетон"/>
+			<field id="cost_other_owner_pump" dataType="Float" alias="Стоимость чужего насоса"/>
 			<sql/>
-			<globalFilter id="client_vehicle_owner_id" fieldId="client_id"/>
+			<globalFilter id="vehicle_owner_client_list" fieldId="client_id"/>
 		</model>
 		<model id="ShipmentDialog" parent="ModelSQLBeton" dataTable="shipments_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
@@ -2264,6 +2260,10 @@
 			<field id="header_id" dataType="Int" refTable="concrete_costs_for_owner_h" refField="id" required="TRUE"/>
 			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id"/>
 			<field id="price" dataType="Float" length="15" precision="2"/>
+			<index id="concrete_costs_for_owner_header_concrete_idx" unique="TRUE">
+				<field id="header_id"/>
+				<field id="concrete_type_id"/>
+			</index>
 		</model>
 		<model id="ConcreteCostForOwnerList" parent="ModelSQLBeton" dataTable="concrete_costs_for_owner_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -2277,9 +2277,7 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="name" dataType="String" length="150" required="TRUE"/>
-			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
-			<field id="concrete_costs_for_owner_h_id" dataType="Int" refTable="concrete_costs_for_owner_h" refField="id"/>
 			<index id="vehicle_owners_name_idx">
 				<expression>lower(name)</expression>
 			</index>
@@ -2287,9 +2285,33 @@
 		<model id="VehicleOwnerList" parent="ModelSQLBeton" dataTable="vehicle_owners_list" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="name" dataType="String"/>
-			<field id="clients_ref" dataType="JSON"/>
-			<field id="concrete_costs_for_owner_h_ref" dataType="JSON"/>
 			<field id="users_ref" dataType="JSON"/>
+			<field id="client_list" dataType="Text"/>
+			<field id="last_concrete_costs_for_owner_h_ref" dataType="JSON"/>
+		</model>
+		<model id="VehicleOwnerClient" parent="ModelSQLBeton" dataTable="vehicle_owner_clients" virtual="FALSE">
+			<field id="vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
+			<index id="vehicle_owner_clients_client_idx" unique="TRUE">
+				<field id="client_id"/>
+			</index>
+		</model>
+		<model id="VehicleOwnerClientList" parent="ModelSQLBeton" dataTable="vehicle_owner_clients_list" virtual="FALSE">
+			<field id="vehicle_owner_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="client_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="vehicle_owners_ref" dataType="JSON"/>
+			<field id="clients_ref" dataType="JSON"/>
+		</model>
+		<model id="VehicleOwnerConcretePrice" parent="ModelSQLBeton" dataTable="vehicle_owner_concrete_prices" virtual="FALSE">
+			<field id="vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="date" dataType="Date" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="concrete_costs_for_owner_h_id" dataType="Int" refTable="concrete_costs_for_owner_h" refField="id"/>
+		</model>
+		<model id="VehicleOwnerConcretePriceList" parent="ModelSQLBeton" dataTable="vehicle_owner_concrete_prices_list" virtual="FALSE">
+			<field id="vehicle_owner_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date" dataType="Date" primaryKey="TRUE"/>
+			<field id="vehicle_owners_ref" dataType="JSON"/>
+			<field id="concrete_costs_for_owner_h_ref" dataType="JSON"/>
 		</model>
 		<model id="UserOperatorList" parent="ModelSQLBeton" dataTable="user_operator_list" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -2343,6 +2365,8 @@
 		<constant id="weather_update_interval_sec" name="Интервал в секундах обновления данных о погоде" descr="" dataType="Time" defaultValue="00:30"/>
 		<constant id="call_history_count" name="Количество строк в истории при новом звонке" descr="Сколько последних отгрузок ипоследних звонков показывать при входящем звонке" dataType="Int" defaultValue="5"/>
 		<constant id="water_ship_cost" name="Стоимость доставки воды" descr="Стоимость доставки воды" dataType="Float" length="15" precision="2" defaultValue="2000"/>
+		<constant id="vehicle_owner_accord_from_day" name="Номер дня месяца" descr="Номер дня месяца, начиная с которого владельцы ТС могу согласовывать отгрузки за предыдущий месяц" dataType="Int" defaultValue="5"/>
+		<constant id="vehicle_owner_accord_to_day" name="Номер дня месяца" descr="Номер дня месяца, до которого владельцы ТС могу согласовывать отгрузки за предыдущий месяц" dataType="Int" defaultValue="20"/>
 	</constants>
 	<controllers>
 		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -3225,6 +3249,20 @@
 			<publicMethod id="get_object" modelId="VehicleOwnerList"/>
 			<publicMethod id="complete" modelId="VehicleOwner" patternFieldId="name"/>
 		</controller>
+		<controller id="VehicleOwnerClient" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="VehicleOwnerClient"/>
+			<publicMethod id="update" modelId="VehicleOwnerClient"/>
+			<publicMethod id="delete" modelId="VehicleOwnerClient"/>
+			<publicMethod id="get_list" modelId="VehicleOwnerClientList"/>
+			<publicMethod id="get_object" modelId="VehicleOwnerClientList"/>
+		</controller>
+		<controller id="VehicleOwnerConcretePrice" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="VehicleOwnerConcretePrice"/>
+			<publicMethod id="update" modelId="VehicleOwnerConcretePrice"/>
+			<publicMethod id="delete" modelId="VehicleOwnerConcretePrice"/>
+			<publicMethod id="get_list" modelId="VehicleOwnerConcretePriceList"/>
+			<publicMethod id="get_object" modelId="VehicleOwnerConcretePriceList"/>
+		</controller>
 		<controller id="ShipmentCancelation" parentId="ControllerSQL" state="TRUE">
 			<publicMethod id="insert" modelId="ShipmentCancelation"/>
 			<publicMethod id="update" modelId="ShipmentCancelation"/>
@@ -3319,6 +3357,8 @@
 		<view id="10027" c="VehicleOwner_Controller" t="VehicleOwnerList" f="get_list" section="Справочники" descr="Владельцы транспортных средств"/>
 		<view id="10028" c="User_Controller" t="UserOperatorList" f="get_user_operator_list" section="Справочники" descr="Список операторов"/>
 		<view id="10029" c="ConcreteCostForOwnerHeader_Controller" t="ConcreteCostForOwnerHeaderList" f="get_list" section="Справочники" descr="Прайс бетон для владельцев"/>
+		<view id="10030" c="VehicleOwnerConcretePrice_Controller" t="VehicleOwnerConcretePriceList" f="get_list" section="Справочники" descr="История прайсов по бетону для владельцев"/>
+		<view id="10031" c="VehicleOwnerClient_Controller" t="VehicleOwnerClientList" f="get_list" section="Справочники" descr="Клиенты владельцев ТС"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -3425,6 +3465,8 @@
 		<serverTemplate id="ConcreteCostHeaderList"/>
 		<serverTemplate id="ConcreteCostForOwnerHeaderList"/>
 		<serverTemplate id="VehicleOwnerList"/>
+		<serverTemplate id="VehicleOwnerConcretePriceList"/>
+		<serverTemplate id="VehicleOwnerClientList"/>
 		<serverTemplate id="ShipmentCancelationList"/>
 		<serverTemplate id="ShipmentForVehOwnerList"/>
 		<serverTemplate id="ShipmentForClientVehOwnerList"/>
@@ -3944,6 +3986,8 @@
 		<jsScript file="views/ConcreteCostForOwnerHeaderList_View.js"/>
 		<jsScript file="views/ConcreteCostForOwnerList_View.js"/>
 		<jsScript file="views/VehicleOwnerList_View.js"/>
+		<jsScript file="views/VehicleOwnerConcretePriceList_View.js"/>
+		<jsScript file="views/VehicleOwnerClientList_View.js"/>
 		<jsScript file="views/ShipmentCancelationList.js"/>
 		<jsScript file="views/ShipmentPumpList_View.js"/>
 		<jsScript file="views/ShipmentPumpForVehOwnerList_View.js"/>
@@ -4274,6 +4318,12 @@
 		<jsScript file="models/ConcreteCostForOwnerHeader_Model.js"/>
 		<jsScript file="models/ConcreteCostForOwner_Model.js"/>
 		<jsScript file="models/ConcreteCostForOwnerList_Model.js"/>
+		<jsScript file="models/VehicleOwnerConcretePrice_Model.js"/>
+		<jsScript file="controllers/VehicleOwnerConcretePrice_Controller.js"/>
+		<jsScript file="models/VehicleOwnerConcretePriceList_Model.js"/>
+		<jsScript file="models/VehicleOwnerClient_Model.js"/>
+		<jsScript file="controllers/VehicleOwnerClient_Controller.js"/>
+		<jsScript file="models/VehicleOwnerClientList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

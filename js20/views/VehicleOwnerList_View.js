@@ -46,8 +46,24 @@ function VehicleOwnerList_View(id,options){
 									"ctrlClass":ClientEdit,
 									"ctrlBindFieldId":"client_id",
 									"ctrlOptions":{
-										"labelCaption":""
-									}
+										"enabled":false,
+										"labelCaption":false
+									},
+									"master":true,
+									"detailViewClass":VehicleOwnerClientList_View,
+									"detailViewOptions":{
+										"detailFilters":{
+											"VehicleOwnerClientList_Model":[
+												{
+												"masterFieldId":"id",
+												"field":"vehicle_owner_id",
+												"sign":"e",
+												"val":"0"
+												}	
+											]
+										}													
+									}																											
+									
 								})
 							],
 							"sortable":true
@@ -72,10 +88,24 @@ function VehicleOwnerList_View(id,options){
 								new GridColumnRef({
 									"field":model.getField("concrete_costs_for_owner_h_ref"),
 									"ctrlClass":ConcreteCostForOwnerHeadEdit,
-									"ctrlBindFieldId":"concrete_costs_for_owner_h_id",
 									"ctrlOptions":{
-										"labelCaption":""
-									}
+										"enabled":false,
+										"labelCaption":false
+									},
+									"master":true,
+									"detailViewClass":VehicleOwnerConcretePriceList_View,
+									"detailViewOptions":{
+										"detailFilters":{
+											"VehicleOwnerConcretePriceList_Model":[
+												{
+												"masterFieldId":"id",
+												"field":"vehicle_owner_id",
+												"sign":"e",
+												"val":"0"
+												}	
+											]
+										}													
+									}																											
 								})
 							],
 							"sortable":true

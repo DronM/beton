@@ -174,40 +174,16 @@ function ShipmentForClientVehOwnerList_View(id,options){
 									"field":model.getField("cost_concrete")
 								})
 							]
-						})
-						
-						,new GridCellHead(id+":grid:head:vehicles_ref",{
-							"value":"ТС",
-							"colAttrs":{"align":"center"},
+						})						
+						,new GridCellHead(id+":grid:head:cost_other_owner_pump",{
+							"value":"Стоимость чужего насоса",
+							"colAttrs":{"align":"right"},
 							"columns":[
-								new GridColumnRef({
-									"field":model.getField("vehicles_ref"),
-									"ctrlClass":EditString,
-									"searchOptions":{
-										"field":new FieldString("vehicles_ref->descr"),
-										"searchType":"on_part",
-										"typeChange":true
-									},
-									"form":null
+								new GridColumnFloat({
+									"field":model.getField("cost_other_owner_pump")
 								})
-							],
-							"sortable":true
-						})
-						,new GridCellHead(id+":grid:head:drivers_ref",{
-							"value":"Водитель",
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("drivers_ref"),
-									"ctrlClass":EditString,
-									"searchOptions":{
-										"field":(new FieldString("drivers_ref->descr")),
-										"searchType":"on_part",
-										"typeChange":true
-									}
-								})
-							],
-							"sortable":true
-						})
+							]
+						})						
 						
 					]
 				})
@@ -239,10 +215,13 @@ function ShipmentForClientVehOwnerList_View(id,options){
 							"calcFieldId":"cost_concrete",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost_concrete"})
 						})
+						,new GridCellFoot(id+":grid:foot:tot_cost_other_owner_pump",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"cost_other_owner_pump",
+							"gridColumn":new GridColumnFloat({"id":"tot_cost_other_owner_pump"})
+						})
 						
-						,new GridCell(id+":grid:foot:total_sp2",{
-							"colSpan":"2"
-						})																	
 					]
 				})		
 			]
