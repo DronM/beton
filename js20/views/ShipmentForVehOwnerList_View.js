@@ -303,6 +303,7 @@ function ShipmentForVehOwnerList_View(id,options){
 				})
 			]
 		}),
+		//"lastRowFooter":true,
 		"foot":new GridFoot(id+"grid:foot",{
 			"autoCalc":true,			
 			"elements":[
@@ -313,8 +314,7 @@ function ShipmentForVehOwnerList_View(id,options){
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"quant",
+							"totalFieldId":"total_quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCell(id+":grid:foot:total_sp2",{
@@ -322,14 +322,12 @@ function ShipmentForVehOwnerList_View(id,options){
 						})																	
 						,new GridCellFoot(id+":grid:foot:tot_cost",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"cost",
+							"totalFieldId":"total_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost"})
 						})
 						,new GridCellFoot(id+":grid:foot:tot_cost_for_driver",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"cost_for_driver",
+							"totalFieldId":"total_cost_for_driver",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost_for_driver"})
 						})												
 						,new GridCell(id+":grid:foot:total_sp4",{
@@ -338,8 +336,7 @@ function ShipmentForVehOwnerList_View(id,options){
 											
 						,new GridCellFoot(id+":grid:foot:tot_demurrage_cost",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"demurrage_cost",
+							"totalFieldId":"total_demurrage_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_demurrage_cost"})
 						})						
 						,new GridCell(id+":grid:foot:total_sp3",{

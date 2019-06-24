@@ -890,6 +890,8 @@ $permissions = array();
 				
 					$permissions['VehicleOwner_Controller_complete']=TRUE;
 				
+					$permissions['VehicleOwner_Controller_get_tot_report']=TRUE;
+				
 					$permissions['VehicleOwnerClient_Controller_insert']=TRUE;
 				
 					$permissions['VehicleOwnerClient_Controller_update']=TRUE;

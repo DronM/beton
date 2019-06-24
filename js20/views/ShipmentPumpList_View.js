@@ -293,14 +293,12 @@ function ShipmentPumpList_View(id,options){
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"quant",
+							"totalFieldId":"total_quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCellFoot(id+":grid:foot:tot_pump_cost",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"pump_cost",
+							"totalFieldId":"total_pump_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_pump_cost"})
 						})						
 											

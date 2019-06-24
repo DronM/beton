@@ -249,9 +249,8 @@ function OrderList_View(id,options){
 							"value":"Итого"
 						})												
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
-							"colAttrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"quant",
+							"attrs":{"align":"right"},
+							"totalFieldId":"total_quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCell(id+":grid:foot:total_sp2",{

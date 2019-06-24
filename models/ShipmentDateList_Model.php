@@ -147,6 +147,13 @@ class ShipmentDateList_Model extends ModelSQLBeton{
 		$this->addField($f_demurrage_cost);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
+	$this->setAggFunctions(
+		array(array('alias'=>'total_quant','expr'=>'sum(quant)')
+,array('alias'=>'total_ship_cost','expr'=>'sum(ship_cost)')
+,array('alias'=>'total_demurrage_cost','expr'=>'sum(demurrage_cost)')
+)
+	);	
+
 	}
 
 }

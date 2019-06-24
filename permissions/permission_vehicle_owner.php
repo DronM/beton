@@ -74,6 +74,8 @@ $permissions = array();
 		
 			$permissions['OrderPump_Controller_get_list']=TRUE;
 		
+			$permissions['VehicleOwner_Controller_get_tot_report']=TRUE;
+		
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

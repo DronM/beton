@@ -22,6 +22,12 @@ function ShipmentForVehOwnerList_Model(options){
 	
 	options.fields = {};
 	
+			
+				
+				
+				
+				
+			
 				
 	
 	var filed_options = {};

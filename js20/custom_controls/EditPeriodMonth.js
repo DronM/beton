@@ -11,7 +11,11 @@
  * @requires controls/ButtonCmd.js               
  
  * @param string id 
- * @param {namespace} options
+ * @param {object} options
+ * @param {object} options.filters
+ * @param {string} options.dateFormat  
+ * @param {function} options.onChange
+ * @param {Date} [options.dateFrom=first date of current month]   
  */
  
 function EditPeriodMonth(id,options){
@@ -32,6 +36,7 @@ function EditPeriodMonth(id,options){
 	options.periodSelectOptions = {"periodShift":true};
 	
 	this.m_dateFrom = options.dateFrom;	
+	if(!this.m_dateFrom)this.m_dateFrom = DateHelper.monthStart();
 	this.calcDateTo();
 	
 	this.m_filters = options.filters;	
@@ -150,3 +155,15 @@ EditPeriodMonth.prototype.setGrid = function(v){
 		
 	}
 }
+EditPeriodMonth.prototype.isNull = function(){
+	return isNaN(this.m_dateFrom.getTime());
+}
+
+EditPeriodMonth.prototype.focus = function(){
+}
+
+EditPeriodMonth.prototype.reset = function(){
+	this.m_dateFrom = undefined;
+	this.m_dateTo = undefined;
+}
+

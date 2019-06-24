@@ -108,3 +108,5 @@ UserOperatorList_View.prototype.HEAD_TITLE = "Список операторов"
 VehicleOwnerConcretePriceList_View.prototype.HEAD_TITLE = "История прайсов по бетону для владельцев";
 
 VehicleOwnerClientList_View.prototype.HEAD_TITLE = "Клинеты владельцев ТС";
+
+VehicleOwnerTotReport_View.prototype.HEAD_TITLE = "Итоги";

@@ -247,6 +247,12 @@ class ShipmentPumpList_Model extends ModelSQLBeton{
 		$this->addField($f_user_id);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
+	$this->setAggFunctions(
+		array(array('alias'=>'total_quant','expr'=>'sum(quant)')
+,array('alias'=>'total_pump_cost','expr'=>'sum(pump_cost)')
+)
+	);	
+
 	}
 
 }

@@ -30,6 +30,7 @@ function VehicleOwner_Controller(options){
 	this.addGetList();
 	this.addGetObject();
 	this.addComplete();
+	this.add_get_tot_report();
 		
 }
 extend(VehicleOwner_Controller,ControllerObjServer);
@@ -151,6 +152,26 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	var pm = this.getComplete();
 	pm.addField(new FieldString("name",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");	
+}
+
+			VehicleOwner_Controller.prototype.add_get_tot_report = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_tot_report',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldDate("date",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("templ",options));
+	
+			
+	this.addPublicMethod(pm);
 }
 
 		

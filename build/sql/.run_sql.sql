@@ -11,12 +11,6 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 		o.destination_id,
 		destinations_ref(dest) AS destinations_ref,
 		o.quant,
-		NULL vehicle_id,
-		NULL vehicles_ref,
-		NULL driver_id,
-		NULL drivers_ref,
-		NULL vehicle_owner_id,
-		NULL AS vehicle_owners_ref,
 		o.client_id AS client_id,
 		
 		(SELECT
@@ -45,7 +39,9 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 				LIMIT 1
 				)::numeric(15,2)
 			
-		END AS cost_other_owner_pump
+		END AS cost_other_owner_pump,
+		
+		vown_cl.vehicle_owner_id
 		
 	FROM orders o
 	LEFT JOIN concrete_types AS ct ON ct.id=o.concrete_type_id

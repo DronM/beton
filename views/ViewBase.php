@@ -12,7 +12,6 @@ require_once(USER_CONTROLLERS_PATH.'MainMenuConstructor_Controller.php');
 if (file_exists('models/MainMenu_Model_admin.php')){
 require_once('models/MainMenu_Model_admin.php');
 }
-		
 			
 if (file_exists('models/MainMenu_Model_owner.php')){
 require_once('models/MainMenu_Model_owner.php');
@@ -1270,6 +1269,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentPumpList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentPumpForVehOwnerList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserOperatorList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerTotReport_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));

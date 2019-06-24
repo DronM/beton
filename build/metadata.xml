@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-06-22 06:11:16</lastBuild></version>
+		<lastBuild>2019-06-24 05:59:52</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -44,6 +44,7 @@
 		<version dateOpen="2019-06-19 10:06:36" dateClose="2019-06-19 10:06:55">1.00138</version>
 		<version dateOpen="2019-06-20 05:06:28" dateClose="2019-06-20 07:06:18">1.00139</version>
 		<version dateOpen="2019-06-20 09:06:19" dateClose="2019-06-22 06:06:11">1.00140</version>
+		<version dateOpen="2019-06-22 09:06:00" dateClose="2019-06-24 06:06:00">1.00141</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -55,17 +56,15 @@
 				<ru descr="Русский"/>
 			</value>
 		</enum>
-		<enum id="role_types">
-			<value id="admin">
-				<ru descr="Администратор"/>
-			</value>
-		</enum>
 		<enum id="data_types" descr="Типы данных">
 			<value id="users">
 				<ru descr="Пользователи"/>
 			</value>
 		</enum>
 		<enum id="role_types">
+			<value id="admin">
+				<ru descr="Администратор"/>
+			</value>
 			<value id="owner">
 				<ru descr="Администратор"/>
 			</value>
@@ -727,6 +726,9 @@
 			</index>
 		</model>
 		<model id="OrderList" parent="ModelSQLBeton" dataTable="orders_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="number" dataType="String" alias="Номер"/>
 			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
@@ -900,6 +902,13 @@
 			</index>
 		</model>
 		<model id="ShipmentList" parent="ModelSQLBeton" dataTable="shipments_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+				<aggFunction alias="total_cost" expr="sum(cost)"/>
+				<aggFunction alias="total_pump_cost" expr="sum(pump_cost)"/>
+				<aggFunction alias="total_cost_for_driver" expr="sum(cost_for_driver)"/>
+				<aggFunction alias="total_demurrage_cost" expr="sum(demurrage_cost)"/>
+			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
@@ -942,6 +951,12 @@
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="ShipmentForVehOwnerList" parent="ModelSQLBeton" dataTable="shipments_for_veh_owner_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+				<aggFunction alias="total_cost" expr="sum(cost)"/>
+				<aggFunction alias="total_cost_for_driver" expr="sum(cost_for_driver)"/>
+				<aggFunction alias="total_demurrage_cost" expr="sum(demurrage_cost)"/>
+			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
@@ -967,6 +982,12 @@
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="ShipmentForClientVehOwnerList" parent="ModelSQLBeton" dataTable="shipments_for_client_veh_owner_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+				<aggFunction alias="total_cost_shipment" expr="sum(cost_shipment)"/>
+				<aggFunction alias="total_cost_concrete" expr="sum(cost_concrete)"/>
+				<aggFunction alias="total_cost_other_owner_pump" expr="sum(cost_other_owner_pump)"/>
+			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
 			<field id="ship_date" dataType="Date" alias="Дата отгрузки"/>
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
@@ -1008,6 +1029,10 @@
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="ShipmentPumpList" parent="ModelSQLBeton" dataTable="shipments_pump_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+				<aggFunction alias="total_pump_cost" expr="sum(pump_cost)"/>
+			</aggFunctions>
 			<field id="order_id" dataType="Int" alias="Заявка"/>
 			<field id="last_ship_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="order_number" dataType="String" alias="Номер заявки"/>
@@ -1035,6 +1060,10 @@
 			<globalFilter id="vehicle_owner_id" fieldId="pump_vehicle_owner_id"/>
 		</model>
 		<model id="ShipmentPumpForVehOwnerList" parent="ModelSQLBeton" dataTable="shipments_pump_for_veh_owner_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+				<aggFunction alias="total_pump_cost" expr="sum(pump_cost)"/>
+			</aggFunctions>
 			<field id="last_ship_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="date_time" dataType="DateTime" alias="Дата"/>
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
@@ -1117,6 +1146,11 @@
 			<field id="quant" dataType="Float" alias="Количество"/>
 		</model>
 		<model id="ShipmentDateList" parent="ModelSQLBeton" dataTable="shipment_dates_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+				<aggFunction alias="total_ship_cost" expr="sum(ship_cost)"/>
+				<aggFunction alias="total_demurrage_cost" expr="sum(demurrage_cost)"/>
+			</aggFunctions>
 			<field id="ship_date" dataType="DateTime" alias="Дата"/>
 			<field id="client_id" dataType="Int" sysCol="TRUE"/>
 			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
@@ -3248,6 +3282,10 @@
 			<publicMethod id="get_list" modelId="VehicleOwnerList"/>
 			<publicMethod id="get_object" modelId="VehicleOwnerList"/>
 			<publicMethod id="complete" modelId="VehicleOwner" patternFieldId="name"/>
+			<publicMethod id="get_tot_report">
+				<field id="date" dataType="Date"/>
+				<field id="templ" dataType="String"/>
+			</publicMethod>
 		</controller>
 		<controller id="VehicleOwnerClient" parentId="ControllerSQL" state="TRUE">
 			<publicMethod id="insert" modelId="VehicleOwnerClient"/>
@@ -3325,6 +3363,7 @@
 		<permission type="allow" controllerId="Driver" methodId="get_list" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="ProductionSite" methodId="get_list" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="OrderPump" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="VehicleOwner" methodId="get_tot_report" roleId="vehicle_owner"/>
 	</permissions>
 	<views>
 		<view id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи"/>
@@ -3395,6 +3434,7 @@
 		<view id="50010" t="LabEntryItemReport" section="Отчеты" descr="Показатели по месяцам"/>
 		<view id="50011" t="LabEntryItemOnRatePeriodReport" section="Отчеты" descr="Показатели по периодам"/>
 		<view id="50012" t="LabEntryAvgReport" section="Отчеты" descr="Средние показатели по датам"/>
+		<view id="50013" t="VehicleOwnerTotReport" section="Отчеты" descr="Итоги для владельца ТС"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -3472,6 +3512,7 @@
 		<serverTemplate id="ShipmentForClientVehOwnerList"/>
 		<serverTemplate id="ShipmentPumpForVehOwnerList"/>
 		<serverTemplate id="UserOperatorList"/>
+		<serverTemplate id="VehicleOwnerTotReport"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -3992,6 +4033,7 @@
 		<jsScript file="views/ShipmentPumpList_View.js"/>
 		<jsScript file="views/ShipmentPumpForVehOwnerList_View.js"/>
 		<jsScript file="views/UserOperatorList_View.js"/>
+		<jsScript file="views/VehicleOwnerTotReport_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>

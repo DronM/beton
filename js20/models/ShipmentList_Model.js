@@ -22,6 +22,13 @@ function ShipmentList_Model(options){
 	
 	options.fields = {};
 	
+			
+				
+				
+				
+				
+				
+			
 				
 	
 	var filed_options = {};

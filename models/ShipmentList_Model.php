@@ -398,6 +398,15 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$this->addField($f_owner_pump_agreed_date_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
+	$this->setAggFunctions(
+		array(array('alias'=>'total_quant','expr'=>'sum(quant)')
+,array('alias'=>'total_cost','expr'=>'sum(cost)')
+,array('alias'=>'total_pump_cost','expr'=>'sum(pump_cost)')
+,array('alias'=>'total_cost_for_driver','expr'=>'sum(cost_for_driver)')
+,array('alias'=>'total_demurrage_cost','expr'=>'sum(demurrage_cost)')
+)
+	);	
+
 	}
 
 }

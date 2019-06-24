@@ -199,26 +199,22 @@ function ShipmentForClientVehOwnerList_View(id,options){
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"quant",
+							"totalFieldId":"total_quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCellFoot(id+":grid:foot:tot_cost_shipment",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"cost_shipment",
+							"totalFieldId":"total_cost_shipment",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost_shipment"})
 						})
 						,new GridCellFoot(id+":grid:foot:tot_cost_concrete",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"cost_concrete",
+							"totalFieldId":"total_cost_concrete",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost_concrete"})
 						})
 						,new GridCellFoot(id+":grid:foot:tot_cost_other_owner_pump",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"cost_other_owner_pump",
+							"totalFieldId":"total_cost_other_owner_pump",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost_other_owner_pump"})
 						})
 						

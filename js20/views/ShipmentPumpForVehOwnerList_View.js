@@ -10,12 +10,18 @@ function ShipmentPumpForVehOwnerList_View(id,options){
 	var model = options.models.ShipmentPumpForVehOwnerList_Model;
 	var contr = new Shipment_Controller();
 
-	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
+	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null,"vehicle_owner_accord_from_day":null,"vehicle_owner_accord_to_day":null};
 	window.getApp().getConstantManager().get(constants);
 
 	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"field":new FieldDateTime("date_time")
 	});
+
+	//расчет даты от/до согласования
+	var d = DateHelper.time();
+	var acc_start = new Date(d.getFullYear(),d.getMonth()+1,constants.vehicle_owner_accord_from_day.getValue());
+	var acc_start_time = acc_start.getTime();
+	var acc_start_descr = DateHelper.format(acc_start,"d/m/y");
 
 	var filters = {
 		"period":{
@@ -179,6 +185,9 @@ function ShipmentPumpForVehOwnerList_View(id,options){
 											if(m.getFieldValue("owner_pump_agreed")){
 												res.value = DateHelper.format(m.getFieldValue("owner_pump_agreed_date_time"),"d/m/y");
 											}
+											else if(m.getFieldValue("date_time").getTime()<acc_start_time) {
+												res.value = "Разрешено с "+acc_start_descr;
+											}											
 											else{
 												var ctrl = new ButtonCmd(null,{
 													"caption":"Согласовать",
@@ -209,14 +218,12 @@ function ShipmentPumpForVehOwnerList_View(id,options){
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"quant",
+							"totalFieldId":"total_quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCellFoot(id+":grid:foot:tot_pump_cost",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"pump_cost",
+							"totalFieldId":"total_pump_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_pump_cost"})
 						})						
 											

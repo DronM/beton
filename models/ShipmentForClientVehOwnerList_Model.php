@@ -130,6 +130,14 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$this->addField($f_cost_other_owner_pump);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
+	$this->setAggFunctions(
+		array(array('alias'=>'total_quant','expr'=>'sum(quant)')
+,array('alias'=>'total_cost_shipment','expr'=>'sum(cost_shipment)')
+,array('alias'=>'total_cost_concrete','expr'=>'sum(cost_concrete)')
+,array('alias'=>'total_cost_other_owner_pump','expr'=>'sum(cost_other_owner_pump)')
+)
+	);	
+
 	}
 
 }

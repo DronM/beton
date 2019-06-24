@@ -216,21 +216,19 @@ function ShipmentDateList_View(id,options){
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"quant",
+							"totalFieldId":"total_quant",
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCellFoot(id+":grid:foot:tot_ship_cost",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"ship_cost",
+							"totalFieldId":"total_ship_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_ship_cost"})
 						})						
 												
 						,new GridCellFoot(id+":grid:foot:tot_demurrage_cost",{
 							"attrs":{"align":"right"},
 							"calcOper":"sum",
-							"calcFieldId":"demurrage_cost",
+							"calcFieldId":"total_demurrage_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_demurrage_cost"})
 						})						
 						
