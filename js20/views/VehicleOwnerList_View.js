@@ -38,13 +38,13 @@ function VehicleOwnerList_View(id,options){
 							"sortable":true,
 							"sort":"asc"														
 						})
-						,new GridCellHead(id+":grid:head:clients_ref",{
-							"value":"Клиент",
+						,new GridCellHead(id+":grid:head:client_list",{
+							"value":"Клиенты",
 							"columns":[
-								new GridColumnRef({
-									"field":model.getField("clients_ref"),
-									"ctrlClass":ClientEdit,
-									"ctrlBindFieldId":"client_id",
+								new GridColumn({
+									"field":model.getField("client_list"),
+									"ctrlClass":null,
+									"ctrlBindFieldId":null,
 									"ctrlOptions":{
 										"enabled":false,
 										"labelCaption":false
@@ -82,12 +82,13 @@ function VehicleOwnerList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:concrete_costs_for_owner_h_ref",{
+						,new GridCellHead(id+":grid:head:last_concrete_costs_for_owner_h_ref",{
 							"value":"Прайс бетон",
 							"columns":[
 								new GridColumnRef({
-									"field":model.getField("concrete_costs_for_owner_h_ref"),
-									"ctrlClass":ConcreteCostForOwnerHeadEdit,
+									"field":model.getField("last_concrete_costs_for_owner_h_ref"),
+									"ctrlClass":null,
+									"ctrlBindFieldId":null,
 									"ctrlOptions":{
 										"enabled":false,
 										"labelCaption":false

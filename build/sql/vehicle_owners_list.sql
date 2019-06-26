@@ -9,7 +9,7 @@ CREATE OR REPLACE VIEW vehicle_owners_list AS
 		clients_ref(cl) AS clients_ref,
 		users_ref(u) AS users_ref,
 		concrete_costs_for_owner_h_ref(pr_temp) AS concrete_costs_for_owner_h_ref,
-		vown_cl.client_list,
+		coalesce(vown_cl.client_list,' ') AS client_list,
 		concrete_costs_for_owner_h_ref(pr) AS last_concrete_costs_for_owner_h_ref
 		
 	FROM vehicle_owners AS own

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-06-24 05:59:52</lastBuild></version>
+		<lastBuild>2019-06-26 06:08:32</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -45,6 +45,7 @@
 		<version dateOpen="2019-06-20 05:06:28" dateClose="2019-06-20 07:06:18">1.00139</version>
 		<version dateOpen="2019-06-20 09:06:19" dateClose="2019-06-22 06:06:11">1.00140</version>
 		<version dateOpen="2019-06-22 09:06:00" dateClose="2019-06-24 06:06:00">1.00141</version>
+		<version dateOpen="2019-06-26 06:06:07" dateClose="2019-06-26 06:06:08">1.00142</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -906,7 +907,6 @@
 				<aggFunction alias="total_quant" expr="sum(quant)"/>
 				<aggFunction alias="total_cost" expr="sum(cost)"/>
 				<aggFunction alias="total_pump_cost" expr="sum(pump_cost)"/>
-				<aggFunction alias="total_cost_for_driver" expr="sum(cost_for_driver)"/>
 				<aggFunction alias="total_demurrage_cost" expr="sum(demurrage_cost)"/>
 			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>

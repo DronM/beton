@@ -16,6 +16,10 @@ function AssignedVehicleGrid(id,options){
 	
 	options.className = OrderMakeList_View.prototype.TABLE_CLASS+" "+window.getApp().getBsCol(12);
 
+	if(options.noAutoRefresh===true){
+		options.contClassName = window.getApp().getBsCol(5);
+	}
+	/*
 	if(!options.refreshInterval){
 		options.contClassName = window.getApp().getBsCol(5);
 	}
@@ -23,6 +27,7 @@ function AssignedVehicleGrid(id,options){
 		options.readPublicMethod = (new Shipment_Controller()).getPublicMethod("get_assigned_vehicle_list");
 		options.readPublicMethod.setFieldValue("production_site_id",options.prodSiteId);		
 	}
+	*/
 	
 	this.m_shortDescriptions = options.shortDescriptions;
 	var self = this;	
@@ -34,7 +39,7 @@ function AssignedVehicleGrid(id,options){
 	options.onEventSetRowOptions = function(opts){
 		var m = this.getModel();
 		var ass_time = m.getFieldValue("date_time");
-		if(ass_time && ((DateHelper.time().getTime()-ass_time.getTime())/1000/60)<=2 ){		
+		if(ass_time && ((DateHelper.time().getTime()-ass_time.getTime())/1000/60)<=self.JUST_ASSIGNED_SEC ){		
 			opts.className = opts.className||"";
 			opts.className+=(opts.className.length? " ":"")+"just_assigned";
 		}
@@ -116,19 +121,18 @@ function AssignedVehicleGrid(id,options){
 extend(AssignedVehicleGrid,GridAjx);
 
 /* Constants */
-
+AssignedVehicleGrid.prototype.JUST_ASSIGNED_SEC = 2;
 
 /* private members */
 
 /* protected*/
-AssignedVehicleGrid.prototype.m_oldData;
+AssignedVehicleGrid.prototype.m_oldDataHash;
 
 /* public methods */
 
 AssignedVehicleGrid.prototype.onGetData = function(){
 	//ADDED
-	var new_data = [];
-	var new_data_added = false;
+	var new_data = " ";//serialized new keys
 	
 	if (this.m_model){
 		//refresh from model
@@ -217,11 +221,7 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 		
 			//ADDED
 			var row_keys_str = CommonHelper.serialize(row_keys);
-			if(this.m_oldData && CommonHelper.inArray(row_keys_str,this.m_oldData)==-1){
-				new_data_added = true;
-				this.m_oldData.push(row_keys_str);
-			} 
-			new_data.push(row_keys_str);
+			new_data+= row_keys_str;
 			row.setAttr("keys", row_keys_str);
 			
 			if (details_expanded){
@@ -294,15 +294,20 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 	}
 	
 	//*********
-	this.m_oldData = new_data;
-	if(new_data_added){
-		this.makeSound();
+	
+	var new_data_h = CommonHelper.md5(new_data);
+	if(!this.m_oldDataHash || this.m_oldDataHash!=new_data_h){
+		if(this.m_oldDataHash!=undefined){
+			this.makeSound();
+		}
+		this.m_oldDataHash = new_data_h;
 	}
 }
 
 
 AssignedVehicleGrid.prototype.makeSound = function(){
 	if(!this.m_shortDescriptions){
+		console.log("!!!!SOUND!!!!")
 		var audio = new Audio("img/Bell-sound-effect-ding.mp3");
 		audio.play();
 	}	
