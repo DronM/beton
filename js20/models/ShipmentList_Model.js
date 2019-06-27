@@ -275,10 +275,19 @@ function ShipmentList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Комментарий бухгалетрии';
+	filed_options.alias = 'Комментарий (насос)';
 	filed_options.autoInc = false;	
 	
 	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Комментарий (миксер)';
+	filed_options.autoInc = false;	
+	
+	options.fields.acc_comment_shipment = new FieldText("acc_comment_shipment",filed_options);
 	
 				
 	

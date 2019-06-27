@@ -41,7 +41,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$dt = (!$pm->getParamValue('date'))? MyDate::StartMonth(time()) : $this->getExtVal($pm,'date');
 		$dt+= Beton::shiftStartTime();
 		$date_from = Beton::shiftStart($dt);
-		$date_to = Beton::shiftEnd(MyDate::EndMonth($dt));
+		$date_to = Beton::shiftEnd(MyDate::EndMonth($dt)-24*60*60+Beton::shiftStartTime());
 		$date_from_db = "'".date('Y-m-d H:i:s',$date_from)."'";
 		$date_to_db = "'".date('Y-m-d H:i:s',$date_to)."'";
 		
@@ -68,19 +68,21 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			client_ships AS (
 				SELECT
 					sum(t.cost_concrete) AS cost_concrete,
-					sum(t.cost_shipment) AS cost_shipment
+					sum(t.cost_shipment) AS cost_shipment,
+					sum(t.cost_other_owner_pump) AS cost_other_owner_pump
 				FROM shipments_for_client_veh_owner_list t
 				WHERE	
 					".($vown_id? sprintf("t.vehicle_owner_id=%d AND ",$vown_id):"")."
 					t.ship_date  BETWEEN ".$date_from_db." AND ".$date_to_db."
 			)
 		SELECT
-			(SELECT cost FROM ships) AS ship_cost,
-			(SELECT cost_for_driver FROM ships) AS ship_for_driver_cost,
-			(SELECT demurrage_cost FROM ships) AS ship_demurrage_cost,
-			(SELECT cost FROM pumps) AS pumps_cost,
-			(SELECT cost_concrete FROM client_ships) AS client_ships_concrete_cost,
-			(SELECT cost_shipment FROM client_ships) AS client_ships_shipment_cost";
+			(SELECT coalesce(cost,0.00) FROM ships) AS ship_cost,
+			(SELECT coalesce(cost_for_driver,0.00) FROM ships) AS ship_for_driver_cost,
+			(SELECT coalesce(demurrage_cost,0.00) FROM ships) AS ship_demurrage_cost,
+			(SELECT coalesce(cost,0.00) FROM pumps) AS pumps_cost,
+			(SELECT coalesce(cost_concrete,0.00) FROM client_ships) AS client_ships_concrete_cost,
+			(SELECT coalesce(cost_other_owner_pump,0.00) FROM client_ships) AS client_ships_other_owner_pump_cost,
+			(SELECT coalesce(cost_shipment,0.00) FROM client_ships) AS client_ships_shipment_cost";
 		$this->addNewModel($q,'VehicleOwnerTotReport_Model');
 	}
 

@@ -373,13 +373,22 @@ function ShipmentList_View(id,options){
 							"sortable":true
 						})						
 						,new GridCellHead(id+":grid:head:acc_comment",{
-							"value":"Бух.коммент.",
+							"value":"Бух.ком.(насос)",
 							"columns":[
 								new GridColumn({
 									"field":model.getField("acc_comment")
 								})
 							]
 						})							
+						,new GridCellHead(id+":grid:head:acc_comment_shipment",{
+							"value":"Бух.ком.(миксер)",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("acc_comment_shipment")
+								})
+							]
+						})							
+						
 						,new GridCellHead(id+":grid:head:client_mark",{
 							"value":"Баллы",
 							"colAttrs":{"align":"center"},
@@ -475,7 +484,7 @@ function ShipmentList_View(id,options){
 						})						
 					
 						,new GridCell(id+":grid:foot:total_sp3",{
-							"colSpan":"7"
+							"colSpan":"8"
 						})						
 					]
 				})		

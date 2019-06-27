@@ -29,6 +29,16 @@ class VehicleOwnerConcretePrice_Model extends ModelSQLBeton{
 		$this->addField($f_vehicle_owner_id);
 		//********************
 		
+		//*** Field client_id ***
+		$f_opts = array();
+		$f_opts['primaryKey'] = TRUE;
+		$f_opts['autoInc']=FALSE;
+		$f_opts['id']="client_id";
+						
+		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
+		$this->addField($f_client_id);
+		//********************
+		
 		//*** Field date ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;

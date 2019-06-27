@@ -1,6 +1,6 @@
 -- VIEW: shipments_for_veh_client_owner_list
 
-DROP VIEW shipments_for_client_veh_owner_list;
+--DROP VIEW shipments_for_client_veh_owner_list;
 
 CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	SELECT

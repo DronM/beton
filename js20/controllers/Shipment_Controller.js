@@ -136,6 +136,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	var options = {};
 	
+	var field = new FieldText("acc_comment_shipment",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
 	var field = new FieldBool("owner_pump_agreed",options);
 	
 	pm.addField(field);
@@ -257,6 +263,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldText("acc_comment",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("acc_comment_shipment",options);
 	
 	pm.addField(field);
 	
@@ -406,8 +418,11 @@ extend(Shipment_Controller,ControllerObjServer);
 	f_opts.alias = "Насос,владелец";
 	pm.addField(new FieldJSON("pump_vehicle_owners_ref",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Комментарий бухгалетрии";
+	f_opts.alias = "Комментарий (насос)";
 	pm.addField(new FieldText("acc_comment",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Комментарий (миксер)";
+	pm.addField(new FieldText("acc_comment_shipment",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("pump_vehicle_owner_id",f_opts));

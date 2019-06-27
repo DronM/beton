@@ -22,3 +22,18 @@ FROM vehicle_owners AS t
 WHERE t.concrete_costs_for_owner_h_id IS NOT NULL
 )
 
+
+
+/*
+UPDATE vehicle_owner_concrete_prices
+SET client_id=s.client_id
+FROM(
+SELECT v.client_id,v.id AS vehicle_owner_id
+FROM vehicle_owner_concrete_prices AS p
+LEFT JOIN vehicle_owners v ON v.id=p.vehicle_owner_id
+) AS s
+WHERE s.vehicle_owner_id=vehicle_owner_concrete_prices.vehicle_owner_id
+*/
+--SELECT * FROM vehicle_owner_concrete_prices
+--ALTER TABLE vehicle_owner_concrete_prices DROP CONSTRAINT vehicle_owner_concrete_prices_pkey;
+ALTER TABLE vehicle_owner_concrete_prices ADD PRIMARY KEY (vehicle_owner_id,client_id,date);

@@ -56,7 +56,25 @@ function VehicleOwnerConcretePriceList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.concrete_costs_for_owner_h_ref = new FieldJSON("concrete_costs_for_owner_h_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_id = new FieldInt("client_id",filed_options);
 	
 		VehicleOwnerConcretePriceList_Model.superclass.constructor.call(this,id,options);
 }

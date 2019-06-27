@@ -23,6 +23,7 @@ CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
 		sh.demurrage,
 		sh.demurrage_cost,
 		sh.acc_comment,
+		sh.acc_comment_shipment,
 		sh.owner_agreed,
 		sh.owner_agreed_date_time,
 		(WITH

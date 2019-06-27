@@ -102,6 +102,9 @@ class Shipment_Controller extends ControllerSQL{
 		$param = new FieldExtText('acc_comment'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtText('acc_comment_shipment'
+				,array());
+		$pm->addParam($param);
 		$param = new FieldExtBool('owner_pump_agreed'
 				,array());
 		$pm->addParam($param);
@@ -203,6 +206,10 @@ class Shipment_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtText('acc_comment'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtText('acc_comment_shipment'
 				,array(
 			));
 			$pm->addParam($param);

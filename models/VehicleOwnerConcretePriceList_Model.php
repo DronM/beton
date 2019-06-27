@@ -46,12 +46,28 @@ class VehicleOwnerConcretePriceList_Model extends ModelSQLBeton{
 		$this->addField($f_vehicle_owners_ref);
 		//********************
 		
+		//*** Field clients_ref ***
+		$f_opts = array();
+		$f_opts['id']="clients_ref";
+						
+		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
+		$this->addField($f_clients_ref);
+		//********************
+		
 		//*** Field concrete_costs_for_owner_h_ref ***
 		$f_opts = array();
 		$f_opts['id']="concrete_costs_for_owner_h_ref";
 						
 		$f_concrete_costs_for_owner_h_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_costs_for_owner_h_ref",$f_opts);
 		$this->addField($f_concrete_costs_for_owner_h_ref);
+		//********************
+		
+		//*** Field client_id ***
+		$f_opts = array();
+		$f_opts['id']="client_id";
+						
+		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
+		$this->addField($f_client_id);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

@@ -1,8 +1,8 @@
 -- View: public.shipments_list
 
- --DROP VIEW shipments_for_veh_owner_list;
- --DROP VIEW shipment_dates_list;
- --DROP VIEW public.shipments_list;
+--DROP VIEW shipments_for_veh_owner_list;
+--DROP VIEW shipment_dates_list;
+--DROP VIEW public.shipments_list;
 
 CREATE OR REPLACE VIEW public.shipments_list AS 
 	SELECT
@@ -69,6 +69,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
 		
 		sh.acc_comment,
+		sh.acc_comment_shipment,
 		v_own.id AS vehicle_owner_id,
 		
 		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,

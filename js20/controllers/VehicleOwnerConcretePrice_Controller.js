@@ -46,6 +46,12 @@ extend(VehicleOwnerConcretePrice_Controller,ControllerObjServer);
 	
 	var options = {};
 	options.primaryKey = true;options.required = true;
+	var field = new FieldInt("client_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.primaryKey = true;options.required = true;
 	var field = new FieldDate("date",options);
 	
 	pm.addField(field);
@@ -74,6 +80,15 @@ extend(VehicleOwnerConcretePrice_Controller,ControllerObjServer);
 	
 	var options = {};
 	options.primaryKey = true;
+	var field = new FieldInt("client_id",options);
+	
+	pm.addField(field);
+	
+	field = new FieldInt("old_client_id",{});
+	pm.addField(field);
+	
+	var options = {};
+	options.primaryKey = true;
 	var field = new FieldDate("date",options);
 	
 	pm.addField(field);
@@ -96,6 +111,9 @@ extend(VehicleOwnerConcretePrice_Controller,ControllerObjServer);
 	var options = {"required":true};
 		
 	pm.addField(new FieldInt("vehicle_owner_id",options));
+	var options = {"required":true};
+		
+	pm.addField(new FieldInt("client_id",options));
 	var options = {"required":true};
 		
 	pm.addField(new FieldDate("date",options));
@@ -129,7 +147,13 @@ extend(VehicleOwnerConcretePrice_Controller,ControllerObjServer);
 	pm.addField(new FieldJSON("vehicle_owners_ref",f_opts));
 	var f_opts = {};
 	
+	pm.addField(new FieldJSON("clients_ref",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldJSON("concrete_costs_for_owner_h_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("client_id",f_opts));
 }
 
 			VehicleOwnerConcretePrice_Controller.prototype.addGetObject = function(){

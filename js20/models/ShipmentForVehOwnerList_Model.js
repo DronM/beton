@@ -197,7 +197,7 @@ function ShipmentForVehOwnerList_Model(options){
 	filed_options.alias = 'Комментарий бухгалетрии';
 	filed_options.autoInc = false;	
 	
-	options.fields.acc_comment = new FieldText("acc_comment",filed_options);
+	options.fields.acc_comment_shipment = new FieldText("acc_comment_shipment",filed_options);
 	
 				
 	

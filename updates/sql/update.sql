@@ -5400,3 +5400,573 @@ CREATE OR REPLACE VIEW vehicle_owners_list AS
 	;
 	
 ALTER VIEW vehicle_owners_list OWNER TO beton;
+
+
+-- ******************* update 26/06/2019 11:55:39 ******************
+
+		ALTER TABLE shipments ADD COLUMN acc_comment_shipment text;
+
+
+
+-- ******************* update 26/06/2019 11:57:31 ******************
+-- View: public.shipments_dialog
+
+ DROP VIEW public.shipments_dialog;
+
+CREATE OR REPLACE VIEW public.shipments_dialog AS 
+	SELECT
+		sh.id,
+		sh.date_time,
+		sh.ship_date_time,
+		sh.quant,
+		destinations_ref(dest) As destinations_ref,
+		clients_ref(cl) As clients_ref,
+		vehicle_schedules_ref(vs,v,d) AS vehicle_schedules_ref,
+		sh.shipped,
+		sh.client_mark,
+		sh.demurrage,
+		sh.blanks_exist,
+		production_sites_ref(ps) AS production_sites_ref,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		
+		v.vehicle_owner_id,
+		
+		/*
+		CASE
+			WHEN o.pump_vehicle_id IS NULL THEN 0
+			WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost
+			--last ship only!!!
+			WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+			THEN
+				CASE
+					WHEN coalesce(o.unload_price,0)>0 THEN o.unload_price
+					ELSE
+						(SELECT
+							CASE
+								WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+								ELSE coalesce(pr_vals.price_m,0)*o.quant
+							END
+						FROM pump_prices_values AS pr_vals
+						WHERE pr_vals.pump_price_id = pvh.pump_price_id
+							AND dest.distance<=pr_vals.quant_from
+						ORDER BY pr_vals.quant_from ASC
+						LIMIT 1
+						)
+				END
+			ELSE 0	
+		END*/
+		shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
+		sh.pump_cost_edit,
+		
+		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
+		
+		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS ship_cost,
+		sh.ship_cost_edit,
+		
+		(sh_last.id=sh.id) AS order_last_shipment,
+		
+		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,FALSE) AS ship_cost_default,
+		shipments_pump_cost(sh,o,dest,pvh,FALSE) AS pump_cost_default
+		
+	FROM shipments sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN drivers d ON d.id = vs.driver_id
+	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN (
+		SELECT
+			max(sh.ship_date_time) AS ship_date_time,
+			sh.order_id,
+			sum(sh.quant) AS quant
+		FROM shipments AS sh
+		GROUP BY sh.order_id
+	) AS sh_t ON sh_t.order_id = sh.order_id
+	LEFT JOIN (
+		SELECT
+			t.id,
+			t.order_id,
+			t.ship_date_time
+		FROM shipments AS t
+	) AS sh_last ON sh_last.order_id = sh_t.order_id AND sh_last.ship_date_time = sh_t.ship_date_time
+	
+	ORDER BY sh.date_time;
+
+ALTER TABLE public.shipments_dialog
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/06/2019 11:57:43 ******************
+-- View: public.shipments_list
+
+DROP VIEW shipments_for_veh_owner_list;
+DROP VIEW shipment_dates_list;
+DROP VIEW public.shipments_list;
+
+CREATE OR REPLACE VIEW public.shipments_list AS 
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.quant,
+		
+		--shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
+		(CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+					coalesce(dest.price,0))			
+				END
+				*
+				CASE
+					WHEN sh.quant>=7 THEN sh.quant
+					WHEN dest.distance<=60 THEN greatest(5,sh.quant)
+					ELSE 7
+				END
+		END)::numeric(15,2)
+		AS cost,
+		
+		sh.shipped,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,		
+		v.owner,
+		
+		vehicles_ref(v) AS vehicles_ref,
+		vs.vehicle_id,
+		
+		drivers_ref(d) AS drivers_ref,
+		vs.driver_id,
+		
+		destinations_ref(dest) As destinations_ref,
+		o.destination_id,
+		
+		clients_ref(cl) As clients_ref,
+		o.client_id,
+		
+		shipments_demurrage_cost(sh.demurrage::interval) AS demurrage_cost,
+		sh.demurrage,
+		
+		sh.client_mark,
+		sh.blanks_exist,
+		
+		users_ref(u) As users_ref,
+		o.user_id,
+		
+		production_sites_ref(ps) AS production_sites_ref,
+		sh.production_site_id,
+		
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		v_own.id AS vehicle_owner_id,
+		
+		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_cost,
+		
+		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
+		pvh.vehicle_id AS pump_vehicle_id,
+		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		sh.owner_pump_agreed,
+		sh.owner_pump_agreed_date_time,
+		
+		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		
+		CASE
+			WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(dest.price,0))			
+		END AS ship_price,
+		
+		coalesce(sh.ship_cost_edit,FALSE) AS ship_cost_edit,
+		coalesce(sh.pump_cost_edit,FALSE) AS pump_cost_edit
+		
+	FROM shipments sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN drivers d ON d.id = vs.driver_id
+	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+	LEFT JOIN users u ON u.id = sh.user_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	ORDER BY sh.date_time DESC
+	--LIMIT 60
+	;
+
+ALTER TABLE public.shipments_list OWNER TO beton;
+
+
+
+-- ******************* update 26/06/2019 11:57:51 ******************
+-- VIEW: shipments_for_veh_client_owner_list
+
+--DROP VIEW shipments_for_client_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
+	SELECT
+		o.id,
+		o.date_time::date AS ship_date,
+		o.concrete_type_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		o.quant,
+		o.client_id AS client_id,
+		
+		(SELECT
+			sum(shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE))
+		FROM shipments AS sh
+		WHERE sh.order_id=o.id
+		) AS cost_shipment,
+		
+		coalesce(pr.price,0)*o.quant::numeric AS cost_concrete,
+		
+		--стоимость чужего насоса, если есть
+		CASE
+			WHEN o.pump_vehicle_id IS NULL OR pvh_v.vehicle_owner_id=vown_cl.vehicle_owner_id THEN 0::numeric(15,2)
+			WHEN coalesce(last_sh.pump_cost_edit,FALSE) THEN last_sh.pump_cost::numeric(15,2)
+			WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+			ELSE
+				(SELECT
+					CASE
+						WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+						ELSE coalesce(pr_vals.price_m,0)*o.quant
+					END
+				FROM pump_prices_values AS pr_vals
+				WHERE pr_vals.pump_price_id = pvh.pump_price_id
+					AND o.quant<=pr_vals.quant_to
+				ORDER BY pr_vals.quant_to ASC
+				LIMIT 1
+				)::numeric(15,2)
+			
+		END AS cost_other_owner_pump,
+		
+		vown_cl.vehicle_owner_id
+		
+	FROM orders o
+	LEFT JOIN concrete_types AS ct ON ct.id=o.concrete_type_id
+	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_owner_clients AS vown_cl ON vown_cl.client_id=o.client_id	
+	LEFT JOIN (
+		SELECT
+			t_pr.vehicle_owner_id,
+			max(t_pr.date) AS last_date
+		FROM vehicle_owner_concrete_prices AS t_pr
+		GROUP BY t_pr.vehicle_owner_id
+	) AS pr_last ON pr_last.vehicle_owner_id = vown_cl.vehicle_owner_id
+	LEFT JOIN vehicle_owner_concrete_prices AS pr_h ON pr_h.vehicle_owner_id=pr_last.vehicle_owner_id AND pr_h.date=pr_last.last_date
+	LEFT JOIN concrete_costs_for_owner AS pr ON pr.header_id = pr_h.concrete_costs_for_owner_h_id AND pr.concrete_type_id=o.concrete_type_id
+	
+	LEFT JOIN (
+		SELECT
+			t.order_id,
+			max(t.ship_date_time) AS ship_date_time
+		FROM shipments t
+		GROUP BY t.order_id
+	) AS last_sh_t ON last_sh_t.order_id = o.id	
+	LEFT JOIN shipments last_sh ON last_sh.order_id = last_sh_t.order_id AND last_sh.ship_date_time = last_sh_t.ship_date_time
+	
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	
+	
+	ORDER BY o.date_time DESC
+	;
+	
+ALTER VIEW shipments_for_client_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 26/06/2019 11:58:03 ******************
+-- View: shipment_dates_list
+
+-- DROP VIEW shipment_dates_list;
+
+CREATE OR REPLACE VIEW shipment_dates_list AS 
+	SELECT
+		sh.ship_date_time::date AS ship_date,
+		
+		sh.concrete_type_id,
+		sh.concrete_types_ref::text,
+		
+		sh.destination_id,
+		sh.destinations_ref::text,
+		
+		sh.client_id,
+		sh.clients_ref::text,
+		
+		sh.production_site_id,
+		sh.production_sites_ref::text,
+		
+		sum(sh.quant) AS quant,
+		sum(sh.cost) AS ship_cost,
+		
+		sum(sh.demurrage) AS demurrage,
+		sum(sh.demurrage_cost) AS demurrage_cost
+		
+	FROM shipments_list sh
+	/*LEFT JOIN shipments sh_t ON sh_t.id = sh.id
+	LEFT JOIN orders o ON o.id = sh_t.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	*/
+	GROUP BY
+		sh.ship_date_time::date,
+		sh.concrete_type_id,
+		sh.concrete_types_ref::text,
+		sh.destination_id,
+		sh.destinations_ref::text,
+		sh.client_id,
+		sh.clients_ref::text,
+		sh.production_site_id,
+		sh.production_sites_ref::text
+		
+	ORDER BY sh.ship_date_time::date DESC;
+
+ALTER TABLE shipment_dates_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/06/2019 12:00:20 ******************
+-- VIEW: shipments_for_veh_owner_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.destination_id,
+		sh.destinations_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.cost,
+		sh.ship_cost_edit,
+		sh.pump_cost_edit,
+		sh.demurrage,
+		sh.demurrage_cost,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		(WITH
+		act_price AS (SELECT h.date AS d FROM shipment_for_driver_costs_h h WHERE h.date<=sh.ship_date_time::date ORDER BY h.date DESC LIMIT 1)
+		SELECT shdr_cost.price
+		FROM shipment_for_driver_costs AS shdr_cost
+		WHERE
+			shdr_cost.date=(SELECT d FROM act_price)
+			AND shdr_cost.distance_to<=dest.distance OR shdr_cost.id=(SELECT t.id FROM shipment_for_driver_costs t WHERE t.date=(SELECT d FROM act_price) ORDER BY t.distance_to LIMIT 1)
+
+		ORDER BY shdr_cost.distance_to DESC
+		LIMIT 1
+		)*sh.quant AS cost_for_driver
+		
+	FROM shipments_list sh
+	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	;
+	
+ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 26/06/2019 12:45:11 ******************
+
+WITH
+	--миксеры,водители,простой
+	ships AS (
+		SELECT
+			sum(cost) AS cost,
+			sum(cost_for_driver) AS cost_for_driver,
+			sum(demurrage_cost) AS demurrage_cost
+		FROM shipments_for_veh_owner_list AS t
+		WHERE
+			t.vehicle_owner_id = 156
+			AND t.ship_date_time BETWEEN '2019-05-01 06:00' AND '2019-06-01 05:59:59'
+	)
+	
+	--насосы
+	,pumps AS (
+		SELECT
+			sum(t.pump_cost) AS cost
+		FROM shipments_pump_list t
+		WHERE
+			t.pump_vehicle_owner_id = 156
+			AND t.date_time BETWEEN '2019-05-01 06:00' AND '2019-06-01 05:59:59'
+	)
+	,
+	client_ships AS (
+		SELECT
+			sum(t.cost_concrete) AS cost_concrete,
+			sum(t.cost_shipment) AS cost_shipment
+		FROM shipments_for_client_veh_owner_list t
+		WHERE	
+			t.vehicle_owner_id = 156
+			AND t.ship_date BETWEEN '2019-05-01 06:00' AND '2019-06-01 05:59:59'
+	)
+SELECT
+	(SELECT coalesce(cost,0) FROM ships) AS ship_cost,
+	(SELECT coalesce(cost_for_driver,0) FROM ships) AS ship_for_driver_cost,
+	(SELECT coalesce(demurrage_cost,0) FROM ships) AS ship_demurrage_cost,
+	(SELECT coalesce(cost,0) FROM pumps) AS pumps_cost,
+	(SELECT coalesce(cost_concrete,0) FROM client_ships) AS client_ships_concrete_cost,
+	(SELECT coalesce(cost_shipment,0) FROM client_ships) AS client_ships_shipment_cost
+
+
+-- ******************* update 26/06/2019 14:07:52 ******************
+-- VIEW: vehicle_owner_clients_list
+
+--DROP VIEW vehicle_owner_clients_list;
+
+CREATE OR REPLACE VIEW vehicle_owner_clients_list AS
+	SELECT
+		t.vehicle_owner_id,
+		vehicle_owners_ref(vown) AS vehicle_owners_ref,
+		t.client_id,
+		clients_ref(cl) AS clients_ref,
+		concrete_costs_for_owner_h_ref(pr) AS last_concrete_costs_for_owner_h_ref
+		  
+	FROM vehicle_owner_clients t
+	LEFT JOIN clients cl ON cl.id=t.client_id
+	LEFT JOIN vehicle_owners vown ON vown.id=t.vehicle_owner_id
+	
+	LEFT JOIN (
+		SELECT
+			max(t_pr.date) AS max_date,
+			t_pr.vehicle_owner_id
+		FROM vehicle_owner_concrete_prices AS t_pr
+		GROUP BY t_pr.vehicle_owner_id
+	) AS pr_last ON pr_last.vehicle_owner_id=vown.id
+	LEFT JOIN vehicle_owner_concrete_prices AS pr_h ON pr_h.date = pr_last.max_date AND pr_h.vehicle_owner_id=pr_last.vehicle_owner_id
+	LEFT JOIN concrete_costs_for_owner_h AS pr ON pr.id=pr_h.concrete_costs_for_owner_h_id
+	;
+	
+ALTER VIEW vehicle_owner_clients_list OWNER TO beton;
+
+
+-- ******************* update 26/06/2019 14:14:08 ******************
+-- VIEW: vehicle_owner_concrete_prices_list
+
+--DROP VIEW vehicle_owner_concrete_prices_list;
+
+CREATE OR REPLACE VIEW vehicle_owner_concrete_prices_list AS
+	SELECT
+		t.vehicle_owner_id,
+		t.date,
+		vehicle_owners_ref(vown) AS vehicle_owners_ref,
+		concrete_costs_for_owner_h_ref(pr_h) AS concrete_costs_for_owner_h_ref
+		
+	FROM vehicle_owner_concrete_prices AS t
+	LEFT JOIN vehicle_owners vown ON vown.id=t.vehicle_owner_id
+	LEFT JOIN concrete_costs_for_owner_h pr_h ON pr_h.id=t.concrete_costs_for_owner_h_id
+	LEFT JOIN clients cl ON cl.id=t.client_id
+	;
+	
+ALTER VIEW vehicle_owner_concrete_prices_list OWNER TO beton;
+
+
+-- ******************* update 26/06/2019 14:14:28 ******************
+-- VIEW: vehicle_owner_concrete_prices_list
+
+--DROP VIEW vehicle_owner_concrete_prices_list;
+
+CREATE OR REPLACE VIEW vehicle_owner_concrete_prices_list AS
+	SELECT
+		t.vehicle_owner_id,
+		t.date,
+		vehicle_owners_ref(vown) AS vehicle_owners_ref,
+		concrete_costs_for_owner_h_ref(pr_h) AS concrete_costs_for_owner_h_ref,
+		t.client_id,
+		clients_ref(cl) AS clients_ref
+		
+	FROM vehicle_owner_concrete_prices AS t
+	LEFT JOIN vehicle_owners vown ON vown.id=t.vehicle_owner_id
+	LEFT JOIN concrete_costs_for_owner_h pr_h ON pr_h.id=t.concrete_costs_for_owner_h_id
+	LEFT JOIN clients cl ON cl.id=t.client_id
+	;
+	
+ALTER VIEW vehicle_owner_concrete_prices_list OWNER TO beton;
+
+
+-- ******************* update 26/06/2019 14:21:09 ******************
+-- VIEW: vehicle_owner_concrete_prices_list
+
+--DROP VIEW vehicle_owner_concrete_prices_list;
+
+CREATE OR REPLACE VIEW vehicle_owner_concrete_prices_list AS
+	SELECT
+		t.vehicle_owner_id,
+		t.date,
+		vehicle_owners_ref(vown) AS vehicle_owners_ref,
+		concrete_costs_for_owner_h_ref(pr_h) AS concrete_costs_for_owner_h_ref,
+		t.client_id,
+		clients_ref(cl) AS clients_ref
+		
+	FROM vehicle_owner_concrete_prices AS t
+	LEFT JOIN vehicle_owners vown ON vown.id=t.vehicle_owner_id
+	LEFT JOIN concrete_costs_for_owner_h pr_h ON pr_h.id=t.concrete_costs_for_owner_h_id
+	LEFT JOIN clients cl ON cl.id=t.client_id
+	;
+	
+ALTER VIEW vehicle_owner_concrete_prices_list OWNER TO beton;

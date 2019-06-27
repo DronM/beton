@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-06-26 06:08:32</lastBuild></version>
+		<lastBuild>2019-06-27 06:06:44</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -46,6 +46,7 @@
 		<version dateOpen="2019-06-20 09:06:19" dateClose="2019-06-22 06:06:11">1.00140</version>
 		<version dateOpen="2019-06-22 09:06:00" dateClose="2019-06-24 06:06:00">1.00141</version>
 		<version dateOpen="2019-06-26 06:06:07" dateClose="2019-06-26 06:06:08">1.00142</version>
+		<version dateOpen="2019-06-26 06:06:15" dateClose="2019-06-27 06:06:06">1.00143</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -886,6 +887,7 @@
 			<field id="owner_agreed" dataType="Bool" defaultValue="FALSE"/>
 			<field id="owner_agreed_date_time" dataType="DateTimeTZ"/>
 			<field id="acc_comment" dataType="Text"/>
+			<field id="acc_comment_shipment" dataType="Text"/>
 			<field id="owner_pump_agreed" dataType="Bool" defaultValue="FALSE"/>
 			<field id="owner_pump_agreed_date_time" dataType="DateTimeTZ"/>
 			<field id="pump_cost" dataType="Float" length="15" precision="2"/>
@@ -936,7 +938,8 @@
 			<field id="pump_vehicles_ref" dataType="JSON" alias="Насос"/>
 			<field id="pump_vehicle_id" dataType="Int" sysCol="TRUE"/>
 			<field id="pump_vehicle_owners_ref" dataType="JSON" alias="Насос,владелец"/>
-			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
+			<field id="acc_comment" dataType="Text" alias="Комментарий (насос)"/>
+			<field id="acc_comment_shipment" dataType="Text" alias="Комментарий (миксер)"/>
 			<field id="pump_vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
 			<field id="shipped" dataType="Bool" sysCol="TRUE"/>
 			<field id="client_mark" dataType="Int" alias="Оценка"/>
@@ -975,7 +978,7 @@
 			<field id="ship_cost_edit" dataType="Bool" alias="Стоимость доставки отредактирована" sysCol="TRUE"/>
 			<field id="demurrage" dataType="String" alias="Простой"/>
 			<field id="demurrage_cost" dataType="Float" alias="Стомость простоя"/>
-			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
+			<field id="acc_comment_shipment" dataType="Text" alias="Комментарий бухгалетрии"/>
 			<field id="owner_agreed" dataType="Bool" alias="Согласовано миксер"/>
 			<field id="owner_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования миксер"/>
 			<sql/>
@@ -1016,6 +1019,7 @@
 			<field id="demurrage" dataType="String" alias="Простой"/>
 			<field id="blanks_exist" dataType="Bool" alias="Наличие бланков"/>
 			<field id="acc_comment" dataType="Text" alias="Комментарий бухгалетрии"/>
+			<field id="acc_comment_shipment" dataType="Text" alias="Комментарий (миксер)"/>
 			<field id="vehicle_owner_id" dataType="Int" sysCol="TRUE"/>
 			<field id="pump_cost" dataType="Float" alias="Стоимость насос"/>
 			<field id="pump_cost_default" dataType="Float" length="15" precision="2"/>
@@ -2335,9 +2339,11 @@
 			<field id="client_id" dataType="Int" primaryKey="TRUE"/>
 			<field id="vehicle_owners_ref" dataType="JSON"/>
 			<field id="clients_ref" dataType="JSON"/>
+			<field id="last_concrete_costs_for_owner_h_ref" dataType="JSON"/>
 		</model>
 		<model id="VehicleOwnerConcretePrice" parent="ModelSQLBeton" dataTable="vehicle_owner_concrete_prices" virtual="FALSE">
 			<field id="vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
 			<field id="date" dataType="Date" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
 			<field id="concrete_costs_for_owner_h_id" dataType="Int" refTable="concrete_costs_for_owner_h" refField="id"/>
 		</model>
@@ -2345,7 +2351,9 @@
 			<field id="vehicle_owner_id" dataType="Int" primaryKey="TRUE"/>
 			<field id="date" dataType="Date" primaryKey="TRUE"/>
 			<field id="vehicle_owners_ref" dataType="JSON"/>
+			<field id="clients_ref" dataType="JSON"/>
 			<field id="concrete_costs_for_owner_h_ref" dataType="JSON"/>
+			<field id="client_id" dataType="Int"/>
 		</model>
 		<model id="UserOperatorList" parent="ModelSQLBeton" dataTable="user_operator_list" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>

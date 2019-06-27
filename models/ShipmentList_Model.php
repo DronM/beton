@@ -294,11 +294,21 @@ class ShipmentList_Model extends ModelSQLBeton{
 		//*** Field acc_comment ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Комментарий бухгалетрии';
+		$f_opts['alias']='Комментарий (насос)';
 		$f_opts['id']="acc_comment";
 						
 		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
 		$this->addField($f_acc_comment);
+		//********************
+		
+		//*** Field acc_comment_shipment ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Комментарий (миксер)';
+		$f_opts['id']="acc_comment_shipment";
+						
+		$f_acc_comment_shipment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment_shipment",$f_opts);
+		$this->addField($f_acc_comment_shipment);
 		//********************
 		
 		//*** Field pump_vehicle_owner_id ***

@@ -259,11 +259,11 @@ function ShipmentForVehOwnerList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:acc_comment",{
+						,new GridCellHead(id+":grid:head:acc_comment_shipment",{
 							"value":"Бух.коммент.",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("acc_comment")
+									"field":model.getField("acc_comment_shipment")
 								})
 							]
 						})	

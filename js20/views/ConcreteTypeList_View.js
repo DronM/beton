@@ -5,7 +5,7 @@ function ConcreteTypeList_View(id,options){
 
 	ConcreteTypeList_View.superclass.constructor.call(this,id,options);
 
-	var model = options.models.ConcreteType_Model;
+	var model = options.models.ConcreteTypeList_Model;
 	var contr = new ConcreteType_Controller();
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};

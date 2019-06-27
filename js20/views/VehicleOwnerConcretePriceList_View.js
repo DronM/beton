@@ -63,7 +63,9 @@ function VehicleOwnerConcretePriceList_View(id,options){
 										"value":DateHelper.time()
 									}
 								})
-							]
+							],
+							"sortable":true,
+							"sort":"desc"
 						})
 						
 						,new GridCellHead(id+":grid:head:concrete_costs_for_owner_h_ref",{

@@ -39,6 +39,16 @@ function VehicleOwnerConcretePrice_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.client_id = new FieldInt("client_id",filed_options);
+	options.fields.client_id.getValidator().setRequired(true);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.date = new FieldDate("date",filed_options);
 	options.fields.date.getValidator().setRequired(true);
 	

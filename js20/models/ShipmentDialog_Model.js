@@ -143,6 +143,15 @@ function ShipmentDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Комментарий (миксер)';
+	filed_options.autoInc = false;	
+	
+	options.fields.acc_comment_shipment = new FieldText("acc_comment_shipment",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	

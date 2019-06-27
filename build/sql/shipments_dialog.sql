@@ -17,6 +17,7 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 		sh.blanks_exist,
 		production_sites_ref(ps) AS production_sites_ref,
 		sh.acc_comment,
+		sh.acc_comment_shipment,
 		
 		v.vehicle_owner_id,
 		

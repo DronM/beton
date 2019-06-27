@@ -77,7 +77,10 @@ function ShipmentDialog_View(id,options){
 		}));	
 
 		this.addElement(new EditText(id+":acc_comment",{
-			"labelCaption":"Комментарий бухгалтерии:"
+			"labelCaption":"Комментарий бухгалтерии (насос):"
+		}));
+		this.addElement(new EditText(id+":acc_comment_shipment",{
+			"labelCaption":"Комментарий бухгалтерии (миксер):"
 		}));
 		
 		this.addElement(new EditMoneyEditable(id+":pump_cost",{
@@ -123,6 +126,7 @@ function ShipmentDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("blanks_exist")})
 		,new DataBinding({"control":this.getElement("demurrage")})
 		,new DataBinding({"control":this.getElement("acc_comment")})
+		,new DataBinding({"control":this.getElement("acc_comment_shipment")})
 		,new DataBinding({"control":this.getElement("pump_cost")})
 		,new DataBinding({"control":this.getElement("ship_cost")})
 	]);
@@ -166,6 +170,7 @@ function ShipmentDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("blanks_exist")})
 		,new CommandBinding({"control":this.getElement("demurrage")})
 		,new CommandBinding({"control":this.getElement("acc_comment")})
+		,new CommandBinding({"control":this.getElement("acc_comment_shipment")})
 		,new CommandBinding({"control":this.getElement("pump_cost")})
 		,new CommandBinding({"control":this.getElement("ship_cost")})
 	]);

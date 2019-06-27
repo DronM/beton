@@ -32,9 +32,9 @@ WITH
 			AND t.ship_date BETWEEN '2019-05-01 06:00' AND '2019-06-01 05:59:59'
 	)
 SELECT
-	(SELECT cost FROM ships) AS ship_cost,
-	(SELECT cost_for_driver FROM ships) AS ship_for_driver_cost,
-	(SELECT demurrage_cost FROM ships) AS ship_demurrage_cost,
-	(SELECT cost FROM pumps) AS pumps_cost,
-	(SELECT cost_concrete FROM client_ships) AS client_ships_concrete_cost,
-	(SELECT cost_shipment FROM client_ships) AS client_ships_shipment_cost
+	(SELECT coalesce(cost,0) FROM ships) AS ship_cost,
+	(SELECT coalesce(cost_for_driver,0) FROM ships) AS ship_for_driver_cost,
+	(SELECT coalesce(demurrage_cost,0) FROM ships) AS ship_demurrage_cost,
+	(SELECT coalesce(cost,0) FROM pumps) AS pumps_cost,
+	(SELECT coalesce(cost_concrete,0) FROM client_ships) AS client_ships_concrete_cost,
+	(SELECT coalesce(cost_shipment,0) FROM client_ships) AS client_ships_shipment_cost

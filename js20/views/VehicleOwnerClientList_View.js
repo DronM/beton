@@ -65,6 +65,42 @@ function VehicleOwnerClientList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:last_concrete_costs_for_owner_h_ref",{
+							"value":"Прайс бетон",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("last_concrete_costs_for_owner_h_ref"),
+									"ctrlClass":null,
+									"ctrlBindFieldId":null,
+									"ctrlOptions":{
+										"enabled":false,
+										"labelCaption":false
+									},
+									"master":true,
+									"detailViewClass":VehicleOwnerConcretePriceList_View,
+									"detailViewOptions":{
+										"detailFilters":{
+											"VehicleOwnerConcretePriceList_Model":[
+												{
+												"masterFieldId":"vehicle_owner_id",
+												"field":"vehicle_owner_id",
+												"sign":"e",
+												"val":"0"
+												}	
+												,{
+												"masterFieldId":"client_id",
+												"field":"client_id",
+												"sign":"e",
+												"val":"0"
+												}	
+												
+											]
+										}													
+									}																											
+								})
+							],
+							"sortable":true
+						})
 						
 					]
 				})

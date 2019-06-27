@@ -153,6 +153,14 @@ class Shipment_Model extends ModelSQLBeton{
 		$this->addField($f_acc_comment);
 		//********************
 		
+		//*** Field acc_comment_shipment ***
+		$f_opts = array();
+		$f_opts['id']="acc_comment_shipment";
+						
+		$f_acc_comment_shipment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment_shipment",$f_opts);
+		$this->addField($f_acc_comment_shipment);
+		//********************
+		
 		//*** Field owner_pump_agreed ***
 		$f_opts = array();
 		$f_opts['defaultValue']='FALSE';

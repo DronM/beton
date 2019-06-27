@@ -47,9 +47,11 @@
 			<tr>
 				<th>Миксеры</th>
 				<th>Насосы</th>
+				<th>Простой</th>
 				<th>Итого</th>
 				<th>Выбрано бетона</th>
 				<th>Доставка</th>
+				<th>Чужой насос</th>
 				<th>Итого</th>
 				<th>Финансовы результат</th>
 			</tr>
@@ -67,8 +69,8 @@
 
 <!-- table row -->
 <xsl:template match="row">
-	<xsl:variable name="ship_tot" select="number(ship_cost) + number(pumps_cost)"/>
-	<xsl:variable name="client_ship_tot" select="number(client_ships_concrete_cost) + number(client_ships_shipment_cost)"/>
+	<xsl:variable name="ship_tot" select="number(ship_cost) + number(pumps_cost) +  number(ship_demurrage_cost)"/>
+	<xsl:variable name="client_ship_tot" select="number(client_ships_concrete_cost) + number(client_ships_shipment_cost)  + number(client_ships_other_owner_pump_cost)"/>
 	<xsl:variable name="tot" select="$ship_tot - $client_ship_tot"/>
 	<xsl:variable name="tot_class">
 		<xsl:choose>
@@ -88,6 +90,12 @@
 				<xsl:with-param name="val" select="pumps_cost"/>
 			</xsl:call-template>											
 		</td>
+		<td align="right">
+			<xsl:call-template name="format_money">
+				<xsl:with-param name="val" select="ship_demurrage_cost"/>
+			</xsl:call-template>											
+		</td>
+		
 		<td align="right" class="bg-info">
 			<xsl:call-template name="format_money">
 				<xsl:with-param name="val" select="$ship_tot"/>
@@ -103,6 +111,12 @@
 				<xsl:with-param name="val" select="client_ships_shipment_cost"/>
 			</xsl:call-template>								
 		</td>
+		<td align="right">
+			<xsl:call-template name="format_money">
+				<xsl:with-param name="val" select="client_ships_other_owner_pump_cost"/>
+			</xsl:call-template>								
+		</td>
+		
 		<td align="right" class="bg-info">
 			<xsl:call-template name="format_money">
 				<xsl:with-param name="val" select="$client_ship_tot"/>

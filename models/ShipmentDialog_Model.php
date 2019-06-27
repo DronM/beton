@@ -151,6 +151,16 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$this->addField($f_acc_comment);
 		//********************
 		
+		//*** Field acc_comment_shipment ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Комментарий (миксер)';
+		$f_opts['id']="acc_comment_shipment";
+						
+		$f_acc_comment_shipment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment_shipment",$f_opts);
+		$this->addField($f_acc_comment_shipment);
+		//********************
+		
 		//*** Field vehicle_owner_id ***
 		$f_opts = array();
 		$f_opts['sysCol']=TRUE;

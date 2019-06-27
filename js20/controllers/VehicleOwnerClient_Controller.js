@@ -118,6 +118,9 @@ extend(VehicleOwnerClient_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("clients_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("last_concrete_costs_for_owner_h_ref",f_opts));
 }
 
 			VehicleOwnerClient_Controller.prototype.addGetObject = function(){

@@ -58,6 +58,15 @@ function VehicleOwnerClientList_Model(options){
 	
 	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.last_concrete_costs_for_owner_h_ref = new FieldJSON("last_concrete_costs_for_owner_h_ref",filed_options);
+	
 		VehicleOwnerClientList_Model.superclass.constructor.call(this,id,options);
 }
 extend(VehicleOwnerClientList_Model,ModelXML);

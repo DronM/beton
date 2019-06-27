@@ -31,6 +31,9 @@ class VehicleOwnerConcretePrice_Controller extends ControllerSQL{
 		$param = new FieldExtInt('vehicle_owner_id'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
+		$param = new FieldExtInt('client_id'
+				,array('required'=>TRUE));
+		$pm->addParam($param);
 		$param = new FieldExtDate('date'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
@@ -48,10 +51,16 @@ class VehicleOwnerConcretePrice_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('old_vehicle_owner_id',array('required'=>TRUE)));
 		
+		$pm->addParam(new FieldExtInt('old_client_id',array('required'=>TRUE)));
+		
 		$pm->addParam(new FieldExtDate('old_date',array('required'=>TRUE)));
 		
 		$pm->addParam(new FieldExtInt('obj_mode'));
 		$param = new FieldExtInt('vehicle_owner_id'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('client_id'
 				,array(
 			));
 			$pm->addParam($param);
@@ -68,6 +77,10 @@ class VehicleOwnerConcretePrice_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
+			$param = new FieldExtInt('client_id',array(
+			));
+			$pm->addParam($param);
+		
 			$param = new FieldExtDate('date',array(
 			));
 			$pm->addParam($param);
@@ -81,6 +94,9 @@ class VehicleOwnerConcretePrice_Controller extends ControllerSQL{
 		$pm = new PublicMethod('delete');
 		
 		$pm->addParam(new FieldExtInt('vehicle_owner_id'
+		));		
+		
+		$pm->addParam(new FieldExtInt('client_id'
 		));		
 		
 		$pm->addParam(new FieldExtDate('date'

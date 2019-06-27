@@ -22,7 +22,274 @@ function OrderMakeGrid(id,options){
 	
 	var self = this;
 	
+	var w = window.getWidthType();
+	
 	var model = options.models.OrderMakeList_Model;
+	
+	var elements,foot;
+	if(w=="sm"){
+		elements = [
+			new GridCellHead(id+":order_make_grid:head:date_time_time",{
+				"value":"Время",
+				"colAttrs":{"align":"center"},
+				"columns":[
+					new GridColumnDate({
+						"field":model.getField("date_time"),
+						"dateFormat":"H:i"
+					})
+				]
+			})
+		
+			,new GridCellHead(id+":order_make_grid:head:inf1",{
+				"value":"Заявка",
+				"columns":[
+					new GridColumn({
+						"id":"inf1",
+						"formatFunction":function(fields,cell){
+							var res = DateHelper.format(fields.date_time.getValue(),"H:i");
+							res+= String.fromCharCode(10)+window.getApp().formatCell(fields.clients_ref,cell,self.m_listView.COL_CLIENT_LEN);
+							res+= String.fromCharCode(10)+window.getApp().formatCell(fields.destinations_ref,cell,self.m_listView.COL_DEST_LEN);
+							res+= String.fromCharCode(10)+fields.phone_cel.getValue();
+							return res;
+						}
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:inf2",{
+				"value":"",
+				"columns":[
+					new GridColumn({
+						"id":"inf2",
+						"formatFunction":function(fields,cell){
+							var res = fields.quant.getValue();
+							res+= String.fromCharCode(10)+fields.concrete_types_ref.getValue().getDescr();
+							return res;
+						}
+					})
+				]
+			})
+		];
+	}
+	else{
+		elements = [
+			new GridCellHead(id+":order_make_grid:head:quant_rest",{
+				"value":"Ост.",
+				"columns":[
+					new GridColumn({
+						"field":model.getField("quant_rest"),
+						"master":true,
+						"detailViewClass":ShipmentForOrderList_View,
+						"detailViewOptions":{
+							"listView":self.m_listView,
+							"detailFilters":{
+								"ShipmentForOrderList_Model":[
+									{
+									"masterFieldId":"id",
+									"field":"order_id",
+									"sign":"e",
+									"val":"0"
+									}	
+								]
+							}													
+						}
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:clients_ref",{
+				"value":"Клиент",
+				"columns":[
+					new GridColumn({
+						"field":model.getField("clients_ref"),
+						"formatFunction":function(fields,cell){
+							return window.getApp().formatCell(fields.clients_ref,cell,self.m_listView.COL_CLIENT_LEN);
+						}
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:destinations_ref",{
+				"value":"Объект",
+				"columns":[
+					new GridColumn({
+						"field":model.getField("destinations_ref"),
+						"formatFunction":function(fields,cell){
+							return window.getApp().formatCell(fields.destinations_ref,cell,self.m_listView.COL_DEST_LEN);
+						}
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:quant",{
+				"value":"Кол-во",
+				"colAttrs":{"align":"center"},
+				"columns":[
+					new GridColumn({
+						"field":model.getField("quant")
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:concrete_types_ref",{
+				"value":"Марка",
+				"colAttrs":{"align":"center"},
+				"columns":[
+					new GridColumnRef({
+						"field":model.getField("concrete_types_ref")
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:date_time_time",{
+				"value":"Время",
+				"colAttrs":{"align":"center"},
+				"columns":[
+					new GridColumnDate({
+						"field":model.getField("date_time"),
+						"dateFormat":"H:i"
+					})
+				]
+			})
+			
+			,new GridCellHead(id+":order_make_grid:head:unload_type",{
+				"value":"Подача",
+				"columns":[
+					new GridColumn({
+						"field":model.getField("unload_type"),
+						"formatFunction":function(fields,cell){
+							var res = "";
+							var tp = fields.unload_type.getValue();
+							if(tp=="band"||tp=="pump"){
+								var cmt = fields.pump_vehicle_comment.getValue();
+								res = window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
+								var l = fields.pump_vehicle_length.getValue();
+								if(l){
+									res+="("+l+((cmt&&cmt.length)? ","+cmt:"")+")";
+								}
+								else if(cmt&&cmt.length){
+									res+="("+cmt+")";
+								}
+							}
+							return res;
+						}
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:total",{
+				"value":"Сумма",
+				"colAttrs":{"align":"right"},
+				"columns":[
+					new GridColumn({
+						"field":model.getField("total"),
+						"formatFunction":function(fields){
+							var res = "";
+							if(fields.pay_cash.getValue()){
+								res = CommonHelper.numberFormat(fields.total.getValue(),2,","," ");
+							}
+							return res;
+						}
+					})
+				]
+			})
+		
+			,new GridCellHead(id+":order_make_grid:head:payed",{
+				"value":"Оплата",
+				"colAttrs":{"align":"center"},
+				"columns":[
+					new GridColumn({
+						"field":model.getField("payed"),
+						"formatFunction":function(fields){
+							var res = "";
+							if(fields.payed.getValue()){
+								res = "опл";
+							}
+							else if(fields.under_control.getValue()){
+								res = "!";
+							}
+							else{
+								res = "-";
+							}
+							return res;
+						}
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:comment_text",{
+				"value":"Комментарий",
+				"columns":[
+					new GridColumn({
+						"field":model.getField("comment_text"),
+						"formatFunction":function(fields,cell){
+							return window.getApp().formatCell(fields.comment_text,cell,self.m_listView.COL_COMMENT_LEN);
+						}										
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:phone_cel",{
+				"value":"Телефон",
+				"columns":[
+					new GridColumnPhone({
+						"field":model.getField("phone_cel"),
+						"telExt":window.getApp().getServVar("tel_ext")
+					})
+				]
+			})
+			,new GridCellHead(id+":order_make_grid:head:descr",{
+				"value":"Прораб",
+				"columns":[
+					new GridColumn({
+						"field":model.getField("descr"),
+						"formatFunction":function(fields,cell){
+							return window.getApp().formatCell(fields.descr,cell,self.m_listView.COL_DESCR_LEN);
+						}										
+					})
+				]
+			})
+		];
+		foot = new GridFoot(id+"order_make_grid:foot",{
+			"autoCalc":true,			
+			"elements":[
+				new GridRow(id+":order_make_grid:foot:row0",{
+					"elements":[
+						new GridCellFoot(id+":order_make_grid:foot:tot_quant_rest",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"quant_rest",
+							"gridColumn":new GridColumnFloat({"id":"tot_quant_rest"})
+						})						
+						,new GridCell(id+":order_make_grid:foot:total_sp1",{
+							"colSpan":"2"
+						})						
+						,new GridCellFoot(id+":order_make_grid:foot:tot_quant",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"quant",
+							"gridColumn":new GridColumnFloat({"id":"tot_quant"}),
+							"calc":function(model){
+								var ct_ref = model.getFieldValue("concrete_types_ref");
+								if(ct_ref&&ct_ref.getDescr()!="Вода"){
+									var f_val = model.getFieldValue(this.m_calcFieldId);
+									if(isNaN(f_val))f_val = 0;
+	
+									this.setTotal(this.getTotal()+f_val);							
+								}
+							}
+						})						
+						,new GridCell(id+":order_make_grid:foot:total_sp2",{
+							"colSpan":"3"
+						})						
+						,new GridCellFoot(id+":order_make_grid:foot:tot_total",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"total",
+							"gridColumn":new GridColumnFloat({"id":"tot_total"})
+						})						
+				
+						,new GridCell(id+":order_make_grid:foot:total_sp3",{
+							"colSpan":"4"
+						})						
+				
+					]
+				})		
+			]
+		});		
+	};
+	
 	CommonHelper.merge(options,{
 		"model":model,
 		"className":OrderMakeList_View.prototype.TABLE_CLASS,
@@ -42,6 +309,12 @@ function OrderMakeGrid(id,options){
 				"template":window.getApp().getTemplate("OrderDialogView"),
 				"dateTime_time":self.m_dateTime_time,
 				"dateTime_date":self.dateTime_date
+			}
+		},
+		"onEventSetCellOptions":function(opts){
+			if(window.getWidthType()=="sm"){
+				opts.attrs = opts.attrs || {};
+				opts.attrs.style = "white-space:pre-wrap; word-wrap:break-word;";
 			}
 		},
 		"onEventSetRowOptions":function(opts){
@@ -90,226 +363,11 @@ function OrderMakeGrid(id,options){
 		"head":new GridHead(id+":order_make_grid:head",{
 			"elements":[
 				new GridRow(id+":order_make_grid:head:row0",{
-					"elements":[
-						new GridCellHead(id+":order_make_grid:head:quant_rest",{
-							"value":"Ост.",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("quant_rest"),
-									"master":true,
-									"detailViewClass":ShipmentForOrderList_View,
-									"detailViewOptions":{
-										"listView":self.m_listView,
-										"detailFilters":{
-											"ShipmentForOrderList_Model":[
-												{
-												"masterFieldId":"id",
-												"field":"order_id",
-												"sign":"e",
-												"val":"0"
-												}	
-											]
-										}													
-									}
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:clients_ref",{
-							"value":"Клиент",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("clients_ref"),
-									"formatFunction":function(fields,cell){
-										return window.getApp().formatCell(fields.clients_ref,cell,self.m_listView.COL_CLIENT_LEN);
-									}
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:destinations_ref",{
-							"value":"Объект",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("destinations_ref"),
-									"formatFunction":function(fields,cell){
-										return window.getApp().formatCell(fields.destinations_ref,cell,self.m_listView.COL_DEST_LEN);
-									}
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:quant",{
-							"value":"Кол-во",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumn({
-									"field":model.getField("quant")
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:concrete_types_ref",{
-							"value":"Марка",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("concrete_types_ref")
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:date_time_time",{
-							"value":"Время",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumnDate({
-									"field":model.getField("date_time"),
-									"dateFormat":"H:i"
-								})
-							]
-						})
-						
-						,new GridCellHead(id+":order_make_grid:head:unload_type",{
-							"value":"Подача",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("unload_type"),
-									"formatFunction":function(fields,cell){
-										var res = "";
-										var tp = fields.unload_type.getValue();
-										if(tp=="band"||tp=="pump"){
-											var cmt = fields.pump_vehicle_comment.getValue();
-											res = window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
-											var l = fields.pump_vehicle_length.getValue();
-											if(l){
-												res+="("+l+((cmt&&cmt.length)? ","+cmt:"")+")";
-											}
-											else if(cmt&&cmt.length){
-												res+="("+cmt+")";
-											}
-										}
-										return res;
-									}
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:total",{
-							"value":"Сумма",
-							"colAttrs":{"align":"right"},
-							"columns":[
-								new GridColumn({
-									"field":model.getField("total"),
-									"formatFunction":function(fields){
-										var res = "";
-										if(fields.pay_cash.getValue()){
-											res = CommonHelper.numberFormat(fields.total.getValue(),2,","," ");
-										}
-										return res;
-									}
-								})
-							]
-						})
-					
-						,new GridCellHead(id+":order_make_grid:head:payed",{
-							"value":"Оплата",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumn({
-									"field":model.getField("payed"),
-									"formatFunction":function(fields){
-										var res = "";
-										if(fields.payed.getValue()){
-											res = "опл";
-										}
-										else if(fields.under_control.getValue()){
-											res = "!";
-										}
-										else{
-											res = "-";
-										}
-										return res;
-									}
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:comment_text",{
-							"value":"Комментарий",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("comment_text"),
-									"formatFunction":function(fields,cell){
-										return window.getApp().formatCell(fields.comment_text,cell,self.m_listView.COL_COMMENT_LEN);
-									}										
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:phone_cel",{
-							"value":"Телефон",
-							"columns":[
-								new GridColumnPhone({
-									"field":model.getField("phone_cel"),
-									"telExt":window.getApp().getServVar("tel_ext")
-								})
-							]
-						})
-						,new GridCellHead(id+":order_make_grid:head:descr",{
-							"value":"Прораб",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("descr"),
-									"formatFunction":function(fields,cell){
-										return window.getApp().formatCell(fields.descr,cell,self.m_listView.COL_DESCR_LEN);
-									}										
-								})
-							]
-						})
-					]
+					"elements":elements
 				})
 			]
 		}),
-		"foot":new GridFoot(id+"order_make_grid:foot",{
-			"autoCalc":true,			
-			"elements":[
-				new GridRow(id+":order_make_grid:foot:row0",{
-					"elements":[
-						new GridCellFoot(id+":order_make_grid:foot:tot_quant_rest",{
-							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"quant_rest",
-							"gridColumn":new GridColumnFloat({"id":"tot_quant_rest"})
-						})						
-						,new GridCell(id+":order_make_grid:foot:total_sp1",{
-							"colSpan":"2"
-						})						
-						,new GridCellFoot(id+":order_make_grid:foot:tot_quant",{
-							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"quant",
-							"gridColumn":new GridColumnFloat({"id":"tot_quant"}),
-							"calc":function(model){
-								var ct_ref = model.getFieldValue("concrete_types_ref");
-								if(ct_ref&&ct_ref.getDescr()!="Вода"){
-									var f_val = model.getFieldValue(this.m_calcFieldId);
-									if(isNaN(f_val))f_val = 0;
-			
-									this.setTotal(this.getTotal()+f_val);							
-								}
-							}
-						})						
-						,new GridCell(id+":order_make_grid:foot:total_sp2",{
-							"colSpan":"3"
-						})						
-						,new GridCellFoot(id+":order_make_grid:foot:tot_total",{
-							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"total",
-							"gridColumn":new GridColumnFloat({"id":"tot_total"})
-						})						
-						
-						,new GridCell(id+":order_make_grid:foot:total_sp3",{
-							"colSpan":"4"
-						})						
-						
-					]
-				})		
-			]
-		}),
+		"foot":foot,
 		"selectedRowClass":"order_current_row",
 		"pagination":null,
 		"autoRefresh":false,

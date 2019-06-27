@@ -203,14 +203,14 @@ class ShipmentForVehOwnerList_Model extends ModelSQLBeton{
 		$this->addField($f_demurrage_cost);
 		//********************
 		
-		//*** Field acc_comment ***
+		//*** Field acc_comment_shipment ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Комментарий бухгалетрии';
-		$f_opts['id']="acc_comment";
+		$f_opts['id']="acc_comment_shipment";
 						
-		$f_acc_comment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment",$f_opts);
-		$this->addField($f_acc_comment);
+		$f_acc_comment_shipment=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"acc_comment_shipment",$f_opts);
+		$this->addField($f_acc_comment_shipment);
 		//********************
 		
 		//*** Field owner_agreed ***

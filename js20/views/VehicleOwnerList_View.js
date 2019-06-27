@@ -82,6 +82,7 @@ function VehicleOwnerList_View(id,options){
 							],
 							"sortable":true
 						})
+						/*
 						,new GridCellHead(id+":grid:head:last_concrete_costs_for_owner_h_ref",{
 							"value":"Прайс бетон",
 							"columns":[
@@ -111,7 +112,7 @@ function VehicleOwnerList_View(id,options){
 							],
 							"sortable":true
 						})
-						
+						*/
 					]
 				})
 			]
