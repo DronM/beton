@@ -9,7 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
@@ -39,7 +39,7 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Дата отгрузки';
 		$f_opts['id']="ship_date";
 						
-		$f_ship_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date",$f_opts);
+		$f_ship_date=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date",$f_opts);
 		$this->addField($f_ship_date);
 		//********************
 		
@@ -129,12 +129,23 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$f_cost_other_owner_pump=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_other_owner_pump",$f_opts);
 		$this->addField($f_cost_other_owner_pump);
 		//********************
+		
+		//*** Field cost_total ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость итого';
+		$f_opts['id']="cost_total";
+						
+		$f_cost_total=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_total",$f_opts);
+		$this->addField($f_cost_total);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	$this->setAggFunctions(
 		array(array('alias'=>'total_quant','expr'=>'sum(quant)')
 ,array('alias'=>'total_cost_shipment','expr'=>'sum(cost_shipment)')
 ,array('alias'=>'total_cost_concrete','expr'=>'sum(cost_concrete)')
 ,array('alias'=>'total_cost_other_owner_pump','expr'=>'sum(cost_other_owner_pump)')
+,array('alias'=>'total_cost_total','expr'=>'sum(cost_total)')
 )
 	);	
 

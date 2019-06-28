@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-06-27 06:06:44</lastBuild></version>
+		<lastBuild>2019-06-28 05:32:06</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -47,6 +47,7 @@
 		<version dateOpen="2019-06-22 09:06:00" dateClose="2019-06-24 06:06:00">1.00141</version>
 		<version dateOpen="2019-06-26 06:06:07" dateClose="2019-06-26 06:06:08">1.00142</version>
 		<version dateOpen="2019-06-26 06:06:15" dateClose="2019-06-27 06:06:06">1.00143</version>
+		<version dateOpen="2019-06-27 14:06:12" dateClose="2019-06-28 05:06:32">1.00144</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -990,9 +991,10 @@
 				<aggFunction alias="total_cost_shipment" expr="sum(cost_shipment)"/>
 				<aggFunction alias="total_cost_concrete" expr="sum(cost_concrete)"/>
 				<aggFunction alias="total_cost_other_owner_pump" expr="sum(cost_other_owner_pump)"/>
+				<aggFunction alias="total_cost_total" expr="sum(cost_total)"/>
 			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
-			<field id="ship_date" dataType="Date" alias="Дата отгрузки"/>
+			<field id="ship_date" dataType="DateTimeTZ" alias="Дата отгрузки"/>
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
 			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
@@ -1002,6 +1004,7 @@
 			<field id="cost_shipment" dataType="Float" alias="Стоимость доставки"/>
 			<field id="cost_concrete" dataType="Float" alias="Стоимость бетон"/>
 			<field id="cost_other_owner_pump" dataType="Float" alias="Стоимость чужего насоса"/>
+			<field id="cost_total" dataType="Float" alias="Стоимость итого"/>
 			<sql/>
 			<globalFilter id="vehicle_owner_client_list" fieldId="client_id"/>
 		</model>
@@ -2325,7 +2328,6 @@
 			<field id="name" dataType="String"/>
 			<field id="users_ref" dataType="JSON"/>
 			<field id="client_list" dataType="Text"/>
-			<field id="last_concrete_costs_for_owner_h_ref" dataType="JSON"/>
 		</model>
 		<model id="VehicleOwnerClient" parent="ModelSQLBeton" dataTable="vehicle_owner_clients" virtual="FALSE">
 			<field id="vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>

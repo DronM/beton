@@ -17,11 +17,16 @@ CREATE OR REPLACE VIEW vehicle_owner_clients_list AS
 	LEFT JOIN (
 		SELECT
 			max(t_pr.date) AS max_date,
-			t_pr.vehicle_owner_id
+			t_pr.vehicle_owner_id,
+			t_pr.client_id
 		FROM vehicle_owner_concrete_prices AS t_pr
-		GROUP BY t_pr.vehicle_owner_id
-	) AS pr_last ON pr_last.vehicle_owner_id=vown.id
-	LEFT JOIN vehicle_owner_concrete_prices AS pr_h ON pr_h.date = pr_last.max_date AND pr_h.vehicle_owner_id=pr_last.vehicle_owner_id
+		GROUP BY t_pr.vehicle_owner_id,t_pr.client_id
+	) AS pr_last ON pr_last.vehicle_owner_id=vown.id AND pr_last.client_id=t.client_id
+	
+	LEFT JOIN vehicle_owner_concrete_prices AS pr_h
+		ON pr_h.date = pr_last.max_date
+		AND pr_h.vehicle_owner_id=pr_last.vehicle_owner_id
+		AND pr_h.client_id=pr_last.client_id
 	LEFT JOIN concrete_costs_for_owner_h AS pr ON pr.id=pr_h.concrete_costs_for_owner_h_id
 	;
 	

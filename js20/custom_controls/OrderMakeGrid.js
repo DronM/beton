@@ -46,11 +46,41 @@ function OrderMakeGrid(id,options){
 					new GridColumn({
 						"id":"inf1",
 						"formatFunction":function(fields,cell){
-							var res = DateHelper.format(fields.date_time.getValue(),"H:i");
-							res+= String.fromCharCode(10)+window.getApp().formatCell(fields.clients_ref,cell,self.m_listView.COL_CLIENT_LEN);
+							var res = String.fromCharCode(10)+window.getApp().formatCell(fields.clients_ref,cell,self.m_listView.COL_CLIENT_LEN);
 							res+= String.fromCharCode(10)+window.getApp().formatCell(fields.destinations_ref,cell,self.m_listView.COL_DEST_LEN);
-							res+= String.fromCharCode(10)+fields.phone_cel.getValue();
-							return res;
+							var unl_t = fields.unload_type.getValue();
+							if(unl_t=="band"||unl_t=="pump"){
+								var cmt = fields.pump_vehicle_comment.getValue();
+								res+= String.fromCharCode(10)+(unl_t=="band"? "Лента":"Насос")+":";
+								res+= window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
+								var l = fields.pump_vehicle_length.getValue();
+								if(l){
+									res+="("+l+((cmt&&cmt.length)? ","+cmt:"")+")";
+								}
+								else if(cmt&&cmt.length){
+									res+="("+cmt+")";
+								}
+							}
+							res+= String.fromCharCode(10);
+							var tel = fields.phone_cel.getValue();
+							var tel_m = tel
+							if(tel_m.length==10){
+								tel_m = "+7"+tel;
+							}
+							else if(tel_m.length==11){
+								tel_m = "+7"+tel.substr(1);
+							}
+							
+							var cell_n = cell.getNode();
+							var c_tag = document.createElement("SPAN");
+							c_tag.textContent = res;
+							cell_n.appendChild(c_tag);
+							
+							var t_tag = document.createElement("A");
+							t_tag.setAttribute("href","tel:"+tel_m);
+							t_tag.textContent = CommonHelper.maskFormat(tel,window.getApp().getPhoneEditMask());
+							cell_n.appendChild(t_tag);
+							return "";
 						}
 					})
 				]

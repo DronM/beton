@@ -184,6 +184,15 @@ function ShipmentForClientVehOwnerList_View(id,options){
 								})
 							]
 						})						
+						,new GridCellHead(id+":grid:head:cost_total",{
+							"value":"Итого",
+							"colAttrs":{"align":"right"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("cost_total")
+								})
+							]
+						})						
 						
 					]
 				})
@@ -216,6 +225,11 @@ function ShipmentForClientVehOwnerList_View(id,options){
 							"attrs":{"align":"right"},
 							"totalFieldId":"total_cost_other_owner_pump",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost_other_owner_pump"})
+						})
+						,new GridCellFoot(id+":grid:foot:tot_cost_total",{
+							"attrs":{"align":"right"},
+							"totalFieldId":"total_cost_total",
+							"gridColumn":new GridColumnFloat({"id":"tot_cost_total"})
 						})
 						
 					]
