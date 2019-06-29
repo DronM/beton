@@ -1,11 +1,11 @@
 -- VIEW: shipments_for_veh_client_owner_list
 
---DROP VIEW shipments_for_client_veh_owner_list;
+DROP VIEW shipments_for_client_veh_owner_list;
 
 CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	SELECT
 		o.id,
-		o.date_time::date AS ship_date,
+		o.date_time AS ship_date,
 		o.concrete_type_id,
 		concrete_types_ref(ct) AS concrete_types_ref,
 		o.destination_id,
@@ -19,7 +19,15 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 		WHERE sh.order_id=o.id
 		),0) AS cost_shipment,
 		
-		coalesce(pr.price,0)*o.quant::numeric AS cost_concrete,
+		coalesce(
+			(SELECT
+				pr.price
+			FROM vehicle_owner_concrete_prices AS pr_t
+			LEFT JOIN concrete_costs_for_owner AS pr ON pr.header_id = pr_t.concrete_costs_for_owner_h_id AND pr.concrete_type_id=o.concrete_type_id
+			WHERE pr_t.vehicle_owner_id=vown_cl.vehicle_owner_id AND pr_t.client_id=o.client_id AND pr_t.date<=o.date_time
+			ORDER BY pr_t.date DESC
+			LIMIT 1)
+		,0)*o.quant::numeric AS cost_concrete,
 		
 		--стоимость чужего насоса, если есть
 		coalesce(
@@ -50,7 +58,15 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 		FROM shipments AS sh
 		WHERE sh.order_id=o.id
 		),0) + 
-		coalesce(pr.price,0)*o.quant::numeric + 
+		coalesce(
+			(SELECT
+				pr.price
+			FROM vehicle_owner_concrete_prices AS pr_t
+			LEFT JOIN concrete_costs_for_owner AS pr ON pr.header_id = pr_t.concrete_costs_for_owner_h_id AND pr.concrete_type_id=o.concrete_type_id
+			WHERE pr_t.vehicle_owner_id=vown_cl.vehicle_owner_id AND pr_t.client_id=o.client_id AND pr_t.date<=o.date_time
+			ORDER BY pr_t.date DESC
+			LIMIT 1)
+		,0)*o.quant::numeric +
 		coalesce(
 		CASE
 			WHEN o.pump_vehicle_id IS NULL OR pvh_v.vehicle_owner_id=vown_cl.vehicle_owner_id THEN 0::numeric(15,2)
@@ -76,6 +92,8 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	LEFT JOIN concrete_types AS ct ON ct.id=o.concrete_type_id
 	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
 	LEFT JOIN vehicle_owner_clients AS vown_cl ON vown_cl.client_id=o.client_id	
+	
+	/*
 	LEFT JOIN (
 		SELECT
 			t_pr.vehicle_owner_id,
@@ -87,6 +105,7 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	
 	LEFT JOIN vehicle_owner_concrete_prices AS pr_h ON pr_h.vehicle_owner_id=pr_last.vehicle_owner_id AND pr_h.date=pr_last.last_date AND pr_h.client_id=pr_last.client_id
 	LEFT JOIN concrete_costs_for_owner AS pr ON pr.header_id = pr_h.concrete_costs_for_owner_h_id AND pr.concrete_type_id=o.concrete_type_id
+	*/
 	
 	LEFT JOIN (
 		SELECT

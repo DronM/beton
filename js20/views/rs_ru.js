@@ -46,9 +46,9 @@ EmployeeList_View.prototype.HEAD_TITLE = "Сотрудники";
 QuarryList_View.prototype.HEAD_TITLE = "Карьеры";
 
 ShipmentList_View.prototype.HEAD_TITLE = "Отгрузки";
-ShipmentForVehOwnerList_View.prototype.HEAD_TITLE = "Отгрузки";
+ShipmentForVehOwnerList_View.prototype.HEAD_TITLE = "Наработка (миксеры)";
 ShipmentTimeList_View.prototype.HEAD_TITLE = "Опоздания назначений и отгрузок";
-ShipmentForClientVehOwnerList_View.prototype.HEAD_TITLE = "Отгрузки по клиенту-владельцу ТС";
+ShipmentForClientVehOwnerList_View.prototype.HEAD_TITLE = "Самовывоз";
 
 VehicleScheduleReportAll_View.prototype.HEAD_TITLE = "Печать графиков";
 
@@ -101,7 +101,7 @@ VehicleOwnerList_View.prototype.HEAD_TITLE = "Владельцы транспо�
 ShipmentCancelationList_View.prototype.HEAD_TITLE = "Отмененные отгрузки";
 
 ShipmentPumpList_View.prototype.HEAD_TITLE = "Отгрузки (насосы)";
-ShipmentPumpForVehOwnerList_View.prototype.HEAD_TITLE = "Отгрузки (насосы)";
+ShipmentPumpForVehOwnerList_View.prototype.HEAD_TITLE = "Наработка (насосы)";
 
 UserOperatorList_View.prototype.HEAD_TITLE = "Список операторов";
 

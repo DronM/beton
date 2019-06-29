@@ -9,7 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
@@ -39,7 +39,7 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Дата отгрузки';
 		$f_opts['id']="ship_date";
 						
-		$f_ship_date=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date",$f_opts);
+		$f_ship_date=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date",$f_opts);
 		$this->addField($f_ship_date);
 		//********************
 		

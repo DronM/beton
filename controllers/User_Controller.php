@@ -558,7 +558,7 @@ class User_Controller extends ControllerSQL{
 			else{
 				$expr = sprintf('client_id IN (%s)',$_SESSION['global_vehicle_owner_client_list']);
 			}
-			$filter->addExpression('vehicle_owner_client_list',$expr,'=');
+			$filter->addExpression('vehicle_owner_client_list',$expr,'AND');
 			GlobalFilter::set('ShipmentForClientVehOwnerList_Model',$filter);
 						
 		}

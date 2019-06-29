@@ -170,7 +170,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			else{
 				$expr = sprintf('<xsl:value-of select="@fieldId"/> IN (%s)',$_SESSION['global_vehicle_owner_client_list']);
 			}
-			$filter->addExpression('vehicle_owner_client_list',$expr,'=');
+			$filter->addExpression('vehicle_owner_client_list',$expr,'AND');
 			GlobalFilter::set('<xsl:value-of select="$model_id"/>',$filter);
 			</xsl:for-each>			
 		}

@@ -61,6 +61,16 @@ EditPeriodDateShift.prototype.goFast = function(sign){
 		EditPeriodDateShift.superclass.goFast.call(this,sign);	
 	}
 }
+
+EditPeriodDateShift.prototype.setCtrlDateTime = function(ctrl,dt){
+	dt.setHours(0);
+	dt.setMinutes(0);
+	dt.setSeconds(0);
+	//
+	dt.setTime(dt.getTime() + DateHelper.timeToMS(ctrl.getTimeValueStr()) + ((ctrl.getAttr("name")=="to")? 24*60*60*1000:0) );
+	ctrl.setValue(dt);
+}
+
 EditPeriodDateShift.prototype.go = function(sign){
 	if (this.getControlPeriodSelect().getValue()=="shift"){
 		this.addDaysToControl(this.getControlFrom(),1*sign);

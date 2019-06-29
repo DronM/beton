@@ -13,7 +13,7 @@ function ShipmentForClientVehOwnerList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 
-	var period_ctrl = new EditPeriodDate(id+":filter-ctrl-period",{
+	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"field":new FieldDateTime("ship_date")
 	});
 
@@ -106,10 +106,10 @@ function ShipmentForClientVehOwnerList_View(id,options){
 							"columns":[
 								new GridColumnDate({
 									"field":model.getField("ship_date"),
-									"dateFormat":"d/m/y",
+									"dateFormat":"d/m/y H:i",
 									"ctrlClass":EditDate,
 									"searchOptions":{
-										"field":new FieldDate("ship_date")
+										"field":new FieldDateTime("ship_date")
 									}																		
 								})
 							],

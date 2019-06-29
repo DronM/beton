@@ -45,7 +45,7 @@ function ShipmentForClientVehOwnerList_Model(options){
 	filed_options.alias = 'Дата отгрузки';
 	filed_options.autoInc = false;	
 	
-	options.fields.ship_date = new FieldDateTimeTZ("ship_date",filed_options);
+	options.fields.ship_date = new FieldDateTime("ship_date",filed_options);
 	
 				
 	

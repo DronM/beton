@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-06-28 05:32:06</lastBuild></version>
+		<lastBuild>2019-06-29 05:26:51</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -48,6 +48,7 @@
 		<version dateOpen="2019-06-26 06:06:07" dateClose="2019-06-26 06:06:08">1.00142</version>
 		<version dateOpen="2019-06-26 06:06:15" dateClose="2019-06-27 06:06:06">1.00143</version>
 		<version dateOpen="2019-06-27 14:06:12" dateClose="2019-06-28 05:06:32">1.00144</version>
+		<version dateOpen="2019-06-28 15:06:20" dateClose="2019-06-29 05:06:26">1.00145</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -994,7 +995,7 @@
 				<aggFunction alias="total_cost_total" expr="sum(cost_total)"/>
 			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
-			<field id="ship_date" dataType="DateTimeTZ" alias="Дата отгрузки"/>
+			<field id="ship_date" dataType="DateTime" alias="Дата отгрузки"/>
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
 			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
@@ -3373,6 +3374,7 @@
 		<permission type="allow" controllerId="Driver" methodId="get_list" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="ProductionSite" methodId="get_list" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="OrderPump" methodId="get_list" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="VariantStorage" methodId="all" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="VehicleOwner" methodId="get_tot_report" roleId="vehicle_owner"/>
 	</permissions>
 	<views>

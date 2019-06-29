@@ -74,6 +74,32 @@ $permissions = array();
 		
 			$permissions['OrderPump_Controller_get_list']=TRUE;
 		
+				$permissions['VariantStorage_Controller_insert']=TRUE;
+			
+				$permissions['VariantStorage_Controller_upsert_filter_data']=TRUE;
+			
+				$permissions['VariantStorage_Controller_upsert_col_visib_data']=TRUE;
+			
+				$permissions['VariantStorage_Controller_upsert_col_order_data']=TRUE;
+			
+				$permissions['VariantStorage_Controller_upsert_all_data']=TRUE;
+			
+				$permissions['VariantStorage_Controller_update']=TRUE;
+			
+				$permissions['VariantStorage_Controller_delete']=TRUE;
+			
+				$permissions['VariantStorage_Controller_get_list']=TRUE;
+			
+				$permissions['VariantStorage_Controller_get_object']=TRUE;
+			
+				$permissions['VariantStorage_Controller_get_filter_data']=TRUE;
+			
+				$permissions['VariantStorage_Controller_get_col_visib_data']=TRUE;
+			
+				$permissions['VariantStorage_Controller_get_col_order_data']=TRUE;
+			
+				$permissions['VariantStorage_Controller_get_all_data']=TRUE;
+			
 			$permissions['VehicleOwner_Controller_get_tot_report']=TRUE;
 		
 return array_key_exists($contrId.'_'.$methId,$permissions);
