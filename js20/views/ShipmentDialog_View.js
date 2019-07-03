@@ -94,6 +94,17 @@ function ShipmentDialog_View(id,options){
 				}
 			}
 		}));
+		this.addElement(new EditMoneyEditable(id+":pump_for_client_cost",{
+			"className":"form-control orderMoneyField",
+			"labelCaption":"Стомисоть насос для клиента:",
+			"value":0,
+			"enabled":false
+			,"onToggleEditable":function(){
+				if(!self.getElement("pump_for_client_cost").getEditAllowed()){
+					self.getElement("pump_for_client_cost").setValue(self.getModel().getFieldValue("pump_for_client_cost_default"));
+				}
+			}
+		}));
 
 		this.addElement(new EditMoneyEditable(id+":ship_cost",{
 			"className":"form-control orderMoneyField",
@@ -128,6 +139,7 @@ function ShipmentDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("acc_comment")})
 		,new DataBinding({"control":this.getElement("acc_comment_shipment")})
 		,new DataBinding({"control":this.getElement("pump_cost")})
+		,new DataBinding({"control":this.getElement("pump_for_client_cost")})
 		,new DataBinding({"control":this.getElement("ship_cost")})
 	]);
 	
@@ -147,6 +159,20 @@ function ShipmentDialog_View(id,options){
 				}
 				else{
 					pm.unsetFieldValue("pump_cost_edit");
+				}
+				
+				if(self.getPumpForClientCostEditModified()){
+					var pump_for_client_cost_edit = !self.m_model.getFieldValue("pump_for_client_cost_edit");
+					pm.setFieldValue("pump_for_client_cost_edit",pump_for_client_cost_edit);
+					if(pump_for_client_cost_edit){
+						pm.setFieldValue("pump_for_client_cost",this.getElement("pump_for_client_cost").getValue());
+					}
+					else{
+						pm.unsetFieldValue("pump_for_client_cost");
+					}
+				}
+				else{
+					pm.unsetFieldValue("pump_for_client_cost_edit");
 				}
 				
 				if(self.getShipCostEditModified()){
@@ -172,6 +198,7 @@ function ShipmentDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("acc_comment")})
 		,new CommandBinding({"control":this.getElement("acc_comment_shipment")})
 		,new CommandBinding({"control":this.getElement("pump_cost")})
+		,new CommandBinding({"control":this.getElement("pump_for_client_cost")})
 		,new CommandBinding({"control":this.getElement("ship_cost")})
 	]);
 	
@@ -183,9 +210,15 @@ ShipmentDialog_View.prototype.getModified = function(cmd){
 		ShipmentDialog_View.superclass.getModified.call(this,cmd)
 		|| this.getPumpCostEditModified()
 		|| this.getElement("pump_cost").getModified()
+		|| this.getPumpForClientCostEditModified()
+		|| this.getElement("pump_for_client_cost").getModified()
 		|| this.getShipCostEditModified()
 		|| this.getElement("ship_cost").getModified()		
 	);
+}
+
+ShipmentDialog_View.prototype.getPumpForClientCostEditModified = function(pm){
+	return (this.getElement("pump_for_client_cost").getVisible() && this.getElement("pump_for_client_cost").getEditAllowed()!=this.m_model.getFieldValue("pump_for_client_cost_edit"));
 }
 
 ShipmentDialog_View.prototype.getPumpCostEditModified = function(pm){
@@ -204,9 +237,11 @@ ShipmentDialog_View.prototype.onGetData = function(resp,cmd){
 	var pv = m.getFieldValue("pump_vehicles_ref");
 	if(!pv || pv.isNull() || !m.getFieldValue("order_last_shipment")){
 		this.getElement("pump_cost").setVisible(false);
+		this.getElement("pump_for_client_cost").setVisible(false);
 	}
 	else{
 		this.getElement("pump_cost").setEditAllowed(m.getFieldValue("pump_cost_edit"));
+		this.getElement("pump_for_client_cost").setEditAllowed(m.getFieldValue("pump_for_client_cost_edit"));
 	}
 	
 	this.getElement("ship_cost").setVisible(true);

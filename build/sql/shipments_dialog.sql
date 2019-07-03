@@ -56,7 +56,59 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 		(sh_last.id=sh.id) AS order_last_shipment,
 		
 		shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,FALSE) AS ship_cost_default,
-		shipments_pump_cost(sh,o,dest,pvh,FALSE) AS pump_cost_default
+		shipments_pump_cost(sh,o,dest,pvh,FALSE) AS pump_cost_default,
+		
+		sh.pump_for_client_cost_edit,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_for_client_cost_edit,FALSE) THEN sh.pump_for_client_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_for_client_cost,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_for_client_cost_default
+		
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id

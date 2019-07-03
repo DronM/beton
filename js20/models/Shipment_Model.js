@@ -212,6 +212,26 @@ function Shipment_Model(options){
 	
 	options.fields.ship_cost_edit = new FieldBool("ship_cost_edit",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_for_client_cost = new FieldFloat("pump_for_client_cost",filed_options);
+	options.fields.pump_for_client_cost.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_for_client_cost_edit = new FieldBool("pump_for_client_cost_edit",filed_options);
+	
 			
 			
 			

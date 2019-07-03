@@ -55,6 +55,7 @@ function Login_View(id,options){
 	//Commands
 	var contr = new User_Controller();
 	var pm = contr.getPublicMethod("login");
+	pm.setFieldValue("width_type",window.getWidthType());
 	
 	this.addCommand(new Command("login",{
 		"publicMethod":pm,

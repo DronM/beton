@@ -232,6 +232,35 @@ function ShipmentDialog_Model(options){
 	
 	options.fields.order_last_shipment = new FieldBool("order_last_shipment",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_for_client_cost = new FieldFloat("pump_for_client_cost",filed_options);
+	options.fields.pump_for_client_cost.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_for_client_cost_default = new FieldFloat("pump_for_client_cost_default",filed_options);
+	options.fields.pump_for_client_cost_default.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_for_client_cost_edit = new FieldBool("pump_for_client_cost_edit",filed_options);
+	
 			
 			
 		ShipmentDialog_Model.superclass.constructor.call(this,id,options);

@@ -19,7 +19,6 @@ function OrderMakeGrid(id,options){
 	this.m_shiftStartMS = DateHelper.timeToMS(options.shiftStart);
 	this.m_shiftLengthMS = DateHelper.timeToMS(options.shiftLength);
 	this.m_periodSelect = options.periodSelect;
-	
 	var self = this;
 	
 	var w = window.getWidthType();
@@ -48,19 +47,6 @@ function OrderMakeGrid(id,options){
 						"formatFunction":function(fields,cell){
 							var res = String.fromCharCode(10)+window.getApp().formatCell(fields.clients_ref,cell,self.m_listView.COL_CLIENT_LEN);
 							res+= String.fromCharCode(10)+window.getApp().formatCell(fields.destinations_ref,cell,self.m_listView.COL_DEST_LEN);
-							var unl_t = fields.unload_type.getValue();
-							if(unl_t=="band"||unl_t=="pump"){
-								var cmt = fields.pump_vehicle_comment.getValue();
-								res+= String.fromCharCode(10)+(unl_t=="band"? "Лента":"Насос")+":";
-								res+= window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
-								var l = fields.pump_vehicle_length.getValue();
-								if(l){
-									res+="("+l+((cmt&&cmt.length)? ","+cmt:"")+")";
-								}
-								else if(cmt&&cmt.length){
-									res+="("+cmt+")";
-								}
-							}
 							res+= String.fromCharCode(10);
 							var tel = fields.phone_cel.getValue();
 							var tel_m = tel
@@ -85,6 +71,34 @@ function OrderMakeGrid(id,options){
 					})
 				]
 			})
+			,new GridCellHead(id+":order_make_grid:head:inf3",{
+				"value":"Насос",
+				"columns":[
+					new GridColumn({
+						"id":"inf3",
+						"formatFunction":function(fields,cell){
+							var res = "";
+							var unl_t = fields.unload_type.getValue();
+							if(unl_t=="band"||unl_t=="pump"){
+								var cmt = fields.pump_vehicle_comment.getValue();
+								//String.fromCharCode(10)+
+								res+= (unl_t=="band"? "Лента":"Насос")+":"+String.fromCharCode(10);
+								res+= window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
+								var l = fields.pump_vehicle_length.getValue();
+								if(l){
+									res+="("+l+((cmt&&cmt.length)? ","+cmt:"")+")";
+								}
+								else if(cmt&&cmt.length){
+									res+="("+cmt+")";
+								}
+							}
+						
+							return res;
+						}
+					})
+				]
+			})
+			
 			,new GridCellHead(id+":order_make_grid:head:inf2",{
 				"value":"",
 				"columns":[

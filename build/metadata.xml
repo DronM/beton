@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-06-29 05:26:51</lastBuild></version>
+		<lastBuild>2019-07-03 06:49:05</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -49,6 +49,7 @@
 		<version dateOpen="2019-06-26 06:06:15" dateClose="2019-06-27 06:06:06">1.00143</version>
 		<version dateOpen="2019-06-27 14:06:12" dateClose="2019-06-28 05:06:32">1.00144</version>
 		<version dateOpen="2019-06-28 15:06:20" dateClose="2019-06-29 05:06:26">1.00145</version>
+		<version dateOpen="2019-06-29 06:06:06" dateClose="2019-07-03 06:07:49">1.00146</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -896,6 +897,8 @@
 			<field id="pump_cost_edit" dataType="Bool" defaultValue="FALSE"/>
 			<field id="ship_cost" dataType="Float" length="15" precision="2"/>
 			<field id="ship_cost_edit" dataType="Bool" defaultValue="FALSE"/>
+			<field id="pump_for_client_cost" dataType="Float" length="15" precision="2"/>
+			<field id="pump_for_client_cost_edit" dataType="Bool" defaultValue="FALSE"/>
 			<index id="shipments_date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -912,6 +915,7 @@
 				<aggFunction alias="total_cost" expr="sum(cost)"/>
 				<aggFunction alias="total_pump_cost" expr="sum(pump_cost)"/>
 				<aggFunction alias="total_demurrage_cost" expr="sum(demurrage_cost)"/>
+				<aggFunction alias="total_pump_for_client_cost" expr="sum(pump_for_client_cost)"/>
 			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
@@ -952,6 +956,8 @@
 			<field id="owner_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования миксер"/>
 			<field id="owner_pump_agreed" dataType="Bool" alias="Согласовано насос"/>
 			<field id="owner_pump_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования насос"/>
+			<field id="pump_for_client_cost" dataType="Float" length="15" precision="2"/>
+			<field id="pump_for_client_cost_edit" dataType="Bool" defaultValue="FALSE"/>
 			<sql/>
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
@@ -1033,6 +1039,9 @@
 			<field id="ship_cost_edit" dataType="Bool"/>
 			<field id="pump_vehicles_ref" dataType="JSON" alias="Насос"/>
 			<field id="order_last_shipment" dataType="Bool"/>
+			<field id="pump_for_client_cost" dataType="Float" length="15" precision="2"/>
+			<field id="pump_for_client_cost_default" dataType="Float" length="15" precision="2"/>
+			<field id="pump_for_client_cost_edit" dataType="Bool"/>
 			<sql/>
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
@@ -2734,6 +2743,7 @@
 			<publicMethod id="login">
 				<field id="name" dataType="String" alias="Имя пользователя" length="50"/>
 				<field id="pwd" dataType="Password" alias="Пароль" length="20"/>
+				<field id="width_type" dataType="String" length="2"/>
 			</publicMethod>
 			<publicMethod id="login_ext">
 				<field id="name" dataType="String" alias="Имя пользователя" length="50"/>

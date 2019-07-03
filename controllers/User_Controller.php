@@ -237,6 +237,12 @@ class User_Controller extends ControllerSQL{
 		$opts['length']=20;				
 		$pm->addParam(new FieldExtPassword('pwd',$opts));
 	
+				
+	$opts=array();
+	
+		$opts['length']=2;				
+		$pm->addParam(new FieldExtString('width_type',$opts));
+	
 			
 		$this->addPublicMethod($pm);
 
@@ -632,6 +638,7 @@ class User_Controller extends ControllerSQL{
 		
 		else{
 			$this->set_logged($ar);
+			$_SESSION['width_type'] = $pm->getParamValue("width_type");
 			
 		}
 	}

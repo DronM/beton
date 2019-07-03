@@ -213,6 +213,24 @@ class Shipment_Model extends ModelSQLBeton{
 		$f_ship_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_cost_edit",$f_opts);
 		$this->addField($f_ship_cost_edit);
 		//********************
+		
+		//*** Field pump_for_client_cost ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="pump_for_client_cost";
+						
+		$f_pump_for_client_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost",$f_opts);
+		$this->addField($f_pump_for_client_cost);
+		//********************
+		
+		//*** Field pump_for_client_cost_edit ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="pump_for_client_cost_edit";
+						
+		$f_pump_for_client_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost_edit",$f_opts);
+		$this->addField($f_pump_for_client_cost_edit);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

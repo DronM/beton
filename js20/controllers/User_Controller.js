@@ -318,6 +318,14 @@ extend(User_Controller,ControllerObjServer);
 	
 		pm.addField(new FieldPassword("pwd",options));
 	
+				
+	
+	var options = {};
+	
+		options.maxlength = "2";
+	
+		pm.addField(new FieldString("width_type",options));
+	
 			
 	this.addPublicMethod(pm);
 }

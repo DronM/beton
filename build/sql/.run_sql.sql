@@ -1,6 +1,6 @@
 -- VIEW: shipments_for_veh_client_owner_list
 
-DROP VIEW shipments_for_client_veh_owner_list;
+--DROP VIEW shipments_for_client_veh_owner_list;
 
 CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	SELECT
@@ -33,7 +33,7 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 		coalesce(
 		CASE
 			WHEN o.pump_vehicle_id IS NULL OR pvh_v.vehicle_owner_id=vown_cl.vehicle_owner_id THEN 0::numeric(15,2)
-			WHEN coalesce(last_sh.pump_cost_edit,FALSE) THEN last_sh.pump_cost::numeric(15,2)
+			WHEN coalesce(last_sh.pump_for_client_cost_edit,FALSE) THEN last_sh.pump_for_client_cost::numeric(15,2)
 			WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
 			ELSE
 				(SELECT

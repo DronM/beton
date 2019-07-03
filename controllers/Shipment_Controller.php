@@ -123,6 +123,12 @@ class Shipment_Controller extends ControllerSQL{
 		$param = new FieldExtBool('ship_cost_edit'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtFloat('pump_for_client_cost'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtBool('pump_for_client_cost_edit'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -234,6 +240,14 @@ class Shipment_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtBool('ship_cost_edit'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('pump_for_client_cost'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('pump_for_client_cost_edit'
 				,array(
 			));
 			$pm->addParam($param);

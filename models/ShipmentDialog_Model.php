@@ -240,6 +240,32 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$f_order_last_shipment=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_last_shipment",$f_opts);
 		$this->addField($f_order_last_shipment);
 		//********************
+		
+		//*** Field pump_for_client_cost ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="pump_for_client_cost";
+						
+		$f_pump_for_client_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost",$f_opts);
+		$this->addField($f_pump_for_client_cost);
+		//********************
+		
+		//*** Field pump_for_client_cost_default ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="pump_for_client_cost_default";
+						
+		$f_pump_for_client_cost_default=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost_default",$f_opts);
+		$this->addField($f_pump_for_client_cost_default);
+		//********************
+		
+		//*** Field pump_for_client_cost_edit ***
+		$f_opts = array();
+		$f_opts['id']="pump_for_client_cost_edit";
+						
+		$f_pump_for_client_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost_edit",$f_opts);
+		$this->addField($f_pump_for_client_cost_edit);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

@@ -176,6 +176,18 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldFloat("pump_for_client_cost",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("pump_for_client_cost_edit",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -305,6 +317,18 @@ extend(Shipment_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldBool("ship_cost_edit",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("pump_for_client_cost",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("pump_for_client_cost_edit",options);
 	
 	pm.addField(field);
 	
@@ -453,6 +477,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Дата согласования насос";
 	pm.addField(new FieldDateTimeTZ("owner_pump_agreed_date_time",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("pump_for_client_cost",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("pump_for_client_cost_edit",f_opts));
 }
 
 			Shipment_Controller.prototype.add_get_list_for_veh_owner = function(){

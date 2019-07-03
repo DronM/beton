@@ -244,6 +244,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		else{
 			$this->set_logged($ar);
+			$_SESSION['width_type'] = $pm->getParamValue("width_type");
 			
 		}
 	}

@@ -27,6 +27,7 @@ function ShipmentList_Model(options){
 				
 				
 				
+				
 			
 				
 	
@@ -378,6 +379,26 @@ function ShipmentList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.owner_pump_agreed_date_time = new FieldDateTimeTZ("owner_pump_agreed_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_for_client_cost = new FieldFloat("pump_for_client_cost",filed_options);
+	options.fields.pump_for_client_cost.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_for_client_cost_edit = new FieldBool("pump_for_client_cost_edit",filed_options);
 	
 			
 			

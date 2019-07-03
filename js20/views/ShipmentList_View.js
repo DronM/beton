@@ -158,6 +158,13 @@ function ShipmentList_View(id,options){
 					opts.className+=(opts.className.length? " ":"")+"cost_edit";
 				}
 			}				
+			else if(opts.gridColumn.getId()=="pump_for_client_cost"){
+				opts.className = opts.className||"";
+				if(this.getModel().getFieldValue("pump_for_client_cost_edit")){
+					opts.title="Значение отредактирована вручную";
+					opts.className+=(opts.className.length? " ":"")+"cost_edit";
+				}
+			}				
 			
 		},
 		"popUpMenu":popup_menu,
@@ -344,6 +351,16 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:pump_for_client_cost",{
+							"value":"Стоим.насос для кл-та",
+							"colAttrs":{"align":"right"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("pump_for_client_cost")									
+								})
+							]
+						})
+						
 						,new GridCellHead(id+":grid:head:pump_vehicles_ref",{
 							"value":"Насос",
 							"columns":[
@@ -481,6 +498,11 @@ function ShipmentList_View(id,options){
 							"attrs":{"align":"right"},
 							"totalFieldId":"total_pump_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_pump_cost"})
+						})						
+						,new GridCellFoot(id+":grid:foot:tot_pump_for_client_cost",{
+							"attrs":{"align":"right"},
+							"totalFieldId":"total_pump_for_client_cost",
+							"gridColumn":new GridColumnFloat({"id":"tot_pump_for_client_cost"})
 						})						
 					
 						,new GridCell(id+":grid:foot:total_sp3",{

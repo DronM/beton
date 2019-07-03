@@ -407,12 +407,31 @@ class ShipmentList_Model extends ModelSQLBeton{
 		$f_owner_pump_agreed_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"owner_pump_agreed_date_time",$f_opts);
 		$this->addField($f_owner_pump_agreed_date_time);
 		//********************
+		
+		//*** Field pump_for_client_cost ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="pump_for_client_cost";
+						
+		$f_pump_for_client_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost",$f_opts);
+		$this->addField($f_pump_for_client_cost);
+		//********************
+		
+		//*** Field pump_for_client_cost_edit ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="pump_for_client_cost_edit";
+						
+		$f_pump_for_client_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost_edit",$f_opts);
+		$this->addField($f_pump_for_client_cost_edit);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	$this->setAggFunctions(
 		array(array('alias'=>'total_quant','expr'=>'sum(quant)')
 ,array('alias'=>'total_cost','expr'=>'sum(cost)')
 ,array('alias'=>'total_pump_cost','expr'=>'sum(pump_cost)')
 ,array('alias'=>'total_demurrage_cost','expr'=>'sum(demurrage_cost)')
+,array('alias'=>'total_pump_for_client_cost','expr'=>'sum(pump_for_client_cost)')
 )
 	);	
 
