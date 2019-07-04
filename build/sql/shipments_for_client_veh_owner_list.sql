@@ -12,6 +12,7 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 		destinations_ref(dest) AS destinations_ref,
 		o.quant,
 		o.client_id AS client_id,
+		clients_ref(cl) AS clients_ref,
 		
 		coalesce((SELECT
 			sum(shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE))
@@ -53,6 +54,9 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 		vown_cl.vehicle_owner_id,
 		
 		
+		--простой
+		coalesce(demurrage.cost,0.00)::numeric(15,2) AS cost_demurrage,
+		
 		coalesce((SELECT
 			sum(shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE))
 		FROM shipments AS sh
@@ -86,6 +90,9 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 				)::numeric(15,2)
 			
 		END,0)::numeric(15,2)		
+		
+		+coalesce(demurrage.cost,0.00)
+		
 		AS cost_total
 		
 	FROM orders o
@@ -119,6 +126,15 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
 	
+	LEFT JOIN (
+		SELECT
+			t.order_id,
+			sum(coalesce(shipments_demurrage_cost(t.demurrage::interval),0.00)) AS cost		
+		FROM shipments AS t
+		GROUP BY t.order_id
+	) AS demurrage ON demurrage.order_id=o.id
+	
+	LEFT JOIN clients cl ON cl.id = o.client_id
 	
 	ORDER BY o.date_time DESC
 	;

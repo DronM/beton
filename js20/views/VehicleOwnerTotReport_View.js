@@ -43,6 +43,7 @@ extend(VehicleOwnerTotReport_View,ViewAjxList);
 
 /* public methods */
 VehicleOwnerTotReport_View.prototype.makeReport = function(d){
+	window.setGlobalWait(true);
 	var pm = (new VehicleOwner_Controller()).getPublicMethod("get_tot_report");
 	pm.setFieldValue("date",d);
 	pm.setFieldValue("templ","VehicleOwnerTotReport");
@@ -52,6 +53,9 @@ VehicleOwnerTotReport_View.prototype.makeReport = function(d){
 		"retContentType":"text",
 		"ok":function(resp){
 			self.getElement("report").getNode().innerHTML = resp;
+		},
+		"all":function(){
+			window.setGlobalWait(false);
 		}
 	});
 }

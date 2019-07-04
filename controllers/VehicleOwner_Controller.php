@@ -183,7 +183,8 @@ class VehicleOwner_Controller extends ControllerSQL{
 				SELECT
 					sum(t.cost_concrete) AS cost_concrete,
 					sum(t.cost_shipment) AS cost_shipment,
-					sum(t.cost_other_owner_pump) AS cost_other_owner_pump
+					sum(t.cost_other_owner_pump) AS cost_other_owner_pump,
+					sum(t.cost_demurrage) AS cost_demurrage
 				FROM shipments_for_client_veh_owner_list t
 				WHERE	
 					".($vown_id? sprintf("t.vehicle_owner_id=%d AND ",$vown_id):"")."
@@ -196,6 +197,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 			(SELECT coalesce(cost,0.00) FROM pumps) AS pumps_cost,
 			(SELECT coalesce(cost_concrete,0.00) FROM client_ships) AS client_ships_concrete_cost,
 			(SELECT coalesce(cost_other_owner_pump,0.00) FROM client_ships) AS client_ships_other_owner_pump_cost,
+			(SELECT coalesce(cost_demurrage,0.00) FROM client_ships) AS demurrage_cost,
 			(SELECT coalesce(cost_shipment,0.00) FROM client_ships) AS client_ships_shipment_cost";
 		$this->addNewModel($q,'VehicleOwnerTotReport_Model');
 	}

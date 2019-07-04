@@ -47,6 +47,7 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		
 		$f_opts['alias']='Объект';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="destinations_ref";
 						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
@@ -66,6 +67,7 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		
 		$f_opts['alias']='Марка';
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="concrete_types_ref";
 						
 		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
@@ -100,6 +102,17 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$this->addField($f_client_id);
 		//********************
 		
+		//*** Field clients_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Клиент';
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="clients_ref";
+						
+		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
+		$this->addField($f_clients_ref);
+		//********************
+		
 		//*** Field cost_shipment ***
 		$f_opts = array();
 		
@@ -130,6 +143,16 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$this->addField($f_cost_other_owner_pump);
 		//********************
 		
+		//*** Field cost_demurrage ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость простоя';
+		$f_opts['id']="cost_demurrage";
+						
+		$f_cost_demurrage=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_demurrage",$f_opts);
+		$this->addField($f_cost_demurrage);
+		//********************
+		
 		//*** Field cost_total ***
 		$f_opts = array();
 		
@@ -145,6 +168,7 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 ,array('alias'=>'total_cost_shipment','expr'=>'sum(cost_shipment)')
 ,array('alias'=>'total_cost_concrete','expr'=>'sum(cost_concrete)')
 ,array('alias'=>'total_cost_other_owner_pump','expr'=>'sum(cost_other_owner_pump)')
+,array('alias'=>'cost_demurrage','expr'=>'sum(cost_demurrage)')
 ,array('alias'=>'total_cost_total','expr'=>'sum(cost_total)')
 )
 	);	

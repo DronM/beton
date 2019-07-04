@@ -116,6 +116,22 @@ function ShipmentForClientVehOwnerList_View(id,options){
 							"sortable":true,
 							"sort":"desc"
 						})
+						,new GridCellHead(id+":grid:head:clients_ref",{
+							"value":"Клиент",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("clients_ref"),
+									"ctrlClass":EditString,
+									"searchOptions":{
+										"field":new FieldString("clients_ref->descr"),
+										"searchType":"on_part",
+										"typeChange":true
+									},
+									"form":null
+								})
+							]
+						})
+						
 						,new GridCellHead(id+":grid:head:destinations_ref",{
 							"value":"Объект",
 							"columns":[
@@ -184,6 +200,16 @@ function ShipmentForClientVehOwnerList_View(id,options){
 								})
 							]
 						})						
+						,new GridCellHead(id+":grid:head:cost_demurrage",{
+							"value":"Простой",
+							"colAttrs":{"align":"right"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("cost_demurrage")
+								})
+							]
+						})						
+						
 						,new GridCellHead(id+":grid:head:cost_total",{
 							"value":"Итого",
 							"colAttrs":{"align":"right"},
@@ -204,7 +230,7 @@ function ShipmentForClientVehOwnerList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":"3"
+							"colSpan":"4"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
@@ -226,6 +252,12 @@ function ShipmentForClientVehOwnerList_View(id,options){
 							"totalFieldId":"total_cost_other_owner_pump",
 							"gridColumn":new GridColumnFloat({"id":"tot_cost_other_owner_pump"})
 						})
+						,new GridCellFoot(id+":grid:foot:tot_cost_demurrage",{
+							"attrs":{"align":"right"},
+							"totalFieldId":"total_cost_demurrage",
+							"gridColumn":new GridColumnFloat({"id":"tot_cost_demurrage"})
+						})
+						
 						,new GridCellFoot(id+":grid:foot:tot_cost_total",{
 							"attrs":{"align":"right"},
 							"totalFieldId":"total_cost_total",

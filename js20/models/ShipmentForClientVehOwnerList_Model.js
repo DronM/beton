@@ -28,6 +28,7 @@ function ShipmentForClientVehOwnerList_Model(options){
 				
 				
 				
+				
 			
 				
 	
@@ -105,6 +106,15 @@ function ShipmentForClientVehOwnerList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Клиент';
+	filed_options.autoInc = false;	
+	
+	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Стоимость доставки';
 	filed_options.autoInc = false;	
 	
@@ -127,6 +137,15 @@ function ShipmentForClientVehOwnerList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.cost_other_owner_pump = new FieldFloat("cost_other_owner_pump",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость простоя';
+	filed_options.autoInc = false;	
+	
+	options.fields.cost_demurrage = new FieldFloat("cost_demurrage",filed_options);
 	
 				
 	
