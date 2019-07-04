@@ -17,7 +17,7 @@
 function EditPeriodShift(id,options){
 	options = options || {};	
 	
-	options.template = window.getApp().getTemplate("EditPeriodShift");
+	options.template = options.template ||window.getApp().getTemplate("EditPeriodShift");
 	
 	options.cmdPeriodSelect = false;
 	options.downFastTitle = "Предыдущая неделя";
@@ -145,9 +145,11 @@ EditPeriodShift.prototype.updateDateInf = function(){
 EditPeriodShift.prototype.getPeriodDescr = function(){	
 	return (
 		DateHelper.format(this.m_dateFrom,this.m_dateTempl)+
-		" ("+this.m_daysOfWeek[this.m_dateFrom.getDay()]+')'+
+		" "+this.m_daysOfWeek[this.m_dateFrom.getDay()]
+		/*+
 		" - "+
 		DateHelper.format(this.m_dateTo,this.m_dateTempl)
+		*/
 	);
 }
 
@@ -178,7 +180,7 @@ EditPeriodShift.prototype.setPredefinedPeriod = function(per){
 	}				
 	else if (per=="prev_shift"){
 		this.setCtrlDateTime(this.getControlFrom(),DateHelper.dateStart(new Date(DateHelper.time().getTime()-24*60*60*1000)));
-		this.setCtrlDateTime(this.getControlTo(),new Date(DateHelper.dateStart().getTime()));
+		this.setCtrlDateTime(this.getControlTo(),new Date(DateHelper.dateStart().getTime()-24*60*60*1000));
 	}				
 	
 	EditPeriodShift.superclass.setPredefinedPeriod.call(this,per);

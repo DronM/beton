@@ -49,11 +49,11 @@ function OrderMakeGrid(id,options){
 							res+= String.fromCharCode(10)+window.getApp().formatCell(fields.destinations_ref,cell,self.m_listView.COL_DEST_LEN);
 							res+= String.fromCharCode(10);
 							var tel = fields.phone_cel.getValue();
-							var tel_m = tel
-							if(tel_m.length==10){
+							var tel_m = tel;
+							if(tel_m && tel_m.length==10){
 								tel_m = "+7"+tel;
 							}
-							else if(tel_m.length==11){
+							else if(tel_m && tel_m.length==11){
 								tel_m = "+7"+tel.substr(1);
 							}
 							
@@ -62,10 +62,12 @@ function OrderMakeGrid(id,options){
 							c_tag.textContent = res;
 							cell_n.appendChild(c_tag);
 							
-							var t_tag = document.createElement("A");
-							t_tag.setAttribute("href","tel:"+tel_m);
-							t_tag.textContent = CommonHelper.maskFormat(tel,window.getApp().getPhoneEditMask());
-							cell_n.appendChild(t_tag);
+							if(tel_m && tel_m.length){
+								var t_tag = document.createElement("A");
+								t_tag.setAttribute("href","tel:"+tel_m);
+								t_tag.textContent = CommonHelper.maskFormat(tel,window.getApp().getPhoneEditMask());
+								cell_n.appendChild(t_tag);
+							}
 							return "";
 						}
 					})

@@ -53,6 +53,7 @@ function OrderMakeList_View(id,options){
 			init_dt = DateHelper.strtotime(options.models.InitDate.getFieldValue("dt"));
 		}
 		var per_select = new EditPeriodShift(id+":order_make_filter",{
+			"template":window.getApp().getTemplate( ((window.getWidthType()=="sm")? "EditPeriodShiftSM":"EditPeriodShift") ),
 			"dateFrom":init_dt,
 			"onChange":function(dateTime){
 				self.m_refreshMethod.setFieldValue("date",dateTime);

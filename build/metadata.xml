@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-07-03 06:49:05</lastBuild></version>
+		<lastBuild>2019-07-04 05:39:01</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -50,6 +50,7 @@
 		<version dateOpen="2019-06-27 14:06:12" dateClose="2019-06-28 05:06:32">1.00144</version>
 		<version dateOpen="2019-06-28 15:06:20" dateClose="2019-06-29 05:06:26">1.00145</version>
 		<version dateOpen="2019-06-29 06:06:06" dateClose="2019-07-03 06:07:49">1.00146</version>
+		<version dateOpen="2019-07-03 13:07:54" dateClose="2019-07-04 05:07:39">1.00147</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -3556,6 +3557,7 @@
 		<jsTemplate id="ColorPaletteList" file="tmpl/ColorPaletteList.html"/>
 		<jsTemplate id="EditFile" file="tmpl/EditFile.html"/>
 		<jsTemplate id="EditPeriodShift" file="tmpl/EditPeriodShift.html"/>
+		<jsTemplate id="EditPeriodShiftSM" file="tmpl/EditPeriodShift.sm.html"/>
 		<jsTemplate id="EditPeriodMonth" file="tmpl/EditPeriodMonth.html"/>
 		<jsTemplate id="ZoneDrawingControl" file="tmpl/ZoneDrawingControl.html"/>
 		<jsTemplate id="OrderDialog_View" file="tmpl/OrderDialog_View.html"/>
@@ -3772,6 +3774,7 @@
 		<jsScript file="controls/GridBody.js"/>
 		<jsScript file="controls/Grid.js"/>
 		<jsScript file="controls/rs/Grid.rs_ru.js" resource="ru"/>
+		<jsScript file="controls/GridSearchInf.js"/>
 		<jsScript file="controls/VariantStorage.js"/>
 		<jsScript file="controls/GridCommands.js"/>
 		<jsScript file="controls/GridCmd.js"/>

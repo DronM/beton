@@ -496,6 +496,11 @@ table td{
 	font-weight:bold;
 }
 
+.grid_details{
+	position:relative;
+	left:50px;	
+}
+
 #OrderMakeList\:mat_totals_grid\:cont{
 	margin-bottom:15px;	
 }

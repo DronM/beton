@@ -580,6 +580,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/rs/Grid.rs_ru.js'));
 	}
 
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridSearchInf.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/VariantStorage.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCommands.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmd.js'));

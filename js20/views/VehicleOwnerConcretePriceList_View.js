@@ -21,7 +21,7 @@ function VehicleOwnerConcretePriceList_View(id,options){
 	}
 	
 	this.addElement(new GridAjx(id+":grid",{
-		"keyIds":["vehicle_owner_id","date"],
+		"keyIds":["vehicle_owner_id","date","client_id"],
 		"model":model,
 		"controller":contr,
 		"editInline":true,

@@ -148,7 +148,10 @@ function ShipmentForOrderList_View(id,options){
 							"columns":[
 								new GridColumnFloat({
 									"field":model.getField("quant"),
-									"ctrlClass":EditFloat
+									"ctrlClass":EditFloat,
+									"ctrlOptions":{
+										"notZero":true
+									}									
 								})
 							]
 						})
