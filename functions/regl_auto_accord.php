@@ -19,11 +19,17 @@ $dbLink->query(
 			SELECT (
 				(CASE WHEN (SELECT v FROM mon)=12 THEN extract('year' FROM now())-1 ELSE extract('year' FROM now()) END)::text
 				||'-'|| (CASE WHEN (SELECT v FROM mon)<10 THEN '0' ELSE '' END )||(SELECT v FROM mon) ||'-01'
-			)::date AS v
+			)::date+
+			const_first_shift_start_time_val()
+			AS v
 		),
 		per AS (SELECT	
 			(SELECT v FROM d_from) AS d_from,
-			((SELECT v FROM d_from) + '1 month'::interval - '1 day'::interval)::date AS d_to
+			get_shift_end(
+				((SELECT v FROM d_from) + '1 month'::interval -'1 day'::interval)::date+
+				const_first_shift_start_time_val()
+			)
+			AS d_to
 		)
 	SELECT shipments.id AS ship_id
 	FROM shipments
@@ -53,11 +59,17 @@ $dbLink->query(
 			SELECT (
 				(CASE WHEN (SELECT v FROM mon)=12 THEN extract('year' FROM now())-1 ELSE extract('year' FROM now()) END)::text
 				||'-'|| (CASE WHEN (SELECT v FROM mon)<10 THEN '0' ELSE '' END )||(SELECT v FROM mon) ||'-01'
-			)::date AS v
+			)::date+
+			const_first_shift_start_time_val()
+			AS v
 		),
 		per AS (SELECT	
 			(SELECT v FROM d_from) AS d_from,
-			((SELECT v FROM d_from) + '1 month'::interval - '1 day'::interval)::date AS d_to
+			get_shift_end(
+				((SELECT v FROM d_from) + '1 month'::interval -'1 day'::interval)::date+
+				const_first_shift_start_time_val()
+			)
+			AS d_to
 		)
 	SELECT shipments.id AS ship_id
 	FROM shipments

@@ -58,6 +58,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		$f_opts = array();
 		
 		$f_opts['alias']='Количество';
+		$f_opts['length']=19;
 		$f_opts['id']="quant";
 						
 		$f_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);

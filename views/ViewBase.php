@@ -543,6 +543,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridColumnTime.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridColumnEnum.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridColumnRef.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridColumnInterval.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCell.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHead.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellFoot.js'));
@@ -1181,6 +1182,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ViewList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MainMenuConstructorList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MainMenuConstructor_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LoginList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserDialog_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserProfile_View.js'));
@@ -1372,6 +1374,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/QuarryEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OrderEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ConcreteCostForOwnerHeadEdit.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentForVehOwnerCmdSetAgreed.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentPumpForVehOwnerCmdSetAgreed.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1612,6 +1616,11 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerClient_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleOwnerClient_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerClientList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/Login_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/Login_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/LoginList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/Session_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShippedVehicleList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

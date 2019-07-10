@@ -227,8 +227,7 @@ function ShipmentDateList_View(id,options){
 												
 						,new GridCellFoot(id+":grid:foot:tot_demurrage_cost",{
 							"attrs":{"align":"right"},
-							"calcOper":"sum",
-							"calcFieldId":"total_demurrage_cost",
+							"totalFieldId":"total_demurrage_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_demurrage_cost"})
 						})						
 						

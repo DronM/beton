@@ -57,6 +57,7 @@ function ShipmentForOrderList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.quant = new FieldFloat("quant",filed_options);
+	options.fields.quant.getValidator().setMaxLength('19');
 	
 				
 	

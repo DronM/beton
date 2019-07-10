@@ -50,6 +50,67 @@ function AssignedVehicleList_View(id,options){
 			this.addElement(prod_cite);
 			this.m_prodSiteControlList.push(prod_cite);
 		}
+		
+		if(!options.shortDescriptions){
+			var sh_model = (options.models&&options.models.ShippedVehicleList_Model)? options.models.ShippedVehicleList_Model:new ShippedVehicleList_Model();
+			this.addElement(new GridAjx(id+":shipped_vehicles_list",{
+				"model":sh_model,
+				"readPublicMethod":(new Shipment_Controller()).getPublicMethod("get_shipped_vihicles_list"),
+				"editInline":null,
+				"editWinClass":null,
+				"commands":null,		
+				"popUpMenu":null,
+				"head":new GridHead(id+":shipped_vehicles_list-grid:head",{
+					"elements":[
+						new GridRow(id+":shipped_vehicles_list-grid:head:row0",{
+							"elements":[
+								new GridCellHead(id+":shipped_vehicles_list-grid:head:vehicles_ref",{
+									"value":"ТС",
+									"columns":[
+										new GridColumnRef({
+											"field":sh_model.getField("vehicles_ref")
+										})
+									]
+								})
+								,new GridCellHead(id+":shipped_vehicles_list-grid:head:drivers_ref",{
+									"value":"Водитель",
+									"columns":[
+										new GridColumnRef({
+											"field":sh_model.getField("drivers_ref")
+										})
+									]
+								})
+								,new GridCellHead(id+":shipped_vehicles_list-grid:head:destinations_ref",{
+									"value":"Объект",
+									"columns":[
+										new GridColumnRef({
+											"field":sh_model.getField("destinations_ref")
+										})
+									]
+								})							
+								/*,new GridCellHead(id+":shipped_vehicles_list-grid:head:ship_date_time",{
+									"value":"Время",
+									"columns":[
+										new GridColumn({
+											"field":sh_model.getField("ship_date_time"),
+											"dateFormat":"H:i"
+										})
+									]
+								})
+								*/
+							]
+						})
+					]
+				}),
+				"pagination":null,				
+				"autoRefresh":false,
+				"refreshInterval":null,
+				"rowSelect":false,
+				"navigate":false,
+				"focus":false
+			
+			}));
+		}
 	}
 		
 	AssignedVehicleList_View.superclass.constructor.call(this,id,options);
@@ -117,6 +178,10 @@ AssignedVehicleList_View.prototype.onRefresh = function(){
 				self.m_prodSiteControlList[i].m_model = resp.getModel("AssignedVehicleList_Model");
 				self.m_prodSiteControlList[i].onGetData();
 			}
+			
+			var sh_gr = self.getElement("shipped_vehicles_list");
+			sh_gr.m_model = resp.getModel("ShippedVehicleList_Model");
+			sh_gr.onGetData();
 			
 		}
 		,"all":function(){

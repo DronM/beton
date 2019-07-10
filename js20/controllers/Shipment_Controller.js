@@ -46,7 +46,10 @@ function Shipment_Controller(options){
 	this.add_delete_shipped();
 	this.add_delete_assigned();
 	this.add_owner_set_agreed();
+	this.add_owner_set_agreed_all();
 	this.add_owner_set_pump_agreed();
+	this.add_owner_set_pump_agreed_all();
+	this.add_get_shipped_vihicles_list();
 		
 }
 extend(Shipment_Controller,ControllerObjServer);
@@ -810,6 +813,13 @@ extend(Shipment_Controller,ControllerObjServer);
 	this.addPublicMethod(pm);
 }
 
+			Shipment_Controller.prototype.add_owner_set_agreed_all = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('owner_set_agreed_all',opts);
+	
+	this.addPublicMethod(pm);
+}
+
 			Shipment_Controller.prototype.add_owner_set_pump_agreed = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('owner_set_pump_agreed',opts);
@@ -823,6 +833,20 @@ extend(Shipment_Controller,ControllerObjServer);
 		pm.addField(new FieldInt("shipment_id",options));
 	
 			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_owner_set_pump_agreed_all = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('owner_set_pump_agreed_all',opts);
+	
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_get_shipped_vihicles_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_shipped_vihicles_list',opts);
+	
 	this.addPublicMethod(pm);
 }
 

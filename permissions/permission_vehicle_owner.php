@@ -36,6 +36,10 @@ $permissions = array();
 		
 			$permissions['Shipment_Controller_owner_set_pump_agreed']=TRUE;
 		
+			$permissions['Shipment_Controller_owner_set_agreed_all']=TRUE;
+		
+			$permissions['Shipment_Controller_owner_set_pump_agreed_all']=TRUE;
+		
 			$permissions['Vehicle_Controller_get_list']=TRUE;
 		
 			$permissions['Vehicle_Controller_get_object']=TRUE;

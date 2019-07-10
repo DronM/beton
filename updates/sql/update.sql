@@ -7932,3 +7932,647 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	;
 	
 ALTER VIEW shipments_for_client_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 05/07/2019 14:27:24 ******************
+﻿-- Function: shipments_quant_for_cost(in_quant numeric,in_distance numeric)
+
+-- DROP FUNCTION shipments_quant_for_cost(in_quant numeric,in_distance numeric);
+
+CREATE OR REPLACE FUNCTION shipments_quant_for_cost(in_quant numeric,in_distance numeric)
+  RETURNS numeric AS
+$$
+	SELECT
+		CASE
+			WHEN in_quant>=7 THEN in_quant
+			WHEN in_distance<=60 THEN greatest(5,in_quant)
+			ELSE 7
+		END
+	;
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION shipments_quant_for_cost(in_quant numeric,in_distance numeric) OWNER TO beton;
+
+
+-- ******************* update 05/07/2019 14:28:11 ******************
+-- VIEW: shipments_for_veh_owner_list
+
+DROP VIEW shipments_for_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.destination_id,
+		sh.destinations_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.cost,
+		sh.ship_cost_edit,
+		sh.pump_cost_edit,
+		sh.demurrage,
+		sh.demurrage_cost,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		(WITH
+		act_price AS (
+			SELECT h.date AS d
+			FROM shipment_for_driver_costs_h h
+			WHERE h.date<=sh.ship_date_time::date
+			ORDER BY h.date DESC
+			LIMIT 1
+		)
+		SELECT shdr_cost.price
+		FROM shipment_for_driver_costs AS shdr_cost
+		WHERE
+			shdr_cost.date=(SELECT d FROM act_price)
+			AND shdr_cost.distance_to<=dest.distance
+			OR shdr_cost.id=(
+				SELECT t.id
+				FROM shipment_for_driver_costs t
+				WHERE t.date=(SELECT d FROM act_price)
+				ORDER BY t.distance_to LIMIT 1
+			)
+
+		ORDER BY shdr_cost.distance_to DESC
+		LIMIT 1
+		) * shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric) AS cost_for_driver
+		
+	FROM shipments_list sh
+	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	;
+	
+ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 05/07/2019 14:29:07 ******************
+-- View: public.shipments_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+--DROP VIEW shipment_dates_list;
+--DROP VIEW public.shipments_list;
+
+CREATE OR REPLACE VIEW public.shipments_list AS 
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.quant,
+		
+		--shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
+		(CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+					coalesce(dest.price,0))			
+				END
+				*
+				shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+				/*
+				CASE
+					WHEN sh.quant>=7 THEN sh.quant
+					WHEN dest.distance<=60 THEN greatest(5,sh.quant)
+					ELSE 7
+				END
+				*/
+		END)::numeric(15,2)
+		AS cost,
+		
+		sh.shipped,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,		
+		v.owner,
+		
+		vehicles_ref(v) AS vehicles_ref,
+		vs.vehicle_id,
+		
+		drivers_ref(d) AS drivers_ref,
+		vs.driver_id,
+		
+		destinations_ref(dest) As destinations_ref,
+		o.destination_id,
+		
+		clients_ref(cl) As clients_ref,
+		o.client_id,
+		
+		shipments_demurrage_cost(sh.demurrage::interval) AS demurrage_cost,
+		sh.demurrage,
+		
+		sh.client_mark,
+		sh.blanks_exist,
+		
+		users_ref(u) As users_ref,
+		o.user_id,
+		
+		production_sites_ref(ps) AS production_sites_ref,
+		sh.production_site_id,
+		
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		v_own.id AS vehicle_owner_id,
+		
+		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_cost,
+		
+		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
+		pvh.vehicle_id AS pump_vehicle_id,
+		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		sh.owner_pump_agreed,
+		sh.owner_pump_agreed_date_time,
+		
+		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		
+		CASE
+			WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(dest.price,0))			
+		END AS ship_price,
+		
+		coalesce(sh.ship_cost_edit,FALSE) AS ship_cost_edit,
+		coalesce(sh.pump_cost_edit,FALSE) AS pump_cost_edit,
+		
+		sh.pump_for_client_cost_edit,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_for_client_cost_edit,FALSE) THEN sh.pump_for_client_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_for_client_cost
+		
+		
+	FROM shipments sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN drivers d ON d.id = vs.driver_id
+	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+	LEFT JOIN users u ON u.id = sh.user_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	ORDER BY sh.date_time DESC
+	--LIMIT 60
+	;
+
+ALTER TABLE public.shipments_list OWNER TO beton;
+
+
+
+-- ******************* update 06/07/2019 07:02:18 ******************
+-- VIEW: logins_list
+
+--DROP VIEW logins_list;
+
+CREATE OR REPLACE VIEW logins_list AS
+	SELECT
+		t.id,
+		t.date_time_in,
+		t.date_time_out,
+		t.ip,
+		t.user_id,
+		users_ref(u) AS users_ref,
+		t.pub_key,
+		t.set_date_time
+		
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	;
+	
+ALTER VIEW logins_list OWNER TO beton;
+
+
+-- ******************* update 06/07/2019 07:07:21 ******************
+-- VIEW: logins_list
+
+--DROP VIEW logins_list;
+
+CREATE OR REPLACE VIEW logins_list AS
+	SELECT
+		t.id,
+		t.date_time_in,
+		t.date_time_out,
+		t.ip,
+		t.user_id,
+		users_ref(u) AS users_ref,
+		t.pub_key,
+		t.set_date_time
+		
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	ORDER BY t.date_time_in
+	;
+	
+ALTER VIEW logins_list OWNER TO beton;
+
+
+-- ******************* update 06/07/2019 07:13:44 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'20013',
+		'Login_Controller',
+		'get_list',
+		'LoginList',
+		'Документы',
+		'Лог активности',
+		FALSE
+		);
+	
+
+-- ******************* update 06/07/2019 07:17:12 ******************
+-- VIEW: logins_list
+
+--DROP VIEW logins_list;
+
+CREATE OR REPLACE VIEW logins_list AS
+	SELECT
+		t.id,
+		t.date_time_in,
+		t.date_time_out,
+		t.ip,
+		t.user_id,
+		users_ref(u) AS users_ref,
+		t.pub_key,
+		t.set_date_time
+		
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	ORDER BY t.date_time_in DESC
+	;
+	
+ALTER VIEW logins_list OWNER TO beton;
+
+
+-- ******************* update 06/07/2019 07:21:23 ******************
+-- VIEW: logins_list
+
+--DROP VIEW logins_list;
+
+CREATE OR REPLACE VIEW logins_list AS
+	SELECT
+		t.id,
+		t.date_time_in,
+		t.date_time_out,
+		t.ip,
+		t.user_id,
+		users_ref(u) AS users_ref,
+		t.pub_key,
+		t.set_date_time
+		
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	WHERE t.user_id IS NOT NULL
+	ORDER BY t.date_time_in DESC
+	;
+	
+ALTER VIEW logins_list OWNER TO beton;
+
+
+-- ******************* update 09/07/2019 16:04:51 ******************
+
+		--constant value table
+		CREATE TABLE IF NOT EXISTS const_show_time_for_shipped_vehicles
+		(name text, descr text, val interval,
+			val_type text,ctrl_class text,ctrl_options json, view_class text,view_options json);
+		ALTER TABLE const_show_time_for_shipped_vehicles OWNER TO beton;
+		INSERT INTO const_show_time_for_shipped_vehicles (name,descr,val,val_type,ctrl_class,ctrl_options,view_class,view_options) VALUES (
+			'Время показа отргруженных ТС'
+			,'Время, в течении которого показывать отгруженные ТС на большом экране'
+			,
+				'00:30'
+			,'Interval'
+			,NULL
+			,NULL
+			,NULL
+			,NULL
+		);
+		--constant get value
+		CREATE OR REPLACE FUNCTION const_show_time_for_shipped_vehicles_val()
+		RETURNS interval AS
+		$BODY$
+			SELECT val::interval AS val FROM const_show_time_for_shipped_vehicles LIMIT 1;
+		$BODY$
+		LANGUAGE sql STABLE COST 100;
+		ALTER FUNCTION const_show_time_for_shipped_vehicles_val() OWNER TO beton;
+		--constant set value
+		CREATE OR REPLACE FUNCTION const_show_time_for_shipped_vehicles_set_val(Interval)
+		RETURNS void AS
+		$BODY$
+			UPDATE const_show_time_for_shipped_vehicles SET val=$1;
+		$BODY$
+		LANGUAGE sql VOLATILE COST 100;
+		ALTER FUNCTION const_show_time_for_shipped_vehicles_set_val(Interval) OWNER TO beton;
+		--edit view: all keys and descr
+		CREATE OR REPLACE VIEW const_show_time_for_shipped_vehicles_view AS
+		SELECT
+			'show_time_for_shipped_vehicles'::text AS id
+			,t.name
+			,t.descr
+		,
+		t.val::text AS val
+		,t.val_type::text AS val_type
+		,t.ctrl_class::text
+		,t.ctrl_options::json
+		,t.view_class::text
+		,t.view_options::json
+		FROM const_show_time_for_shipped_vehicles AS t
+		;
+		ALTER VIEW const_show_time_for_shipped_vehicles_view OWNER TO beton;
+		CREATE OR REPLACE VIEW constants_list_view AS
+		SELECT *
+		FROM const_doc_per_page_count_view
+		UNION ALL
+		SELECT *
+		FROM const_grid_refresh_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_order_grid_refresh_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_backup_vehicles_feature_view
+		UNION ALL
+		SELECT *
+		FROM const_base_geo_zone_id_view
+		UNION ALL
+		SELECT *
+		FROM const_base_geo_zone_view
+		UNION ALL
+		SELECT *
+		FROM const_chart_step_min_view
+		UNION ALL
+		SELECT *
+		FROM const_day_shift_length_view
+		UNION ALL
+		SELECT *
+		FROM const_days_allowed_with_broken_tracker_view
+		UNION ALL
+		SELECT *
+		FROM const_def_order_unload_speed_view
+		UNION ALL
+		SELECT *
+		FROM const_demurrage_coast_per_hour_view
+		UNION ALL
+		SELECT *
+		FROM const_first_shift_start_time_view
+		UNION ALL
+		SELECT *
+		FROM const_geo_zone_check_points_count_view
+		UNION ALL
+		SELECT *
+		FROM const_map_default_lat_view
+		UNION ALL
+		SELECT *
+		FROM const_map_default_lon_view
+		UNION ALL
+		SELECT *
+		FROM const_max_hour_load_view
+		UNION ALL
+		SELECT *
+		FROM const_max_vehicle_at_work_view
+		UNION ALL
+		SELECT *
+		FROM const_min_demurrage_time_view
+		UNION ALL
+		SELECT *
+		FROM const_min_quant_for_ship_cost_view
+		UNION ALL
+		SELECT *
+		FROM const_no_tracker_signal_warn_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_ord_mark_if_no_ship_time_view
+		UNION ALL
+		SELECT *
+		FROM const_order_auto_place_tolerance_view
+		UNION ALL
+		SELECT *
+		FROM const_order_step_min_view
+		UNION ALL
+		SELECT *
+		FROM const_own_vehicles_feature_view
+		UNION ALL
+		SELECT *
+		FROM const_raw_mater_plcons_rep_def_days_view
+		UNION ALL
+		SELECT *
+		FROM const_self_ship_dest_id_view
+		UNION ALL
+		SELECT *
+		FROM const_self_ship_dest_view
+		UNION ALL
+		SELECT *
+		FROM const_shift_for_orders_length_time_view
+		UNION ALL
+		SELECT *
+		FROM const_shift_length_time_view
+		UNION ALL
+		SELECT *
+		FROM const_ship_coast_for_self_ship_destination_view
+		UNION ALL
+		SELECT *
+		FROM const_speed_change_for_order_autolocate_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_unload_time_view
+		UNION ALL
+		SELECT *
+		FROM const_avg_mat_cons_dev_day_count_view
+		UNION ALL
+		SELECT *
+		FROM const_days_for_plan_procur_view
+		UNION ALL
+		SELECT *
+		FROM const_lab_min_sample_count_view
+		UNION ALL
+		SELECT *
+		FROM const_lab_days_for_avg_view
+		UNION ALL
+		SELECT *
+		FROM const_city_ext_view
+		UNION ALL
+		SELECT *
+		FROM const_def_lang_view
+		UNION ALL
+		SELECT *
+		FROM const_efficiency_warn_k_view
+		UNION ALL
+		SELECT *
+		FROM const_zone_violation_alarm_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_weather_update_interval_sec_view
+		UNION ALL
+		SELECT *
+		FROM const_call_history_count_view
+		UNION ALL
+		SELECT *
+		FROM const_water_ship_cost_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_owner_accord_from_day_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_owner_accord_to_day_view
+		UNION ALL
+		SELECT *
+		FROM const_show_time_for_shipped_vehicles_view;
+		ALTER VIEW constants_list_view OWNER TO beton;
+	
+
+-- ******************* update 09/07/2019 16:14:27 ******************
+-- VIEW: shipped_vehicles_list
+
+--DROP VIEW shipped_vehicles_list;
+
+CREATE OR REPLACE VIEW shipped_vehicles_list AS
+	SELECT
+		t.id,
+		now()-ship_date_time AS elapsed_time,
+		destinations_ref(dest) AS destinations_ref,
+		drivers_ref(dr) AS drivers_ref,
+		vehicles_ref(v) AS vehicles_ref,
+		production_sites_ref(ps) AS production_sites_ref
+	FROM shipments AS t
+	LEFT JOIN orders AS o ON o.id=t.order_id
+	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id=t.vehicle_schedule_id
+	LEFT JOIN vehicles AS v ON v.id=vsch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id=vsch.driver_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	WHERE t.shipped AND (t.ship_date_time BETWEEN now()-const_show_time_for_shipped_vehicles_val() AND now())
+	;
+	
+ALTER VIEW shipped_vehicles_list OWNER TO beton;
+
+
+-- ******************* update 09/07/2019 16:19:45 ******************
+-- VIEW: shipped_vehicles_list
+
+--DROP VIEW shipped_vehicles_list;
+
+CREATE OR REPLACE VIEW shipped_vehicles_list AS
+	SELECT
+		t.id,
+		now()-t.ship_date_time AS elapsed_time,
+		destinations_ref(dest) AS destinations_ref,
+		drivers_ref(dr) AS drivers_ref,
+		vehicles_ref(v) AS vehicles_ref,
+		production_sites_ref(ps) AS production_sites_ref
+	FROM shipments AS t
+	LEFT JOIN orders AS o ON o.id=t.order_id
+	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id=t.vehicle_schedule_id
+	LEFT JOIN vehicles AS v ON v.id=vsch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id=vsch.driver_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	WHERE t.shipped AND (t.ship_date_time BETWEEN now()-const_show_time_for_shipped_vehicles_val() AND now())
+	ORDER BY t.ship_date_time DESC
+	;
+	
+ALTER VIEW shipped_vehicles_list OWNER TO beton;
+
+
+-- ******************* update 09/07/2019 16:33:35 ******************
+-- VIEW: shipped_vehicles_list
+
+--DROP VIEW shipped_vehicles_list;
+
+CREATE OR REPLACE VIEW shipped_vehicles_list AS
+	SELECT
+		t.id,
+		date_trunc('minute', now()-t.ship_date_time) AS elapsed_time,
+		destinations_ref(dest) AS destinations_ref,
+		drivers_ref(dr) AS drivers_ref,
+		vehicles_ref(v) AS vehicles_ref,
+		production_sites_ref(ps) AS production_sites_ref
+	FROM shipments AS t
+	LEFT JOIN orders AS o ON o.id=t.order_id
+	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id=t.vehicle_schedule_id
+	LEFT JOIN vehicles AS v ON v.id=vsch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id=vsch.driver_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	WHERE t.shipped AND (t.ship_date_time BETWEEN now()-const_show_time_for_shipped_vehicles_val() AND now())
+	ORDER BY t.ship_date_time DESC
+	;
+	
+ALTER VIEW shipped_vehicles_list OWNER TO beton;

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-07-04 17:29:04</lastBuild></version>
+		<lastBuild>2019-07-10 05:40:12</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -52,6 +52,7 @@
 		<version dateOpen="2019-06-29 06:06:06" dateClose="2019-07-03 06:07:49">1.00146</version>
 		<version dateOpen="2019-07-03 13:07:54" dateClose="2019-07-04 05:07:39">1.00147</version>
 		<version dateOpen="2019-07-04 12:07:10" dateClose="2019-07-04 17:07:29">1.00148</version>
+		<version dateOpen="2019-07-06 06:07:52" dateClose="2019-07-10 05:07:40">1.00149</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -408,6 +409,39 @@
 			<field id="name" dataType="String" alias="Имя"/>
 			<field id="email" dataType="String" alias="Эл.почта"/>
 			<field id="phone_cel" dataType="String" length="11" alias="Моб.телефон"/>
+		</model>
+		<model id="Session" parent="ModelSQLBeton" dataTable="sessions" virtual="FALSE">
+			<field id="id" dataType="String" length="128" primaryKey="TRUE" autoInc="FALSE" dbRequired="TRUE"/>
+			<field id="set_time" dataType="DateTimeTZ"/>
+			<field id="data" dataType="Text"/>
+			<field id="session_key" dataType="String" length="128"/>
+			<field id="pub_key" dataType="String" length="15"/>
+			<index id="sessions_set_time_idx">
+				<field id="set_time"/>
+			</index>
+		</model>
+		<model id="Login" parent="ModelSQLBeton" dataTable="logins" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+			<field id="date_time_in" dataType="DateTimeTZ"/>
+			<field id="date_time_out" dataType="DateTimeTZ"/>
+			<field id="ip" dataType="String" length="15"/>
+			<field id="session_id" dataType="String" length="128"/>
+			<field id="user_id" dataType="Int"/>
+			<field id="pub_key" dataType="String" length="15"/>
+			<field id="set_date_time" dataType="DateTimeTZ"/>
+			<index id="logins_user_idx" unique="TRUE">
+				<field id="user_id"/>
+			</index>
+		</model>
+		<model id="LoginList" parent="ModelSQLBeton" dataTable="logins_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" sysCol="TRUE"/>
+			<field id="date_time_in" dataType="DateTimeTZ" alias="Дата входа"/>
+			<field id="date_time_out" dataType="DateTimeTZ" alias="Дата выхода"/>
+			<field id="ip" dataType="String" length="15" alias="IP адрес"/>
+			<field id="user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="users_ref" dataType="JSON" alias="Пользователь"/>
+			<field id="pub_key" dataType="String" length="15" sysCol="TRUE"/>
+			<field id="set_date_time" dataType="DateTimeTZ" alias="Время последнего обращения"/>
 		</model>
 		<model id="Client" parent="ModelSQLBeton" dataTable="clients" virtual="FALSE">
 			<defaultOrder>
@@ -1108,7 +1142,7 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
 			<field id="date_time" dataType="DateTime" alias="Назначен"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Отгружен"/>
-			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="quant" dataType="Float" length="19" precision="4" alias="Количество"/>
 			<field id="vehicle_schedules_ref" dataType="JSON" alias="Экипаж"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="vs_state" dataType="String" alias="Статус"/>
@@ -1166,6 +1200,14 @@
 			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
+		</model>
+		<model id="ShippedVehicleList" parent="ModelSQLBeton" dataTable="shipped_vehicles_list" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Отгружен"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
+			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 		</model>
 		<model id="ShipmentDateList" parent="ModelSQLBeton" dataTable="shipment_dates_list" virtual="TRUE">
 			<aggFunctions>
@@ -2426,6 +2468,7 @@
 		<constant id="water_ship_cost" name="Стоимость доставки воды" descr="Стоимость доставки воды" dataType="Float" length="15" precision="2" defaultValue="2000"/>
 		<constant id="vehicle_owner_accord_from_day" name="Номер дня месяца" descr="Номер дня месяца, начиная с которого владельцы ТС могу согласовывать отгрузки за предыдущий месяц" dataType="Int" defaultValue="5"/>
 		<constant id="vehicle_owner_accord_to_day" name="Номер дня месяца" descr="Номер дня месяца, до которого владельцы ТС могу согласовывать отгрузки за предыдущий месяц" dataType="Int" defaultValue="20"/>
+		<constant id="show_time_for_shipped_vehicles" name="Время показа отргруженных ТС" descr="Время, в течении которого показывать отгруженные ТС на большом экране" dataType="Interval" defaultValue="00:30"/>
 	</constants>
 	<controllers>
 		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -2729,9 +2772,16 @@
 			<publicMethod id="owner_set_agreed">
 				<field id="shipment_id" dataType="Int" required="TRUE"/>
 			</publicMethod>
+			<publicMethod id="owner_set_agreed_all"/>
 			<publicMethod id="owner_set_pump_agreed">
 				<field id="shipment_id" dataType="Int" required="TRUE"/>
 			</publicMethod>
+			<publicMethod id="owner_set_pump_agreed_all"/>
+			<publicMethod id="get_shipped_vihicles_list" modelId="ShippedVehicleList"/>
+		</controller>
+		<controller id="Login" parentId="ControllerSQL" state="TRUE" noState="TRUE">
+			<publicMethod id="get_list" modelId="LoginList"/>
+			<publicMethod id="get_object" modelId="LoginList"/>
 		</controller>
 		<controller id="User" parentId="ControllerSQL" state="TRUE" noState="TRUE">
 			<publicMethod id="insert" modelId="User"/>
@@ -3370,6 +3420,8 @@
 		<permission type="allow" controllerId="Shipment" methodId="get_pump_list_for_veh_owner" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Shipment" methodId="owner_set_agreed" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Shipment" methodId="owner_set_pump_agreed" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Shipment" methodId="owner_set_agreed_all" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="Shipment" methodId="owner_set_pump_agreed_all" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Vehicle" methodId="get_list" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Vehicle" methodId="get_object" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="Vehicle" methodId="vehicles_with_trackers" roleId="vehicle_owner"/>
@@ -3437,6 +3489,7 @@
 		<view id="20010" c="Shipment_Controller" t="ShipmentForVehOwnerList" f="get_list_for_veh_owner" section="Документы" descr="Отгрузки для владельцев ТС"/>
 		<view id="20011" c="Shipment_Controller" t="ShipmentPumpForVehOwnerList" f="get_pump_list_for_veh_owner" section="Документы" descr="Отгрузки (насосы) для владельцев ТС"/>
 		<view id="20012" c="Shipment_Controller" t="ShipmentForClientVehOwnerList" f="get_list_for_client_veh_owner" section="Документы" descr="Отгрузки по клиенту-владельцу ТС"/>
+		<view id="20013" c="Login_Controller" t="LoginList" f="get_list" section="Документы" descr="Лог активности"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -3469,6 +3522,7 @@
 		<serverTemplate id="ConstantList" class="list"/>
 		<serverTemplate id="MainMenuConstructorList" class="list"/>
 		<serverTemplate id="ViewList" class="list"/>
+		<serverTemplate id="LoginList" class="list"/>
 		<serverTemplate id="UserList" class="list"/>
 		<serverTemplate id="MainMenuConstructorList" class="list"/>
 		<serverTemplate id="MailForSendingList" class="list"/>
@@ -3765,6 +3819,7 @@
 		<jsScript file="controls/GridColumnTime.js"/>
 		<jsScript file="controls/GridColumnEnum.js"/>
 		<jsScript file="controls/GridColumnRef.js"/>
+		<jsScript file="controls/GridColumnInterval.js"/>
 		<jsScript file="controls/GridCell.js"/>
 		<jsScript file="controls/GridCellHead.js"/>
 		<jsScript file="controls/GridCellFoot.js"/>
@@ -3965,6 +4020,7 @@
 		<jsScript file="views/ViewList_View.js"/>
 		<jsScript file="views/MainMenuConstructorList_View.js"/>
 		<jsScript file="views/MainMenuConstructor_View.js"/>
+		<jsScript file="views/LoginList_View.js"/>
 		<jsScript file="views/UserList_View.js"/>
 		<jsScript file="views/UserDialog_View.js"/>
 		<jsScript file="views/UserProfile_View.js"/>
@@ -4156,6 +4212,8 @@
 		<jsScript file="custom_controls/QuarryEdit.js"/>
 		<jsScript file="custom_controls/OrderEdit.js"/>
 		<jsScript file="custom_controls/ConcreteCostForOwnerHeadEdit.js"/>
+		<jsScript file="custom_controls/ShipmentForVehOwnerCmdSetAgreed.js"/>
+		<jsScript file="custom_controls/ShipmentPumpForVehOwnerCmdSetAgreed.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -4396,6 +4454,11 @@
 		<jsScript file="models/VehicleOwnerClient_Model.js"/>
 		<jsScript file="controllers/VehicleOwnerClient_Controller.js"/>
 		<jsScript file="models/VehicleOwnerClientList_Model.js"/>
+		<jsScript file="controllers/Login_Controller.js"/>
+		<jsScript file="models/Login_Model.js"/>
+		<jsScript file="models/LoginList_Model.js"/>
+		<jsScript file="models/Session_Model.js"/>
+		<jsScript file="models/ShippedVehicleList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

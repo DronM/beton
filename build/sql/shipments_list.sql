@@ -29,11 +29,14 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 					coalesce(dest.price,0))			
 				END
 				*
+				shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+				/*
 				CASE
 					WHEN sh.quant>=7 THEN sh.quant
 					WHEN dest.distance<=60 THEN greatest(5,sh.quant)
 					ELSE 7
 				END
+				*/
 		END)::numeric(15,2)
 		AS cost,
 		

@@ -17,22 +17,9 @@ function ShipmentForVehOwnerList_View(id,options){
 		"field":new FieldDateTime("ship_date_time")
 	});
 
-	//расчет даты от/до согласования
-	var d = DateHelper.time();
-	var acc_start = new Date(d.getFullYear(),d.getMonth()+1,constants.vehicle_owner_accord_from_day.getValue());
-	var acc_start_time = acc_start.getTime();
-	var acc_start_descr = DateHelper.format(acc_start,"d/m/y");
-	/*
-	var acc_end = new Date(d.getFullYear(),d.getMonth()+1,constants.vehicle_owner_accord_to_day.getValue());
-	var acc_end_time = acc_end.getTime();
-	var acc_end_descr = DateHelper.format(acc_end,"d/m/y");	
-	var acc_year = d.getFullYear();
-	var acc_month = d.getMonth()-1;
-	if(acc_month<0){
-		acc_month = 11;
-		acc_year-= 1;
-	}
-	*/
+	var cur_d = (DateHelper.time()).getDate();
+	var prev_month_acc_allowed = (cur_d>=constants.vehicle_owner_accord_from_day.getValue() && cur_d<=constants.vehicle_owner_accord_to_day.getValue());
+	this.m_accDescr = {};
 	
 	var filters = {
 		"period":{
@@ -109,7 +96,11 @@ function ShipmentForVehOwnerList_View(id,options){
 			"cmdDelete":false,
 			"cmdFilter":true,
 			"filters":filters,
-			"variantStorage":options.variantStorage
+			"variantStorage":options.variantStorage,
+			"addCustomCommandsAfter":function(commands){
+				commands.push(new ShipmentForVehOwnerCmdSetAgreed(id+":grid:cmd:setAgreed"));
+			}
+			
 			//"cmdExport":false
 		}),
 		"popUpMenu":popup_menu,
@@ -280,18 +271,37 @@ function ShipmentForVehOwnerList_View(id,options){
 											if(m.getFieldValue("owner_agreed")){
 												res.value = DateHelper.format(m.getFieldValue("owner_agreed_date_time"),"d/m/y");
 											}
-											else if(m.getFieldValue("ship_date_time").getTime()<acc_start_time) {
-												res.value = "Разрешено с "+acc_start_descr;
+											else if(!m.getFieldValue("ship_date_time")){
+												res.value = "Не отгружено";
 											}
 											else{
-												var ctrl = new ButtonCmd(null,{
-													"caption":"Согласовать",
-													"onClick":function(){
-														self.setOwnerAgreed(this);
+												var m_dif = ((DateHelper.time()).getMonth() - m.getFieldValue("ship_date_time").getMonth());
+												if(m_dif==1 && prev_month_acc_allowed){
+													var ctrl = new ButtonCmd(null,{
+														"caption":"Согласовать",
+														"onClick":function(){
+															self.setOwnerAgreed(this);
+														}
+													});
+													ctrl.m_row = row;
+													res.elements = [ctrl];
+												}
+												else if(m_dif<=1){
+													if(!self.m_accDescr["m_"+m_dif]){
+														var ship_time = m.getFieldValue("ship_date_time");
+														self.m_accDescr["m_"+m_dif] = {
+															"from":DateHelper.format(
+																new Date(ship_time.getFullYear(),ship_time.getMonth()+1,constants.vehicle_owner_accord_from_day.getValue())
+																,"d/m/y"
+																)
+															,"to":DateHelper.format(
+																new Date(ship_time.getFullYear(),ship_time.getMonth()+1,constants.vehicle_owner_accord_to_day.getValue())
+																,"d/m/y"
+																)
+														};	
 													}
-												});
-												ctrl.m_row = row;
-												res.elements = [ctrl];
+													res.value = "Разрешено с "+self.m_accDescr["m_"+m_dif].from+" до "+self.m_accDescr["m_"+m_dif].to;
+												}
 											}
 											return res;
 										})(column,row)

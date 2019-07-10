@@ -280,7 +280,17 @@ $permissions = array();
 				
 					$permissions['Shipment_Controller_owner_set_agreed']=TRUE;
 				
+					$permissions['Shipment_Controller_owner_set_agreed_all']=TRUE;
+				
 					$permissions['Shipment_Controller_owner_set_pump_agreed']=TRUE;
+				
+					$permissions['Shipment_Controller_owner_set_pump_agreed_all']=TRUE;
+				
+					$permissions['Shipment_Controller_get_shipped_vihicles_list']=TRUE;
+				
+					$permissions['Login_Controller_get_list']=TRUE;
+				
+					$permissions['Login_Controller_get_object']=TRUE;
 				
 					$permissions['User_Controller_insert']=TRUE;
 				

@@ -662,3 +662,12 @@ td.operatorNotShipped{
 td.cost_edit{
 	background-color:yellow !important;
 }
+
+#AssignedVehicleList-grid{
+	font-size:250%;
+}
+#AssignedVehicleList-grid2{
+	position:relative;
+	top:300px;
+	font-size:150%;
+}
