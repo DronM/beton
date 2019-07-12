@@ -244,6 +244,7 @@
 <li><a href="#VehicleRun_Model">VehicleRun_Model</a></li>
 <li><a href="#ShipQuantForCostGrade_Model">ShipQuantForCostGrade_Model</a></li>
 <li><a href="#RAMaterialConsumptionDateList_Model">RAMaterialConsumptionDateList_Model</a></li>
+<li><a href="#RAMaterialConsumptionDocList_Model">RAMaterialConsumptionDocList_Model</a></li>
 <li><a href="#TrackerZoneControl_Model">TrackerZoneControl_Model</a></li>
 <li><a href="#TrackerZoneControlList_Model">TrackerZoneControlList_Model</a></li>
 <li><a href="#Weather_Model">Weather_Model</a></li>
@@ -265,6 +266,7 @@
 <li><a href="#VehicleOwnerConcretePrice_Model">VehicleOwnerConcretePrice_Model</a></li>
 <li><a href="#VehicleOwnerConcretePriceList_Model">VehicleOwnerConcretePriceList_Model</a></li>
 <li><a href="#UserOperatorList_Model">UserOperatorList_Model</a></li>
+<li><a href="#TelList_Model">TelList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -516,31 +518,7 @@
 <a href="#ClientList_Model">Model: ClientList_Model</a><h2>get_object</h2>
 <a href="#ClientDialog_Model">Model: ClientDialog_Model</a><h2>complete</h2>
 <a href="#Client_Model">Model: Client_Model</a><h2>complete_for_order</h2>
-<p>Arguments:</p>
-<div class="content_item content_item2">
-<h3>name</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:String</p>
-<p>Required:
-								Да</p>
-</div>
-<h3>ic</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:Int</p>
-<p>Required:
-								Нет</p>
-</div>
-<h3>mid</h3>
-<p></p>
-<div class="content_item content_item3">
-<p>Type:Int</p>
-<p>Required:
-								Нет</p>
-</div>
-</div>
-<h2>union</h2>
+<a href="#OrderClient_Model">Model: OrderClient_Model</a><h2>union</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>main_client_id</h3>
@@ -1481,8 +1459,7 @@
 <p>Методы:</p>
 <h2>get_dates_list</h2>
 <a href="#RAMaterialConsumptionDateList_Model">Model: RAMaterialConsumptionDateList_Model</a><h2>get_docs_list</h2>
-<p>Arguments:</p>
-<div class="content_item content_item2"></div>
+<a href="#RAMaterialConsumptionDocList_Model">Model: RAMaterialConsumptionDocList_Model</a>
 </div>
 </div>
 <div id="RawMaterial_Controller" class="content_box">
@@ -6005,6 +5982,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>inn</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>phone_cel</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
@@ -7301,6 +7284,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>shift_to</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>shift_descr</h2>
 <div>Type:String</div>
 <div>Primary key:</div>
@@ -7314,6 +7303,48 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>shift_to_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="RAMaterialConsumptionDocList_Model" class="content_box">
+<h1>RAMaterialConsumptionDocList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>driver_descr</h2>
 <div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -10528,6 +10559,24 @@
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="TelList_Model" class="content_box">
+<h1>TelList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>tel</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:10</div>
 <div>Precision:</div>
 </div>
 </div>

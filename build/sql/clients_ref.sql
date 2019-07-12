@@ -9,7 +9,7 @@ $BODY$
 		'keys',json_build_object(
 			'id',$1.id    
 			),	
-		'descr',$1.name,
+		'descr',$1.name||CASE WHEN $1.inn IS NOT NULL AND length($1.inn)>0 THEN ', '||$1.inn ELSE '' END,
 		'dataType','clients'
 	);
 $BODY$

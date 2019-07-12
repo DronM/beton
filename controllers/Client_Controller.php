@@ -231,8 +231,7 @@ class Client_Controller extends ControllerSQL{
 		
 				
 	$opts=array();
-	
-		$opts['required']=TRUE;				
+			
 		$pm->addParam(new FieldExtString('name',$opts));
 	
 				
@@ -407,6 +406,7 @@ class Client_Controller extends ControllerSQL{
 			"SELECT
 				clients.id,
 				clients.name,
+				clients.inn AS inn,
 				last_order.descr,
 				last_order.phone_cel,
 				concrete_types_ref(ct) AS concrete_types_ref,

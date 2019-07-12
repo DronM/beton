@@ -112,3 +112,6 @@ VehicleOwnerConcretePriceList_View.prototype.HEAD_TITLE = "История пра
 VehicleOwnerClientList_View.prototype.HEAD_TITLE = "Клинеты владельцев ТС";
 
 VehicleOwnerTotReport_View.prototype.HEAD_TITLE = "Итоги";
+
+MatTotalList_View.prototype.HEAD_TITLE = "Общая таблица";
+MatCorrectList_View.prototype.HEAD_TITLE = "Корректировка расхода материалов";

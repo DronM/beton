@@ -1282,6 +1282,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentPumpForVehOwnerList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserOperatorList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerTotReport_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MatTotalList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MatCorrectList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1376,6 +1378,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ConcreteCostForOwnerHeadEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentForVehOwnerCmdSetAgreed.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentPumpForVehOwnerCmdSetAgreed.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MatTotalGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MatCorrectGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1621,6 +1625,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/LoginList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/Session_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShippedVehicleList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/TelList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RAMaterialConsumptionDocList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

@@ -24,7 +24,7 @@ function RAMaterialConsumptionDocGrid(id,options){
 	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"field":new FieldDateTime("shift")
 	});
-	
+	/*
 	var filters = {
 		"period":{
 			"binding":new CommandBinding({
@@ -47,23 +47,23 @@ function RAMaterialConsumptionDocGrid(id,options){
 			]
 		}
 	};
-	
+	*/
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	
 	CommonHelper.merge(options,{
-		"keyIds":["shift"],
+		"keyIds":["date_time"],
 		"controller":contr,
-		"readPublicMethod":contr.getPublicMethod("get_dates_list"),
+		"readPublicMethod":contr.getPublicMethod("get_docs_list"),
 		"editInline":null,
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":cmd",{
 			"cmdInsert":false,
 			"cmdInsert":false,
 			"cmdDelete":false,
-			"cmdFilter":true,
-			"filters":filters,
-			"cmdSearch":false,
+			"cmdFilter":false,
+			//"filters":filters,
+			"cmdSearch":true,
 			"variantStorage":options.variantStorage
 		}),
 		"popUpMenu":popup_menu,
@@ -72,17 +72,18 @@ function RAMaterialConsumptionDocGrid(id,options){
 				new GridRow(id+":head:row0")
 			]		
 		}),
-		"foot":new GridFoot(id+"grid:foot",{
+		/*"foot":new GridFoot(id+"grid:foot",{
 			"autoCalc":true,			
 			"elements":[
 				new GridRow(id+":foot:row0")		
 			]
-		}),
+		}),*/
 		"pagination":null,
-		"autoRefresh":false,
+		"autoRefresh":true,
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
-		"focus":true
+		"focus":true,
+		"lastRowFooter":true
 	});	
 	
 	RAMaterialConsumptionDocGrid.superclass.constructor.call(this,id,options);
@@ -122,25 +123,28 @@ RAMaterialConsumptionDocGrid.prototype.onGetData = function(resp){
 		var mat_m = resp? resp.getModel("RawMaterial_Model") : this.m_initRawMaterial_Model;
 		
 		//CUSTOM HEADER&&Footer
-		var f_row = this.getFoot().getElement("row0");
+		//var f_row = this.getFoot().getElement("row0");
 		var h_row = this.getHead().getElement("row0");
 		h_row.delDOM();
 		h_row.clear();
-		f_row.delDOM();
-		f_row.clear();		
+		//f_row.delDOM();
+		//f_row.clear();		
 		h_row.addElement(new GridCellHead(h_row.getId()+":date_time",{
 			"value":"Смена",
+			"colAttrs":{"align":"center"},
 			"columns":[
-				new GridColumn({
-					"field":this.m_model.getField("date_time")								
+				new GridColumnDate({
+					"field":this.m_model.getField("date_time"),
+					"dateFormat":"H:i"
 				})
 			]
 		}));
-		f_row.addElement(new GridCell(h_row.getId()+":sp1"));
+		//f_row.addElement(new GridCell(h_row.getId()+":sp1"));
 
 		//concrete_type
 		h_row.addElement(new GridCellHead(h_row.getId()+":concrete_type_descr",{
 			"value":"Марка",
+			"colAttrs":{"align":"center"},
 			"columns":[
 				new GridColumn({
 					"field":this.m_model.getField("concrete_type_descr")
@@ -150,6 +154,7 @@ RAMaterialConsumptionDocGrid.prototype.onGetData = function(resp){
 		//vehicle
 		h_row.addElement(new GridCellHead(h_row.getId()+":vehicle_descr",{
 			"value":"ТС",
+			"colAttrs":{"align":"center"},
 			"columns":[
 				new GridColumn({
 					"field":this.m_model.getField("vehicle_descr")
@@ -177,12 +182,12 @@ RAMaterialConsumptionDocGrid.prototype.onGetData = function(resp){
 				})
 			]
 		}));		
-		f_row.addElement(new GridCellFoot(f_row.getId()+":tot_concrete_quant",{
+		/*f_row.addElement(new GridCellFoot(f_row.getId()+":tot_concrete_quant",{
 			"attrs":{"align":"right"},
 			"calcOper":"sum",
 			"calcFieldId":"concrete_quant",
 			"gridColumn":new GridColumnFloat({"id":"tot_concrete_quant"})			
-		}));		
+		}));*/
 		
 		var mat_ind = 0;		
 		while(mat_m.getNextRow()){
@@ -204,7 +209,7 @@ RAMaterialConsumptionDocGrid.prototype.onGetData = function(resp){
 					})
 				]
 			}));		
-			f_row.addElement(new GridCellFoot(f_row.getId()+":tot_quant_"+col_mat_id,{
+			/*f_row.addElement(new GridCellFoot(f_row.getId()+":tot_quant_"+col_mat_id,{
 				"attrs":{"align":"right"},
 				"calcOper":"sum",
 				"calcFieldId":col_id,
@@ -214,10 +219,10 @@ RAMaterialConsumptionDocGrid.prototype.onGetData = function(resp){
 					"thousandSeparator":""
 				})
 			}));
-			
+			*/
 		}		
 		this.getHead().toDOM();
-		this.getFoot().toDOM();				
+		//this.getFoot().toDOM();				
 		
 	}
 	

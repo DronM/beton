@@ -8,11 +8,7 @@ function ConcreteTypeList_View(id,options){
 	var model = options.models.ConcreteTypeList_Model;
 	var contr = new ConcreteType_Controller();
 	
-	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
-	window.getApp().getConstantManager().get(constants);
-	
 	var popup_menu = new PopUpMenu();
-	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
 		"model":model,
 		"controller":contr,

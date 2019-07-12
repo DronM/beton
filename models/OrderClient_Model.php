@@ -46,6 +46,14 @@ class OrderClient_Model extends {
 		$this->addField($f_descr);
 		//********************
 		
+		//*** Field inn ***
+		$f_opts = array();
+		$f_opts['id']="inn";
+						
+		$f_inn=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
+		$this->addField($f_inn);
+		//********************
+		
 		//*** Field phone_cel ***
 		$f_opts = array();
 		$f_opts['id']="phone_cel";

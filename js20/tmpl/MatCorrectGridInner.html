@@ -1,0 +1,73 @@
+<thead>
+	<tr>
+		<th rowspan="2">Смена
+		</th>
+		{{#materials}}
+		<th colspan="4" class="{{mat_class}}">{{mat_name}}
+		</th>
+		{{/materials}}
+	</tr>
+	<tr>
+		{{#materials}}
+		<th class="{{mat_class}}">Норма
+		</th>
+		
+		<th class="{{mat_class}}">Факт
+		</th>
+					
+		<th class="{{mat_class}}">Обнул.
+		</th>						
+		
+		<th class="{{mat_class}}">Сальдо
+		</th>
+		{{/materials}}
+	</tr>
+</thead>
+<tbody>
+	{{#dates}}
+	<tr {{#cur_date}}class="order_current_row"{{/cur_date}}>
+		<td>{{date_descr}}
+		</td>
+		
+		{{#date_materials}}
+		<td align="right" class="{{mat_class}}">{{norm}}
+		</td>
+		
+		<td mat_id="{{mat_id}}" dt="{{dt}}" align="right"
+		class="{{mat_class}} quant_consump_editable{{#corrected_editted}} quant_consump_editted{{/corrected_editted}}"
+		title="Двойной клик для редактирования">{{corrected}}
+		</td>
+		
+		<td mat_id="{{mat_id}}" dt="{{dt}}" align="right"
+		class="{{mat_class}} quant_consump_editable obnul {{#obnul_editted}} quant_consump_editted{{/obnul_editted}}"
+		title="Двойной клик для редактирования">{{obnul}}
+		</td>
+		<td align="right" class="{{mat_class}}">{{balance}}
+		</td>
+		
+		{{/date_materials}}
+	</tr>
+	{{/dates}}
+</tbody>
+<tfoot>
+	<tr>
+		<td>Итого
+		</td>
+		
+		{{#materials}}
+		<td>{{norm}}
+		</td>
+		
+		<td align="right">{{corrected}}
+		</td>
+		
+		<td align="right">{{obnul}}
+		</td>
+		
+		<td>{{balance}}
+		</td>
+		
+		{{/materials}}
+		
+	</tr>
+<tfoot>

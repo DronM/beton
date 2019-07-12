@@ -15,8 +15,8 @@ function RAMaterialConsumptionDocList_View(id,options){
 	options = options || {};
 	options.addElement = function(){
 		this.addElement(new RAMaterialConsumptionDocGrid(id+":grid",{
-			"model":(options.models&&options.models.RAMaterialConsumptionDocList_Model)? options.models.RAMaterialConsumptionDocList_Model:new ModelXML("RAMaterialConsumptionDocList_Model")
-			,"modelMat":(options.models&& options.models.RawMaterial_Model)? options.models.RawMaterial_Model : new RawMaterial_Model()
+			"filters":options.detailFilters.RAMaterialConsumptionDocList_Model,
+			"model":(options.models&&options.models.RAMaterialConsumptionDocList_Model)? options.models.RAMaterialConsumptionDocList_Model:new RAMaterialConsumptionDocList_Model()			,"modelMat":(options.models&& options.models.RawMaterial_Model)? options.models.RawMaterial_Model : new RawMaterial_Model()
 			,"variantStorage":options.variantStorage
 		}));
 	}

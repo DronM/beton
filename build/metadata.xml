@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-07-10 05:40:12</lastBuild></version>
+		<lastBuild>2019-07-12 05:32:16</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -53,6 +53,7 @@
 		<version dateOpen="2019-07-03 13:07:54" dateClose="2019-07-04 05:07:39">1.00147</version>
 		<version dateOpen="2019-07-04 12:07:10" dateClose="2019-07-04 17:07:29">1.00148</version>
 		<version dateOpen="2019-07-06 06:07:52" dateClose="2019-07-10 05:07:40">1.00149</version>
+		<version dateOpen="2019-07-10 06:07:02" dateClose="2019-07-12 05:07:32">1.00150</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2238,6 +2239,7 @@
 			<field id="id" dataType="Int"/>
 			<field id="name" dataType="String"/>
 			<field id="descr" dataType="String"/>
+			<field id="inn" dataType="String"/>
 			<field id="phone_cel" dataType="Int"/>
 			<field id="concrete_types_ref" dataType="JSON"/>
 			<field id="destinations_ref" dataType="JSON"/>
@@ -2271,10 +2273,19 @@
 		</model>
 		<model id="RAMaterialConsumptionDateList" virtual="TRUE" server="FALSE">
 			<field id="shift" dataType="DateTime" primaryKey="TRUE"/>
+			<field id="shift_to" dataType="DateTime"/>
 			<field id="shift_descr" dataType="String"/>
 			<field id="shift_from_descr" dataType="String"/>
 			<field id="shift_to_descr" dataType="String"/>
 			<field id="concrete_quant" dataType="Float"/>
+		</model>
+		<model id="RAMaterialConsumptionDocList" parent="ModelSQLBeton" virtual="TRUE">
+			<field id="date_time" dataType="DateTime" primaryKey="TRUE" alias="Дата"/>
+			<field id="date_descr" dataType="String" sysCol="TRUE"/>
+			<field id="concrete_type_descr" dataType="String" alias="Марка"/>
+			<field id="vehicle_descr" dataType="String" alias="ТС"/>
+			<field id="driver_descr" dataType="String" alias="Водитель"/>
+			<field id="concrete_quant" dataType="Float" alias="Объем"/>
 		</model>
 		<model id="TrackerZoneControl" parent="ModelSQLBeton" dataTable="tracker_zone_controls" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
@@ -2421,6 +2432,10 @@
 			<field id="phone_cel" dataType="String"/>
 			<field id="production_sites_ref" dataType="JSON"/>
 		</model>
+		<model id="TelList" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="tel" dataType="String" length="10"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -2469,6 +2484,8 @@
 		<constant id="vehicle_owner_accord_from_day" name="Номер дня месяца" descr="Номер дня месяца, начиная с которого владельцы ТС могу согласовывать отгрузки за предыдущий месяц" dataType="Int" defaultValue="5"/>
 		<constant id="vehicle_owner_accord_to_day" name="Номер дня месяца" descr="Номер дня месяца, до которого владельцы ТС могу согласовывать отгрузки за предыдущий месяц" dataType="Int" defaultValue="20"/>
 		<constant id="show_time_for_shipped_vehicles" name="Время показа отргруженных ТС" descr="Время, в течении которого показывать отгруженные ТС на большом экране" dataType="Interval" defaultValue="00:30"/>
+		<constant id="tracker_malfunction_tel_list" name="Список телефонов для сообщений о неисправном трекере" descr="На какие телефоны отправлять сообщение о неработающих трекерах" dataType="JSON"/>
+		<constant id="low_efficiency_tel_list" name="Список телефонов для сообщений о низком состоянии эффективности" descr="На какие телефоны отправлять сообщение о низком состоянии эффективности" dataType="JSON"/>
 	</constants>
 	<controllers>
 		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -2478,7 +2495,7 @@
 			<publicMethod id="get_list" modelId="ClientList"/>
 			<publicMethod id="get_object" modelId="ClientDialog"/>
 			<publicMethod id="complete" modelId="Client" patternFieldId="name"/>
-			<publicMethod id="complete_for_order">
+			<publicMethod id="complete_for_order" modelId="OrderClient">
 				<field id="name" dataType="String" required="TRUE"/>
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
@@ -2674,7 +2691,7 @@
 		</controller>
 		<controller id="RAMaterialConsumption" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="get_dates_list" condFields="TRUE" modelId="RAMaterialConsumptionDateList"/>
-			<publicMethod id="get_docs_list" condFields="TRUE"/>
+			<publicMethod id="get_docs_list" condFields="TRUE" modelId="RAMaterialConsumptionDocList"/>
 		</controller>
 		<controller id="RawMaterialConsRate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="RawMaterialConsRate"/>
@@ -3502,6 +3519,8 @@
 		<view id="30010" c="EmployeeWorkTimeSchedule_Controller" t="EmployeeWorkTimeScheduleList" f="get_list" section="Формы" descr="Табель рабочего времени"/>
 		<view id="30011" c="ClientValidDuplicate_Controller" t="ClientValidDuplicateList" f="get_list" section="Формы" descr="Разрешенные повторы контрагентов"/>
 		<view id="30012" c="ShipmentCancelation_Controller" t="ShipmentCancelationList" f="get_list" section="Формы" descr="Отмененные отгрузки"/>
+		<view id="30013" c="RawMaterial_Controller" t="MatTotalList" f="total_list" section="Формы" descr="Общая таблица"/>
+		<view id="30014" c="RawMaterial_Controller" t="MatCorrectList" f="correct_list" section="Формы" descr="Корректировка расхода"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -3594,6 +3613,8 @@
 		<serverTemplate id="ShipmentPumpForVehOwnerList"/>
 		<serverTemplate id="UserOperatorList"/>
 		<serverTemplate id="VehicleOwnerTotReport"/>
+		<serverTemplate id="MatTotalList"/>
+		<serverTemplate id="MatCorrectList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -3623,6 +3644,8 @@
 		<jsTemplate id="AstIncomeCall_View" file="tmpl/AstIncomeCall_View.html"/>
 		<jsTemplate id="AstIncomeUnknownCall_View" file="tmpl/AstIncomeUnknownCall_View.html"/>
 		<jsTemplate id="OrderCalc" file="tmpl/OrderCalc.html"/>
+		<jsTemplate id="MatTotalGridInner" file="tmpl/MatTotalGridInner.html"/>
+		<jsTemplate id="MatCorrectGridInner" file="tmpl/MatCorrectGridInner.html"/>
 	</jsTemplates>
 	<jsScripts>
 		<!-- Core JS files -->
@@ -4120,6 +4143,8 @@
 		<jsScript file="views/ShipmentPumpForVehOwnerList_View.js"/>
 		<jsScript file="views/UserOperatorList_View.js"/>
 		<jsScript file="views/VehicleOwnerTotReport_View.js"/>
+		<jsScript file="views/MatTotalList_View.js"/>
+		<jsScript file="views/MatCorrectList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -4214,6 +4239,8 @@
 		<jsScript file="custom_controls/ConcreteCostForOwnerHeadEdit.js"/>
 		<jsScript file="custom_controls/ShipmentForVehOwnerCmdSetAgreed.js"/>
 		<jsScript file="custom_controls/ShipmentPumpForVehOwnerCmdSetAgreed.js"/>
+		<jsScript file="custom_controls/MatTotalGrid.js"/>
+		<jsScript file="custom_controls/MatCorrectGrid.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -4459,6 +4486,8 @@
 		<jsScript file="models/LoginList_Model.js"/>
 		<jsScript file="models/Session_Model.js"/>
 		<jsScript file="models/ShippedVehicleList_Model.js"/>
+		<jsScript file="models/TelList_Model.js"/>
+		<jsScript file="models/RAMaterialConsumptionDocList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

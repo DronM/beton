@@ -49,7 +49,6 @@ function RAMaterialConsumptionDateGrid(id,options){
 	};
 	
 	var popup_menu = new PopUpMenu();
-	var pagClass = window.getApp().getPaginationClass();
 	
 	CommonHelper.merge(options,{
 		"keyIds":["shift"],
@@ -99,7 +98,6 @@ extend(RAMaterialConsumptionDateGrid,GridAjx);
 
 
 /* public methods */
-/* public methods */
 RAMaterialConsumptionDateGrid.prototype.onGetData = function(resp){
 	if(resp){
 		this.m_model.setData(resp.getModelData(this.m_model.getId()));
@@ -139,13 +137,13 @@ RAMaterialConsumptionDateGrid.prototype.onGetData = function(resp){
 						"detailFilters":{
 							"RAMaterialConsumptionDocList_Model":[
 								{
-								"masterFieldId":"shift_date_time",
+								"masterFieldId":"shift",
 								"field":"date_time",
 								"sign":"ge",
 								"val":"0"
 								}	
 								,{
-								"masterFieldId":"shift_date_time_end",
+								"masterFieldId":"shift_to",
 								"field":"date_time",
 								"sign":"le",
 								"val":"0"

@@ -24,6 +24,10 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
+
+require_once('common/MyDate.php');
+require_once(ABSOLUTE_PATH.'functions/Beton.php');
+
 class RawMaterial_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster){
 		parent::__construct($dbLinkMaster);
@@ -629,10 +633,26 @@ class RawMaterial_Controller extends ControllerSQL{
 			WHERE concrete_part=true
 			ORDER BY ord",
 		'material_list');
+		
 		$link = $this->getDbLink();
 		$model = new ModelSQL($link,array('id'=>'correct_list'));
 		$model->addField(new FieldSQLDateTime($link,null,null,"date_time"));
+		
 		$where = $this->conditionFromParams($pm,$model);
+		if(!isset($where)){
+			$dt = MyDate::StartMonth(time());
+			$dt+= Beton::shiftStartTime();
+			$date_from = Beton::shiftStart($dt);
+			$date_to = Beton::shiftEnd(MyDate::EndMonth($dt)-24*60*60+Beton::shiftStartTime());
+			$date_from_db = "'".date('Y-m-d H:i:s',$date_from)."'";
+			$date_to_db = "'".date('Y-m-d H:i:s',$date_to)."'";
+		}
+		else{
+			$date_from_db = $where->getFieldValueForDb('date_time','>=',0);
+			$date_to_db = $where->getFieldValueForDb('date_time','<=',0);
+		}		
+		
+		
 		$this->addNewModel(sprintf(
 		"SELECT 
 			get_shift_start(r.date_time) AS shift,
@@ -660,8 +680,8 @@ class RawMaterial_Controller extends ControllerSQL{
 				obn.quant
 		 ORDER BY shift,m.ord
 		",		
-		$where->getFieldValueForDb('date_time','>=',0),
-		$where->getFieldValueForDb('date_time','<=',0)
+		$date_from_db,
+		$date_to_db
 		),'correct_list');
 	}
 	public function total_list($pm){
@@ -687,14 +707,29 @@ class RawMaterial_Controller extends ControllerSQL{
 			WHERE concrete_part=true
 			ORDER BY ord",
 		'material_list');
+		
 		$link = $this->getDbLink();
 		$model = new ModelSQL($link,array('id'=>'total_list'));
 		$model->addField(new FieldSQLDateTime($link,null,null,"date_time"));
+		
 		$where = $this->conditionFromParams($pm,$model);
+		if(!isset($where)){
+			$dt = MyDate::StartMonth(time());
+			$dt+= Beton::shiftStartTime();
+			$date_from = Beton::shiftStart($dt);
+			$date_to = Beton::shiftEnd(MyDate::EndMonth($dt)-24*60*60+Beton::shiftStartTime());
+			$date_from_db = "'".date('Y-m-d H:i:s',$date_from)."'";
+			$date_to_db = "'".date('Y-m-d H:i:s',$date_to)."'";
+		}
+		else{
+			$date_from_db = $where->getFieldValueForDb('date_time','>=',0);
+			$date_to_db = $where->getFieldValueForDb('date_time','<=',0);
+		}		
+		
 		$this->addNewModel(sprintf(
 		"SELECT * FROM raw_material_total_report(%s,%s)",		
-		$where->getFieldValueForDb('date_time','>=',0),
-		$where->getFieldValueForDb('date_time','<=',0)
+		$date_from_db,
+		$date_to_db
 		),'total_list');
 	}
 	

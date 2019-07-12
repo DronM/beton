@@ -44,6 +44,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		//result model
 		$model = new ModelSQL($link,array("id"=>"RAMaterialConsumptionDateList_Model"));
 		$model->addField(new FieldSQLString($link,null,null,"shift"));
+		$model->addField(new FieldSQLString($link,null,null,"shift_to"));
 		$model->addField(new FieldSQLString($link,null,null,"shift_descr"));		
 		$model->addField(new FieldSQLString($link,null,null,"shift_from_descr"));		
 		$model->addField(new FieldSQLString($link,null,null,"shift_to_descr"));		
@@ -68,19 +69,23 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$where = new ModelWhereSQL();			
 		}
 		
-		$sql=sprintf("SELECT
-			shift,shift_descr,
-			shift_from_descr,shift_to_descr,
-			concrete_quant%s
-		FROM ra_material_consumption_dates_list(%s,%s)
-		AS (shift timestamp,
-		shift_descr text,shift_from_descr text,
-		shift_to_descr text,
-		concrete_quant numeric%s)",
-		$fld_list,
-		$where->getFieldValueForDb('shift','&gt;=',0,$date_from_s),
-		$where->getFieldValueForDb('shift','&lt;=',0,$date_to_s),
-		$fld_def);
+		$sql = sprintf(
+			"SELECT
+				shift,
+				shift_to,
+				shift_descr,
+				shift_from_descr,shift_to_descr,
+				concrete_quant%s
+			FROM ra_material_consumption_dates_list_new(%s,%s)
+			AS (shift timestamp,shift_to timestamp,
+			shift_descr text,shift_from_descr text,
+			shift_to_descr text,
+			concrete_quant numeric%s)",
+			$fld_list,
+			$where->getFieldValueForDb('shift','&gt;=',0,$date_from_s),
+			$where->getFieldValueForDb('shift','&lt;=',0,$date_to_s),
+			$fld_def
+		);
 		//throw new Exception($sql);
 		$model->query($sql,TRUE);
 		$this->addModel($model);		
@@ -92,6 +97,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		TRUE);
 		$this->addModel($mat_model);			
 	}
+	
 	public function get_docs_list($pm){
 		$link = $this->getDbLink();
 		$ar = $link->query_first("SELECT COUNT(*) AS cnt FROM raw_materials WHERE name &lt;&gt;''");
@@ -99,7 +105,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		//
 		//result model
 		$model = new ModelSQL($link,array("id"=>"RAMaterialConsumptionDocList_Model"));
-		$model->addField(new FieldSQLString($link,null,null,"date_time"));
+		$model->addField(new FieldSQLDateTime($link,null,null,"date_time"));
 		$model->addField(new FieldSQLString($link,null,null,"date_time_descr"));		
 		$model->addField(new FieldSQLString($link,null,null,"concrete_type_descr"));
 		$model->addField(new FieldSQLString($link,null,null,"vehicle_descr"));
@@ -116,8 +122,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$def_date=null;
 		FieldSQLDateTime::formatForDb(mktime(),$def_date);
 		
-		$model_params = new ModelSQL($link);
-		$model_params->addField(new FieldSQLDateTime($link,null,null,"date_time"));		
+		$model_params = new RAMaterialConsumptionDocList_Model($link);
+		/*
+		$model_params->addField(new FieldSQLDateTime($link,null,null,"date_time"));
+		$model_params->addField(new FieldSQLString($link,null,null,"concrete_type_descr"));
+		$model_params->addField(new FieldSQLString($link,null,null,"driver_descr"));
+		$model_params->addField(new FieldSQLString($link,null,null,"vehicle_descr"));
+		*/
 		$where = $this->conditionFromParams($pm,$model_params);
 		if (!$where){
 			throw new Exception("Не заданы условия!");
@@ -138,6 +149,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$where->getFieldValueForDb('date_time','&gt;=',0,$def_date),
 		$where->getFieldValueForDb('date_time','&lt;=',0,$def_date),
 		$fld_def);
+		
+		//$sql.=' '.$where->getSQL(); НЕТ ИТОГОВ
+		
 		//throw new Exception($sql);
 		$model->query($sql,TRUE);
 		$this->addModel($model);		

@@ -671,3 +671,19 @@ td.cost_edit{
 	top:300px;
 	font-size:150%;
 }
+
+.mat_even{
+	background-color:#ffffe6;
+}
+td.quant_consump_editable{
+	background-color:#ffff00;
+	cursor:pointer;
+}
+td.quant_consump_editted{
+	background-color:#ffcc00;
+	cursor:pointer;
+}
+
+#mat_inplace_edit{
+	width:80px;
+}

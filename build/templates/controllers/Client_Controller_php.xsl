@@ -106,6 +106,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			"SELECT
 				clients.id,
 				clients.name,
+				clients.inn AS inn,
 				last_order.descr,
 				last_order.phone_cel,
 				concrete_types_ref(ct) AS concrete_types_ref,

@@ -1,0 +1,79 @@
+<thead>
+	<tr>
+		<th rowspan="2">Смена
+		</th>
+		<th rowspan="2">Объем
+		</th>
+		{{#materials}}
+		<th colspan="4" class="{{mat_class}}">{{mat_name}}
+			<div>Ср.расх.:{{mat_avg_cons}}
+			</div>
+		</th>
+		{{/materials}}
+	</tr>
+	<tr>
+		{{#materials}}
+		<th class="{{mat_class}}">На начало
+		</th>
+		
+		<th class="{{mat_class}}">Приход
+		</th>
+					
+		<th class="{{mat_class}}">Расход
+		</th>						
+		
+		<th class="{{mat_class}}">На конец
+		</th>
+		{{/materials}}
+	</tr>
+</thead>
+<tbody>
+	{{#dates}}
+	<tr {{#cur_date}}class="order_current_row"{{/cur_date}}>
+		<td>{{date_descr}}
+		</td>
+		
+		<td align="right">{{quant_shipment}}
+		</td>
+		
+		{{#date_materials}}
+		<td align="right" class="{{mat_class}}">{{quant_beg}}
+		</td>
+		
+		<td align="right" class="{{mat_class}}">{{quant_procur}}
+		</td>
+		
+		<td mat_id="{{mat_id}}" dt="{{dt}}" align="right" class="{{mat_class}} quant_consump_editable{{#quant_consump_editted}} quant_consump_editted{{/quant_consump_editted}}" title="Двойной клик для редактирования">{{quant_consump}}
+		</td>
+		
+		<td align="right" class="{{mat_class}}">{{quant_end}}
+		</td>
+		{{/date_materials}}
+	</tr>
+	{{/dates}}
+</tbody>
+<tfoot>
+	<tr>
+		<td>Итого
+		</td>
+		
+		<td align="right">{{quant_shipment}}
+		</td>
+		
+		{{#materials}}
+		<td>
+		</td>
+		
+		<td align="right">{{quant_procur}}
+		</td>
+		
+		<td align="right">{{quant_consump}}
+		</td>
+		
+		<td>
+		</td>
+		
+		{{/materials}}
+		
+	</tr>
+<tfoot>

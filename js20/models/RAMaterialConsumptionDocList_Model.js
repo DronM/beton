@@ -16,8 +16,8 @@
  * @param {Object} options
  */
 
-function RAMaterialConsumptionDateList_Model(options){
-	var id = 'RAMaterialConsumptionDateList_Model';
+function RAMaterialConsumptionDocList_Model(options){
+	var id = 'RAMaterialConsumptionDocList_Model';
 	options = options || {};
 	
 	options.fields = {};
@@ -26,10 +26,10 @@ function RAMaterialConsumptionDateList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	
+	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
-	options.fields.shift = new FieldDateTime("shift",filed_options);
+	options.fields.date_time = new FieldDateTime("date_time",filed_options);
 	
 				
 	
@@ -38,45 +38,45 @@ function RAMaterialConsumptionDateList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.shift_to = new FieldDateTime("shift_to",filed_options);
+	options.fields.date_descr = new FieldString("date_descr",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Марка';
 	filed_options.autoInc = false;	
 	
-	options.fields.shift_descr = new FieldString("shift_descr",filed_options);
+	options.fields.concrete_type_descr = new FieldString("concrete_type_descr",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'ТС';
 	filed_options.autoInc = false;	
 	
-	options.fields.shift_from_descr = new FieldString("shift_from_descr",filed_options);
+	options.fields.vehicle_descr = new FieldString("vehicle_descr",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Водитель';
 	filed_options.autoInc = false;	
 	
-	options.fields.shift_to_descr = new FieldString("shift_to_descr",filed_options);
+	options.fields.driver_descr = new FieldString("driver_descr",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Объем';
 	filed_options.autoInc = false;	
 	
 	options.fields.concrete_quant = new FieldFloat("concrete_quant",filed_options);
 	
-		RAMaterialConsumptionDateList_Model.superclass.constructor.call(this,id,options);
+		RAMaterialConsumptionDocList_Model.superclass.constructor.call(this,id,options);
 }
-extend(RAMaterialConsumptionDateList_Model,ModelXML);
+extend(RAMaterialConsumptionDocList_Model,ModelXML);
 

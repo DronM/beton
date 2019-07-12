@@ -29,6 +29,14 @@ class RAMaterialConsumptionDateList_Model extends {
 		$this->addField($f_shift);
 		//********************
 		
+		//*** Field shift_to ***
+		$f_opts = array();
+		$f_opts['id']="shift_to";
+						
+		$f_shift_to=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shift_to",$f_opts);
+		$this->addField($f_shift_to);
+		//********************
+		
 		//*** Field shift_descr ***
 		$f_opts = array();
 		$f_opts['id']="shift_descr";

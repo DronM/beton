@@ -1,1 +1,0 @@
-psql:.run_sql.sql:3: ОШИБКА:  представление "shipped_vehicles_list" не существует

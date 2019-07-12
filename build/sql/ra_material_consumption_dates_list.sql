@@ -1,8 +1,8 @@
--- Function: ra_material_consumption_dates_list(timestamp without time zone, timestamp without time zone)
+-- Function: ra_material_consumption_dates_list_new(timestamp without time zone, timestamp without time zone)
 
--- DROP FUNCTION ra_material_consumption_dates_list(timestamp without time zone, timestamp without time zone);
+-- DROP FUNCTION ra_material_consumption_dates_list_new(timestamp without time zone, timestamp without time zone);
 
-CREATE OR REPLACE FUNCTION ra_material_consumption_dates_list(
+CREATE OR REPLACE FUNCTION ra_material_consumption_dates_list_new(
     in_date_time_from timestamp without time zone,
     in_date_time_to timestamp without time zone)
   RETURNS SETOF record AS
@@ -41,6 +41,7 @@ BEGIN
 			ORDER BY date_time)
 		(SELECT
 			consump_d.date_time AS shift,
+			get_shift_end(consump_d.date_time) AS shift_to,
 			get_shift_descr(consump_d.date_time)::text AS shift_descr,
 			date10_time8_descr(consump_d.date_time)::text AS shift_from_descr,
 			date10_time8_descr(get_shift_end(consump_d.date_time))::text AS shift_to_descr,
@@ -58,6 +59,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION ra_material_consumption_dates_list(timestamp without time zone, timestamp without time zone)
+ALTER FUNCTION ra_material_consumption_dates_list_new(timestamp without time zone, timestamp without time zone)
   OWNER TO beton;
 

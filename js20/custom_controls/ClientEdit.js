@@ -51,7 +51,7 @@ function ClientEdit(id,options){
 	options.acPublicMethod = options.acController.getPublicMethod((options.acPublicMethodId||"complete"))
 	options.acPatternFieldId = options.acPatternFieldId || "name";
 	options.acKeyFields = options.acKeyFields || [options.acModel.getField("id")];
-	options.acDescrFields = options.acDescrFields || [options.acModel.getField("name")];
+	options.acDescrFields = options.acDescrFields || [options.acModel.getField("name"),options.acModel.getField("inn")];
 	options.acICase = options.acICase || "1";
 	options.acMid = options.acMid || "1";
 	

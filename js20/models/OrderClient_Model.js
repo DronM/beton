@@ -56,6 +56,15 @@ function OrderClient_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.inn = new FieldString("inn",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.phone_cel = new FieldInt("phone_cel",filed_options);
 	
 				
