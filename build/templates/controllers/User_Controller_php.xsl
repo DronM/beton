@@ -177,7 +177,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		$log_ar = $this->getDbLinkMaster()->query_first(
 			sprintf("SELECT pub_key FROM logins
-			WHERE session_id=md5('%s') AND user_id =%d AND date_time_out IS NULL",
+			WHERE session_id='%s' AND user_id =%d AND date_time_out IS NULL",
 			session_id(),intval($ar['id']))
 		);
 		if (!$log_ar['pub_key']){
@@ -189,19 +189,25 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				sprintf("UPDATE logins SET 
 					user_id = '%s',
 					pub_key = '%s'
-				WHERE session_id=md5('%s') AND user_id IS NULL
+				WHERE session_id='%s' AND user_id IS NULL
 				RETURNING id",
-				$ar['id'],$this->pub_key,session_id())
+				$ar['id'],
+				$this->pub_key,session_id()
+				)
 			);				
 			if (!$log_ar['id']){
 				//нет вообще юзера
 				$log_ar = $this->getDbLinkMaster()->query_first(
-					sprintf("INSERT INTO logins
-					(date_time_in,ip,session_id,pub_key,user_id)
-					VALUES(now(),'%s',md5('%s'),'%s',%d)
-					RETURNING id",
-					$_SERVER["REMOTE_ADDR"],
-					session_id(),$this->pub_key,$ar['id'])
+					sprintf(
+						"INSERT INTO logins
+						(date_time_in,ip,session_id,pub_key,user_id)
+						VALUES(now(),'%s','%s','%s',%d)
+						RETURNING id",
+						$_SERVER["REMOTE_ADDR"],
+						session_id(),
+						$this->pub_key,
+						$ar['id']
+					)
 				);								
 			}
 			$_SESSION['LOGIN_ID'] = $ar['id'];			
@@ -278,7 +284,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				setcookie(PARAM_TOKEN,$access_token,time()+SESSION_EXP_SEC,'expert72',$_SERVER['HTTP_HOST']);
 			}
 			else{
-				setcookie(PARAM_TOKEN,NULL,-1,'expert72',$_SERVER['HTTP_HOST']);
+				setcookie(PARAM_TOKEN,NULL,-1,'beton',$_SERVER['HTTP_HOST']);
 			}
 		}
 	}
@@ -329,17 +335,27 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$pub_key = uniqid();
 			
 			$link->query('BEGIN');									
-			$link->query(sprintf(
-			"UPDATE sessions
-				SET id=md5('%s')
-			WHERE id=md5('%s')",$new_sess_id,$old_sess_id));
+			$link->query(
+				sprintf(
+					"UPDATE sessions
+						SET id='%s'
+					WHERE id='%s'",
+					$new_sess_id,
+					$old_sess_id
+				)
+			);
 			
-			$link->query(sprintf(
-			"UPDATE logins
-				SET set_date_time=now()::timestamp,
-					session_id=md5('%s'),
-					pub_key='%s'
-			WHERE id=%d",$new_sess_id,$pub_key,$ar['id']));
+			$link->query(
+				sprintf(
+					"UPDATE logins
+						SET set_date_time=now()::timestamp,
+							session_id='%s',
+							pub_key='%s'
+					WHERE id=%d",
+				$new_sess_id,
+				$pub_key,$ar['id']
+				)
+			);
 			
 			$link->query('COMMIT');
 		}

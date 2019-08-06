@@ -17,8 +17,6 @@ function MailForSendingList_View(id,options){
 	
 	MailForSendingList_View.superclass.constructor.call(this,id,options);
 	
-	MailForSendingList_View.superclass.constructor.call(this,id,options);
-	
 	var model = options.models.MailForSendingList_Model;
 	var contr = new MailForSending_Controller();
 	

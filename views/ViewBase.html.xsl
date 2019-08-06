@@ -143,6 +143,7 @@
 		application.m_weather.toDOM();
 	}	
 	<xsl:if test="count(/document/model[@id='AstCallCurrent_Model']/row) &gt;0">
+	if(window.getWidthType()!="sm"){
 	//ВХОДЯЩИЙ ЗВОНОК!
 	var view_opts = {};
 	view_opts.models = {};
@@ -232,7 +233,7 @@
 			window.call_form.open();		
 		}
 	}
-	
+	}
 	</xsl:if>
 	
 	</xsl:if>

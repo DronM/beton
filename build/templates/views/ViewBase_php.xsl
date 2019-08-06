@@ -90,7 +90,13 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->getVarModel()->addField(new Field('user_id',DT_INT));
 		$this->getVarModel()->addField(new Field('user_name',DT_STRING));
 		$this->getVarModel()->addField(new Field('tel_ext',DT_STRING));
-		
+		/*
+		$this->getVarModel()->addField(new Field('token',DT_STRING));
+		$this->getVarModel()->addField(new Field('tokenr',DT_STRING));
+		$this->getVarModel()->addField(new Field('tokenParam',DT_STRING));
+		$this->getVarModel()->addField(new Field('sessionAutoRefresh',DT_BOOL));
+		$this->getVarModel()->addField(new Field('sessionExpirationSec',DT_INT));
+		*/
 		
 		<!-- obligatory vars values -->
 		$this->getVarModel()->insert();
@@ -121,8 +127,13 @@ class ViewBase extends ViewHTMLXSLT {
 			$this->setVarValue('user_name',$_SESSION['user_name']);
 			$this->setVarValue('curDate',round(microtime(true) * 1000));
 			$this->setVarValue('tel_ext',$_SESSION['tel_ext']);
-			//$this->setVarValue('token',$_SESSION['token']);
-			//$this->setVarValue('tokenr',$_SESSION['tokenr']);
+			/*
+			$this->setVarValue('token',$_SESSION['token']);
+			$this->setVarValue('tokenr',$_SESSION['tokenr']);
+			$this->setVarValue('tokenParam',PARAM_TOKEN);
+			$this->setVarValue('sessionAutoRefresh',SESSION_AUTOREFRESH? 'true':'false');
+			$this->setVarValue('sessionExpirationSec',SESSION_EXP_SEC);
+			*/
 		}
 		<!-- custom vars values
 		if (isset($_SESSION['constrain_to_store'])){

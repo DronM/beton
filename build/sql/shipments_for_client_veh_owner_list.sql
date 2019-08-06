@@ -20,6 +20,7 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 		WHERE sh.order_id=o.id
 		),0) AS cost_shipment,
 		
+		--БЕТОН
 		coalesce(
 			(SELECT
 				pr.price
@@ -57,12 +58,14 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 		--простой
 		coalesce(demurrage.cost,0.00)::numeric(15,2) AS cost_demurrage,
 		
+		--ИТОГИ
 		coalesce((SELECT
 			sum(shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE))
 		FROM shipments AS sh
 		WHERE sh.order_id=o.id
-		),0) + 
-		coalesce(
+		),0)
+		--БЕТОН 
+		+coalesce(
 			(SELECT
 				pr.price
 			FROM vehicle_owner_concrete_prices AS pr_t
@@ -70,11 +73,13 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 			WHERE pr_t.vehicle_owner_id=vown_cl.vehicle_owner_id AND pr_t.client_id=o.client_id AND pr_t.date<=o.date_time
 			ORDER BY pr_t.date DESC
 			LIMIT 1)
-		,0)*o.quant::numeric +
-		coalesce(
+		,0)*o.quant::numeric
+		
+		--стоимость чужего насоса, если есть
+		+coalesce(
 		CASE
 			WHEN o.pump_vehicle_id IS NULL OR pvh_v.vehicle_owner_id=vown_cl.vehicle_owner_id THEN 0::numeric(15,2)
-			WHEN coalesce(last_sh.pump_cost_edit,FALSE) THEN last_sh.pump_cost::numeric(15,2)
+			WHEN coalesce(last_sh.pump_for_client_cost_edit,FALSE) THEN last_sh.pump_for_client_cost::numeric(15,2)
 			WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
 			ELSE
 				(SELECT
@@ -89,9 +94,10 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 				LIMIT 1
 				)::numeric(15,2)
 			
-		END,0)::numeric(15,2)		
+		END,0)::numeric(15,2)
 		
-		+coalesce(demurrage.cost,0.00)
+		--простой
+		+coalesce(demurrage.cost,0.00)::numeric(15,2)
 		
 		AS cost_total
 		

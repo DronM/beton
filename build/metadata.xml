@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-07-12 05:32:16</lastBuild></version>
+		<lastBuild>2019-08-06 18:52:50</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -54,6 +54,7 @@
 		<version dateOpen="2019-07-04 12:07:10" dateClose="2019-07-04 17:07:29">1.00148</version>
 		<version dateOpen="2019-07-06 06:07:52" dateClose="2019-07-10 05:07:40">1.00149</version>
 		<version dateOpen="2019-07-10 06:07:02" dateClose="2019-07-12 05:07:32">1.00150</version>
+		<version dateOpen="2019-07-16 09:07:02" dateClose="2019-08-06 18:08:53">1.00151</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -3678,6 +3679,7 @@
 		<jsScript file="core/VersException.js"/>
 		<jsScript file="core/ConstantManager.js"/>
 		<jsScript file="core/ServConnector.js"/>
+		<jsScript file="core/ServConnectorSecure.js"/>
 		<jsScript file="core/Response.js"/>
 		<jsScript file="core/ResponseXML.js"/>
 		<jsScript file="core/ResponseJSON.js"/>
