@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-08-07 05:40:59</lastBuild></version>
+		<lastBuild>2019-08-07 06:29:38</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -56,6 +56,7 @@
 		<version dateOpen="2019-07-10 06:07:02" dateClose="2019-07-12 05:07:32">1.00150</version>
 		<version dateOpen="2019-07-16 09:07:02" dateClose="2019-08-06 18:08:53">1.00151</version>
 		<version dateOpen="2019-08-06 18:08:53" dateClose="2019-08-07 05:08:41">1.00152</version>
+		<version dateOpen="2019-08-07 05:08:48" dateClose="2019-08-07 06:08:29">1.00153</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
