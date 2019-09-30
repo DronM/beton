@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-08-07 06:29:38</lastBuild></version>
+		<lastBuild>2019-09-30 16:33:48</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -57,6 +57,7 @@
 		<version dateOpen="2019-07-16 09:07:02" dateClose="2019-08-06 18:08:53">1.00151</version>
 		<version dateOpen="2019-08-06 18:08:53" dateClose="2019-08-07 05:08:41">1.00152</version>
 		<version dateOpen="2019-08-07 05:08:48" dateClose="2019-08-07 06:08:29">1.00153</version>
+		<version dateOpen="2019-08-07 13:08:38" dateClose="2019-09-30 16:09:33">1.00154</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -702,6 +703,7 @@
 			<field id="pump_length" dataType="Int"/>
 			<field id="deleted" dataType="Bool" defaultValue="FALSE"/>
 			<field id="comment_text" dataType="String" length="100"/>
+			<field id="phone_cels" dataType="JSONB"/>
 		</model>
 		<model id="PumpVehicleList" parent="ModelSQLBeton" dataTable="pump_veh_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -716,6 +718,7 @@
 			<field id="pump_length" dataType="Int"/>
 			<field id="comment_text" dataType="String"/>
 			<field id="vehicle_owner_id" dataType="Int"/>
+			<field id="phone_cels" dataType="JSONB"/>
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="PumpVehicleWorkList" parent="ModelSQLBeton" dataTable="pump_veh_work_list" virtual="TRUE">
@@ -729,6 +732,7 @@
 			<field id="make" dataType="String"/>
 			<field id="plate" dataType="String"/>
 			<field id="pump_length" dataType="Int"/>
+			<field id="phone_cels" dataType="JSONB"/>
 			<globalFilter id="vehicle_owner_id" fieldId="pump_vehicle_owner_id"/>
 		</model>
 		<model id="Order" parent="ModelSQLBeton" dataTable="orders" virtual="FALSE">
@@ -2437,7 +2441,118 @@
 		</model>
 		<model id="TelList" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
-			<field id="tel" dataType="String" length="10"/>
+			<field id="tel" dataType="String" length="15"/>
+		</model>
+		<model id="ConcreteTypeMapToProduction" parent="ModelSQLBeton" dataTable="concrete_type_map_to_production" virtual="FALSE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id"/>
+			<field id="production_descr" dataType="String" length="100" required="TRUE"/>
+			<index id="concrete_type_map_to_production_production_descr_idx" unique="TRUE">
+				<field id="production_descr"/>
+			</index>
+		</model>
+		<model id="ConcreteTypeMapToProductionList" parent="ModelSQLBeton" dataTable="concrete_type_map_to_production_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="concrete_types_ref" dataType="JSON"/>
+			<field id="production_descr" dataType="String" length="100" required="TRUE"/>
+		</model>
+		<model id="VehicleMapToProduction" parent="ModelSQLBeton" dataTable="vehicle_map_to_production" virtual="FALSE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
+			<field id="production_descr" dataType="String" length="10" required="TRUE"/>
+			<index id="vehicle_map_to_production_production_descr_idx" unique="TRUE">
+				<field id="production_descr"/>
+			</index>
+		</model>
+		<model id="VehicleMapToProductionList" parent="ModelSQLBeton" dataTable="vehicle_map_to_production_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="production_descr" dataType="String"/>
+		</model>
+		<model id="RawMaterialMapToProduction" parent="ModelSQLBeton" dataTable="raw_material_map_to_production" virtual="FALSE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ" required="TRUE"/>
+			<field id="raw_material_id" dataType="Int" refTable="raw_materials" refField="id"/>
+			<field id="production_descr" dataType="String" length="100" required="TRUE"/>
+			<field id="order_id" dataType="Int"/>
+			<index id="raw_material_map_to_production_production_descr_idx" unique="TRUE">
+				<field id="production_descr"/>
+				<field id="date_time"/>
+			</index>
+		</model>
+		<model id="RawMaterialMapToProductionList" parent="ModelSQLBeton" dataTable="raw_material_map_to_production_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="raw_materials_ref" dataType="JSON"/>
+			<field id="production_descr" dataType="String" length="100" required="TRUE"/>
+			<field id="order_id" dataType="Int"/>
+		</model>
+		<model id="MaterialFactConsumption" parent="ModelSQLBeton" dataTable="material_fact_consumptions" virtual="FALSE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id" required="TRUE"/>
+			<field id="upload_date_time" dataType="DateTimeTZ" required="TRUE"/>
+			<field id="upload_user_id" dataType="Int" refTable="users" refField="id" required="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ" required="TRUE"/>
+			<field id="concrete_type_production_descr" dataType="String" length="100" required="TRUE"/>
+			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id"/>
+			<field id="raw_material_production_descr" dataType="String" length="100" required="TRUE"/>
+			<field id="raw_material_id" dataType="Int" refTable="raw_materials" refField="id"/>
+			<field id="vehicle_production_descr" dataType="String" length="5" required="TRUE"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
+			<field id="vehicle_schedule_state_id" dataType="Int" refTable="vehicle_schedule_states" refField="id"/>
+			<field id="concrete_quant" dataType="Float" length="19" precision="4"/>
+			<field id="material_quant" dataType="Float" length="19" precision="4"/>
+			<field id="material_quant_req" dataType="Float" length="19" precision="4"/>
+			<index id="material_fact_consumptions_production_site_idx" unique="FALSE">
+				<field id="production_site"/>
+			</index>
+			<index id="material_fact_consumptions_date_time_idx" unique="FALSE">
+				<field id="date_time"/>
+			</index>
+			<index id="material_fact_consumptions_concrete_type_production_descr_idx" unique="FALSE">
+				<field id="concrete_type_production_descr"/>
+			</index>
+			<index id="material_fact_consumptions_raw_material_production_descr_idx" unique="FALSE">
+				<field id="raw_material_production_descr"/>
+			</index>
+			<index id="material_fact_consumptions_vehicle_production_descr_idx" unique="FALSE">
+				<field id="vehicle_production_descr"/>
+			</index>
+		</model>
+		<model id="MaterialFactConsumptionList" parent="ModelSQLBeton" dataTable="material_fact_consumptions_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="upload_date_time" dataType="DateTimeTZ"/>
+			<field id="upload_users_ref" dataType="JSON"/>
+			<field id="production_site_id" dataType="Int"/>
+			<field id="production_sites_ref" dataType="JSON"/>
+			<field id="orders_ref" dataType="JSON"/>
+			<field id="shipments_inf" dataType="String"/>
+			<field id="concrete_types_ref" dataType="JSON"/>
+			<field id="concrete_type_production_descr" dataType="String"/>
+			<field id="raw_materials_ref" dataType="JSON"/>
+			<field id="raw_material_production_descr" dataType="String"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="vehicle_production_descr" dataType="String"/>
+			<field id="concrete_quant" dataType="Float" length="19" precision="4"/>
+			<field id="material_quant" dataType="Float" length="19" precision="4"/>
+			<field id="material_quant_req" dataType="Float" length="19" precision="4"/>
+		</model>
+		<model id="MaterialFactConsumptionRolledList" parent="ModelSQLBeton" dataTable="material_fact_consumptions_rolled_list" virtual="TRUE">
+			<field id="date_time" dataType="DateTimeTZ" primaryKey="TRUE"/>
+			<field id="production_site_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="upload_date_time" dataType="DateTimeTZ"/>
+			<field id="upload_users_ref" dataType="JSON"/>
+			<field id="production_sites_ref" dataType="JSON"/>
+			<field id="orders_ref" dataType="JSON"/>
+			<field id="shipments_inf" dataType="String"/>
+			<field id="concrete_types_ref" dataType="JSON"/>
+			<field id="concrete_type_production_descr" dataType="String"/>
+			<field id="raw_material_production_descr" dataType="String"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="vehicle_production_descr" dataType="String"/>
+			<field id="concrete_quant" dataType="Float" length="19" precision="4"/>
+			<field id="materials" dataType="JSONB"/>
 		</model>
 	</models>
 	<constants>
@@ -3404,6 +3519,46 @@
 			<publicMethod id="get_list" modelId="ShipmentCancelationList"/>
 			<publicMethod id="get_object" modelId="ShipmentCancelationList"/>
 		</controller>
+		<controller id="TelList" parentIdJS="ControllerObjClient" server="FALSE">
+			<publicMethod id="insert" modelId="TelList"/>
+			<publicMethod id="update" modelId="TelList"/>
+			<publicMethod id="delete" modelId="TelList"/>
+			<publicMethod id="get_list" modelId="TelList"/>
+			<publicMethod id="get_object" modelId="TelList"/>
+		</controller>
+		<controller id="ConcreteTypeMapToProduction" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ConcreteTypeMapToProduction"/>
+			<publicMethod id="update" modelId="ConcreteTypeMapToProduction"/>
+			<publicMethod id="delete" modelId="ConcreteTypeMapToProduction"/>
+			<publicMethod id="get_list" modelId="ConcreteTypeMapToProductionList"/>
+			<publicMethod id="get_object" modelId="ConcreteTypeMapToProductionList"/>
+		</controller>
+		<controller id="RawMaterialMapToProduction" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="RawMaterialMapToProduction"/>
+			<publicMethod id="update" modelId="RawMaterialMapToProduction"/>
+			<publicMethod id="delete" modelId="RawMaterialMapToProduction"/>
+			<publicMethod id="get_list" modelId="RawMaterialMapToProductionList"/>
+			<publicMethod id="get_object" modelId="RawMaterialMapToProductionList"/>
+		</controller>
+		<controller id="VehicleMapToProduction" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="VehicleMapToProduction"/>
+			<publicMethod id="update" modelId="VehicleMapToProduction"/>
+			<publicMethod id="delete" modelId="VehicleMapToProduction"/>
+			<publicMethod id="get_list" modelId="VehicleMapToProductionList"/>
+			<publicMethod id="get_object" modelId="VehicleMapToProductionList"/>
+		</controller>
+		<controller id="MaterialFactConsumption" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="MaterialFactConsumption"/>
+			<publicMethod id="update" modelId="MaterialFactConsumption"/>
+			<publicMethod id="delete" modelId="MaterialFactConsumption"/>
+			<publicMethod id="get_list" modelId="MaterialFactConsumptionList"/>
+			<publicMethod id="get_rolled_list" modelId="MaterialFactConsumptionRolledList" condFields="TRUE"/>
+			<publicMethod id="get_object" modelId="MaterialFactConsumptionList"/>
+			<publicMethod id="upload_production_file" encType="multipart" requestType="post">
+				<field id="production_site_id" dataType="Int" required="TRUE"/>
+				<field id="production_file" dataType="Text"/>
+			</publicMethod>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -3497,6 +3652,9 @@
 		<view id="10029" c="ConcreteCostForOwnerHeader_Controller" t="ConcreteCostForOwnerHeaderList" f="get_list" section="Справочники" descr="Прайс бетон для владельцев"/>
 		<view id="10030" c="VehicleOwnerConcretePrice_Controller" t="VehicleOwnerConcretePriceList" f="get_list" section="Справочники" descr="История прайсов по бетону для владельцев"/>
 		<view id="10031" c="VehicleOwnerClient_Controller" t="VehicleOwnerClientList" f="get_list" section="Справочники" descr="Клиенты владельцев ТС"/>
+		<view id="10032" c="RawMaterialMapToProduction_Controller" t="RawMaterialMapToProductionList" f="get_list" section="Справочники" descr="Соответствие материалов в производстве и в бетоне"/>
+		<view id="10033" c="VehicleMapToProduction_Controller" t="VehicleMapToProductionList" f="get_list" section="Справочники" descr="Соответствие ТС в производстве и в бетоне"/>
+		<view id="10034" c="ConcreteTypeMapToProduction_Controller" t="ConcreteTypeMapToProductionList" f="get_list" section="Справочники" descr="Соответствие марок в производстве и в бетоне"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -3524,6 +3682,9 @@
 		<view id="30012" c="ShipmentCancelation_Controller" t="ShipmentCancelationList" f="get_list" section="Формы" descr="Отмененные отгрузки"/>
 		<view id="30013" c="RawMaterial_Controller" t="MatTotalList" f="total_list" section="Формы" descr="Общая таблица"/>
 		<view id="30014" c="RawMaterial_Controller" t="MatCorrectList" f="correct_list" section="Формы" descr="Корректировка расхода"/>
+		<view id="30015" t="MaterialFactConsumptionUpload" section="Формы" descr="Загрузка данных с завода"/>
+		<view id="10035" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionList" f="get_list" section="Формы" descr="Фактический расход материалов"/>
+		<view id="10036" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionRolledList" f="get_rolled_list" section="Формы" descr="Фактический расход материалов (свернуто)"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -3618,6 +3779,11 @@
 		<serverTemplate id="VehicleOwnerTotReport"/>
 		<serverTemplate id="MatTotalList"/>
 		<serverTemplate id="MatCorrectList"/>
+		<serverTemplate id="RawMaterialMapToProductionList"/>
+		<serverTemplate id="VehicleMapToProductionList"/>
+		<serverTemplate id="ConcreteTypeMapToProductionList"/>
+		<serverTemplate id="MaterialFactConsumptionList"/>
+		<serverTemplate id="MaterialFactConsumptionRolledList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -3638,6 +3804,7 @@
 		<jsTemplate id="IcomoonList" file="tmpl/IcomoonList.html"/>
 		<jsTemplate id="ColorPaletteList" file="tmpl/ColorPaletteList.html"/>
 		<jsTemplate id="EditFile" file="tmpl/EditFile.html"/>
+		<jsTemplate id="EditFileInf" file="tmpl/EditFileInf.html"/>
 		<jsTemplate id="EditPeriodShift" file="tmpl/EditPeriodShift.html"/>
 		<jsTemplate id="EditPeriodShiftSM" file="tmpl/EditPeriodShift.sm.html"/>
 		<jsTemplate id="EditPeriodMonth" file="tmpl/EditPeriodMonth.html"/>
@@ -3680,8 +3847,8 @@
 		<jsScript file="core/DbException.js"/>
 		<jsScript file="core/VersException.js"/>
 		<jsScript file="core/ConstantManager.js"/>
+		<jsScript file="core/CookieManager.js"/>
 		<jsScript file="core/ServConnector.js"/>
-		<jsScript file="core/ServConnectorSecure.js"/>
 		<jsScript file="core/Response.js"/>
 		<jsScript file="core/ResponseXML.js"/>
 		<jsScript file="core/ResponseJSON.js"/>
@@ -4149,6 +4316,12 @@
 		<jsScript file="views/VehicleOwnerTotReport_View.js"/>
 		<jsScript file="views/MatTotalList_View.js"/>
 		<jsScript file="views/MatCorrectList_View.js"/>
+		<jsScript file="views/VehicleMapToProductionList_View.js"/>
+		<jsScript file="views/ConcreteTypeMapToProductionList_View.js"/>
+		<jsScript file="views/RawMaterialMapToProductionList_View.js"/>
+		<jsScript file="views/MaterialFactConsumptionUpload_View.js"/>
+		<jsScript file="views/MaterialFactConsumptionList_View.js"/>
+		<jsScript file="views/MaterialFactConsumptionRolledList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -4245,6 +4418,7 @@
 		<jsScript file="custom_controls/ShipmentPumpForVehOwnerCmdSetAgreed.js"/>
 		<jsScript file="custom_controls/MatTotalGrid.js"/>
 		<jsScript file="custom_controls/MatCorrectGrid.js"/>
+		<jsScript file="custom_controls/TelListGrid.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -4492,6 +4666,20 @@
 		<jsScript file="models/ShippedVehicleList_Model.js"/>
 		<jsScript file="models/TelList_Model.js"/>
 		<jsScript file="models/RAMaterialConsumptionDocList_Model.js"/>
+		<jsScript file="controllers/TelList_Controller.js"/>
+		<jsScript file="models/ConcreteTypeMapToProduction_Model.js"/>
+		<jsScript file="models/VehicleMapToProduction_Model.js"/>
+		<jsScript file="models/RawMaterialMapToProduction_Model.js"/>
+		<jsScript file="models/MaterialFactConsumption_Model.js"/>
+		<jsScript file="controllers/ConcreteTypeMapToProduction_Controller.js"/>
+		<jsScript file="controllers/RawMaterialMapToProduction_Controller.js"/>
+		<jsScript file="controllers/VehicleMapToProduction_Controller.js"/>
+		<jsScript file="models/VehicleMapToProductionList_Model.js"/>
+		<jsScript file="models/RawMaterialMapToProductionList_Model.js"/>
+		<jsScript file="models/ConcreteTypeMapToProductionList_Model.js"/>
+		<jsScript file="controllers/MaterialFactConsumption_Controller.js"/>
+		<jsScript file="models/MaterialFactConsumptionList_Model.js"/>
+		<jsScript file="models/MaterialFactConsumptionRolledList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

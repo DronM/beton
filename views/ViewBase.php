@@ -165,8 +165,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/DbException.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/VersException.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ConstantManager.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/CookieManager.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ServConnector.js'));
-		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ServConnectorSecure.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/Response.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ResponseXML.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ResponseJSON.js'));
@@ -1285,6 +1285,12 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleOwnerTotReport_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MatTotalList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MatCorrectList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleMapToProductionList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ConcreteTypeMapToProductionList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialMapToProductionList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MaterialFactConsumptionUpload_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MaterialFactConsumptionList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MaterialFactConsumptionRolledList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1381,6 +1387,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentPumpForVehOwnerCmdSetAgreed.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MatTotalGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MatCorrectGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/TelListGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1628,6 +1635,20 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShippedVehicleList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/TelList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RAMaterialConsumptionDocList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/TelList_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteTypeMapToProduction_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleMapToProduction_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialMapToProduction_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialFactConsumption_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ConcreteTypeMapToProduction_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/RawMaterialMapToProduction_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/VehicleMapToProduction_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleMapToProductionList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialMapToProductionList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ConcreteTypeMapToProductionList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/MaterialFactConsumption_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialFactConsumptionList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialFactConsumptionRolledList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];
@@ -1639,15 +1660,20 @@ class ViewBase extends ViewHTMLXSLT {
 		
 		$this->getVarModel()->addField(new Field('role_id',DT_STRING));
 		$this->getVarModel()->addField(new Field('user_id',DT_INT));
-		$this->getVarModel()->addField(new Field('user_name',DT_STRING));
-		$this->getVarModel()->addField(new Field('tel_ext',DT_STRING));
-		/*
-		$this->getVarModel()->addField(new Field('token',DT_STRING));
-		$this->getVarModel()->addField(new Field('tokenr',DT_STRING));
-		$this->getVarModel()->addField(new Field('tokenParam',DT_STRING));
-		$this->getVarModel()->addField(new Field('sessionAutoRefresh',DT_BOOL));
-		$this->getVarModel()->addField(new Field('sessionExpirationSec',DT_INT));
-		*/
+		$this->getVarModel()->addField(new Field('user_name',DT_STRING));		
+		
+		if (isset($_SESSION['role_id'])){
+			$this->getVarModel()->addField(new Field('tel_ext',DT_STRING));
+			
+			if(isset($_SESSION['token'])){
+				$this->getVarModel()->addField(new Field('token',DT_STRING));
+				if(defined('SESSION_EXP_SEC') && intval(SESSION_EXP_SEC)){
+					$this->getVarModel()->addField(new Field('tokenr',DT_STRING));					
+				}	
+				$this->getVarModel()->addField(new Field('tokenExpires',DT_STRING));
+			}
+			
+		}
 		
 		
 		$this->getVarModel()->insert();
@@ -1678,13 +1704,15 @@ class ViewBase extends ViewHTMLXSLT {
 			$this->setVarValue('user_name',$_SESSION['user_name']);
 			$this->setVarValue('curDate',round(microtime(true) * 1000));
 			$this->setVarValue('tel_ext',$_SESSION['tel_ext']);
-			/*
-			$this->setVarValue('token',$_SESSION['token']);
-			$this->setVarValue('tokenr',$_SESSION['tokenr']);
-			$this->setVarValue('tokenParam',PARAM_TOKEN);
-			$this->setVarValue('sessionAutoRefresh',SESSION_AUTOREFRESH? 'true':'false');
-			$this->setVarValue('sessionExpirationSec',SESSION_EXP_SEC);
-			*/
+			
+			if(isset($_SESSION['token'])){
+				$this->setVarValue('token',$_SESSION['token']);
+				if(defined('SESSION_EXP_SEC') && intval(SESSION_EXP_SEC)){
+					$this->setVarValue('tokenr',$_SESSION['tokenr']);					
+				}
+				$this->setVarValue('tokenExpires',date('Y-m-d H:i:s',$_SESSION['tokenExpires']));
+			}			
+			
 		}
 		
 		

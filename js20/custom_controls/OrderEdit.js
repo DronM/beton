@@ -22,7 +22,10 @@ function OrderEdit(id,options){
 	options.acModel = new OrderList_Model();
 	options.acPatternFieldId = options.acPatternFieldId || "number";
 	options.acKeyFields = options.acKeyFields || [options.acModel.getField("id")];
-	options.acDescrFields = options.acDescrFields || [options.acModel.getField("number")];
+	//options.acDescrFields = options.acDescrFields || [options.acModel.getField("number"),options.acModel.getField("date_time")];
+	options.acDescrFunction = function(fields){
+		return fields.number.getValue()+" от "+DateHelper.format(fields.date_time.getValue(),"d/m/y H:i")+" ("+fields.clients_ref.getValue().getDescr()+")";
+	}
 	options.acICase = options.acICase || "1";
 	options.acMid = options.acMid || "1";
 	

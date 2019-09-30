@@ -9429,3 +9429,3225 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 	
 ALTER VIEW shipments_for_client_veh_owner_list OWNER TO beton;
 
+
+-- ******************* update 07/08/2019 12:53:26 ******************
+-- Function: sess_write(character varying, text, character varying)
+
+-- DROP FUNCTION sess_write(character varying, text, character varying);
+
+CREATE OR REPLACE FUNCTION sess_enc_write(
+    in_id character varying,
+    in_data text,
+    in_key text,
+    in_remote_ip character varying)
+  RETURNS void AS
+$BODY$
+BEGIN
+	UPDATE sessions
+	SET
+		set_time = now(),
+		data_enc = PGP_SYM_DECRYPT(in_data_enc,in_key)
+	WHERE id = in_id;
+	
+	IF FOUND THEN
+		RETURN;
+	END IF;
+	
+	BEGIN
+		INSERT INTO sessions (id, data_enc, set_time,session_key)
+		VALUES(in_id, PGP_SYM_DECRYPT(in_data,in_key), now(),in_id);
+		
+		INSERT INTO logins(date_time_in,ip,session_id)
+		VALUES(now(),in_remote_ip,in_id);
+		
+	EXCEPTION WHEN unique_violation THEN
+		UPDATE sessions
+		SET
+			set_time = now(),
+			data_enc = PGP_SYM_DECRYPT(in_data_enc,in_key)
+		WHERE id = in_id;
+	END;
+	
+	RETURN;
+
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION sess_enc_write(character varying, text, text, character varying)
+  OWNER TO beton;
+
+
+
+-- ******************* update 07/08/2019 12:57:14 ******************
+-- Function: sess_enc_write(character varying, text, character varying)
+
+-- DROP FUNCTION sess_enc_write(character varying, text, character varying);
+
+CREATE OR REPLACE FUNCTION sess_enc_write(
+    in_id character varying,
+    in_data text,
+    in_key text,
+    in_remote_ip character varying)
+  RETURNS void AS
+$BODY$
+BEGIN
+	UPDATE sessions
+	SET
+		set_time = now(),
+		data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+	WHERE id = in_id;
+	
+	IF FOUND THEN
+		RETURN;
+	END IF;
+	
+	BEGIN
+		INSERT INTO sessions (id, data_enc, set_time,session_key)
+		VALUES(in_id, PGP_SYM_DECRYPT(in_data,in_key), now(),in_id);
+		
+		INSERT INTO logins(date_time_in,ip,session_id)
+		VALUES(now(),in_remote_ip,in_id);
+		
+	EXCEPTION WHEN unique_violation THEN
+		UPDATE sessions
+		SET
+			set_time = now(),
+			data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+		WHERE id = in_id;
+	END;
+	
+	RETURN;
+
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION sess_enc_write(character varying, text, text, character varying)
+  OWNER TO beton;
+
+
+
+-- ******************* update 07/08/2019 12:58:16 ******************
+-- Function: sess_enc_read(character varying, text)
+
+-- DROP FUNCTION sess_enc_read(character varying, text);
+
+CREATE OR REPLACE FUNCTION sess_enc_read(in_id character varying,in_key text)
+  RETURNS text AS
+$BODY$
+	SELECT PGP_SYM_DECRYPT(data_enc,in_key) FROM sessions WHERE id = in_id;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION sess_enc_read(character varying, text)
+  OWNER TO beton;
+
+
+
+-- ******************* update 07/08/2019 13:00:12 ******************
+-- Function: sess_enc_read(character varying, text)
+
+-- DROP FUNCTION sess_enc_read(character varying, text);
+
+CREATE OR REPLACE FUNCTION sess_enc_read(in_id character varying,in_key text)
+  RETURNS text AS
+$BODY$
+	SELECT PGP_SYM_DECRYPT(data_enc,in_key) FROM sessions WHERE id = in_id LIMIT 1;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION sess_enc_read(character varying, text)
+  OWNER TO beton;
+
+
+
+-- ******************* update 07/08/2019 13:26:23 ******************
+-- Function: sess_enc_write(character varying, text, character varying)
+
+-- DROP FUNCTION sess_enc_write(character varying, text, character varying);
+
+CREATE OR REPLACE FUNCTION sess_enc_write(
+    in_id character varying,
+    in_data text,
+    in_key text,
+    in_remote_ip character varying)
+  RETURNS void AS
+$BODY$
+BEGIN
+	UPDATE sessions
+	SET
+		set_time = now(),
+		data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+	WHERE id = in_id;
+	
+	IF FOUND THEN
+		RETURN;
+	END IF;
+	
+	BEGIN
+		INSERT INTO sessions (id, data_enc, set_time,session_key)
+		VALUES(in_id, PGP_SYM_DECRYPT(in_data,in_key), now(),in_id);
+		
+		INSERT INTO logins(date_time_in,ip,session_id)
+		VALUES(now(),in_remote_ip,in_id);
+		
+	EXCEPTION WHEN unique_violation THEN
+		UPDATE sessions
+		SET
+			set_time = now(),
+			data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+		WHERE id = in_id;
+	END;
+	
+	RETURN;
+
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION sess_enc_write(character varying, text, text, character varying)
+  OWNER TO beton;
+
+
+
+-- ******************* update 07/08/2019 13:27:48 ******************
+-- Function: sess_enc_write(character varying, text, character varying)
+
+ DROP FUNCTION sess_enc_write(character varying, text,text, character varying);
+
+CREATE OR REPLACE FUNCTION sess_enc_write(
+    in_id character varying,
+    in_data_enc text,
+    in_key text,
+    in_remote_ip character varying)
+  RETURNS void AS
+$BODY$
+BEGIN
+	UPDATE sessions
+	SET
+		set_time = now(),
+		data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+	WHERE id = in_id;
+	
+	IF FOUND THEN
+		RETURN;
+	END IF;
+	
+	BEGIN
+		INSERT INTO sessions (id, data_enc, set_time,session_key)
+		VALUES(in_id, PGP_SYM_DECRYPT(in_data,in_key), now(),in_id);
+		
+		INSERT INTO logins(date_time_in,ip,session_id)
+		VALUES(now(),in_remote_ip,in_id);
+		
+	EXCEPTION WHEN unique_violation THEN
+		UPDATE sessions
+		SET
+			set_time = now(),
+			data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+		WHERE id = in_id;
+	END;
+	
+	RETURN;
+
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION sess_enc_write(character varying, text, text, character varying)
+  OWNER TO beton;
+
+
+
+-- ******************* update 07/08/2019 13:40:55 ******************
+-- Function: sess_enc_write(character varying, text, character varying)
+
+-- DROP FUNCTION sess_enc_write(character varying, text,text, character varying);
+
+CREATE OR REPLACE FUNCTION sess_enc_write(
+    in_id character varying,
+    in_data_enc text,
+    in_key text,
+    in_remote_ip character varying)
+  RETURNS void AS
+$BODY$
+BEGIN
+	UPDATE sessions
+	SET
+		set_time = now(),
+		data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+	WHERE id = in_id;
+	
+	IF FOUND THEN
+		RETURN;
+	END IF;
+	
+	BEGIN
+		INSERT INTO sessions (id, data_enc, set_time,session_key)
+		VALUES(in_id, PGP_SYM_ENCRYPT(in_data_enc,in_key), now(),in_id);
+		
+		INSERT INTO logins(date_time_in,ip,session_id)
+		VALUES(now(),in_remote_ip,in_id);
+		
+	EXCEPTION WHEN unique_violation THEN
+		UPDATE sessions
+		SET
+			set_time = now(),
+			data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+		WHERE id = in_id;
+	END;
+	
+	RETURN;
+
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION sess_enc_write(character varying, text, text, character varying)
+  OWNER TO beton;
+
+
+
+-- ******************* update 08/08/2019 16:13:30 ******************
+-- Function: sess_enc_write(character varying, text, character varying)
+
+-- DROP FUNCTION sess_enc_write(character varying, text,text, character varying);
+
+CREATE OR REPLACE FUNCTION sess_enc_write(
+    in_id character varying,
+    in_data_enc text,
+    in_key text,
+    in_remote_ip character varying)
+  RETURNS void AS
+$BODY$
+BEGIN
+	UPDATE sessions
+	SET
+		set_time = now(),
+		data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+	WHERE id = in_id;
+	
+	IF FOUND THEN
+		RETURN;
+	END IF;
+	
+	BEGIN
+		INSERT INTO sessions (id, data_enc, set_time)
+		VALUES(in_id, PGP_SYM_ENCRYPT(in_data_enc,in_key), now());
+		
+		INSERT INTO logins(date_time_in,ip,session_id)
+		VALUES(now(),in_remote_ip,in_id);
+		
+	EXCEPTION WHEN unique_violation THEN
+		UPDATE sessions
+		SET
+			set_time = now(),
+			data_enc = PGP_SYM_ENCRYPT(in_data_enc,in_key)
+		WHERE id = in_id;
+	END;
+	
+	RETURN;
+
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION sess_enc_write(character varying, text, text, character varying)
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/08/2019 14:50:13 ******************
+
+
+-- ******************* update 22/08/2019 14:51:33 ******************
+
+
+-- ******************* update 22/08/2019 14:52:28 ******************
+-- Function: public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval)
+
+-- DROP FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval);
+
+CREATE OR REPLACE FUNCTION public.vehicle_track_with_stops(
+    IN in_vehicle_id integer,
+    IN in_date_time_from timestamp without time zone,
+    IN in_date_time_to timestamp without time zone,
+    IN stop_dur_interval interval)
+  RETURNS TABLE(vehicle_id integer, plate text, period timestamp without time zone, period_str text, lon_str text, lat_str text, speed numeric, ns character, ew character, recieved_dt timestamp without time zone, recieved_dt_str text, odometer integer, engine_on_str text, voltage numeric, heading numeric, heading_str text, lon double precision, lat double precision) AS
+$BODY$
+DECLARE tr_stops_row RECORD;
+	tr_stops_curs refcursor;
+	v_stop_started boolean;
+	v_date_time_from timestamp without time zone;
+	v_date_time_to timestamp without time zone;
+BEGIN
+	v_date_time_from = in_date_time_from + age(now(),now() at time zone 'UTC');
+	v_date_time_to = in_date_time_to + age(now(),now() at time zone 'UTC');
+	
+	OPEN tr_stops_curs SCROLL FOR
+		SELECT 
+			vehicles.id AS vehicle_id,
+			vehicles.plate::text AS plate,
+			tr.period+age(now(),now() at time zone 'UTC') AS period,
+			date5_time5_descr(tr.period+age(now(),now() at time zone 'UTC'))::text AS period_str,
+			tr.longitude::text As lon_str,
+			tr.latitude::text AS lat_str,
+			round(tr.speed,0)::numeric AS speed,
+			tr.ns,
+			tr.ew,
+			tr.recieved_dt+age(now(),now() at time zone 'UTC') AS recieved_dt,
+			date5_time5_descr(tr.recieved_dt+age(now(),now() at time zone 'UTC'))::text AS recieved_dt_str,
+			tr.odometer,
+			engine_descr(tr.engine_on)::text AS engine_on_str,
+			tr.voltage,
+			tr.heading,
+			heading_descr(tr.heading)::text AS heading_str,
+			tr.lon,
+			tr.lat
+		FROM car_tracking AS tr
+		LEFT JOIN vehicles ON vehicles.tracker_id=tr.car_id
+		--WHERE tr.period+age(now(),now() at time zone 'UTC') BETWEEN in_date_time_from AND in_date_time_to
+		WHERE tr.period BETWEEN v_date_time_from AND v_date_time_to
+		AND vehicles.id=in_vehicle_id
+		AND tr.gps_valid=1;
+
+	v_stop_started = false;
+	LOOP
+		FETCH NEXT FROM tr_stops_curs INTO tr_stops_row;
+		IF  FOUND=false THEN
+			--no more rows
+			EXIT;
+		END IF;
+
+		IF NOT v_stop_started AND tr_stops_row.speed>0 THEN
+			--move point
+			vehicle_id	= tr_stops_row.vehicle_id;
+			plate		= tr_stops_row.plate;
+			period		= tr_stops_row.period;
+			period_str 	= tr_stops_row.period_str;
+			lon_str		= tr_stops_row.lon_str;
+			lat_str		= tr_stops_row.lat_str;
+			speed		= tr_stops_row.speed;
+			ns		= tr_stops_row.ns;
+			ew 		= tr_stops_row.ew;
+			recieved_dt	= tr_stops_row.recieved_dt;
+			recieved_dt_str = tr_stops_row.recieved_dt_str;
+			odometer	= tr_stops_row.odometer;
+			engine_on_str	= tr_stops_row.engine_on_str;
+			voltage		= tr_stops_row.voltage;
+			heading		= tr_stops_row.heading;
+			heading_str	= tr_stops_row.heading_str;
+			lon		= tr_stops_row.lon;
+			lat		= tr_stops_row.lat;
+			RETURN NEXT;
+		ELSIF NOT v_stop_started AND tr_stops_row.speed=0 THEN	
+			--new stop - check duration
+			v_stop_started = true;
+			vehicle_id	= tr_stops_row.vehicle_id;
+			plate		= tr_stops_row.plate;
+			period		= tr_stops_row.period;
+			period_str 	= tr_stops_row.period_str;
+			lon_str		= tr_stops_row.lon_str;
+			lat_str		= tr_stops_row.lat_str;
+			speed		= tr_stops_row.speed;
+			ns		= tr_stops_row.ns;
+			ew 		= tr_stops_row.ew;
+			recieved_dt	= tr_stops_row.recieved_dt;
+			recieved_dt_str = tr_stops_row.recieved_dt_str;
+			odometer	= tr_stops_row.odometer;
+			engine_on_str	= tr_stops_row.engine_on_str;
+			voltage		= tr_stops_row.voltage;
+			heading		= tr_stops_row.heading;
+			heading_str	= tr_stops_row.heading_str;
+			lon		= tr_stops_row.lon;
+			lat		= tr_stops_row.lat;
+		ELSIF v_stop_started AND tr_stops_row.speed>0 THEN	
+			--end of stop
+			v_stop_started = false;
+			
+			IF (tr_stops_row.period - period)::interval>=stop_dur_interval THEN
+				RETURN NEXT;
+			END IF;
+		END IF;
+	END LOOP;
+
+	IF v_stop_started THEN	
+		--end of stop or end of period
+		IF (tr_stops_row.period - period)::interval>=stop_dur_interval THEN
+			RETURN NEXT;
+		END IF;
+	END IF;
+
+	CLOSE tr_stops_curs;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval)
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/08/2019 14:53:10 ******************
+-- Function: public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval)
+
+-- DROP FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval);
+
+CREATE OR REPLACE FUNCTION public.vehicle_track_with_stops(
+    IN in_vehicle_id integer,
+    IN in_date_time_from timestamp without time zone,
+    IN in_date_time_to timestamp without time zone,
+    IN stop_dur_interval interval)
+  RETURNS TABLE(vehicle_id integer, plate text, period timestamp without time zone, period_str text, lon_str text, lat_str text, speed numeric, ns character, ew character, recieved_dt timestamp without time zone, recieved_dt_str text, odometer integer, engine_on_str text, voltage numeric, heading numeric, heading_str text, lon double precision, lat double precision) AS
+$BODY$
+DECLARE tr_stops_row RECORD;
+	tr_stops_curs refcursor;
+	v_stop_started boolean;
+	v_date_time_from timestamp without time zone;
+	v_date_time_to timestamp without time zone;
+BEGIN
+	v_date_time_from = in_date_time_from + age(now(),now() at time zone 'UTC');
+	v_date_time_to = in_date_time_to + age(now(),now() at time zone 'UTC');
+	
+	OPEN tr_stops_curs SCROLL FOR
+		SELECT 
+			vehicles.id AS vehicle_id,
+			vehicles.plate::text AS plate,
+			tr.period+age(now(),now() at time zone 'UTC') AS period,
+			date5_time5_descr(tr.period+age(now(),now() at time zone 'UTC'))::text AS period_str,
+			tr.longitude::text As lon_str,
+			tr.latitude::text AS lat_str,
+			round(tr.speed,0)::numeric AS speed,
+			tr.ns,
+			tr.ew,
+			tr.recieved_dt+age(now(),now() at time zone 'UTC') AS recieved_dt,
+			date5_time5_descr(tr.recieved_dt+age(now(),now() at time zone 'UTC'))::text AS recieved_dt_str,
+			tr.odometer,
+			engine_descr(tr.engine_on)::text AS engine_on_str,
+			tr.voltage,
+			tr.heading,
+			heading_descr(tr.heading)::text AS heading_str,
+			tr.lon,
+			tr.lat
+		FROM car_tracking AS tr
+		LEFT JOIN vehicles ON vehicles.tracker_id=tr.car_id
+		--WHERE tr.period+age(now(),now() at time zone 'UTC') BETWEEN in_date_time_from AND in_date_time_to
+		WHERE tr.period BETWEEN v_date_time_from AND v_date_time_to
+		AND vehicles.id=in_vehicle_id
+		AND tr.gps_valid=1;
+
+	v_stop_started = false;
+	LOOP
+		FETCH NEXT FROM tr_stops_curs INTO tr_stops_row;
+		IF  FOUND=false THEN
+			--no more rows
+			EXIT;
+		END IF;
+
+		IF NOT v_stop_started AND tr_stops_row.speed>0 THEN
+			--move point
+			vehicle_id	= tr_stops_row.vehicle_id;
+			plate		= tr_stops_row.plate;
+			period		= tr_stops_row.period;
+			period_str 	= tr_stops_row.period_str;
+			lon_str		= tr_stops_row.lon_str;
+			lat_str		= tr_stops_row.lat_str;
+			speed		= tr_stops_row.speed;
+			ns		= tr_stops_row.ns;
+			ew 		= tr_stops_row.ew;
+			recieved_dt	= tr_stops_row.recieved_dt;
+			recieved_dt_str = tr_stops_row.recieved_dt_str;
+			odometer	= tr_stops_row.odometer;
+			engine_on_str	= tr_stops_row.engine_on_str;
+			voltage		= tr_stops_row.voltage;
+			heading		= tr_stops_row.heading;
+			heading_str	= tr_stops_row.heading_str;
+			lon		= tr_stops_row.lon;
+			lat		= tr_stops_row.lat;
+			RETURN NEXT;
+		ELSIF NOT v_stop_started AND tr_stops_row.speed=0 THEN	
+			--new stop - check duration
+			v_stop_started = true;
+			vehicle_id	= tr_stops_row.vehicle_id;
+			plate		= tr_stops_row.plate;
+			period		= tr_stops_row.period;
+			period_str 	= tr_stops_row.period_str;
+			lon_str		= tr_stops_row.lon_str;
+			lat_str		= tr_stops_row.lat_str;
+			speed		= tr_stops_row.speed;
+			ns		= tr_stops_row.ns;
+			ew 		= tr_stops_row.ew;
+			recieved_dt	= tr_stops_row.recieved_dt;
+			recieved_dt_str = tr_stops_row.recieved_dt_str;
+			odometer	= tr_stops_row.odometer;
+			engine_on_str	= tr_stops_row.engine_on_str;
+			voltage		= tr_stops_row.voltage;
+			heading		= tr_stops_row.heading;
+			heading_str	= tr_stops_row.heading_str;
+			lon		= tr_stops_row.lon;
+			lat		= tr_stops_row.lat;
+		ELSIF v_stop_started AND tr_stops_row.speed>0 THEN	
+			--end of stop
+			v_stop_started = false;
+			
+			IF (tr_stops_row.period - period)::interval>=stop_dur_interval THEN
+				RETURN NEXT;
+			END IF;
+		END IF;
+	END LOOP;
+
+	IF v_stop_started THEN	
+		--end of stop or end of period
+		IF (tr_stops_row.period - period)::interval>=stop_dur_interval THEN
+			RETURN NEXT;
+		END IF;
+	END IF;
+
+	CLOSE tr_stops_curs;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval)
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/08/2019 14:53:41 ******************
+-- Function: public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval)
+
+-- DROP FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval);
+
+CREATE OR REPLACE FUNCTION public.vehicle_track_with_stops(
+    IN in_vehicle_id integer,
+    IN in_date_time_from timestamp without time zone,
+    IN in_date_time_to timestamp without time zone,
+    IN stop_dur_interval interval)
+  RETURNS TABLE(vehicle_id integer, plate text, period timestamp without time zone, period_str text, lon_str text, lat_str text, speed numeric, ns character, ew character, recieved_dt timestamp without time zone, recieved_dt_str text, odometer integer, engine_on_str text, voltage numeric, heading numeric, heading_str text, lon double precision, lat double precision) AS
+$BODY$
+DECLARE tr_stops_row RECORD;
+	tr_stops_curs refcursor;
+	v_stop_started boolean;
+	v_date_time_from timestamp without time zone;
+	v_date_time_to timestamp without time zone;
+BEGIN
+	v_date_time_from = in_date_time_from + age(now(),now() at time zone 'UTC');
+	v_date_time_to = in_date_time_to + age(now(),now() at time zone 'UTC');
+	
+	OPEN tr_stops_curs SCROLL FOR
+		SELECT 
+			vehicles.id AS vehicle_id,
+			vehicles.plate::text AS plate,
+			tr.period+age(now(),now() at time zone 'UTC') AS period,
+			date5_time5_descr(tr.period+age(now(),now() at time zone 'UTC'))::text AS period_str,
+			tr.longitude::text As lon_str,
+			tr.latitude::text AS lat_str,
+			round(tr.speed,0)::numeric AS speed,
+			tr.ns,
+			tr.ew,
+			tr.recieved_dt+age(now(),now() at time zone 'UTC') AS recieved_dt,
+			date5_time5_descr(tr.recieved_dt+age(now(),now() at time zone 'UTC'))::text AS recieved_dt_str,
+			tr.odometer,
+			engine_descr(tr.engine_on)::text AS engine_on_str,
+			tr.voltage,
+			tr.heading,
+			heading_descr(tr.heading)::text AS heading_str,
+			tr.lon,
+			tr.lat
+		FROM car_tracking AS tr
+		LEFT JOIN vehicles ON vehicles.tracker_id=tr.car_id
+		--WHERE tr.period+age(now(),now() at time zone 'UTC') BETWEEN in_date_time_from AND in_date_time_to
+		WHERE tr.period BETWEEN v_date_time_from AND v_date_time_to
+		AND vehicles.id=in_vehicle_id
+		AND tr.gps_valid=1;
+
+	v_stop_started = false;
+	LOOP
+		FETCH NEXT FROM tr_stops_curs INTO tr_stops_row;
+		IF  FOUND=false THEN
+			--no more rows
+			EXIT;
+		END IF;
+
+		IF NOT v_stop_started AND tr_stops_row.speed>0 THEN
+			--move point
+			vehicle_id	= tr_stops_row.vehicle_id;
+			plate		= tr_stops_row.plate;
+			period		= tr_stops_row.period;
+			period_str 	= tr_stops_row.period_str;
+			lon_str		= tr_stops_row.lon_str;
+			lat_str		= tr_stops_row.lat_str;
+			speed		= tr_stops_row.speed;
+			ns		= tr_stops_row.ns;
+			ew 		= tr_stops_row.ew;
+			recieved_dt	= tr_stops_row.recieved_dt;
+			recieved_dt_str = tr_stops_row.recieved_dt_str;
+			odometer	= tr_stops_row.odometer;
+			engine_on_str	= tr_stops_row.engine_on_str;
+			voltage		= tr_stops_row.voltage;
+			heading		= tr_stops_row.heading;
+			heading_str	= tr_stops_row.heading_str;
+			lon		= tr_stops_row.lon;
+			lat		= tr_stops_row.lat;
+			RETURN NEXT;
+		ELSIF NOT v_stop_started AND tr_stops_row.speed=0 THEN	
+			--new stop - check duration
+			v_stop_started = true;
+			vehicle_id	= tr_stops_row.vehicle_id;
+			plate		= tr_stops_row.plate;
+			period		= tr_stops_row.period;
+			period_str 	= tr_stops_row.period_str;
+			lon_str		= tr_stops_row.lon_str;
+			lat_str		= tr_stops_row.lat_str;
+			speed		= tr_stops_row.speed;
+			ns		= tr_stops_row.ns;
+			ew 		= tr_stops_row.ew;
+			recieved_dt	= tr_stops_row.recieved_dt;
+			recieved_dt_str = tr_stops_row.recieved_dt_str;
+			odometer	= tr_stops_row.odometer;
+			engine_on_str	= tr_stops_row.engine_on_str;
+			voltage		= tr_stops_row.voltage;
+			heading		= tr_stops_row.heading;
+			heading_str	= tr_stops_row.heading_str;
+			lon		= tr_stops_row.lon;
+			lat		= tr_stops_row.lat;
+		ELSIF v_stop_started AND tr_stops_row.speed>0 THEN	
+			--end of stop
+			v_stop_started = false;
+			
+			IF (tr_stops_row.period - period)::interval>=stop_dur_interval THEN
+				RETURN NEXT;
+			END IF;
+		END IF;
+	END LOOP;
+
+	IF v_stop_started THEN	
+		--end of stop or end of period
+		IF (tr_stops_row.period - period)::interval>=stop_dur_interval THEN
+			RETURN NEXT;
+		END IF;
+	END IF;
+
+	CLOSE tr_stops_curs;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval)
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/08/2019 14:58:05 ******************
+-- Function: public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval)
+
+-- DROP FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval);
+
+CREATE OR REPLACE FUNCTION public.vehicle_track_with_stops(
+    IN in_vehicle_id integer,
+    IN in_date_time_from timestamp without time zone,
+    IN in_date_time_to timestamp without time zone,
+    IN stop_dur_interval interval)
+  RETURNS TABLE(vehicle_id integer, plate text, period timestamp without time zone, period_str text, lon_str text, lat_str text, speed numeric, ns character, ew character, recieved_dt timestamp without time zone, recieved_dt_str text, odometer integer, engine_on_str text, voltage numeric, heading numeric, heading_str text, lon double precision, lat double precision) AS
+$BODY$
+DECLARE tr_stops_row RECORD;
+	tr_stops_curs refcursor;
+	v_stop_started boolean;
+	v_date_time_from timestamp without time zone;
+	v_date_time_to timestamp without time zone;
+BEGIN
+	v_date_time_from = in_date_time_from + age(now(),now() at time zone 'UTC');
+	v_date_time_to = in_date_time_to + age(now(),now() at time zone 'UTC');
+	
+	OPEN tr_stops_curs SCROLL FOR
+		SELECT 
+			vehicles.id AS vehicle_id,
+			vehicles.plate::text AS plate,
+			tr.period+age(now(),now() at time zone 'UTC') AS period,
+			date5_time5_descr(tr.period+age(now(),now() at time zone 'UTC'))::text AS period_str,
+			tr.longitude::text As lon_str,
+			tr.latitude::text AS lat_str,
+			round(tr.speed,0)::numeric AS speed,
+			tr.ns,
+			tr.ew,
+			tr.recieved_dt+age(now(),now() at time zone 'UTC') AS recieved_dt,
+			date5_time5_descr(tr.recieved_dt+age(now(),now() at time zone 'UTC'))::text AS recieved_dt_str,
+			tr.odometer,
+			engine_descr(tr.engine_on)::text AS engine_on_str,
+			tr.voltage,
+			tr.heading,
+			heading_descr(tr.heading)::text AS heading_str,
+			tr.lon,
+			tr.lat
+		FROM car_tracking AS tr
+		LEFT JOIN vehicles ON vehicles.tracker_id=tr.car_id
+		--WHERE tr.period+age(now(),now() at time zone 'UTC') BETWEEN in_date_time_from AND in_date_time_to
+		WHERE tr.period BETWEEN v_date_time_from AND v_date_time_to
+		AND vehicles.id=in_vehicle_id
+		AND tr.gps_valid=1;
+
+	v_stop_started = false;
+	LOOP
+		FETCH NEXT FROM tr_stops_curs INTO tr_stops_row;
+		IF  FOUND=false THEN
+			--no more rows
+			EXIT;
+		END IF;
+
+		IF NOT v_stop_started AND tr_stops_row.speed>0 THEN
+			--move point
+			vehicle_id	= tr_stops_row.vehicle_id;
+			plate		= tr_stops_row.plate;
+			period		= tr_stops_row.period;
+			period_str 	= tr_stops_row.period_str;
+			lon_str		= tr_stops_row.lon_str;
+			lat_str		= tr_stops_row.lat_str;
+			speed		= tr_stops_row.speed;
+			ns		= tr_stops_row.ns;
+			ew 		= tr_stops_row.ew;
+			recieved_dt	= tr_stops_row.recieved_dt;
+			recieved_dt_str = tr_stops_row.recieved_dt_str;
+			odometer	= tr_stops_row.odometer;
+			engine_on_str	= tr_stops_row.engine_on_str;
+			voltage		= tr_stops_row.voltage;
+			heading		= tr_stops_row.heading;
+			heading_str	= tr_stops_row.heading_str;
+			lon		= tr_stops_row.lon;
+			lat		= tr_stops_row.lat;
+			RETURN NEXT;
+		ELSIF NOT v_stop_started AND tr_stops_row.speed=0 THEN	
+			--new stop - check duration
+			v_stop_started = true;
+			vehicle_id	= tr_stops_row.vehicle_id;
+			plate		= tr_stops_row.plate;
+			period		= tr_stops_row.period;
+			period_str 	= tr_stops_row.period_str;
+			lon_str		= tr_stops_row.lon_str;
+			lat_str		= tr_stops_row.lat_str;
+			speed		= tr_stops_row.speed;
+			ns		= tr_stops_row.ns;
+			ew 		= tr_stops_row.ew;
+			recieved_dt	= tr_stops_row.recieved_dt;
+			recieved_dt_str = tr_stops_row.recieved_dt_str;
+			odometer	= tr_stops_row.odometer;
+			engine_on_str	= tr_stops_row.engine_on_str;
+			voltage		= tr_stops_row.voltage;
+			heading		= tr_stops_row.heading;
+			heading_str	= tr_stops_row.heading_str;
+			lon		= tr_stops_row.lon;
+			lat		= tr_stops_row.lat;
+		ELSIF v_stop_started AND tr_stops_row.speed>0 THEN	
+			--end of stop
+			v_stop_started = false;
+			
+			IF (tr_stops_row.period - period)::interval>=stop_dur_interval THEN
+				RETURN NEXT;
+			END IF;
+		END IF;
+	END LOOP;
+
+	IF v_stop_started THEN	
+		--end of stop or end of period
+		IF (tr_stops_row.period - period)::interval>=stop_dur_interval THEN
+			RETURN NEXT;
+		END IF;
+	END IF;
+
+	CLOSE tr_stops_curs;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval)
+  OWNER TO beton;
+
+
+
+-- ******************* update 16/09/2019 16:29:58 ******************
+-- Function: public.shipment_process()
+
+-- DROP FUNCTION public.shipment_process();
+
+CREATE OR REPLACE FUNCTION public.shipment_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE quant_rest numeric;
+	v_vehicle_load_capacity vehicles.load_capacity%TYPE DEFAULT 0;
+	v_vehicle_state vehicle_states;
+	v_vehicle_plate vehicles.plate%TYPE;
+	v_vehicle_feature vehicles.feature%TYPE;
+	v_ord_date_time timestamp;
+	v_destination_id int;
+	--v_shift_open boolean;
+BEGIN
+	/*
+	IF (TG_OP='UPDATE' AND NEW.shipped AND OLD.shipped) THEN
+		--closed shipment, but trying to change smth
+		RAISE EXCEPTION 'Для возможности изменения отмените отгрузку!';
+	END IF;
+	*/
+
+	IF (TG_WHEN='BEFORE' AND TG_OP='UPDATE' AND OLD.shipped=true) THEN
+		--register actions
+		PERFORM ra_materials_remove_acts('shipment'::doc_types,NEW.id);
+		PERFORM ra_material_consumption_remove_acts('shipment'::doc_types,NEW.id);
+	END IF;
+	
+	IF (TG_WHEN='BEFORE' AND TG_OP='UPDATE'
+	AND (OLD.vehicle_schedule_id<>NEW.vehicle_schedule_id OR OLD.id<>NEW.id)
+	)
+	THEN
+		--
+		DELETE FROM vehicle_schedule_states t WHERE t.shipment_id = OLD.id AND t.schedule_id = OLD.vehicle_schedule_id;	
+	END IF;
+	
+	-- vehicle data
+	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
+		SELECT v.load_capacity,v.plate,v.feature INTO v_vehicle_load_capacity, v_vehicle_plate,v_vehicle_feature
+		FROM vehicle_schedules AS vs
+		LEFT JOIN vehicles As v ON v.id=vs.vehicle_id
+		WHERE vs.id=NEW.vehicle_schedule_id;	
+
+		IF (v_vehicle_feature IS NULL)
+		OR (
+			(v_vehicle_feature<>const_own_vehicles_feature_val())
+			AND (v_vehicle_feature<>const_backup_vehicles_feature_val()) 
+		) THEN
+			--check destination. const_self_ship_dest_id_val only allowed!!!
+			SELECT orders.destination_id INTO v_destination_id FROM orders WHERE orders.id=NEW.order_id;
+			IF v_destination_id <> const_self_ship_dest_id_val() THEN
+				RAISE EXCEPTION 'Данному автомобилю запрещено вывозить на этот объект!';
+			END IF;
+		END IF;
+	END IF;
+
+	--check vehicle state && open shift
+	IF (TG_OP='INSERT') THEN
+		/*
+		SELECT true INTO v_shift_open FROM shifts WHERE shifts.date = NEW.date_time::date;
+		IF NOT FOUND THEN
+			RAISE EXCEPTION 'Смена "%" не открыта!',get_shift_descr(NEW.date_time);
+		END IF;
+		*/
+		
+		SELECT vehicle_schedule_states.state INTO v_vehicle_state
+		FROM vehicle_schedule_states
+		WHERE schedule_id=NEW.vehicle_schedule_id
+		ORDER BY date_time DESC NULLS LAST
+		LIMIT 1;
+		
+		/*IF v_vehicle_state != 'free'::vehicle_states THEN
+			RAISE EXCEPTION 'Автомобиль "%" в статусе "%", должен быть 
+				"%"',v_vehicle_plate,get_vehicle_states_descr(v_vehicle_state),get_vehicle_states_descr('free'::vehicle_states);
+		END IF;
+		*/
+	END IF;
+
+	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
+		-- ********** check balance ****************************************
+		SELECT o.quant-SUM(COALESCE(s.quant,0)),o.date_time INTO quant_rest,v_ord_date_time FROM orders AS o
+		LEFT JOIN shipments AS s ON s.order_id=o.id	
+		WHERE o.id = NEW.order_id
+		GROUP BY o.quant,o.date_time;
+
+		--order shift date MUST overlap shipment shift date!		
+		IF get_shift_start(NEW.date_time)<>get_shift_start(v_ord_date_time) THEN
+			RAISE EXCEPTION 'Заявка из другой смены!';
+		END IF;
+		
+
+		IF (TG_OP='UPDATE') THEN
+			quant_rest:= quant_rest + OLD.quant;
+		END IF;
+		
+		IF (quant_rest<NEW.quant::numeric) THEN
+			RAISE EXCEPTION 'Остаток по данной заявке: %, запрошено: %',quant_descr(quant_rest::numeric),quant_descr(NEW.quant::numeric);
+		END IF;
+		-- ********** check balance ****************************************
+
+		
+		-- *********  check load capacity *************************************		
+		IF v_vehicle_load_capacity < NEW.quant THEN
+			RAISE EXCEPTION 'Грузоподъемность автомобиля: "%", запрошено: %',quant_descr(v_vehicle_load_capacity::numeric),quant_descr(NEW.quant::numeric);
+		END IF;
+		-- *********  check load capacity *************************************
+	END IF;
+
+	IF TG_OP='UPDATE' THEN
+		IF (NEW.shipped AND OLD.shipped=false) THEN
+			NEW.ship_date_time = current_timestamp;
+		ELSEIF (OLD.shipped AND NEW.shipped=false) THEN
+			NEW.ship_date_time = null;
+		END IF;
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.shipment_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 16/09/2019 16:37:25 ******************
+
+		ALTER TABLE pump_vehicles ADD COLUMN phone_cels jsonb;
+
+
+
+-- ******************* update 16/09/2019 16:41:29 ******************
+-- View: public.pump_veh_list
+
+-- DROP VIEW public.pump_veh_list CASCADE;
+
+CREATE OR REPLACE VIEW public.pump_veh_list AS 
+	SELECT
+		pv.id,
+		pv.phone_cel,
+		vehicles_ref(v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		v.make,
+		v.owner,
+		v.feature,
+		v.plate,
+		pv.deleted,
+		pv.pump_length,
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		pv.comment_text,
+		
+		v.vehicle_owner_id,
+		
+		pv.phone_cels
+		
+	FROM pump_vehicles pv
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	ORDER BY v.plate;
+
+ALTER TABLE public.pump_veh_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 16/09/2019 16:41:52 ******************
+-- View: public.pump_veh_work_list
+
+-- DROP VIEW public.pump_veh_work_list CASCADE;
+
+CREATE OR REPLACE VIEW public.pump_veh_work_list AS 
+	SELECT
+		pv.id,
+		pv.phone_cel,
+		vehicles_ref(v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		v.make,
+		v.owner,
+		v.feature,
+		v.plate,
+		pv.pump_length,
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		v.vehicle_owner_id AS pump_vehicle_owner_id,
+		
+		pv.phone_cels
+		
+	FROM pump_vehicles pv
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	WHERE coalesce(pv.deleted,FALSE)=FALSE	
+	ORDER BY v.plate;
+
+ALTER TABLE public.pump_veh_work_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 23/09/2019 12:36:20 ******************
+--DROP FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+RETURNS void as $$
+BEGIN
+    UPDATE material_fact_consumptions
+    SET
+    	upload_date_time = now(),
+    	upload_user_id = $2,
+    	concrete_quant = $1.concrete_quant,
+    	material_quant = $1.material_quant,
+    	material_quant_req = $1.material_quant_req
+    	
+    WHERE production_site_id = $1.production_site_id
+    	AND date_time = $1.date_time
+    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+    	AND raw_material_production_descr = $1.raw_material_production_descr
+    	AND vehicle_production_descr = $1.vehicle_production_descr
+    	;
+    
+    IF FOUND THEN
+        RETURN;
+    END IF;
+    
+    BEGIN
+        INSERT INTO material_fact_consumptions (
+        	production_site_id,
+        	upload_date_time,
+        	upload_user_id,
+        	date_time,
+        	concrete_type_production_descr,
+        	raw_material_production_descr,
+        	vehicle_production_descr,
+        	concrete_quant,
+        	material_quant,
+        	material_quant_req
+       	)
+        VALUES (
+        	$1.production_site_id,
+        	now(),
+        	$2,
+        	$1.date_time,
+        	$1.concrete_type_production_descr,
+        	$1.raw_material_production_descr,
+        	$1.vehicle_production_descr,
+        	$1.concrete_quant,
+        	$1.material_quant,
+        	$1.material_quant_req
+        );
+    EXCEPTION WHEN OTHERS THEN
+	    UPDATE material_fact_consumptions
+	    SET
+	    	upload_date_time = now(),
+	    	upload_user_id = $2,
+	    	concrete_quant = $1.concrete_quant,
+	    	material_quant = $1.material_quant,
+	    	material_quant_req = $1.material_quant_req
+	    	
+	    WHERE production_site_id = $1.production_site_id
+	    	AND date_time = $1.date_time
+	    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+	    	AND raw_material_production_descr = $1.raw_material_production_descr
+	    	AND vehicle_production_descr = $1.vehicle_production_descr
+	    	;
+    END;
+    RETURN;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add(material_fact_consumptions,int) OWNER TO beton;
+
+
+-- ******************* update 24/09/2019 10:33:14 ******************
+--DROP FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+RETURNS void as $$
+BEGIN
+    UPDATE material_fact_consumptions
+    SET
+    	upload_date_time = now(),
+    	upload_user_id = $2,
+    	concrete_quant = $1.concrete_quant,
+    	material_quant = $1.material_quant,
+    	material_quant_req = $1.material_quant_req
+    	
+    WHERE production_site_id = $1.production_site_id
+    	AND date_time = $1.date_time
+    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+    	AND raw_material_production_descr = $1.raw_material_production_descr
+    	AND vehicle_production_descr = $1.vehicle_production_descr
+    	;
+    
+    IF FOUND THEN
+        RETURN;
+    END IF;
+    
+    BEGIN
+        INSERT INTO material_fact_consumptions (
+        	production_site_id,
+        	upload_date_time,
+        	upload_user_id,
+        	date_time,
+        	concrete_type_production_descr,
+        	raw_material_production_descr,
+        	vehicle_production_descr,
+        	concrete_quant,
+        	material_quant,
+        	material_quant_req
+       	)
+        VALUES (
+        	$1.production_site_id,
+        	now(),
+        	$2,
+        	$1.date_time,
+        	$1.concrete_type_production_descr,
+        	$1.raw_material_production_descr,
+        	$1.vehicle_production_descr,
+        	$1.concrete_quant,
+        	$1.material_quant,
+        	$1.material_quant_req
+        );
+    EXCEPTION WHEN OTHERS THEN
+	    UPDATE material_fact_consumptions
+	    SET
+	    	upload_date_time = now(),
+	    	upload_user_id = $2,
+	    	concrete_quant = $1.concrete_quant,
+	    	material_quant = $1.material_quant,
+	    	material_quant_req = $1.material_quant_req
+	    	
+	    WHERE production_site_id = $1.production_site_id
+	    	AND date_time = $1.date_time
+	    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+	    	AND raw_material_production_descr = $1.raw_material_production_descr
+	    	AND vehicle_production_descr = $1.vehicle_production_descr
+	    	;
+    END;
+    RETURN;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add(material_fact_consumptions,int) OWNER TO beton;
+
+
+-- ******************* update 24/09/2019 10:48:20 ******************
+-- VIEW: concrete_type_map_to_production_list
+
+--DROP VIEW concrete_type_map_to_production_list;
+
+CREATE OR REPLACE VIEW concrete_type_map_to_production_list AS
+	SELECT
+		t.id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.production_descr
+	FROM concrete_type_map_to_production AS t
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	;
+	
+ALTER VIEW concrete_type_map_to_production_list OWNER TO beton;
+
+
+-- ******************* update 24/09/2019 10:53:19 ******************
+-- VIEW: raw_material_map_to_production_list
+
+--DROP VIEW raw_material_map_to_production_list;
+
+CREATE OR REPLACE VIEW raw_material_map_to_production_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		materials_ref(mat) AS raw_materials_ref,
+		t.production_descr
+	FROM raw_material_map_to_production AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	;
+	
+ALTER VIEW raw_material_map_to_production_list OWNER TO beton;
+
+
+-- ******************* update 24/09/2019 10:54:26 ******************
+-- VIEW: vehicle_map_to_production_list
+
+--DROP VIEW vehicle_map_to_production_list;
+
+CREATE OR REPLACE VIEW vehicle_map_to_production_list AS
+	SELECT
+		t.id,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.production_descr
+	FROM vehicle_map_to_production AS t
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	;
+	
+ALTER VIEW vehicle_map_to_production_list OWNER TO beton;
+
+
+-- ******************* update 24/09/2019 11:00:00 ******************
+-- VIEW: raw_material_map_to_production_list
+
+--DROP VIEW raw_material_map_to_production_list;
+
+CREATE OR REPLACE VIEW raw_material_map_to_production_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		materials_ref(mat) AS raw_materials_ref,
+		t.production_descr
+	FROM raw_material_map_to_production AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	ORDER BY mat.name,t.date_time DESC
+	;
+	
+ALTER VIEW raw_material_map_to_production_list OWNER TO beton;
+
+
+-- ******************* update 24/09/2019 11:08:01 ******************
+-- VIEW: vehicle_map_to_production_list
+
+--DROP VIEW vehicle_map_to_production_list;
+
+CREATE OR REPLACE VIEW vehicle_map_to_production_list AS
+	SELECT
+		t.id,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.production_descr
+	FROM vehicle_map_to_production AS t
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	ORDER BY vh.plate
+	;
+	
+ALTER VIEW vehicle_map_to_production_list OWNER TO beton;
+
+
+-- ******************* update 24/09/2019 11:08:35 ******************
+-- VIEW: concrete_type_map_to_production_list
+
+--DROP VIEW concrete_type_map_to_production_list;
+
+CREATE OR REPLACE VIEW concrete_type_map_to_production_list AS
+	SELECT
+		t.id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.production_descr
+	FROM concrete_type_map_to_production AS t
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	ORDER BY ct.name
+	;
+	
+ALTER VIEW concrete_type_map_to_production_list OWNER TO beton;
+
+
+-- ******************* update 24/09/2019 11:09:30 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10032',
+		'RawMaterialMapToProduction_Controller',
+		'get_list',
+		'RawMaterialMapToProductionList',
+		'Справочники',
+		'Соответствие материалов в производстве и в бетоне',
+		FALSE
+		);
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10033',
+		'VahicleMapToProduction_Controller',
+		'get_list',
+		'VahicleMapToProductionList',
+		'Справочники',
+		'Соответствие ТС в производстве и в бетоне',
+		FALSE
+		);
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10034',
+		'ConcreteTypeMapToProduction_Controller',
+		'get_list',
+		'ConcreteTypeMapToProductionList',
+		'Справочники',
+		'Соответствие марок в производстве и в бетоне',
+		FALSE
+		);
+	
+
+-- ******************* update 24/09/2019 13:34:55 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'30015',
+		NULL,
+		NULL,
+		'MaterialFactConsumptionUpload',
+		'Формы',
+		'Загрузка данных с завода',
+		FALSE
+		);
+	
+
+-- ******************* update 25/09/2019 09:36:57 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		materials_ref(mat) AS raw_materials_ref,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	ORDER BY pr.name,t.date_time,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 09:37:23 ******************
+-- VIEW: raw_material_map_to_production_list
+
+--DROP VIEW raw_material_map_to_production_list;
+
+CREATE OR REPLACE VIEW raw_material_map_to_production_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		materials_ref(mat) AS raw_materials_ref,
+		t.production_descr
+	FROM raw_material_map_to_production AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	ORDER BY mat.name,t.date_time DESC
+	;
+	
+ALTER VIEW raw_material_map_to_production_list OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 12:44:02 ******************
+--DROP FUNCTION material_fact_consumptions_add_material(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(text)
+RETURNS int as $$
+DECLARE
+	v_raw_material_id int;
+BEGIN
+	v_raw_material_id = NULL;
+	SELECT raw_material_id INTO v_raw_material_id FROM raw_material_map_to_production WHERE production_descr = $1;
+	IF v_raw_material_id IS NULL THEN
+		INSERT INTO raw_material_map_to_production
+		(date_time,production_descr)
+		VALUES
+		(now(),$1)
+		;
+	END IF;
+	
+	RETURN v_raw_material_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_material(text) OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 12:45:46 ******************
+--DROP FUNCTION material_fact_consumptions_add_vehicle(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_vehicle(text)
+RETURNS int as $$
+DECLARE
+	v_vehicle_id int;
+BEGIN
+	v_vehicle_id = NULL;
+	SELECT vehicle_id INTO v_vehicle_id FROM vehicle_map_to_production WHERE production_descr = $1;
+	IF v_vehicle_id IS NULL THEN
+		INSERT INTO vehicle_map_to_production
+		(production_descr)
+		VALUES
+		($1)
+		;
+	END IF;
+	
+	RETURN v_vehicle_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_vehicle(text) OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 12:46:37 ******************
+--DROP FUNCTION material_fact_consumptions_add_concrete_type(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_concrete_type(text)
+RETURNS int as $$
+DECLARE
+	v_concrete_type_id int;
+BEGIN
+	v_concrete_type_id = NULL;
+	SELECT concrete_type_id INTO v_concrete_type_id FROM concrete_type_map_to_production WHERE production_descr = $1;
+	IF v_concrete_type_id IS NULL THEN
+		INSERT INTO concrete_type_map_to_production
+		(production_descr)
+		VALUES
+		($1)
+		;
+	END IF;
+	
+	RETURN v_concrete_type_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_concrete_type(text) OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 13:05:37 ******************
+--DROP FUNCTION material_fact_consumptions_add_material(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(text)
+RETURNS int as $$
+DECLARE
+	v_raw_material_id int;
+BEGIN
+	v_raw_material_id = NULL;
+	SELECT raw_material_id INTO v_raw_material_id FROM raw_material_map_to_production WHERE production_descr = $1;
+	RAISE EXCEPTION 'Found=%',FOUND;
+	IF v_raw_material_id IS NULL THEN
+		INSERT INTO raw_material_map_to_production
+		(date_time,production_descr)
+		VALUES
+		(now(),$1)
+		;
+	END IF;
+	
+	RETURN v_raw_material_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_material(text) OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 13:06:36 ******************
+--DROP FUNCTION material_fact_consumptions_add_material(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(text)
+RETURNS int as $$
+DECLARE
+	v_raw_material_id int;
+BEGIN
+	v_raw_material_id = NULL;
+	SELECT raw_material_id INTO v_raw_material_id FROM raw_material_map_to_production WHERE production_descr = $1;
+	IF NOT FOUND THEN
+		INSERT INTO raw_material_map_to_production
+		(date_time,production_descr)
+		VALUES
+		(now(),$1)
+		;
+	END IF;
+	
+	RETURN v_raw_material_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_material(text) OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 17:51:51 ******************
+DROP FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+/*
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+RETURNS void as $$
+BEGIN
+    UPDATE material_fact_consumptions
+    SET
+    	upload_date_time = now(),
+    	upload_user_id = $2,
+    	concrete_quant = $1.concrete_quant,
+    	material_quant = $1.material_quant,
+    	material_quant_req = $1.material_quant_req
+    	
+    WHERE production_site_id = $1.production_site_id
+    	AND date_time = $1.date_time
+    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+    	AND raw_material_production_descr = $1.raw_material_production_descr
+    	AND vehicle_production_descr = $1.vehicle_production_descr
+    	;
+    
+    IF FOUND THEN
+        RETURN;
+    END IF;
+    
+    BEGIN
+        INSERT INTO material_fact_consumptions (
+        	production_site_id,
+        	upload_date_time,
+        	upload_user_id,
+        	date_time,
+        	concrete_type_production_descr,
+        	raw_material_production_descr,
+        	vehicle_production_descr,
+        	concrete_quant,
+        	material_quant,
+        	material_quant_req
+       	)
+        VALUES (
+        	$1.production_site_id,
+        	now(),
+        	$2,
+        	$1.date_time,
+        	$1.concrete_type_production_descr,
+        	$1.raw_material_production_descr,
+        	$1.vehicle_production_descr,
+        	$1.concrete_quant,
+        	$1.material_quant,
+        	$1.material_quant_req
+        );
+    EXCEPTION WHEN OTHERS THEN
+	    UPDATE material_fact_consumptions
+	    SET
+	    	upload_date_time = now(),
+	    	upload_user_id = $2,
+	    	concrete_quant = $1.concrete_quant,
+	    	material_quant = $1.material_quant,
+	    	material_quant_req = $1.material_quant_req
+	    	
+	    WHERE production_site_id = $1.production_site_id
+	    	AND date_time = $1.date_time
+	    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+	    	AND raw_material_production_descr = $1.raw_material_production_descr
+	    	AND vehicle_production_descr = $1.vehicle_production_descr
+	    	;
+    END;
+    RETURN;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add(material_fact_consumptions,int) OWNER TO beton;
+*/
+
+
+-- ******************* update 25/09/2019 17:54:56 ******************
+--DROP FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add(material_fact_consumptions)
+RETURNS void as $$
+BEGIN
+    UPDATE material_fact_consumptions
+    SET
+    	upload_date_time = $1.upload_date_time,
+    	upload_user_id = $1.upload_user_id,
+    	concrete_quant = $1.concrete_quant,
+    	material_quant = $1.material_quant,
+    	material_quant_req = $1.material_quant_req
+    	
+    WHERE production_site_id = $1.production_site_id
+    	AND date_time = $1.date_time
+    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+    	AND raw_material_production_descr = $1.raw_material_production_descr
+    	AND vehicle_production_descr = $1.vehicle_production_descr
+    	;
+    
+    IF FOUND THEN
+        RETURN;
+    END IF;
+    
+    BEGIN
+        INSERT INTO material_fact_consumptions 
+        VALUES ($1.*);
+    EXCEPTION WHEN OTHERS THEN
+	    UPDATE material_fact_consumptions
+	    SET
+	    	upload_date_time = $1.upload_date_time,
+	    	upload_user_id = $1.upload_user_id,
+	    	concrete_quant = $1.concrete_quant,
+	    	material_quant = $1.material_quant,
+	    	material_quant_req = $1.material_quant_req
+	    	
+	    WHERE production_site_id = $1.production_site_id
+	    	AND date_time = $1.date_time
+	    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+	    	AND raw_material_production_descr = $1.raw_material_production_descr
+	    	AND vehicle_production_descr = $1.vehicle_production_descr
+	    	;
+    END;
+    RETURN;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add(material_fact_consumptions) OWNER TO beton;
+
+
+
+-- ******************* update 25/09/2019 18:23:55 ******************
+--DROP FUNCTION material_fact_consumptions_add_concrete_type(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_concrete_type(text)
+RETURNS int as $$
+DECLARE
+	v_concrete_type_id int;
+BEGIN
+	v_concrete_type_id = NULL;
+	SELECT concrete_type_id INTO v_concrete_type_id FROM concrete_type_map_to_production WHERE production_descr = $1;
+	IF NOT FOUND THEN
+		INSERT INTO concrete_type_map_to_production
+		(production_descr)
+		VALUES
+		($1)
+		;
+	END IF;
+	
+	RETURN v_concrete_type_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_concrete_type(text) OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 18:24:10 ******************
+--DROP FUNCTION material_fact_consumptions_add_vehicle(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_vehicle(text)
+RETURNS int as $$
+DECLARE
+	v_vehicle_id int;
+BEGIN
+	v_vehicle_id = NULL;
+	SELECT vehicle_id INTO v_vehicle_id FROM vehicle_map_to_production WHERE production_descr = $1;
+	IF NOT FOUND THEN
+		INSERT INTO vehicle_map_to_production
+		(production_descr)
+		VALUES
+		($1)
+		;
+	END IF;
+	
+	RETURN v_vehicle_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_vehicle(text) OWNER TO beton;
+
+
+-- ******************* update 25/09/2019 18:35:16 ******************
+--DROP FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add(material_fact_consumptions)
+RETURNS void as $$
+BEGIN
+    UPDATE material_fact_consumptions
+    SET
+    	upload_date_time = $1.upload_date_time,
+    	upload_user_id = $1.upload_user_id,
+    	concrete_quant = $1.concrete_quant,
+    	material_quant = $1.material_quant,
+    	material_quant_req = $1.material_quant_req
+    	
+    WHERE production_site_id = $1.production_site_id
+    	AND date_time = $1.date_time
+    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+    	AND raw_material_production_descr = $1.raw_material_production_descr
+    	AND vehicle_production_descr = $1.vehicle_production_descr
+    	;
+    
+    IF FOUND THEN
+        RETURN;
+    END IF;
+    
+    --BEGIN
+        INSERT INTO material_fact_consumptions 
+        VALUES ($1.*);
+    /*    
+    EXCEPTION WHEN OTHERS THEN
+	    UPDATE material_fact_consumptions
+	    SET
+	    	upload_date_time = $1.upload_date_time,
+	    	upload_user_id = $1.upload_user_id,
+	    	concrete_quant = $1.concrete_quant,
+	    	material_quant = $1.material_quant,
+	    	material_quant_req = $1.material_quant_req
+	    	
+	    WHERE production_site_id = $1.production_site_id
+	    	AND date_time = $1.date_time
+	    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+	    	AND raw_material_production_descr = $1.raw_material_production_descr
+	    	AND vehicle_production_descr = $1.vehicle_production_descr
+	    	;
+    END;
+    */
+    RETURN;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add(material_fact_consumptions) OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 09:19:26 ******************
+-- VIEW: material_fact_consumptions_list
+
+DROP VIEW material_fact_consumptions_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		materials_ref(mat) AS raw_materials_ref,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	ORDER BY pr.name,t.date_time,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 09:38:19 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10035',
+		'MaterialFactConsumption_Controller',
+		'get_list',
+		'MaterialFactConsumptionList',
+		'Формы',
+		'Фактический расход материалов',
+		FALSE
+		);
+	
+
+-- ******************* update 26/09/2019 09:58:20 ******************
+--DROP FUNCTION material_fact_consumptions_add_vehicle(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_vehicle(text)
+RETURNS int as $$
+DECLARE
+	v_vehicle_id int;
+BEGIN
+	v_vehicle_id = NULL;
+	SELECT vehicle_id INTO v_vehicle_id FROM vehicle_map_to_production WHERE production_descr = $1;
+	IF NOT FOUND THEN
+		SELECT id FROM vehciles INTO v_vehicle_id WHERE plate=$1 OR (length($1)=3 AND length(plate)=6 AND '%'||plate||'%' LIKE $1);
+		
+		INSERT INTO vehicle_map_to_production
+		(production_descr,vehicle_id)
+		VALUES
+		($1,v_vehicle_id)
+		;
+	END IF;
+	
+	RETURN v_vehicle_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_vehicle(text) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 09:59:12 ******************
+--DROP FUNCTION material_fact_consumptions_add_material(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(text)
+RETURNS int as $$
+DECLARE
+	v_raw_material_id int;
+BEGIN
+	v_raw_material_id = NULL;
+	SELECT raw_material_id INTO v_raw_material_id FROM raw_material_map_to_production WHERE production_descr = $1;
+	IF NOT FOUND THEN
+		SELECT id FROM raw_materials INTO v_raw_material_id WHERE name=$1;
+	
+		INSERT INTO raw_material_map_to_production
+		(date_time,production_descr,raw_material_id)
+		VALUES
+		(now(),$1,v_raw_material_id)
+		;
+	END IF;
+	
+	RETURN v_raw_material_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_material(text) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 09:59:51 ******************
+--DROP FUNCTION material_fact_consumptions_add_concrete_type(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_concrete_type(text)
+RETURNS int as $$
+DECLARE
+	v_concrete_type_id int;
+BEGIN
+	v_concrete_type_id = NULL;
+	SELECT concrete_type_id INTO v_concrete_type_id FROM concrete_type_map_to_production WHERE production_descr = $1;
+	IF NOT FOUND THEN
+		SELECT id FROM concrete_types INTO v_concrete_type_id WHERE name=$1;
+	
+		INSERT INTO concrete_type_map_to_production
+		(production_descr,concrete_type_id)
+		VALUES
+		($1,v_concrete_type_id)
+		;
+	END IF;
+	
+	RETURN v_concrete_type_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_concrete_type(text) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 10:47:37 ******************
+﻿-- Function: raw_material_map_to_production_recalc(in_material_id int, in_date_time timestamp)
+
+-- DROP FUNCTION raw_material_map_to_production_recalc(int in_material_id int, in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_date_time timestamp)
+  RETURNS void AS
+$$
+	UPDATE material_fact_consumptions
+	SET raw_material_id=in_material_id
+	WHERE (in_date_time IS NOT NULL AND date_time>=in_date_time) OR in_date_time IS NULL
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_date_time timestamp) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 10:48:26 ******************
+-- Function: public.raw_material_map_to_production_process()
+
+-- DROP FUNCTION public.raw_material_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.raw_material_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			OLD.material_id,
+			(SELECT date_time FROM raw_material_map_to_production WHERE date_time<OLD.date_time ORDER BY date_time DESC LIMIT 1)
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.material_id,
+			NEW.date_time
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (NEW.raw_material_id<>OLD.raw_material_id OR NEW.date_time<>OLD.date_time) THEN
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.material_id,
+			least(NEW.date_time,OLD.date_time)
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.raw_material_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 10:50:38 ******************
+-- Trigger: raw_material_map_to_production_trigger_after on public.raw_material_map_to_production
+
+-- DROP TRIGGER raw_material_map_to_production_trigger_after ON public.raw_material_map_to_production;
+
+CREATE TRIGGER raw_material_map_to_production_trigger_after
+  AFTER INSERT OR UPDATE OR DELETE
+  ON public.raw_material_map_to_production
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.raw_material_map_to_production_process();
+
+
+
+-- ******************* update 26/09/2019 10:52:52 ******************
+﻿-- Function: raw_material_map_to_production_recalc(in_material_id int, in_date_time timestamp)
+
+ DROP FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_date_time timestamp);
+/*
+CREATE OR REPLACE FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_date_time timestamp)
+  RETURNS void AS
+$$
+	UPDATE material_fact_consumptions
+	SET raw_material_id=in_material_id
+	WHERE (in_date_time IS NOT NULL AND date_time>=in_date_time) OR in_date_time IS NULL
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_date_time timestamp) OWNER TO beton;
+*/
+
+
+-- ******************* update 26/09/2019 10:54:44 ******************
+﻿-- Function: raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp)
+
+-- DROP FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp)
+  RETURNS void AS
+$$
+	UPDATE material_fact_consumptions
+	SET raw_material_id=in_material_id
+	WHERE raw_material_production_descr = in_production_descr
+	AND ( (in_date_time IS NOT NULL AND date_time>=in_date_time) OR in_date_time IS NULL )
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 10:58:30 ******************
+-- Function: public.raw_material_map_to_production_process()
+
+-- DROP FUNCTION public.raw_material_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.raw_material_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			OLD.material_id,
+			OLD.production_descr,
+			(SELECT date_time FROM raw_material_map_to_production WHERE date_time<OLD.date_time ORDER BY date_time DESC LIMIT 1)
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.material_id,
+			NEW.production_descr,
+			NEW.date_time
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (NEW.raw_material_id<>OLD.raw_material_id OR NEW.date_time<>OLD.date_time OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET raw_material_id = NULL
+			WHERE raw_material_production_descr=OLD.production_descr AND date_time>=OLD.date_time;			
+		END IF;
+		
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.material_id,
+			NEW.production_descr,
+			least(NEW.date_time,OLD.date_time)
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.raw_material_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 10:58:36 ******************
+﻿-- Function: raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp)
+
+-- DROP FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp)
+  RETURNS void AS
+$$
+	UPDATE material_fact_consumptions
+	SET raw_material_id=in_material_id
+	WHERE raw_material_production_descr = in_production_descr
+	AND ( (in_date_time IS NOT NULL AND date_time>=in_date_time) OR in_date_time IS NULL )
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 10:59:52 ******************
+﻿-- Function: vehicle_map_to_production_recalc(in_vehicle_id int, in_production_descr text)
+
+-- DROP FUNCTION vehicle_map_to_production_recalc(int in_vehicle_id int, in_production_descr text);
+
+CREATE OR REPLACE FUNCTION vehicle_map_to_production_recalc(in_vehicle_id int, in_production_descr text)
+  RETURNS void AS
+$$
+	UPDATE material_fact_consumptions
+	SET vehicle_id=in_vehicle_id
+	WHERE vehicle_production_descr=in_production_descr;
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION vehicle_map_to_production_recalc(in_material_id int, in_production_descr text) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 11:02:33 ******************
+-- Function: public.vehicle_map_to_production_process()
+
+-- DROP FUNCTION public.vehicle_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.vehicle_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM vehicle_map_to_production_recalc(
+			OLD.vehicle_id,
+			OLD.production_descr
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM vehicle_map_to_production_recalc(
+			NEW.vehicle_id,
+			NEW.production_descr
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (NEW.vehicle_id<>OLD.vehicle_id OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET vehicle_id = NULL
+			WHERE vehicle_production_descr=OLD.production_descr;
+		END IF;
+		
+		PERFORM vehicle_map_to_production_recalc(
+			NEW.vehicle_id,
+			NEW.production_descr
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.vehicle_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 11:03:14 ******************
+-- Trigger: vehicle_map_to_production_trigger_after on public.vehicle_map_to_production
+
+-- DROP TRIGGER vehicle_map_to_production_trigger_after ON public.vehicle_map_to_production;
+
+CREATE TRIGGER vehicle_map_to_production_trigger_after
+  AFTER INSERT OR UPDATE OR DELETE
+  ON public.vehicle_map_to_production
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.vehicle_map_to_production_process();
+
+
+
+-- ******************* update 26/09/2019 11:05:14 ******************
+-- Function: public.concrete_type_map_to_production_process()
+
+-- DROP FUNCTION public.concrete_type_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.concrete_type_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			OLD.concrete_type_id,
+			OLD.production_descr
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (NEW.concrete_type_id<>OLD.concrete_type_id OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET concrete_type_id = NULL
+			WHERE concrete_type_production_descr=OLD.production_descr;
+		END IF;
+		
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.concrete_type_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 11:05:53 ******************
+﻿-- Function: concrete_type_map_to_production_recalc(in_concrete_type_id int, in_production_descr text)
+
+-- DROP FUNCTION concrete_type_map_to_production_recalc(int in_concrete_type_id int, in_production_descr text);
+
+CREATE OR REPLACE FUNCTION concrete_type_map_to_production_recalc(in_concrete_type_id int, in_production_descr text)
+  RETURNS void AS
+$$
+	UPDATE material_fact_consumptions
+	SET concrete_type_id=in_concrete_type_id
+	WHERE concrete_type_production_descr=in_production_descr;
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION concrete_type_map_to_production_recalc(in_material_id int, in_production_descr text) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 11:05:57 ******************
+-- Function: public.concrete_type_map_to_production_process()
+
+-- DROP FUNCTION public.concrete_type_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.concrete_type_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			OLD.concrete_type_id,
+			OLD.production_descr
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (NEW.concrete_type_id<>OLD.concrete_type_id OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET concrete_type_id = NULL
+			WHERE concrete_type_production_descr=OLD.production_descr;
+		END IF;
+		
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.concrete_type_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 11:06:00 ******************
+-- Trigger: concrete_type_map_to_production_trigger_after on public.concrete_type_map_to_production
+
+-- DROP TRIGGER concrete_type_map_to_production_trigger_after ON public.concrete_type_map_to_production;
+
+CREATE TRIGGER concrete_type_map_to_production_trigger_after
+  AFTER INSERT OR UPDATE OR DELETE
+  ON public.concrete_type_map_to_production
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.concrete_type_map_to_production_process();
+
+
+
+-- ******************* update 26/09/2019 11:11:57 ******************
+--DROP FUNCTION material_fact_consumptions_add(material_fact_consumptions,int)
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add(material_fact_consumptions)
+RETURNS void as $$
+BEGIN
+    UPDATE material_fact_consumptions
+    SET
+    	upload_date_time = $1.upload_date_time,
+    	upload_user_id = $1.upload_user_id,
+    	concrete_quant = $1.concrete_quant,
+    	material_quant = $1.material_quant,
+    	material_quant_req = $1.material_quant_req
+    	
+    WHERE production_site_id = $1.production_site_id
+    	AND date_time = $1.date_time
+    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+    	AND raw_material_production_descr = $1.raw_material_production_descr
+    	AND vehicle_production_descr = $1.vehicle_production_descr
+    	;
+    
+    IF FOUND THEN
+        RETURN;
+    END IF;
+    
+    BEGIN
+        INSERT INTO material_fact_consumptions 
+        VALUES ($1.*);
+       
+    EXCEPTION WHEN unique_violation THEN
+	    UPDATE material_fact_consumptions
+	    SET
+	    	upload_date_time = $1.upload_date_time,
+	    	upload_user_id = $1.upload_user_id,
+	    	concrete_quant = $1.concrete_quant,
+	    	material_quant = $1.material_quant,
+	    	material_quant_req = $1.material_quant_req
+	    	
+	    WHERE production_site_id = $1.production_site_id
+	    	AND date_time = $1.date_time
+	    	AND concrete_type_production_descr = $1.concrete_type_production_descr
+	    	AND raw_material_production_descr = $1.raw_material_production_descr
+	    	AND vehicle_production_descr = $1.vehicle_production_descr
+	    	;
+    END;
+    
+    RETURN;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add(material_fact_consumptions) OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 11:27:36 ******************
+-- Function: public.concrete_type_map_to_production_process()
+
+-- DROP FUNCTION public.concrete_type_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.concrete_type_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	RAISE EXCEPTION 'РЕЗ=%',(NEW.concrete_type_id<>OLD.concrete_type_id);
+	IF TG_OP='DELETE' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			OLD.concrete_type_id,
+			OLD.production_descr
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (NEW.concrete_type_id<>OLD.concrete_type_id OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET concrete_type_id = NULL
+			WHERE concrete_type_production_descr=OLD.production_descr;
+		END IF;
+		
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+	
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' THEN
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.concrete_type_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 11:28:50 ******************
+-- Function: public.concrete_type_map_to_production_process()
+
+-- DROP FUNCTION public.concrete_type_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.concrete_type_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			OLD.concrete_type_id,
+			OLD.production_descr
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0) OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET concrete_type_id = NULL
+			WHERE concrete_type_production_descr=OLD.production_descr;
+		END IF;
+		
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+	
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' THEN
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.concrete_type_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 11:29:51 ******************
+-- Function: public.raw_material_map_to_production_process()
+
+-- DROP FUNCTION public.raw_material_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.raw_material_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			OLD.material_id,
+			OLD.production_descr,
+			(SELECT date_time FROM raw_material_map_to_production WHERE date_time<OLD.date_time ORDER BY date_time DESC LIMIT 1)
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.material_id,
+			NEW.production_descr,
+			NEW.date_time
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.raw_material_id,0)<>coalesce(OLD.raw_material_id,0) OR NEW.date_time<>OLD.date_time OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET raw_material_id = NULL
+			WHERE raw_material_production_descr=OLD.production_descr AND date_time>=OLD.date_time;			
+		END IF;
+		
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.material_id,
+			NEW.production_descr,
+			least(NEW.date_time,OLD.date_time)
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.raw_material_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 11:30:21 ******************
+-- Function: public.vehicle_map_to_production_process()
+
+-- DROP FUNCTION public.vehicle_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.vehicle_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM vehicle_map_to_production_recalc(
+			OLD.vehicle_id,
+			OLD.production_descr
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM vehicle_map_to_production_recalc(
+			NEW.vehicle_id,
+			NEW.production_descr
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET vehicle_id = NULL
+			WHERE vehicle_production_descr=OLD.production_descr;
+		END IF;
+		
+		PERFORM vehicle_map_to_production_recalc(
+			NEW.vehicle_id,
+			NEW.production_descr
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.vehicle_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 12:08:29 ******************
+-- Function: public.raw_material_map_to_production_process()
+
+-- DROP FUNCTION public.raw_material_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.raw_material_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			OLD.raw_material_id,
+			OLD.production_descr,
+			(SELECT date_time FROM raw_material_map_to_production WHERE date_time<OLD.date_time ORDER BY date_time DESC LIMIT 1)
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.raw_material_id,
+			NEW.production_descr,
+			NEW.date_time
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.raw_material_id,0)<>coalesce(OLD.raw_material_id,0) OR NEW.date_time<>OLD.date_time OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET raw_material_id = NULL
+			WHERE raw_material_production_descr=OLD.production_descr AND date_time>=OLD.date_time;			
+		END IF;
+		
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.raw_material_id,
+			NEW.production_descr,
+			least(NEW.date_time,OLD.date_time)
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.raw_material_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 12:09:44 ******************
+-- Function: public.raw_material_map_to_production_process()
+
+-- DROP FUNCTION public.raw_material_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.raw_material_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			OLD.raw_material_id,
+			OLD.production_descr::text,
+			(SELECT date_time FROM raw_material_map_to_production WHERE date_time<OLD.date_time ORDER BY date_time DESC LIMIT 1)
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.raw_material_id,
+			NEW.production_descr::text,
+			NEW.date_time
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.raw_material_id,0)<>coalesce(OLD.raw_material_id,0) OR NEW.date_time<>OLD.date_time OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET raw_material_id = NULL
+			WHERE raw_material_production_descr=OLD.production_descr AND date_time>=OLD.date_time;			
+		END IF;
+		
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.raw_material_id,
+			NEW.production_descr::text,
+			least(NEW.date_time,OLD.date_time)
+		);
+	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.raw_material_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 12:10:20 ******************
+﻿-- Function: raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp with time zone)
+
+-- DROP FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp with time zone);
+
+CREATE OR REPLACE FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp with time zone)
+  RETURNS void AS
+$$
+	UPDATE material_fact_consumptions
+	SET raw_material_id=in_material_id
+	WHERE raw_material_production_descr = in_production_descr
+	AND ( (in_date_time IS NOT NULL AND date_time>=in_date_time) OR in_date_time IS NULL )
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION raw_material_map_to_production_recalc(in_material_id int, in_production_descr text, in_date_time timestamp with time zone) OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 12:31:35 ******************
+﻿-- Function: material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int)
+
+-- DROP FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int)
+  RETURNS int AS
+$$
+	SELECT id FROM vehicle_schedule_states AS st
+	WHERE st.schedule_id =
+		(SELECT vsch.id FROM vehicle_schedules AS vsch WHERE vsch.vehicle_id=in_vehicle_id AND vsch.schedule_date = in_date_time::date)
+	AND st.date_time BETWEEN in_date_time-'1 minute'::interval AND in_date_time+'1 minute'::interval
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 12:42:13 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id=vh_sch_st.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	ORDER BY pr.name,t.date_time,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 12:49:37 ******************
+﻿-- Function: material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int)
+
+-- DROP FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int)
+  RETURNS int AS
+$$
+	SELECT id FROM vehicle_schedule_states AS st
+	WHERE st.schedule_id =
+		(SELECT vsch.id FROM vehicle_schedules AS vsch WHERE vsch.vehicle_id=in_vehicle_id AND vsch.schedule_date = in_date_time::date)
+	AND st.state = 'assigned'
+	AND st.date_time BETWEEN in_date_time-'10 minute'::interval AND in_date_time+'10 minute'::interval
+	LIMIT 1
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 12:52:33 ******************
+﻿-- Function: material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int)
+
+-- DROP FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int)
+  RETURNS int AS
+$$
+	SELECT id FROM vehicle_schedule_states AS st
+	WHERE st.schedule_id =
+		(SELECT vsch.id FROM vehicle_schedules AS vsch WHERE vsch.vehicle_id=in_vehicle_id AND vsch.schedule_date = in_date_time::date)
+	AND (st.state = 'assigned' OR st.state = 'busy')
+	AND st.date_time BETWEEN in_date_time-'10 minute'::interval AND in_date_time+'10 minute'::interval
+	LIMIT 1
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 12:53:11 ******************
+﻿-- Function: material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int)
+
+-- DROP FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int)
+  RETURNS int AS
+$$
+	SELECT id FROM vehicle_schedule_states AS st
+	WHERE st.schedule_id =
+		(SELECT vsch.id FROM vehicle_schedules AS vsch WHERE vsch.vehicle_id=in_vehicle_id AND vsch.schedule_date = in_date_time::date)
+	AND (st.state = 'assigned' OR st.state = 'busy')
+	AND st.date_time BETWEEN in_date_time-'20 minute'::interval AND in_date_time+'20 minute'::interval
+	LIMIT 1
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp without time zone,in_vehicle_id int) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 12:58:57 ******************
+﻿-- Function: material_fact_consumptions_find_schedule(in_date_time timestamp with time zone,in_vehicle_id int)
+
+-- DROP FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp with time zone,in_vehicle_id int);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp with time zone,in_vehicle_id int)
+  RETURNS int AS
+$$
+	SELECT id FROM vehicle_schedule_states AS st
+	WHERE st.schedule_id =
+		(SELECT vsch.id FROM vehicle_schedules AS vsch WHERE vsch.vehicle_id=in_vehicle_id AND vsch.schedule_date = in_date_time::date)
+	AND (st.state = 'assigned' OR st.state = 'busy')
+	AND st.date_time BETWEEN in_date_time-'20 minute'::interval AND in_date_time+'20 minute'::interval
+	LIMIT 1
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_schedule(in_date_time timestamp with time zone,in_vehicle_id int) OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 13:00:11 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id=vh_sch_st.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	ORDER BY pr.name,t.date_time,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 14:08:07 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='INSERT' THEN
+		SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_id;
+		RETURN NEW;
+		
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time) THEN
+		SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_id;
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 14:09:47 ******************
+-- Trigger: material_fact_consumptions_trigger_before on public.material_fact_consumptions
+
+-- DROP TRIGGER material_fact_consumptions_trigger_before ON public.material_fact_consumptions;
+
+CREATE TRIGGER material_fact_consumptions_trigger_before
+  BEFORE INSERT OR UPDATE
+  ON public.material_fact_consumptions
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.material_fact_consumptions_process();
+
+
+
+-- ******************* update 26/09/2019 14:11:21 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='INSERT' THEN
+		SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		RETURN NEW;
+		
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time) THEN
+		SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 14:31:03 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='INSERT' THEN
+		SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		RETURN NEW;
+		
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time) THEN
+		SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' THEN	
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 14:42:54 ******************
+-- Function: public.orders_ref(orders)
+
+-- DROP FUNCTION public.orders_ref(orders);
+
+CREATE OR REPLACE FUNCTION public.orders_ref(orders)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr','Заявка №'||order_num($1)::text||' от '||to_char($1.date_time,'DD/MM/YY HH24:MI'),
+		'dataType','orders'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.orders_ref(orders) OWNER TO beton;
+
+
+
+-- ******************* update 26/09/2019 14:51:24 ******************
+-- VIEW: material_fact_consumptions_list
+
+DROP VIEW material_fact_consumptions_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		t.production_site_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id=vh_sch_st.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	ORDER BY pr.name,t.date_time,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 17:13:15 ******************
+-- VIEW: material_fact_consumptions_list
+
+DROP VIEW material_fact_consumptions_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		t.production_site_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id=vh_sch_st.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	ORDER BY pr.name,t.date_time,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 17:17:46 ******************
+-- VIEW: material_fact_consumptions_rolled_list
+
+--DROP VIEW material_fact_consumptions_rolled_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
+	SELECT
+		t.date_time,
+		t.upload_date_time,
+		t.upload_users_ref::text,
+		t.production_sites_ref::text,
+		t.production_site_id,
+		t.concrete_types_ref::text,
+		t.concrete_type_production_descr,
+		t.raw_materials_ref::text,
+		t.raw_material_production_descr,
+		t.vehicles_ref::text,
+		t.vehicle_production_descr,
+		t.orders_ref::text,
+		t.shipments_inf,
+		sum(t.concrete_quant) AS concrete_quant,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant_req) AS material_quant_req
+	FROM material_fact_consumptions_list AS t
+	GROUP BY 
+		t.date_time,
+		t.upload_date_time,
+		t.upload_users_ref::text,
+		t.production_sites_ref::text,
+		t.production_site_id,
+		t.concrete_types_ref::text,
+		t.concrete_type_production_descr,
+		t.raw_materials_ref::text,
+		t.raw_material_production_descr,
+		t.vehicles_ref::text,
+		t.vehicle_production_descr,
+		t.orders_ref::text,
+		t.shipments_inf	
+	;
+	
+ALTER VIEW material_fact_consumptions_rolled_list OWNER TO beton;
+
+
+-- ******************* update 26/09/2019 17:23:11 ******************
+-- VIEW: material_fact_consumptions_rolled_list
+
+DROP VIEW material_fact_consumptions_rolled_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
+	SELECT
+		t.date_time,
+		t.upload_date_time,
+		t.upload_users_ref::text,
+		t.production_sites_ref::text,
+		t.production_site_id,
+		t.concrete_types_ref::text,
+		t.concrete_type_production_descr,
+		t.raw_materials_ref::text,
+		t.raw_material_production_descr,
+		t.vehicles_ref::text,
+		t.vehicle_production_descr,
+		t.orders_ref::text,
+		t.shipments_inf,
+		t.concrete_quant,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant_req) AS material_quant_req
+	FROM material_fact_consumptions_list AS t
+	GROUP BY 
+		t.date_time,
+		t.upload_date_time,
+		t.upload_users_ref::text,
+		t.production_sites_ref::text,
+		t.production_site_id,
+		t.concrete_types_ref::text,
+		t.concrete_type_production_descr,
+		t.raw_materials_ref::text,
+		t.raw_material_production_descr,
+		t.vehicles_ref::text,
+		t.vehicle_production_descr,
+		t.orders_ref::text,
+		t.shipments_inf,
+		t.concrete_quant	
+	;
+	
+ALTER VIEW material_fact_consumptions_rolled_list OWNER TO beton;
+
+
+-- ******************* update 30/09/2019 09:52:13 ******************
+-- VIEW: material_fact_consumptions_rolled_list
+
+DROP VIEW material_fact_consumptions_rolled_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
+	SELECT
+		date_time,
+		upload_date_time,
+		(upload_users_ref::text)::jsonb AS upload_users_ref,
+		(production_sites_ref::text)::jsonb AS production_sites_ref,
+		production_site_id,
+		(concrete_types_ref::text)::jsonb AS concrete_types_ref,
+		concrete_type_production_descr,
+		(vehicles_ref::text)::jsonb AS vehicles_ref,
+		vehicle_production_descr,
+		(orders_ref::text)::jsonb AS orders_ref,
+		shipments_inf,
+		concrete_quant,
+		jsonb_agg(
+			jsonb_build_object(
+				'production_descr',raw_material_production_descr,
+				'ref',raw_materials_ref,
+				'quant',material_quant,
+				'quant_req',material_quant_req
+			)
+		) AS materials
+	FROM material_fact_consumptions_list
+	GROUP BY date_time,
+		concrete_quant,
+		upload_date_time,
+		upload_users_ref::text,
+		production_sites_ref::text,
+		production_site_id,
+		concrete_types_ref::text,
+		concrete_type_production_descr,
+		vehicles_ref::text,
+		vehicle_production_descr,
+		orders_ref::text,
+		shipments_inf
+	ORDER BY date_time DESC
+
+	;
+	
+ALTER VIEW material_fact_consumptions_rolled_list OWNER TO beton;
+
+
+-- ******************* update 30/09/2019 10:09:09 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10036',
+		'MaterialFactConsumption_Controller',
+		'get_rolled_list',
+		'MaterialFactConsumptionRolledList',
+		'Формы',
+		'Фактический расход материалов (свернуто)',
+		FALSE
+		);
+	
+
+-- ******************* update 30/09/2019 12:19:47 ******************
+
+		ALTER TABLE raw_material_map_to_production ADD COLUMN order_id int;
+
+
+
+-- ******************* update 30/09/2019 12:24:24 ******************
+-- VIEW: raw_material_map_to_production_list
+
+--DROP VIEW raw_material_map_to_production_list;
+
+CREATE OR REPLACE VIEW raw_material_map_to_production_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		materials_ref(mat) AS raw_materials_ref,
+		t.production_descr,
+		t.order_id
+	FROM raw_material_map_to_production AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	ORDER BY t.order_id,t.date_time DESC
+	;
+	
+ALTER VIEW raw_material_map_to_production_list OWNER TO beton;
+
+
+-- ******************* update 30/09/2019 12:27:22 ******************
+-- Function: public.raw_material_map_to_production_process()
+
+-- DROP FUNCTION public.raw_material_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.raw_material_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			OLD.raw_material_id,
+			OLD.production_descr::text,
+			(SELECT date_time FROM raw_material_map_to_production WHERE date_time<OLD.date_time ORDER BY date_time DESC LIMIT 1)
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.raw_material_id,
+			NEW.production_descr::text,
+			NEW.date_time
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.raw_material_id,0)<>coalesce(OLD.raw_material_id,0) OR NEW.date_time<>OLD.date_time OR NEW.production_descr<>OLD.production_descr) THEN
+		IF NEW.production_descr<>OLD.production_descr THEN
+			UPDATE material_fact_consumptions
+			SET raw_material_id = NULL
+			WHERE raw_material_production_descr=OLD.production_descr AND date_time>=OLD.date_time;			
+		END IF;
+		
+		PERFORM raw_material_map_to_production_recalc(
+			NEW.raw_material_id,
+			NEW.production_descr::text,
+			least(NEW.date_time,OLD.date_time)
+		);
+	
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' THEN
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.raw_material_map_to_production_process()
+  OWNER TO beton;
+
+

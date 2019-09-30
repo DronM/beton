@@ -932,6 +932,60 @@ $permissions = array();
 				
 					$permissions['ShipmentCancelation_Controller_get_object']=TRUE;
 				
+					$permissions['TelList_Controller_insert']=TRUE;
+				
+					$permissions['TelList_Controller_update']=TRUE;
+				
+					$permissions['TelList_Controller_delete']=TRUE;
+				
+					$permissions['TelList_Controller_get_list']=TRUE;
+				
+					$permissions['TelList_Controller_get_object']=TRUE;
+				
+					$permissions['ConcreteTypeMapToProduction_Controller_insert']=TRUE;
+				
+					$permissions['ConcreteTypeMapToProduction_Controller_update']=TRUE;
+				
+					$permissions['ConcreteTypeMapToProduction_Controller_delete']=TRUE;
+				
+					$permissions['ConcreteTypeMapToProduction_Controller_get_list']=TRUE;
+				
+					$permissions['ConcreteTypeMapToProduction_Controller_get_object']=TRUE;
+				
+					$permissions['RawMaterialMapToProduction_Controller_insert']=TRUE;
+				
+					$permissions['RawMaterialMapToProduction_Controller_update']=TRUE;
+				
+					$permissions['RawMaterialMapToProduction_Controller_delete']=TRUE;
+				
+					$permissions['RawMaterialMapToProduction_Controller_get_list']=TRUE;
+				
+					$permissions['RawMaterialMapToProduction_Controller_get_object']=TRUE;
+				
+					$permissions['VehicleMapToProduction_Controller_insert']=TRUE;
+				
+					$permissions['VehicleMapToProduction_Controller_update']=TRUE;
+				
+					$permissions['VehicleMapToProduction_Controller_delete']=TRUE;
+				
+					$permissions['VehicleMapToProduction_Controller_get_list']=TRUE;
+				
+					$permissions['VehicleMapToProduction_Controller_get_object']=TRUE;
+				
+					$permissions['MaterialFactConsumption_Controller_insert']=TRUE;
+				
+					$permissions['MaterialFactConsumption_Controller_update']=TRUE;
+				
+					$permissions['MaterialFactConsumption_Controller_delete']=TRUE;
+				
+					$permissions['MaterialFactConsumption_Controller_get_list']=TRUE;
+				
+					$permissions['MaterialFactConsumption_Controller_get_rolled_list']=TRUE;
+				
+					$permissions['MaterialFactConsumption_Controller_get_object']=TRUE;
+				
+					$permissions['MaterialFactConsumption_Controller_upload_production_file']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

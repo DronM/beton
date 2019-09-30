@@ -373,7 +373,7 @@
 			<!-- one level-->
 			<li>
 			    <a href="index.php?c={@c}&amp;f={@f}&amp;t={@t}{$TOKEN}"
-			    onclick="window.getApp().showMenuItem(this,'{@c}','{@f}','{@t}{$TOKEN}',null,'{@viewdescr}');return false;"
+			    onclick="window.getApp().showMenuItem(this,'{@c}','{@f}','{@t}',null,'{@viewdescr}');return false;"
 			    defaultItem="{@default='true'}">
 				<xsl:choose>
 				<xsl:when test="@glyphclass and string-length(@glyphclass) &gt; 0 and not(@glyphclass='null')">
@@ -596,7 +596,7 @@ throw Error(CommonHelper.longString(function () {/*
 					<ul class="dropdown-menu dropdown-menu-right">
 						<li>
 							<a href="index.php?c=User_Controller&amp;f=get_profile&amp;t=UserProfile{$TOKEN}"
-							onclick="window.getApp().showMenuItem(this,'User_Controller','get_profile','UserProfile{$TOKEN}',null,'Профиль');return false;">
+							onclick="window.getApp().showMenuItem(this,'User_Controller','get_profile','UserProfile',null,'Профиль');return false;">
 							<i class="icon-user-plus"></i> Профиль
 							</a>
 						</li>					        

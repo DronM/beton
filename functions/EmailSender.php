@@ -11,6 +11,7 @@ class EmailSender {
 				$subject,
 				$body,
 				$smsType=NULL){
+				
 		if (strlen($to)){
 			$ar = $dbLink->query_first(sprintf(
 			"INSERT INTO mail_for_sending
@@ -53,8 +54,7 @@ class EmailSender {
 			);	
 		}
 	}
-	public static function sendAllMail($delFiles,&$dbLink,
-				$smtpHost,$smtpPort,$smtpUser,$smtpPwd){
+	public static function sendAllMail($delFiles,&$dbLink,$smtpHost,$smtpPort,$smtpUser,$smtpPwd){
 		// Perform Query
 		$result = $dbLink->query(
 			"SELECT

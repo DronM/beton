@@ -687,3 +687,12 @@ td.quant_consump_editted{
 #mat_inplace_edit{
 	width:80px;
 }
+
+a.tel_in_list{
+	display:block;
+}
+
+.production_upload_no_match{
+	background-color:red !important;
+	border:2px solid red;
+}

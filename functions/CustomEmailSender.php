@@ -4,7 +4,8 @@ require_once(FRAME_WORK_PATH.'db/db_pgsql.php');
 require_once("EmailSender.php");
 
 class CustomEmailSender extends EmailSender{
-	public static function addEMail(
+
+	public static function regEMail(
 			$link,
 			$funcText,
 			$attArray=NULL,
@@ -43,14 +44,19 @@ class CustomEmailSender extends EmailSender{
 			return $mail_id;
 		}
 	}
-	public static function sendAllMail($delFiles=TRUE){
+	public static function sendAllMail($delFiles=TRUE,&$dbLink=NULL,$smtpHost=NULL,$smtpPort=NULL,$smtpUser=NULL,$smtpPwd=NULL){
+		$smtpHost = is_null($smtpHost)? SMTP_HOST:$smtpHost;
+		$smtpPort = is_null($smtpPort)? SMTP_PORT:$smtpPort;
+		$smtpUser = is_null($smtpUser)? SMTP_USER:$smtpUser;
+		$smtpPwd = is_null($smtpPwd)? SMTP_PWD:$smtpPwd;
+	
 		$dbLink = new DB_Sql();
 		$dbLink->persistent=true;
 		$dbLink->database	= DB_NAME;			
 		$dbLink->connect(DB_SERVER_MASTER,DB_USER,DB_PASSWORD);
 		
 		parent::sendAllMail($dbLink,
-				SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PWD,
+				$smtpHost,$smtpPort,$smtpUser,$smtpPwd,
 				$delFiles);
 	}
 	

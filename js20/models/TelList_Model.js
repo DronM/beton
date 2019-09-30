@@ -39,7 +39,7 @@ function TelList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.tel = new FieldString("tel",filed_options);
-	options.fields.tel.getValidator().setMaxLength('10');
+	options.fields.tel.getValidator().setMaxLength('15');
 	
 		TelList_Model.superclass.constructor.call(this,id,options);
 }

@@ -21,28 +21,20 @@ function AssignedVehicleList_View(id,options){
 	
 	this.m_noAutoRefresh = options.noAutoRefresh;
 	
-	var app = window.getApp();
-	if(!app.m_prodSite_Model){
-		(new ProductionSite_Controller()).getPublicMethod("get_list").run({
-			"async":false,
-			"ok":function(resp){
-				app.m_prodSite_Model = resp.getModel("ProductionSite_Model");
-			}
-		})
-	}
-	
 	options.addElement = function(){
 	
+		var prod_site_m = window.getApp().getProdSiteModel();
+		
 		this.m_prodSiteControlList = [];
 		
 		var model = (options.models&&options.models.AssignedVehicleList_Model)? options.models.AssignedVehicleList_Model : new AssignedVehicleList_Model();
-		app.m_prodSite_Model.reset();
-		while(app.m_prodSite_Model.getNextRow()){
-			var ps_id = app.m_prodSite_Model.getFieldValue("id");
+		prod_site_m.reset();
+		while(prod_site_m.getNextRow()){
+			var ps_id = prod_site_m.getFieldValue("id");
 			var prod_cite = new AssignedVehicleGrid(id+":prodSite"+ps_id,{
 				"model":model,
 				"prodSiteId":ps_id,
-				"prodSiteDescr":app.m_prodSite_Model.getFieldValue("name"),
+				"prodSiteDescr":prod_site_m.getFieldValue("name"),
 				"noAutoRefresh":options.noAutoRefresh,
 				"shortDestinations":options.shortDestinations,
 				"shortDescriptions":options.shortDescriptions

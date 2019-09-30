@@ -9,7 +9,7 @@ $BODY$
 		'keys',json_build_object(
 			'id',$1.id    
 			),	
-		'descr','Заявка №'||$1.number::text||' от '||to_char($1.date_time,'DD/MM/YY HH24:MI'),
+		'descr','Заявка №'||order_num($1)::text||' от '||to_char($1.date_time,'DD/MM/YY HH24:MI'),
 		'dataType','orders'
 	);
 $BODY$

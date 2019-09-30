@@ -88,6 +88,15 @@ function PumpVehicle_Model(options){
 	options.fields.comment_text = new FieldString("comment_text",filed_options);
 	options.fields.comment_text.getValidator().setMaxLength('100');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.phone_cels = new FieldJSONB("phone_cels",filed_options);
+	
 		PumpVehicle_Model.superclass.constructor.call(this,id,options);
 }
 extend(PumpVehicle_Model,ModelXML);

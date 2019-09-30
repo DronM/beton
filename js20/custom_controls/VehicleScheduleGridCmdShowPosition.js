@@ -44,13 +44,19 @@ VehicleScheduleGridCmdShowPosition.prototype.onCommand = function(){
 	var left = win_w/3;
 	var w = win_w/3*2;//left - 20;
 	
+	var href = "t=Map&v=Child";
+	var conn = window.getApp().getServConnector();
+	if(conn.getAccessTokenParam){
+		href+= "&"+conn.getAccessTokenParam()+"="+conn.getAccessToken();
+	}
+	
 	this.m_mapForm = new WindowForm({
 		"id":"MapForm",
 		"height":h,
 		"width":w,
 		"left":left,
 		"top":10,
-		"URLParams":"t=Map&v=Child",
+		"URLParams":href,
 		"name":"Map",
 		"params":{
 			"editViewOptions":{

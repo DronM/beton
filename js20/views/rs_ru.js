@@ -115,3 +115,7 @@ VehicleOwnerTotReport_View.prototype.HEAD_TITLE = "Итоги";
 
 MatTotalList_View.prototype.HEAD_TITLE = "Общая таблица";
 MatCorrectList_View.prototype.HEAD_TITLE = "Корректировка расхода материалов";
+
+ConcreteTypeMapToProductionList_View.prototype.HEAD_TITLE = "Соответствие марок в производстве и в этой программе";
+VehicleMapToProductionList_View.prototype.HEAD_TITLE = "Соответствие ТС в производстве и в этой программе";
+RawMaterialMapToProductionList_View.prototype.HEAD_TITLE = "Соответствие материалов в производстве и в этой программе";

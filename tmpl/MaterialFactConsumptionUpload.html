@@ -1,0 +1,66 @@
+<div id="{{id}}" class="panel panel-flat">
+	<div class="panel-heading">
+		<h3 class="panel-title">Загрузка файлов с заводов<a class="heading-elements-toggle"><i class="icon-more"></i></a></h3>
+	</div>
+	
+	{{#matchingEnabled}}
+	<div class="tabbable">
+		<ul class="nav nav-tabs nav-tabs-highlight">
+			<li class="active"><a href="#uploading" data-toggle="tab" aria-expanded="true">Загрузка данных</a></li>
+			<li class=""><a href="#uploaded_data" data-toggle="tab" aria-expanded="false">Данные</a></li>
+			<li class=""><a href="#matching" data-toggle="tab" aria-expanded="false">Соответствия</a></li>
+		</ul>
+	</div>
+		
+	<div class="tab-content dialogForm">
+		<div class="tab-pane fade in active" id="uploading">					
+			{{#productions}}
+			<div class="panel panel-flat">				
+				<div class="panel-heading">
+					<h4 class="panel-title">{{productionName}}
+					</h4>
+				</div>
+			
+				<div id="{{id}}:production_file_{{productionId}}">
+				</div>
+				<div id="{{id}}:cmd_uploading_{{productionId}}">
+				</div>
+			</div>
+			{{/productions}}			
+		</div>
+
+		<div class="tab-pane fade in" id="uploaded_data">
+			
+			<div id="{{id}}:material_fact_consumptions_list">
+			</div>
+		</div>
+
+		<div class="tab-pane fade in" id="matching">
+			
+			<h3>Соответствие траспортных средств в производстве и в этой программе
+			</h3>
+			<div id="{{id}}:vehicle_map_to_production_list">
+			</div>
+			
+			<h3>Соответствие марок в производстве и в этой программе
+			</h3>
+			<div id="{{id}}:concrete_type_map_to_production_list">
+			</div>
+			
+			<h3>Соответствие материалов в производстве и в этой программе
+			</h3>
+			<div id="{{id}}:raw_material_map_to_production_list">
+			</div>
+		</div>
+	</div>
+
+	{{/matchingEnabled}}
+
+	{{#matchingDisabled}}
+	{{#productions}}
+	<div id="{{id}}:production_file_{{productionId}}"/>
+	<div id="{{id}}:cmd_uploading_{{productionId}}"/>
+	{{/productions}}
+	{{/matchingDisabled}}
+	
+</div>	

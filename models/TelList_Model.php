@@ -31,7 +31,7 @@ class TelList_Model extends {
 		
 		//*** Field tel ***
 		$f_opts = array();
-		$f_opts['length']=10;
+		$f_opts['length']=15;
 		$f_opts['id']="tel";
 						
 		$f_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tel",$f_opts);

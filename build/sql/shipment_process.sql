@@ -27,6 +27,14 @@ BEGIN
 		PERFORM ra_material_consumption_remove_acts('shipment'::doc_types,NEW.id);
 	END IF;
 	
+	IF (TG_WHEN='BEFORE' AND TG_OP='UPDATE'
+	AND (OLD.vehicle_schedule_id<>NEW.vehicle_schedule_id OR OLD.id<>NEW.id)
+	)
+	THEN
+		--
+		DELETE FROM vehicle_schedule_states t WHERE t.shipment_id = OLD.id AND t.schedule_id = OLD.vehicle_schedule_id;	
+	END IF;
+	
 	-- vehicle data
 	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
 		SELECT v.load_capacity,v.plate,v.feature INTO v_vehicle_load_capacity, v_vehicle_plate,v_vehicle_feature
@@ -62,11 +70,11 @@ BEGIN
 		ORDER BY date_time DESC NULLS LAST
 		LIMIT 1;
 		
-		IF v_vehicle_state != 'free'::vehicle_states THEN
+		/*IF v_vehicle_state != 'free'::vehicle_states THEN
 			RAISE EXCEPTION 'Автомобиль "%" в статусе "%", должен быть 
 				"%"',v_vehicle_plate,get_vehicle_states_descr(v_vehicle_state),get_vehicle_states_descr('free'::vehicle_states);
 		END IF;
-		
+		*/
 	END IF;
 
 	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN

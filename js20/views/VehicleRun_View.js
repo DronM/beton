@@ -28,7 +28,7 @@ function VehicleRun_View(id,options){
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
 		"className":options.detailFilters? OrderMakeList_View.prototype.TABLE_CLASS:null,
-		"keyIds":["veh_id"],
+		"keyIds":["veh_id","st_free_start"],
 		"model":model,
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_vehicle_runs"),
@@ -55,7 +55,25 @@ function VehicleRun_View(id,options){
 			opts.events = opts.events || {};
 			opts.events.click = function(e){
 				if(e.target.tagName=="TD"){
-					self.showVehCurrentPosition(CommonHelper.unserialize(this.getAttr("keys")).veh_id);
+					var keys = CommonHelper.unserialize(this.getAttr("keys"));
+					console.dir(keys)
+					//self.getModel().
+					var key_fields = {
+						"veh_id":new FieldInt("veh_id",{"value":keys.veh_id}),
+						"st_free_start":new FieldDateTime("st_free_start",{"value":DateHelper.strtotime(keys.st_free_start)})
+					}
+					var m = self.getElement("grid").getModel();
+					m.recLocate(key_fields,true);
+					
+					var dt_to = m.getField("st_free_end");
+					if(!dt_to.isSet()){
+						dt_to = new FieldDateTime("st_free_end",{"value":DateHelper.time()});
+					}
+					self.showVehCurrentPosition(
+						keys.veh_id,
+						m.getField("st_free_start").getValueXHR(),
+						dt_to.getValueXHR()
+					);
 				}
 			}
 		},
@@ -162,8 +180,9 @@ extend(VehicleRun_View,ViewAjxList);
 
 /* public methods */
 
-VehicleRun_View.prototype.showVehCurrentPosition = function(vehicleId){
+VehicleRun_View.prototype.showVehCurrentPosition = function(vehicleId,dateFrom,dateTo){
 	var self = this;
+/*	
 	var dt_from,dt_to;
 	var m = this.getElement("grid").getModel();
 	m.reset();
@@ -174,25 +193,33 @@ VehicleRun_View.prototype.showVehCurrentPosition = function(vehicleId){
 			break;
 		}
 	}
-	
+
+return;
+*/
+//alert("vehicleId="+vehicleId+" dt_from="+dateFrom+"dt_to="+dateTo)	
 	var win_w = $( window ).width();
 	var h = $( window ).height()-20;//win_w/3*2;
 	var left = win_w/3;
 	var w = win_w/3*2;//left - 20;
 	
+	var href = "t=Map&v=Child";
+	var conn = window.getApp().getServConnector();
+	if(conn.getAccessTokenParam){
+		href+= "&"+conn.getAccessTokenParam()+"="+conn.getAccessToken();
+	}
 	this.m_mapForm = new WindowForm({
 		"id":"MapForm",
 		"height":h,
 		"width":w,
 		"left":left,
 		"top":10,
-		"URLParams":"t=Map&v=Child",
+		"URLParams":href,
 		"name":"Map",
 		"params":{
 			"editViewOptions":{
 				"vehicle":new RefType({"keys":{"id":vehicleId}}),
-				"valueFrom":dt_from,
-				"valueTo":dt_to
+				"valueFrom":dateFrom,
+				"valueTo":dateTo
 			}
 		},
 		"onClose":function(){

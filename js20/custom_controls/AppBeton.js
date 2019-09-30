@@ -102,3 +102,15 @@ AppBeton.prototype.formatCell = function(field,cell,len){
 	return res;
 }
 
+AppBeton.prototype.getProdSiteModel = function(){
+	if(!this.m_prodSite_Model){
+		var self = this;
+		(new ProductionSite_Controller()).getPublicMethod("get_list").run({
+			"async":false,
+			"ok":function(resp){
+				self.m_prodSite_Model = resp.getModel("ProductionSite_Model");
+			}
+		})
+	}
+	return this.m_prodSite_Model;
+}

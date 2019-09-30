@@ -1,3 +1,20 @@
+SELECT
+	s.*
+FROM
+(
+select clients.name,
+	(SELECT t.caller_id_num FROM ast_calls t WHERE t.client_id=clients.id AND t.call_type='in' order by start_time DESC limit 1) AS tel,
+	clients.create_date
+ from clients
+where clients.create_date>='2019-04-01' AND substring(name,1,6)='Клиент'
+ORDER BY clients.create_date
+) As s
+WHERE s.tel IS NOT NULL AND substring(s.tel,1,1)='9'
+
+
+
+
+
 DELETE FROM vehicle_owner_clients;
 INSERT INTO vehicle_owner_clients
 (vehicle_owner_id,client_id)

@@ -102,7 +102,7 @@ function PumpVehicleList_View(id,options){
 							],
 							"sortable":true
 						})						
-						
+						/*
 						,new GridCellHead(id+":grid:head:phone_cel",{
 							"value":"Телефон",
 							"columns":[
@@ -110,7 +110,58 @@ function PumpVehicleList_View(id,options){
 									"field":model.getField("phone_cel")
 									})
 							]
-						})						
+						})
+						*/						
+						,new GridCellHead(id+":grid:head:phone_cels",{
+							"value":"Телефоны",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("phone_cels"),
+									"ctrlClass":TelListGrid,
+									"ctrlOptions":{
+									},
+									"formatFunction":function(fields,cell){
+										var cell_n = cell.getNode();
+										
+										var v = fields.phone_cels.getValue();
+										if(v&&v.rows){
+											for(var j=0;j<v.rows.length;j++){
+												var tel = v.rows[j].fields.tel;
+												var tel_m = tel;
+												if(tel_m && tel_m.length==10){
+													tel_m = "+7"+tel;
+												}
+												else if(tel_m && tel_m.length==11){
+													tel_m = "+7"+tel.substr(1);
+												}
+												
+												var t_tag = document.createElement("A");
+												t_tag.className = "tel_in_list";
+												t_tag.setAttribute("href","tel:"+tel_m);
+												if(window.getWidthType()!="sm"){
+													t_tag.setAttribute("tel",tel_m);
+													EventHelper.add(t_tag,"click",function(e){
+														e.preventDefault();
+														var pm = (new Caller_Controller()).getPublicMethod("call");
+														pm.setFieldValue("tel",this.getAttribute("tel"));
+														var tel_el = this;
+														pm.run({
+															"ok":function(resp){
+																window.showTempNote("Пытаемся позвонить на номер: "+tel_el.getAttribute("tel"),null,10000);
+															}
+														})
+													});
+												}
+												t_tag.textContent = CommonHelper.maskFormat(tel,window.getApp().getPhoneEditMask());
+												cell_n.appendChild(t_tag);												
+											}
+										}
+										return "";
+									}									
+								})
+							]
+						})
+						
 						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_prices_ref",{
 							"value":"Ценовая схема",
 							"columns":[
