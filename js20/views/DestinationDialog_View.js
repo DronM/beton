@@ -29,6 +29,11 @@ function DestinationDialog_View(id,options){
 			"labelCaption":"Стоимость доставки:",
 			"editContClassName":"input-group "+window.getBsCol(4)
 		}));	
+		this.addElement(new EditFloat(id+":price_for_driver",{
+			"labelCaption":"Специальная цена для водителя:",
+			"editContClassName":"input-group "+window.getBsCol(4)
+		}));	
+		
 		this.addElement(new EditCheckBox(id+":special_price",{
 			"labelCaption":"Специальная цена:",
 			"title":"Разрешить для объекта использовать специальную цену (не по прайсу)",
@@ -63,6 +68,7 @@ function DestinationDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("time_route")})
 		,new DataBinding({"control":this.getElement("price")})
 		,new DataBinding({"control":this.getElement("special_price")})
+		,new DataBinding({"control":this.getElement("price_for_driver")})
 	];
 	this.setDataBindings(r_bd);
 	
@@ -71,6 +77,7 @@ function DestinationDialog_View(id,options){
 		new CommandBinding({"control":this.getElement("name")})
 		,new CommandBinding({"control":this.getElement("distance")})
 		,new CommandBinding({"control":this.getElement("time_route")})
+		,new CommandBinding({"control":this.getElement("price_for_driver")})
 		,new CommandBinding({
 			"control":this.getElement("price"),
 			"func":function(pm){

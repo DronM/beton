@@ -44,7 +44,9 @@ CREATE OR REPLACE VIEW public.destinations_dialog AS
 		destinations.special_price,
 		
 		replace(replace(st_astext(destinations.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS zone_str,
-		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str
+		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str,
+		
+		price_for_driver
 		
 	FROM destinations;
 

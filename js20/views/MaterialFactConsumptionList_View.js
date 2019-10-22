@@ -108,7 +108,7 @@ function MaterialFactConsumptionList_View(id,options){
 									"ctrlOptions":{
 										"labelCaption":"",
 										"enabled":false
-									},
+									}
 								})
 							]
 						})

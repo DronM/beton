@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class LabEntryList_Model extends ModelSQLBeton{
 	
@@ -19,10 +20,11 @@ class LabEntryList_Model extends ModelSQLBeton{
 		
 		$this->setDbName("public");
 		
-		$this->setTableName("lab_entry_list_view");
+		$this->setTableName("lab_entry_list");
 			
 		//*** Field id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="id";
 						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
@@ -32,6 +34,7 @@ class LabEntryList_Model extends ModelSQLBeton{
 		//*** Field shipment_id ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="shipment_id";
 						
 		$f_shipment_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_id",$f_opts);
@@ -46,28 +49,38 @@ class LabEntryList_Model extends ModelSQLBeton{
 		$this->addField($f_date_time);
 		//********************
 		
-		//*** Field ship_date_time_descr ***
+		//*** Field production_sites_ref ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Дата';
-		$f_opts['id']="ship_date_time_descr";
+		$f_opts['alias']='Завод';
+		$f_opts['id']="production_sites_ref";
 						
-		$f_ship_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time_descr",$f_opts);
-		$this->addField($f_ship_date_time_descr);
+		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
+		$this->addField($f_production_sites_ref);
 		//********************
 		
-		//*** Field concrete_type_descr ***
+		//*** Field production_site_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="production_site_id";
+						
+		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
+		$this->addField($f_production_site_id);
+		//********************
+		
+		//*** Field concrete_types_ref ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Марка';
-		$f_opts['id']="concrete_type_descr";
+		$f_opts['id']="concrete_types_ref";
 						
-		$f_concrete_type_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_descr",$f_opts);
-		$this->addField($f_concrete_type_descr);
+		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
+		$this->addField($f_concrete_types_ref);
 		//********************
 		
 		//*** Field concrete_type_id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="concrete_type_id";
 						
 		$f_concrete_type_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_id",$f_opts);
@@ -128,20 +141,21 @@ class LabEntryList_Model extends ModelSQLBeton{
 		
 		//*** Field client_id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="client_id";
 						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
 		//********************
 		
-		//*** Field client_descr ***
+		//*** Field clients_ref ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Заказчик';
-		$f_opts['id']="client_descr";
+		$f_opts['id']="clients_ref";
 						
-		$f_client_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_descr",$f_opts);
-		$this->addField($f_client_descr);
+		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
+		$this->addField($f_clients_ref);
 		//********************
 		
 		//*** Field client_phone ***
@@ -154,14 +168,23 @@ class LabEntryList_Model extends ModelSQLBeton{
 		$this->addField($f_client_phone);
 		//********************
 		
-		//*** Field destination_descr ***
+		//*** Field destination_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="destination_id";
+						
+		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
+		$this->addField($f_destination_id);
+		//********************
+		
+		//*** Field destinations_ref ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Объект';
-		$f_opts['id']="destination_descr";
+		$f_opts['id']="destinations_ref";
 						
-		$f_destination_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_descr",$f_opts);
-		$this->addField($f_destination_descr);
+		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
+		$this->addField($f_destinations_ref);
 		//********************
 		
 		//*** Field ok2 ***

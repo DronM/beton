@@ -65,6 +65,15 @@ function VehicleScheduleMakeOrderList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.driver_tel = new FieldString("driver_tel",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.owner = new FieldString("owner",filed_options);
 	
 				

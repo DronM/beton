@@ -14,44 +14,6 @@
 function RawMaterialConsRateGrid(id,options){
 	options = options || {};	
 	
-	var contr = new RawMaterialConsRate_Controller();
-	
-	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
-	window.getApp().getConstantManager().get(constants);
-	
-	var popup_menu = new PopUpMenu();
-	var pagClass = window.getApp().getPaginationClass();
-	
-	CommonHelper.merge(options,{
-		"keyIds":["rate_date_id"],
-		"controller":contr,
-		"editInline":null,
-		"editWinClass":null,
-		"commands":new GridCmdContainerAjx(id+":cmd",{
-			"cmdInsert":false,
-			"cmdInsert":false,
-			"cmdDelete":false,
-			"cmdFilter":true,
-			"filters":null,
-			"cmdSearch":false,
-			"variantStorage":options.variantStorage
-		}),
-		"filters":(options.detailFilters&&options.detailFilters.RawMaterialConsRateList_Model)? options.detailFilters.RawMaterialConsRateList_Model:null,
-		"popUpMenu":popup_menu,
-		"head":new GridHead(id+":head",{
-			"elements":[
-				new GridRow(id+":head:row0")
-			]		
-		}),
-		"pagination":new pagClass(id+"_page",
-			{"countPerPage":constants.doc_per_page_count.getValue()}),		
-		
-		"autoRefresh":options.detailFilters? true:false,
-		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
-		"rowSelect":false,
-		"focus":true
-	});	
-	
 	RawMaterialConsRateGrid.superclass.constructor.call(this,id,options);
 }
 
@@ -66,6 +28,17 @@ extend(RawMaterialConsRateGrid,GridAjx);
 
 
 /* public methods */
+RawMaterialConsRateGrid.prototype.initEditView = function(parent,replacedNode,cmd){
+
+	RawMaterialConsRateGrid.superclass.initEditView.call(this,parent,replacedNode,cmd);
+	
+	var fields = this.m_model.getFields();
+	var pm = this.m_editViewObj.getWritePublicMethod();
+	for(var i=1;i<=10;i++){
+		pm.setFieldValue("mat"+i+"_id",fields["mat"+i+"_id"].getValue());
+	}
+}
+
 RawMaterialConsRateGrid.prototype.onGetData = function(resp){
 	var mat_m = resp? resp.getModel("RawMaterial_Model") : null;
 	
@@ -79,29 +52,41 @@ RawMaterialConsRateGrid.prototype.onGetData = function(resp){
 		"value":"Марка бетона",
 		"columns":[
 			new GridColumn({
-				"field":this.m_model.getField("concrete_type_descr")
+				"field":this.getModel().getField("concrete_type_descr"),
+				"ctrlClass":EditString,
+				"ctrlOptions":{
+					"enabled":false,
+					"cmdClear":false
+				}
 			})
 		]
 	}));
 	
-	var mat_ind = 0;		
-	while(mat_m.getNextRow()){
-		mat_ind++;
-		var col_mat_id = mat_m.getFieldValue("id");
-		var col_id = "mat_"+mat_ind+"_rate";
-		h_row.addElement(new GridCellHead(h_row.getId()+":"+col_id,{
-			"value":mat_m.getFieldValue("name"),
-			"colAttrs":{"material_id":col_mat_id,"align":"right"},
-			"columns":[
-				new GridColumnFloat({
-					"fieldId":col_id
-				})
-			]
-		}));		
-	}
+	if(mat_m){
+		var mat_ind = 0;		
+		while(mat_m.getNextRow()){
+			mat_ind++;
+			var col_mat_id = mat_m.getFieldValue("id");
+			var col_id = "mat"+mat_ind+"_rate";
+			h_row.addElement(new GridCellHead(h_row.getId()+":"+col_id,{
+				"value":mat_m.getFieldValue("name"),
+				"colAttrs":{"material_id":col_mat_id,"align":"right"},
+				"columns":[
+					new GridColumnFloat({
+						"field":this.getModel().getField(col_id),
+						"precision":"4",
+						"ctrlClass":EditFloat,						
+						"ctrlOptions":{
+							"precision":4
+						}
+					})
+				]
+			}));
+		}
+	}		
 	
-	this.getHead().toDOM();		
-	
+	this.getHead().toDOM();	
+	//debugger
 	RawMaterialConsRateGrid.superclass.onGetData.call(this,resp);
 }
 

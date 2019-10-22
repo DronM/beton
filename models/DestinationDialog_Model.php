@@ -62,6 +62,14 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		$this->addField($f_price);
 		//********************
 		
+		//*** Field price_for_driver ***
+		$f_opts = array();
+		$f_opts['id']="price_for_driver";
+						
+		$f_price_for_driver=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price_for_driver",$f_opts);
+		$this->addField($f_price_for_driver);
+		//********************
+		
 		//*** Field zone_str ***
 		$f_opts = array();
 		$f_opts['id']="zone_str";

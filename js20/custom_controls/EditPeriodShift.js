@@ -134,6 +134,10 @@ EditPeriodShift.prototype.getDateFrom = function(){
 	return this.m_dateFrom;
 }
 
+EditPeriodShift.prototype.getDateTo = function(){
+	return this.m_dateTo;
+}
+
 EditPeriodShift.prototype.calcDateTo = function(){	
 	this.m_dateTo = new Date(this.m_dateFrom.getTime() + this.m_shiftLengthMS - 1000);
 }

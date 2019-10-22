@@ -104,6 +104,8 @@ $permissions = array();
 				
 					$permissions['Order_Controller_get_make_orders_form']=TRUE;
 				
+					$permissions['Order_Controller_get_make_orders_for_lab_form']=TRUE;
+				
 					$permissions['Order_Controller_get_make_orders_list']=TRUE;
 				
 					$permissions['Order_Controller_get_make_orders_for_lab_list']=TRUE;
@@ -195,8 +197,6 @@ $permissions = array();
 					$permissions['RAMaterialConsumption_Controller_get_dates_list']=TRUE;
 				
 					$permissions['RAMaterialConsumption_Controller_get_docs_list']=TRUE;
-				
-					$permissions['RawMaterialConsRate_Controller_insert']=TRUE;
 				
 					$permissions['RawMaterialConsRate_Controller_update']=TRUE;
 				

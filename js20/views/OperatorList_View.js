@@ -306,6 +306,16 @@ function OperatorList_View(id,options){
 		DOMHelper.setText(document.getElementById(self.getId()+":prod_site_title"),n);
 		
 		self.m_gridOnGetData.call(self.getElement("grid"),resp);
+		
+		var new_data = this.m_model.getData().toString();
+		var new_data_h = CommonHelper.md5(new_data);
+		if(!this.m_oldDataHash || this.m_oldDataHash!=new_data_h){
+			if(this.m_oldDataHash!=undefined){
+				window.getApp().makeGridNewDataSound();
+			}
+			this.m_oldDataHash = new_data_h;
+		}
+		
 	}
 }
 extend(OperatorList_View,ViewAjxList);

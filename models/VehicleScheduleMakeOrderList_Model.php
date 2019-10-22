@@ -55,6 +55,14 @@ class VehicleScheduleMakeOrderList_Model extends {
 		$this->addField($f_drivers_ref);
 		//********************
 		
+		//*** Field driver_tel ***
+		$f_opts = array();
+		$f_opts['id']="driver_tel";
+						
+		$f_driver_tel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_tel",$f_opts);
+		$this->addField($f_driver_tel);
+		//********************
+		
 		//*** Field owner ***
 		$f_opts = array();
 		$f_opts['id']="owner";

@@ -153,11 +153,14 @@ extend(LabEntry_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldDateTime("date_time",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Дата";
-	pm.addField(new FieldString("ship_date_time_descr",f_opts));
+	f_opts.alias = "Завод";
+	pm.addField(new FieldJSON("production_sites_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("production_site_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Марка";
-	pm.addField(new FieldString("concrete_type_descr",f_opts));
+	pm.addField(new FieldJSON("concrete_types_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("concrete_type_id",f_opts));
@@ -184,13 +187,16 @@ extend(LabEntry_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("client_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Заказчик";
-	pm.addField(new FieldString("client_descr",f_opts));
+	pm.addField(new FieldJSON("clients_ref",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Телефон";
 	pm.addField(new FieldString("client_phone",f_opts));
 	var f_opts = {};
+	
+	pm.addField(new FieldInt("destination_id",f_opts));
+	var f_opts = {};
 	f_opts.alias = "Объект";
-	pm.addField(new FieldString("destination_descr",f_opts));
+	pm.addField(new FieldJSON("destinations_ref",f_opts));
 	var f_opts = {};
 	f_opts.alias = "ОК2";
 	pm.addField(new FieldText("ok2",f_opts));

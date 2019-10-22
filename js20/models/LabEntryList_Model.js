@@ -53,10 +53,19 @@ function LabEntryList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Дата';
+	filed_options.alias = 'Завод';
 	filed_options.autoInc = false;	
 	
-	options.fields.ship_date_time_descr = new FieldString("ship_date_time_descr",filed_options);
+	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
 	
 				
 	
@@ -65,7 +74,7 @@ function LabEntryList_Model(options){
 	filed_options.alias = 'Марка';
 	filed_options.autoInc = false;	
 	
-	options.fields.concrete_type_descr = new FieldString("concrete_type_descr",filed_options);
+	options.fields.concrete_types_ref = new FieldJSON("concrete_types_ref",filed_options);
 	
 				
 	
@@ -146,7 +155,7 @@ function LabEntryList_Model(options){
 	filed_options.alias = 'Заказчик';
 	filed_options.autoInc = false;	
 	
-	options.fields.client_descr = new FieldString("client_descr",filed_options);
+	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
 	
 				
 	
@@ -161,10 +170,19 @@ function LabEntryList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.destination_id = new FieldInt("destination_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Объект';
 	filed_options.autoInc = false;	
 	
-	options.fields.destination_descr = new FieldString("destination_descr",filed_options);
+	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
 	
 				
 	

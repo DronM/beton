@@ -86,6 +86,16 @@ class Destination_Model extends ModelSQLBeton{
 		$f_special_price=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"special_price",$f_opts);
 		$this->addField($f_special_price);
 		//********************
+		
+		//*** Field price_for_driver ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['defaultValue']='0';
+		$f_opts['id']="price_for_driver";
+						
+		$f_price_for_driver=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price_for_driver",$f_opts);
+		$this->addField($f_price_for_driver);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

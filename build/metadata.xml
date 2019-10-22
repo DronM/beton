@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-09-30 16:33:48</lastBuild></version>
+		<lastBuild>2019-10-22 05:45:31</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -58,6 +58,7 @@
 		<version dateOpen="2019-08-06 18:08:53" dateClose="2019-08-07 05:08:41">1.00152</version>
 		<version dateOpen="2019-08-07 05:08:48" dateClose="2019-08-07 06:08:29">1.00153</version>
 		<version dateOpen="2019-08-07 13:08:38" dateClose="2019-09-30 16:09:33">1.00154</version>
+		<version dateOpen="2019-10-01 09:10:52" dateClose="2019-10-22 05:10:45">1.00155</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -509,6 +510,7 @@
 			<field id="price" dataType="Float" alias="Стоимость"/>
 			<field id="zone" dataType="String"/>
 			<field id="special_price" dataType="Bool" defaultValue="FALSE"/>
+			<field id="price_for_driver" dataType="Float" length="15" precision="2" defaultValue="0"/>
 			<index id="destination_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -523,7 +525,7 @@
 			<field id="time_route" dataType="Time"/>
 			<field id="special_price" dataType="Bool"/>
 			<field id="price" dataType="String"/>
-			<field id="special_price" dataType="Bool"/>
+			<field id="price_for_driver" dataType="Bool"/>
 		</model>
 		<model id="DestinationDialog" parent="ModelSQLBeton" dataTable="destinations_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -531,6 +533,7 @@
 			<field id="distance" dataType="String"/>
 			<field id="time_route" dataType="String"/>
 			<field id="price" dataType="Float"/>
+			<field id="price_for_driver" dataType="Float"/>
 			<field id="zone_str" dataType="String"/>
 			<field id="zone_center_str" dataType="String"/>
 			<field id="special_price" dataType="Bool"/>
@@ -676,6 +679,31 @@
 			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id" alias="Марка бетона" primaryKey="TRUE"/>
 			<field id="raw_material_id" dataType="Int" refTable="raw_materials" refField="id" alias="Материал" primaryKey="TRUE"/>
 			<field id="rate" dataType="Float" length="19" precision="4" alias="Расход"/>
+		</model>
+		<model id="RawMaterialConsRateList" parent="ModelSQLBeton" dataTable="raw_material_cons_rates_list" virtual="TRUE">
+			<field id="rate_date_id" dataType="Int" required="TRUE" primaryKey="TRUE"/>
+			<field id="concrete_type_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="mat1_id" dataType="Int"/>
+			<field id="mat2_id" dataType="Int"/>
+			<field id="mat3_id" dataType="Int"/>
+			<field id="mat4_id" dataType="Int"/>
+			<field id="mat5_id" dataType="Int"/>
+			<field id="mat6_id" dataType="Int"/>
+			<field id="mat7_id" dataType="Int"/>
+			<field id="mat8_id" dataType="Int"/>
+			<field id="mat9_id" dataType="Int"/>
+			<field id="mat10_id" dataType="Int"/>
+			<field id="mat1_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat2_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat3_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat4_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat5_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat6_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat7_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat8_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat9_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat10_rate" dataType="Float" length="19" precision="4"/>
 		</model>
 		<model id="RawMaterialConsRateDateList" parent="ModelSQLBeton" dataTable="raw_material_cons_rates_dates_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
@@ -912,6 +940,34 @@
 			<field id="pump_vehicles_ref" dataType="JSON"/>
 			<field id="pump_prices_ref" dataType="JSON"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ"/>
+		</model>
+		<model id="OrderMakeForLabList" parent="ModelSQLBeton" dataTable="orders_make_for_lab_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="clients_ref" dataType="JSON"/>
+			<field id="destinations_ref" dataType="JSON"/>
+			<field id="concrete_types_ref" dataType="JSON"/>
+			<field id="unload_type" dataType="String"/>
+			<field id="comment_text" dataType="Text"/>
+			<field id="descr" dataType="Text"/>
+			<field id="phone_cel" dataType="String"/>
+			<field id="unload_speed" dataType="Float"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="date_time_to" dataType="Time"/>
+			<field id="quant" dataType="Float"/>
+			<field id="quant_rest" dataType="Float"/>
+			<field id="quant_ordered_before_now" dataType="Float"/>
+			<field id="quant_shipped_before_now" dataType="Float"/>
+			<field id="quant_shipped_day_before_now" dataType="Float"/>
+			<field id="quant_ordered_day" dataType="Float"/>
+			<field id="no_ship_mark" dataType="Bool"/>
+			<field id="payed" dataType="Bool"/>
+			<field id="under_control" dataType="Bool"/>
+			<field id="pay_cash" dataType="Bool"/>
+			<field id="pump_vehicle_owners_ref" dataType="JSON"/>
+			<field id="total" dataType="Float"/>
+			<field id="pump_vehicle_length" dataType="Int"/>
+			<field id="pump_vehicle_comment" dataType="String"/>
+			<field id="is_needed" dataType="Bool"/>
 		</model>
 		<model id="ProductionSite" parent="ModelSQLBeton" dataTable="production_sites" virtual="FALSE">
 			<defaultOrder>
@@ -1686,23 +1742,25 @@
 			<field id="ok2" dataType="Text" alias="OK2"/>
 			<field id="time" dataType="Text" alias="Время"/>
 		</model>
-		<model id="LabEntryList" parent="ModelSQLBeton" dataTable="lab_entry_list_view" virtual="TRUE">
-			<field id="id" dataType="Int"/>
-			<field id="shipment_id" dataType="Int" primaryKey="TRUE"/>
+		<model id="LabEntryList" parent="ModelSQLBeton" dataTable="lab_entry_list" virtual="TRUE">
+			<field id="id" dataType="Int" sysCol="TRUE"/>
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="date_time" dataType="DateTime"/>
-			<field id="ship_date_time_descr" dataType="String" alias="Дата"/>
-			<field id="concrete_type_descr" dataType="String" alias="Марка"/>
-			<field id="concrete_type_id" dataType="Int"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
+			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
 			<field id="ok" dataType="Int"/>
 			<field id="weight" dataType="Int"/>
 			<field id="p7" dataType="String"/>
 			<field id="p28" dataType="String"/>
 			<field id="samples" dataType="Text" alias="Подборы"/>
 			<field id="materials" dataType="Text" alias="Материалы"/>
-			<field id="client_id" dataType="Int"/>
-			<field id="client_descr" dataType="String" alias="Заказчик"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
+			<field id="clients_ref" dataType="JSON" alias="Заказчик"/>
 			<field id="client_phone" dataType="String" alias="Телефон"/>
-			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
 			<field id="ok2" dataType="Text" alias="ОК2"/>
 			<field id="time" dataType="Text" alias="Время"/>
 			<sql/>
@@ -1717,21 +1775,38 @@
 				<field id="shipment_id"/>
 			</index>
 		</model>
-		<model id="LabEntryDetailList" parent="ModelSQLBeton" dataTable="lab_entry_detail_list_view" virtual="TRUE">
+		<model id="LabEntryDetailList" parent="ModelSQLBeton" dataTable="lab_entry_detail_list" virtual="TRUE">
 			<field id="shipment_id" dataType="Int" primaryKey="TRUE"/>
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="code" dataType="String"/>
-			<field id="ship_date_time_descr" dataType="String" alias="Дата"/>
-			<field id="concrete_type_descr" dataType="String" alias="Марка"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Дата"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
 			<field id="ok" dataType="Int" alias="ОК"/>
 			<field id="weight" dataType="Int" alias="Масса"/>
 			<field id="p7" dataType="Int" alias="П7%"/>
 			<field id="p28" dataType="Int" alias="П28%"/>
-			<field id="p_date_descr" dataType="String" alias="Дата"/>
+			<field id="p_date" dataType="Date" alias="Дата"/>
 			<field id="kn" dataType="Int"/>
 			<field id="mpa" dataType="Int"/>
 			<field id="mpa_avg" dataType="String"/>
 			<field id="pres_norm" dataType="String"/>
+			<sql/>
+		</model>
+		<model id="LabEntry30DaysList" parent="ModelSQLBeton" dataTable="lab_entry_30days_2" virtual="TRUE">
+			<field id="concrete_type_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="concrete_type_descr" dataType="String" alias="Марка"/>
+			<field id="cnt" dataType="Int" alias="Всего машин"/>
+			<field id="day_cnt" dataType="Int" alias="Всего по будням"/>
+			<field id="selected_cnt" dataType="Int" alias="Отбор по будням"/>
+			<field id="selected_avg_cnt" dataType="JSON" alias="Отбор по будням"/>
+			<field id="need_cnt" dataType="Int" alias="Надо еще"/>
+			<field id="ok" dataType="Int" alias="ОК"/>
+			<field id="p7" dataType="Int" alias="П7%"/>
+			<field id="p28" dataType="Int" alias="П28%"/>
+			<field id="selected_cnt2" dataType="Int" alias="Отбор"/>
+			<field id="ok2" dataType="Int" alias="ОК"/>
+			<field id="p72" dataType="Int" alias="П7%"/>
+			<field id="p282" dataType="Int" alias="П28%"/>
 			<sql/>
 		</model>
 		<model id="OrderFromClient" parent="ModelSQLBeton" dataTable="orders_from_clients" virtual="FALSE">
@@ -2218,6 +2293,7 @@
 			<field id="vehicles_count" dataType="Int"/>
 			<field id="vehicles_ref" dataType="JSON"/>
 			<field id="drivers_ref" dataType="JSON"/>
+			<field id="driver_tel" dataType="String"/>
 			<field id="owner" dataType="String"/>
 			<field id="vehicle_owners_ref" dataType="JSON"/>
 			<field id="load_capacity" dataType="Int"/>
@@ -2604,6 +2680,7 @@
 		<constant id="show_time_for_shipped_vehicles" name="Время показа отргруженных ТС" descr="Время, в течении которого показывать отгруженные ТС на большом экране" dataType="Interval" defaultValue="00:30"/>
 		<constant id="tracker_malfunction_tel_list" name="Список телефонов для сообщений о неисправном трекере" descr="На какие телефоны отправлять сообщение о неработающих трекерах" dataType="JSON"/>
 		<constant id="low_efficiency_tel_list" name="Список телефонов для сообщений о низком состоянии эффективности" descr="На какие телефоны отправлять сообщение о низком состоянии эффективности" dataType="JSON"/>
+		<constant id="material_closed_balance_date" name="Дата закрытого периода остатков" descr="Дата, раньше который период закрыт для редактирования" dataType="Date"/>
 	</constants>
 	<controllers>
 		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -2713,6 +2790,9 @@
 			<publicMethod id="get_make_orders_form">
 				<field id="date" dataType="Date"/>
 			</publicMethod>
+			<publicMethod id="get_make_orders_for_lab_form">
+				<field id="date" dataType="Date"/>
+			</publicMethod>
 			<publicMethod id="get_make_orders_list" modelId="OrderMakeList">
 				<field id="id" dataType="Int" condFields="TRUE"/>
 			</publicMethod>
@@ -2812,11 +2892,42 @@
 			<publicMethod id="get_docs_list" condFields="TRUE" modelId="RAMaterialConsumptionDocList"/>
 		</controller>
 		<controller id="RawMaterialConsRate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
-			<publicMethod id="insert" modelId="RawMaterialConsRate"/>
-			<publicMethod id="update" modelId="RawMaterialConsRate"/>
+			<publicMethod id="update" modelId="RawMaterialConsRateList">
+				<field id="mat1_id" dataType="Int"/>
+				<field id="mat2_id" dataType="Int"/>
+				<field id="mat3_id" dataType="Int"/>
+				<field id="mat4_id" dataType="Int"/>
+				<field id="mat5_id" dataType="Int"/>
+				<field id="mat6_id" dataType="Int"/>
+				<field id="mat7_id" dataType="Int"/>
+				<field id="mat8_id" dataType="Int"/>
+				<field id="mat9_id" dataType="Int"/>
+				<field id="mat10_id" dataType="Int"/>
+				<field id="mat1_rate" dataType="Float"/>
+				<field id="mat2_rate" dataType="Float"/>
+				<field id="mat3_rate" dataType="Float"/>
+				<field id="mat4_rate" dataType="Float"/>
+				<field id="mat5_rate" dataType="Float"/>
+				<field id="mat6_rate" dataType="Float"/>
+				<field id="mat7_rate" dataType="Float"/>
+				<field id="mat8_rate" dataType="Float"/>
+				<field id="mat9_rate" dataType="Float"/>
+				<field id="mat10_rate" dataType="Float"/>
+			</publicMethod>
 			<publicMethod id="delete" modelId="RawMaterialConsRate"/>
 			<publicMethod id="get_list" modelId="RawMaterialConsRateList"/>
-			<publicMethod id="get_object" modelId="RawMaterialConsRate"/>
+			<publicMethod id="get_object" modelId="RawMaterialConsRateList">
+				<field id="mat1_id" dataType="Int"/>
+				<field id="mat2_id" dataType="Int"/>
+				<field id="mat3_id" dataType="Int"/>
+				<field id="mat4_id" dataType="Int"/>
+				<field id="mat5_id" dataType="Int"/>
+				<field id="mat6_id" dataType="Int"/>
+				<field id="mat7_id" dataType="Int"/>
+				<field id="mat8_id" dataType="Int"/>
+				<field id="mat9_id" dataType="Int"/>
+				<field id="mat10_id" dataType="Int"/>
+			</publicMethod>
 			<publicMethod id="raw_material_cons_report" condFields="TRUE">
 				<field id="grp_fields" dataType="String"/>
 				<field id="agg_fields" dataType="String"/>
@@ -3683,6 +3794,8 @@
 		<view id="30013" c="RawMaterial_Controller" t="MatTotalList" f="total_list" section="Формы" descr="Общая таблица"/>
 		<view id="30014" c="RawMaterial_Controller" t="MatCorrectList" f="correct_list" section="Формы" descr="Корректировка расхода"/>
 		<view id="30015" t="MaterialFactConsumptionUpload" section="Формы" descr="Загрузка данных с завода"/>
+		<view id="30016" c="LabEntry_Controller" t="LabEntryList" f="get_list" section="Формы" descr="Журнал испытания образцов"/>
+		<view id="30017" c="Order_Controller" t="OrderMakeForLabList" f="get_make_orders_for_lab_form" section="Формы" descr="Заявки онлайн (лаборант)"/>
 		<view id="10035" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionList" f="get_list" section="Формы" descr="Фактический расход материалов"/>
 		<view id="10036" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionRolledList" f="get_rolled_list" section="Формы" descr="Фактический расход материалов (свернуто)"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
@@ -3784,6 +3897,8 @@
 		<serverTemplate id="ConcreteTypeMapToProductionList"/>
 		<serverTemplate id="MaterialFactConsumptionList"/>
 		<serverTemplate id="MaterialFactConsumptionRolledList"/>
+		<serverTemplate id="LabEntryList"/>
+		<serverTemplate id="LabEntryDetailList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -4322,6 +4437,9 @@
 		<jsScript file="views/MaterialFactConsumptionUpload_View.js"/>
 		<jsScript file="views/MaterialFactConsumptionList_View.js"/>
 		<jsScript file="views/MaterialFactConsumptionRolledList_View.js"/>
+		<jsScript file="views/LabEntryList_View.js"/>
+		<jsScript file="views/LabEntryDetailList_View.js"/>
+		<jsScript file="views/OrderMakeForLabList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -4419,6 +4537,7 @@
 		<jsScript file="custom_controls/MatTotalGrid.js"/>
 		<jsScript file="custom_controls/MatCorrectGrid.js"/>
 		<jsScript file="custom_controls/TelListGrid.js"/>
+		<jsScript file="custom_controls/VehicleScheduleMakeOrderGrid.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -4680,6 +4799,9 @@
 		<jsScript file="controllers/MaterialFactConsumption_Controller.js"/>
 		<jsScript file="models/MaterialFactConsumptionList_Model.js"/>
 		<jsScript file="models/MaterialFactConsumptionRolledList_Model.js"/>
+		<jsScript file="models/RawMaterialConsRateList_Model.js"/>
+		<jsScript file="models/OrderMakeForLabList_Model.js"/>
+		<jsScript file="models/LabEntry30DaysList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

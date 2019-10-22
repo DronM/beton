@@ -1,0 +1,19 @@
+--select * from rg_materials where material_id=7 AND date_time='3000-01-01 00:00:00'
+/*(select quant+
+( select sum(quant*CASE WHEN deb THEN 1 ELSE -1 END) from ra_materials where material_id=7 and date_time>='2019-10-01 00:00:00' ) 
+from rg_materials where material_id=7 AND date_time='2019-09-01 00:00:00')
+*/
+update rg_materials
+set quant=
+(select quant+
+( select sum(quant*CASE WHEN deb THEN 1 ELSE -1 END) from ra_materials where material_id=7 and date_time>='2019-10-01 00:00:00' ) 
+from rg_materials where material_id=7 AND date_time='2019-09-01 00:00:00')
+where material_id=7 and date_time='3000-01-01 00:00:00'
+
+
+ra_materials_process()
+
+					IF NEW.date_time<=const_material_closed_balance_date_val() THEN
+						RAISE EXCEPTION 'Период закрыт для редактировани!';
+					END IF;
+

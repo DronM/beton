@@ -62,7 +62,6 @@ function DestinationList_View(id,options){
 								})
 							]
 						})
-						
 					]
 				})
 			]

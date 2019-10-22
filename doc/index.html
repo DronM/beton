@@ -135,6 +135,7 @@
 <li><a href="#RawMaterialMinQuant_Model">RawMaterialMinQuant_Model</a></li>
 <li><a href="#RawMaterialConsRateDate_Model">RawMaterialConsRateDate_Model</a></li>
 <li><a href="#RawMaterialConsRate_Model">RawMaterialConsRate_Model</a></li>
+<li><a href="#RawMaterialConsRateList_Model">RawMaterialConsRateList_Model</a></li>
 <li><a href="#RawMaterialConsRateDateList_Model">RawMaterialConsRateDateList_Model</a></li>
 <li><a href="#PumpPrice_Model">PumpPrice_Model</a></li>
 <li><a href="#PumpPriceValue_Model">PumpPriceValue_Model</a></li>
@@ -148,6 +149,7 @@
 <li><a href="#Offer_Model">Offer_Model</a></li>
 <li><a href="#OrderMakeList_Model">OrderMakeList_Model</a></li>
 <li><a href="#OrderDialog_Model">OrderDialog_Model</a></li>
+<li><a href="#OrderMakeForLabList_Model">OrderMakeForLabList_Model</a></li>
 <li><a href="#ProductionSite_Model">ProductionSite_Model</a></li>
 <li><a href="#Shipment_Model">Shipment_Model</a></li>
 <li><a href="#ShipmentList_Model">ShipmentList_Model</a></li>
@@ -200,6 +202,7 @@
 <li><a href="#LabEntryList_Model">LabEntryList_Model</a></li>
 <li><a href="#LabEntryDetail_Model">LabEntryDetail_Model</a></li>
 <li><a href="#LabEntryDetailList_Model">LabEntryDetailList_Model</a></li>
+<li><a href="#LabEntry30DaysList_Model">LabEntry30DaysList_Model</a></li>
 <li><a href="#OrderFromClient_Model">OrderFromClient_Model</a></li>
 <li><a href="#OrderFromClientList_Model">OrderFromClientList_Model</a></li>
 <li><a href="#SupplierOrder_Model">SupplierOrder_Model</a></li>
@@ -1324,6 +1327,17 @@
 								Нет</p>
 </div>
 </div>
+<h2>get_make_orders_for_lab_form</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>date</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Date</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 <h2>get_make_orders_list</h2>
 <a href="#OrderMakeList_Model">Model: OrderMakeList_Model</a><h2>get_make_orders_for_lab_list</h2>
 <p>Arguments:</p>
@@ -1659,12 +1673,11 @@
 <div class="content_item">
 <p class="big"></p>
 <p>Методы:</p>
-<h2>insert</h2>
-<a href="#RawMaterialConsRate_Model">Model: RawMaterialConsRate_Model</a><h2>update</h2>
-<a href="#RawMaterialConsRate_Model">Model: RawMaterialConsRate_Model</a><h2>delete</h2>
+<h2>update</h2>
+<a href="#RawMaterialConsRateList_Model">Model: RawMaterialConsRateList_Model</a><h2>delete</h2>
 <a href="#RawMaterialConsRate_Model">Model: RawMaterialConsRate_Model</a><h2>get_list</h2>
 <a href="#RawMaterialConsRateList_Model">Model: RawMaterialConsRateList_Model</a><h2>get_object</h2>
-<a href="#RawMaterialConsRate_Model">Model: RawMaterialConsRate_Model</a><h2>raw_material_cons_report</h2>
+<a href="#RawMaterialConsRateList_Model">Model: RawMaterialConsRateList_Model</a><h2>raw_material_cons_report</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>grp_fields</h3>
@@ -4447,6 +4460,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>price_for_driver</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
 </div>
 </div>
 <div id="DestinationDialog_Model" class="content_box">
@@ -4478,6 +4497,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price_for_driver</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -4543,7 +4568,7 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>special_price</h2>
+<h2>price_for_driver</h2>
 <div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -5025,6 +5050,96 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="LabEntry30DaysList_Model" class="content_box">
+<h1>LabEntry30DaysList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>concrete_type_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cnt</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>day_cnt</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>selected_cnt</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>selected_avg_cnt</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>need_cnt</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ok</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>p7</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>p28</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>selected_cnt2</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ok2</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>p72</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>p282</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="LabEntryDetail_Model" class="content_box">
 <h1>LabEntryDetail_Model</h1>
 <div class="content_item">
@@ -5083,14 +5198,14 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>ship_date_time_descr</h2>
-<div>Type:String</div>
+<h2>ship_date_time</h2>
+<div>Type:DateTime</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>concrete_type_descr</h2>
-<div>Type:String</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -5119,8 +5234,8 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>p_date_descr</h2>
-<div>Type:String</div>
+<h2>p_date</h2>
+<div>Type:Date</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -5173,14 +5288,20 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>ship_date_time_descr</h2>
-<div>Type:String</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>concrete_type_descr</h2>
-<div>Type:String</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -5233,8 +5354,8 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>client_descr</h2>
-<div>Type:String</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -5245,8 +5366,14 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>destination_descr</h2>
-<div>Type:String</div>
+<h2>destination_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -6957,6 +7084,168 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="OrderMakeForLabList_Model" class="content_box">
+<h1>OrderMakeForLabList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>unload_type</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>descr</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>phone_cel</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>unload_speed</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time_to</h2>
+<div>Type:Time</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_rest</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_ordered_before_now</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_shipped_before_now</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_shipped_day_before_now</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_ordered_day</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>no_ship_mark</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>payed</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>under_control</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pay_cash</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_vehicle_owners_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_vehicle_length</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_vehicle_comment</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>is_needed</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="OrderMakeList_Model" class="content_box">
 <h1>OrderMakeList_Model</h1>
 <div class="content_item">
@@ -8125,6 +8414,150 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+</div>
+</div>
+<div id="RawMaterialConsRateList_Model" class="content_box">
+<h1>RawMaterialConsRateList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>rate_date_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat1_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat2_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat3_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat4_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat5_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat6_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat7_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat8_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat9_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat10_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mat1_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat2_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat3_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat4_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat5_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat6_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat7_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat8_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat9_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>mat10_rate</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
 </div>
 </div>
 <div id="RawMaterialMapToProduction_Model" class="content_box">
@@ -12201,6 +12634,12 @@
 <div>Precision:</div>
 <h2>drivers_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>driver_tel</h2>
+<div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

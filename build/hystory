@@ -269,6 +269,19 @@ set phone_cels = ('{"id": "TelList_Model", "rows": [{"fields": {"id": 1, "tel": 
 WHERE phone_cel IS NOT NULL
 
 1.055
+1) Загрузка данных с заводов
+2) Журнла испытания образцов
+3) Звуковой сигнао при изменении формы оператора
+4) Вставка телефона в строку с шаблоном
+5) Звонок водителю
+6) Нормы расхода не открывает подборы
+7) Цена для водителя по объекту "самовывоз" = 0 shipments_for_veh_owner_list
+8) Поле цена для водителя в объекте, при установке будет браться именно она shipments_for_veh_owner_list
+
+9) Звонок водителю из списка автомобилей
+
+- Интерфейс лаборанта SELECT * FROM lab_entry_30days_2 public function get_make_orders_for_lab_form
+- Изменил схему телефонов владельцев насосов, СМС! тоже поменять
 
 
 
@@ -277,8 +290,6 @@ WHERE phone_cel IS NOT NULL
 
 
 Перенос накладных в бухгалтерию
-
-Журнал испытания образцов LabEntry_Controller->get_list
 
 
 ???Контрагенты повторы Client_Controller->get_duplicates_list НЕ ДЕЛАТЬ!

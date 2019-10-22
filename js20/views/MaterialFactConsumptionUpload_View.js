@@ -88,7 +88,7 @@ function MaterialFactConsumptionUpload_View(id,options){
 			);
 
 			this.addElement(
-				new MaterialFactConsumptionList_View(id+":material_fact_consumptions_list")
+				new MaterialFactConsumptionRolledList_View(id+":material_fact_consumptions_list")
 			);
 			
 		}

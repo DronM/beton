@@ -39,7 +39,9 @@ CREATE OR REPLACE VIEW destination_list_view AS
 				,0)
 		END AS price,
 		
-		destinations.special_price
+		destinations.special_price,
+		
+		destinations.price_for_driver
 		
 	FROM destinations
 	

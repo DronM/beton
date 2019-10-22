@@ -56,7 +56,7 @@ function LabEntryDetailList_Model(options){
 	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
-	options.fields.ship_date_time_descr = new FieldString("ship_date_time_descr",filed_options);
+	options.fields.ship_date_time = new FieldDateTime("ship_date_time",filed_options);
 	
 				
 	
@@ -65,7 +65,7 @@ function LabEntryDetailList_Model(options){
 	filed_options.alias = 'Марка';
 	filed_options.autoInc = false;	
 	
-	options.fields.concrete_type_descr = new FieldString("concrete_type_descr",filed_options);
+	options.fields.concrete_types_ref = new FieldJSON("concrete_types_ref",filed_options);
 	
 				
 	
@@ -110,7 +110,7 @@ function LabEntryDetailList_Model(options){
 	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
-	options.fields.p_date_descr = new FieldString("p_date_descr",filed_options);
+	options.fields.p_date = new FieldDate("p_date",filed_options);
 	
 				
 	

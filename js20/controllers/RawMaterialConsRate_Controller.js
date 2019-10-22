@@ -20,11 +20,10 @@
 function RawMaterialConsRate_Controller(options){
 	options = options || {};
 	options.listModelClass = RawMaterialConsRateList_Model;
-	options.objModelClass = RawMaterialConsRate_Model;
+	options.objModelClass = RawMaterialConsRateList_Model;
 	RawMaterialConsRate_Controller.superclass.constructor.call(this,options);	
 	
 	//methods
-	this.addInsert();
 	this.addUpdate();
 	this.addDelete();
 	this.addGetList();
@@ -33,38 +32,6 @@ function RawMaterialConsRate_Controller(options){
 		
 }
 extend(RawMaterialConsRate_Controller,ControllerObjServer);
-
-			RawMaterialConsRate_Controller.prototype.addInsert = function(){
-	RawMaterialConsRate_Controller.superclass.addInsert.call(this);
-	
-	var pm = this.getInsert();
-	
-	var options = {};
-	options.primaryKey = true;options.required = true;
-	var field = new FieldInt("rate_date_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	options.alias = "Марка бетона";options.primaryKey = true;
-	var field = new FieldInt("concrete_type_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	options.alias = "Материал";options.primaryKey = true;
-	var field = new FieldInt("raw_material_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	options.alias = "Расход";
-	var field = new FieldFloat("rate",options);
-	
-	pm.addField(field);
-	
-	
-}
 
 			RawMaterialConsRate_Controller.prototype.addUpdate = function(){
 	RawMaterialConsRate_Controller.superclass.addUpdate.call(this);
@@ -80,7 +47,7 @@ extend(RawMaterialConsRate_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Марка бетона";options.primaryKey = true;
+	options.primaryKey = true;
 	var field = new FieldInt("concrete_type_id",options);
 	
 	pm.addField(field);
@@ -89,19 +56,210 @@ extend(RawMaterialConsRate_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Материал";options.primaryKey = true;
-	var field = new FieldInt("raw_material_id",options);
 	
-	pm.addField(field);
+	var field = new FieldString("concrete_type_descr",options);
 	
-	field = new FieldInt("old_raw_material_id",{});
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Расход";
-	var field = new FieldFloat("rate",options);
+	
+	var field = new FieldInt("mat1_id",options);
 	
 	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat2_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat3_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat4_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat5_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat6_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat7_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat8_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat9_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("mat10_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat1_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat2_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat3_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat4_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat5_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat6_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat7_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat8_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat9_rate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("mat10_rate",options);
+	
+	pm.addField(field);
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat1_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat2_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat3_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat4_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat5_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat6_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat7_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat8_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat9_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldInt("mat10_id",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat1_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat2_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat3_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat4_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat5_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat6_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat7_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat8_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat9_rate",options));
+	
+		var options = {};
+				
+		pm.addField(new FieldFloat("mat10_rate",options));
 	
 	
 }
@@ -137,6 +295,75 @@ extend(RawMaterialConsRate_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("rate_date_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("concrete_type_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldString("concrete_type_descr",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat1_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat2_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat3_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat4_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat5_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat6_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat7_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat8_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat9_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("mat10_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat1_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat2_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat3_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat4_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat5_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat6_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat7_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat8_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat9_rate",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("mat10_rate",f_opts));
 }
 
 			RawMaterialConsRate_Controller.prototype.addGetObject = function(){
@@ -147,11 +374,48 @@ extend(RawMaterialConsRate_Controller,ControllerObjServer);
 		
 	pm.addField(new FieldInt("rate_date_id",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Марка бетона";	
+		
 	pm.addField(new FieldInt("concrete_type_id",f_opts));
-	var f_opts = {};
-	f_opts.alias = "Материал";	
-	pm.addField(new FieldInt("raw_material_id",f_opts));
+		var options = {};
+						
+		pm.addField(new FieldInt("mat1_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat2_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat3_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat4_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat5_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat6_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat7_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat8_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat9_id",options));
+	
+		var options = {};
+						
+		pm.addField(new FieldInt("mat10_id",options));
+	
 	
 	pm.addField(new FieldString("mode"));
 }

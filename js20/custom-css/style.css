@@ -516,58 +516,62 @@ table td{
 #OrderMakeList\:veh_total{
 	margin-bottom:15px;	
 }
+#OrderMakeForLabList\:veh_schedule_grid\:cont{
+	margin-bottom:15px;	
+}
+
 .order-l-grid{
 	margin-bottom:15px;	
 }
 
-#OrderMakeList\:order_make_grid{
+.order_make_grid{
 	margin-bottom:15px;
 }
 
-#OrderMakeList\:order_make_grid tr{
+.order_make_grid tr{
 	cursor:pointer;
 }
 
-#OrderMakeList\:order_make_grid tr.order_closed{
+.order_make_grid tr.order_closed{
 	background-color:#00FF7F;
 }
-#OrderMakeList\:order_make_grid tr.order_not_started{
+.order_make_grid tr.order_not_started{
 	background-color:#FFCC99;
 }
-#OrderMakeList\:order_make_grid tr.order_started{
+.order_make_grid tr.order_started{
 	background-color:#FFFFDD;
 }
-#OrderMakeList\:order_make_grid tr.order_no_ship_for_long{
+.order_make_grid tr.order_no_ship_for_long{
 	background-color:#CCCCFF;
 }
 tr.order_current_row{
 	border:3px solid black;
 }
 
-#OrderMakeList\:veh_schedule_grid tr.vh_late{
+.veh_schedule_grid tr.vh_late{
 	background-color:#FF9999;
 }
-#OrderMakeList\:veh_schedule_grid tr.vh_late_at_dest{
+.veh_schedule_grid tr.vh_late_at_dest{
 	background-color:#FFD0BA;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_assigned{
+.veh_schedule_grid tr.veh_assigned{
 	background-color:#CCFF99;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_shift{
+.veh_schedule_grid tr.veh_shift{
 	background-color:#D5C7FF;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_shift_added{
+.veh_schedule_grid tr.veh_shift_added{
 	background-color:#D5C7FF;
 }
-#OrderMakeList\:veh_schedule_grid tr.veh_out_from_shift{
+.veh_schedule_grid tr.veh_out_from_shift{
 	background-color:#CEB9D6;
 }
-#OrderMakeList\:veh_schedule_grid td.no_tracker{
+.veh_schedule_grid td.no_tracker{
 	color:#0087ff;
 	font-weight:bold;
 	font-size:150%;
 }
-#OrderMakeList\:veh_schedule_grid td.tracker_no_data{
+.veh_schedule_grid td.tracker_no_data{
 	color:red;
 	font-weight:bold;
 	font-size:150%;
@@ -696,3 +700,14 @@ a.tel_in_list{
 	background-color:red !important;
 	border:2px solid red;
 }
+
+.LabEntry30Days_grid tr{
+	cursor:pointer;	
+}
+.LabEntry30Days_grid tr.need{
+	background-color:#FFCC99;
+}
+.LabEntry30Days_grid td.prev_p{
+	background-color:#CEB9D6;
+}
+

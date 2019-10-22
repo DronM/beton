@@ -395,8 +395,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$db_link = $this->getDbLink();
 		
 		//list
-		$model = new OrderMakeList_Model($db_link);
-		
 		$this->addNewModel(sprintf(
 			"SELECT * FROM orders_make_list WHERE date_time BETWEEN '%s' AND '%s'",
 			date('Y-m-d H:i:s',$date_from),
@@ -420,6 +418,42 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		//features
 		$this->addModel(VehicleSchedule_Controller::getFeatureListModel($db_link,$date_for_db));
+		
+		//weather
+		//$this->addModel(Weather_Controller::getCurrentModel($db_link,$this->getDbLinkMaster()));
+		
+		//init date
+		$this->addModel(new ModelVars(
+			array('id'=>'InitDate',
+				'values'=>array(
+					new Field('dt',DT_DATETIME,
+						array('value'=>date('Y-m-d H:i:s',$date_from)))
+				)
+			)
+		));		
+	}
+
+	public function get_make_orders_for_lab_form($pm){
+	
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		
+		$db_link = $this->getDbLink();
+		
+		//list
+		$this->addNewModel("SELECT * FROM orders_make_for_lab_list",'OrderMakeForLabList_Model');
+		
+		//Lab list
+		$this->addNewModel('SELECT * FROM lab_entry_30days_2','LabEntry30DaysList_Model');
+
+		
+		//Assigning		
+		$this->addModel(Shipment_Controller::getAssigningModel($db_link));
+		
+		//Vehicles		
+		$this->addModel(VehicleSchedule_Controller::getMakeListModel($db_link,$date_for_db));
 		
 		//weather
 		//$this->addModel(Weather_Controller::getCurrentModel($db_link,$this->getDbLinkMaster()));

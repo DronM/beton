@@ -74,6 +74,15 @@ function DestinationDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.price_for_driver = new FieldFloat("price_for_driver",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.zone_str = new FieldString("zone_str",filed_options);
 	
 				

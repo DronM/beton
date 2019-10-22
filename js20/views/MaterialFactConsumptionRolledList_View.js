@@ -338,7 +338,6 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			var attrs = {"colspan":"2"};
 			if(CommonHelper.unserialize(headModel.getFieldValue("raw_materials_ref")).isNull()){
 				attrs["class"] = "production_upload_no_match";
-				console.log("NO MATCH!!!")
 			}
 			
 			row0_elem.push(

@@ -11,7 +11,7 @@
 <xsl:variable name="COLOR_PALETTE" select="/document/model[@id='Page_Model']/row[1]/DEFAULT_COLOR_PALETTE"/>
 <xsl:variable name="TOKEN">
 	<xsl:choose>
-		<xsl:when test="not(/document/model[@id='ModelVars']/row[1]/token='')"><xsl:value-of select="concat('&amp;token=',/document/model[@id='ModelVars']/row[1]/token)"/></xsl:when>
+		<xsl:when test="/document/model[@id='ModelVars']/row[1]/token and not(/document/model[@id='ModelVars']/row[1]/token='')"><xsl:value-of select="concat('&amp;token=',/document/model[@id='ModelVars']/row[1]/token)"/></xsl:when>
 		<xsl:otherwise></xsl:otherwise>
 	</xsl:choose>
 </xsl:variable>
@@ -28,8 +28,7 @@
 			function pageLoad(){							
 				<xsl:call-template name="initApp"/>
 				
-				<xsl:call-template name="checkForError"/>
-								
+				<xsl:call-template name="checkForError"/>				
 				showView();
 			}
 		</script>

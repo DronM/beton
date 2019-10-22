@@ -273,13 +273,15 @@ class LabEntry_Controller extends ControllerSQL{
 		
 		$order = $this->orderFromParams($pm,$model);
 		$where = $this->conditionFromParams($pm,$model);
-		$id_ar = $where->getFieldsById('id','IS NOT');
-		if (is_array($id_ar) && count($id_ar)){
-			if ($id_ar[0]->getValue()==0){
-				$where->deleteField('id','IS NOT');
-			}
-			else{
-				$id_ar[0]->setValue(NULL);
+		if($where){
+			$id_ar = $where->getFieldsById('id','IS NOT');
+			if (is_array($id_ar) && count($id_ar)){
+				if ($id_ar[0]->getValue()==0){
+					$where->deleteField('id','IS NOT');
+				}
+				else{
+					$id_ar[0]->setValue(NULL);
+				}
 			}
 		}
 		$fields = $this->fieldsFromParams($pm);		

@@ -9,6 +9,9 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class LabEntryDetailList_Model extends ModelSQLBeton{
 	
@@ -17,7 +20,7 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		
 		$this->setDbName("public");
 		
-		$this->setTableName("lab_entry_detail_list_view");
+		$this->setTableName("lab_entry_detail_list");
 			
 		//*** Field shipment_id ***
 		$f_opts = array();
@@ -45,24 +48,24 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		$this->addField($f_code);
 		//********************
 		
-		//*** Field ship_date_time_descr ***
+		//*** Field ship_date_time ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Дата';
-		$f_opts['id']="ship_date_time_descr";
+		$f_opts['id']="ship_date_time";
 						
-		$f_ship_date_time_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time_descr",$f_opts);
-		$this->addField($f_ship_date_time_descr);
+		$f_ship_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_date_time",$f_opts);
+		$this->addField($f_ship_date_time);
 		//********************
 		
-		//*** Field concrete_type_descr ***
+		//*** Field concrete_types_ref ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Марка';
-		$f_opts['id']="concrete_type_descr";
+		$f_opts['id']="concrete_types_ref";
 						
-		$f_concrete_type_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_descr",$f_opts);
-		$this->addField($f_concrete_type_descr);
+		$f_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_types_ref",$f_opts);
+		$this->addField($f_concrete_types_ref);
 		//********************
 		
 		//*** Field ok ***
@@ -105,14 +108,14 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 		$this->addField($f_p28);
 		//********************
 		
-		//*** Field p_date_descr ***
+		//*** Field p_date ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Дата';
-		$f_opts['id']="p_date_descr";
+		$f_opts['id']="p_date";
 						
-		$f_p_date_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_date_descr",$f_opts);
-		$this->addField($f_p_date_descr);
+		$f_p_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"p_date",$f_opts);
+		$this->addField($f_p_date);
 		//********************
 		
 		//*** Field kn ***

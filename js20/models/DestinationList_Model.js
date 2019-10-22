@@ -88,7 +88,7 @@ function DestinationList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.special_price = new FieldBool("special_price",filed_options);
+	options.fields.price_for_driver = new FieldBool("price_for_driver",filed_options);
 	
 		DestinationList_Model.superclass.constructor.call(this,id,options);
 }

@@ -93,7 +93,7 @@ function VehicleScheduleMakeOrderList_View(id,options){
 											"field":new FieldInt("driver_id"),
 											"searchType":"on_match"
 										},
-										"formatFunction":function(fields,cell){
+										"formatFunction":function(fields,cell){											
 											return window.getApp().formatCell(fields.drivers_ref,cell,self.COL_DRIVER_LEN);
 										}																		
 									})

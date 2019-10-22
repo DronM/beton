@@ -114,3 +114,40 @@ AppBeton.prototype.getProdSiteModel = function(){
 	}
 	return this.m_prodSite_Model;
 }
+
+AppBeton.prototype.makeGridNewDataSound = function(){
+	var audio = new Audio("img/Bell-sound-effect-ding.mp3");
+	audio.play();
+	//console.log("AppBeton.prototype.makeGridNewDataSound")
+}
+
+AppBeton.prototype.makeCallContinue = function(tel){
+	if(this.getServVar("debug")==1){
+		window.showTempNote("ТЕСТ Пытаемся позвонить на номер: "+tel,null,10000);
+		return;
+	}
+	
+	var pm = (new Caller_Controller()).getPublicMethod("call");
+	pm.setFieldValue("tel",tel);
+	pm.run({
+		"ok":function(resp){
+			window.showTempNote("Пытаемся позвонить на номер: "+tel,null,10000);
+		}
+	})
+}
+
+AppBeton.prototype.makeCall = function(tel){
+	if(!window.Caller_Controller){
+		throw new Error("Контроллер Caller_Controlle не определен!");
+	}
+	var self = this;
+	WindowQuestion.show({
+		"cancel":false,
+		"text":"Набрать номер "+tel+"?",
+		"callBack":function(res){
+			if(res==WindowQuestion.RES_YES){
+				self.makeCallContinue(tel);
+			}
+		}
+	});
+}

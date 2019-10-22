@@ -78,7 +78,7 @@ function RawMaterialConsRateDateList_View(id,options){
 												{
 												"masterFieldId":"id",
 												"field":"rate_date_id",
-												"sign":"ge",
+												"sign":"e",
 												"val":"0"
 												}	
 											]
@@ -86,7 +86,9 @@ function RawMaterialConsRateDateList_View(id,options){
 									}										
 									
 								})
-							]
+							],
+							"sortable":true,
+							"sort":"desc"
 						})
 						,new GridCellHead(id+":grid:head:name",{
 							"value":"Комментарий",

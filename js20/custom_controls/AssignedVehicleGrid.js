@@ -307,7 +307,6 @@ AssignedVehicleGrid.prototype.onGetData = function(){
 
 AssignedVehicleGrid.prototype.makeSound = function(){
 	if(!this.m_shortDescriptions){
-		var audio = new Audio("img/Bell-sound-effect-ding.mp3");
-		audio.play();
+		window.getApp().makeGridNewDataSound();
 	}	
 }

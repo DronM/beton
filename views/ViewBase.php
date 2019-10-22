@@ -1291,6 +1291,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MaterialFactConsumptionUpload_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MaterialFactConsumptionList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MaterialFactConsumptionRolledList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryDetailList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderMakeForLabList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1388,6 +1391,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MatTotalGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MatCorrectGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/TelListGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleMakeOrderGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1649,6 +1653,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/MaterialFactConsumption_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialFactConsumptionList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialFactConsumptionRolledList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialConsRateList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/OrderMakeForLabList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/LabEntry30DaysList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

@@ -12651,3 +12651,1085 @@ ALTER FUNCTION public.raw_material_map_to_production_process()
   OWNER TO beton;
 
 
+
+-- ******************* update 01/10/2019 09:33:43 ******************
+-- View: public.lab_entry_list
+
+-- DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		lab.shipment_id AS id,
+		sh.id AS shipment_id,
+		sh.date_time,
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time"
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	ORDER BY sh.date_time, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 01/10/2019 09:38:13 ******************
+-- View: public.lab_entry_list
+
+ DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		lab.shipment_id AS id,
+		sh.id AS shipment_id,
+		sh.date_time,
+		
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time"
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	ORDER BY sh.date_time, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 01/10/2019 09:55:07 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'30016',
+		'LabEntry_Controller',
+		'get_list',
+		'LabEntryList',
+		'Формы',
+		'Журнал испытания образцов',
+		FALSE
+		);
+	
+
+-- ******************* update 01/10/2019 09:57:56 ******************
+-- View: public.lab_entry_list
+
+-- DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		lab.shipment_id AS id,
+		sh.id AS shipment_id,
+		sh.date_time,
+		
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time"
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	ORDER BY sh.date_time DESC, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 02/10/2019 13:04:45 ******************
+-- View: public.lab_entry_detail_list
+
+-- DROP VIEW public.lab_entry_detail_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_detail_list AS 
+	SELECT
+		sh.id AS shipment_id,
+		lab.id,
+		(sh.id::text || '/'::text) || lab.id::text AS code,
+		sh.date_time AS ship_date_time,
+		lab.ok,
+		lab.weight,
+		round(
+			CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN
+			(
+				SELECT avg(round(s_lab_det.kn::numeric / concr.mpa_ratio, 2)) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			) / concr.pres_norm * 100::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+			CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN
+			(
+				SELECT avg(round(s_lab_det.kn::numeric / concr.mpa_ratio, 2)) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			) / concr.pres_norm * 100::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		CASE
+			WHEN lab.id < 3 THEN (sh.date_time::date + '7 days'::interval)::date
+			ELSE (sh.date_time::date + '28 days'::interval)::date
+		END AS p_date,
+		
+		lab.kn,
+		round(lab.kn::numeric / concr.mpa_ratio, 2) AS mpa,
+		
+		round(
+		CASE
+			WHEN lab.id < 3 THEN
+			(
+				SELECT avg(round(s_lab_det.kn::numeric / concr.mpa_ratio, 2)) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			ELSE (
+				SELECT avg(round(s_lab_det.kn::numeric / concr.mpa_ratio, 2)) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+		END, 2) AS mpa_avg,
+		
+		concr.pres_norm
+		
+	FROM lab_entry_details lab
+	LEFT JOIN shipments sh ON sh.id = lab.shipment_id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	ORDER BY lab.shipment_id, lab.id;
+
+ALTER TABLE public.lab_entry_detail_list OWNER TO beton;
+
+
+
+-- ******************* update 02/10/2019 15:13:12 ******************
+-- VIEW: raw_material_cons_rates_list
+
+--DROP VIEW raw_material_cons_rates_list;
+
+CREATE OR REPLACE VIEW raw_material_cons_rates_list AS
+	SELECT
+		t.rate_date_id,
+		t.concrete_type_id,
+		concrete_types_ref(ctp) AS concrete_types_ref,
+		t.raw_material_id,
+		materials_ref(m) AS raw_materials_ref,
+		t.rate
+		
+	FROM raw_material_cons_rates t
+	LEFT JOIN concrete_types AS ctp ON ctp.id=t.concrete_type_id
+	LEFT JOIN raw_materials AS m ON m.id=t.raw_material_id
+	;
+	
+ALTER VIEW raw_material_cons_rates_list OWNER TO beton;
+
+
+-- ******************* update 07/10/2019 16:54:31 ******************
+
+		--constant value table
+		CREATE TABLE IF NOT EXISTS const_material_closed_balance_date
+		(name text, descr text, val date,
+			val_type text,ctrl_class text,ctrl_options json, view_class text,view_options json);
+		ALTER TABLE const_material_closed_balance_date OWNER TO beton;
+		INSERT INTO const_material_closed_balance_date (name,descr,val,val_type,ctrl_class,ctrl_options,view_class,view_options) VALUES (
+			'Дата закрытого периода остатков'
+			,'Дата, раньше который период закрыт для редактирования'
+			,NULL
+			,'Date'
+			,NULL
+			,NULL
+			,NULL
+			,NULL
+		);
+		--constant get value
+		CREATE OR REPLACE FUNCTION const_material_closed_balance_date_val()
+		RETURNS date AS
+		$BODY$
+			SELECT val::date AS val FROM const_material_closed_balance_date LIMIT 1;
+		$BODY$
+		LANGUAGE sql STABLE COST 100;
+		ALTER FUNCTION const_material_closed_balance_date_val() OWNER TO beton;
+		--constant set value
+		CREATE OR REPLACE FUNCTION const_material_closed_balance_date_set_val(Date)
+		RETURNS void AS
+		$BODY$
+			UPDATE const_material_closed_balance_date SET val=$1;
+		$BODY$
+		LANGUAGE sql VOLATILE COST 100;
+		ALTER FUNCTION const_material_closed_balance_date_set_val(Date) OWNER TO beton;
+		--edit view: all keys and descr
+		CREATE OR REPLACE VIEW const_material_closed_balance_date_view AS
+		SELECT
+			'material_closed_balance_date'::text AS id
+			,t.name
+			,t.descr
+		,
+		t.val::text AS val
+		,t.val_type::text AS val_type
+		,t.ctrl_class::text
+		,t.ctrl_options::json
+		,t.view_class::text
+		,t.view_options::json
+		FROM const_material_closed_balance_date AS t
+		;
+		ALTER VIEW const_material_closed_balance_date_view OWNER TO beton;
+		CREATE OR REPLACE VIEW constants_list_view AS
+		SELECT *
+		FROM const_doc_per_page_count_view
+		UNION ALL
+		SELECT *
+		FROM const_grid_refresh_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_order_grid_refresh_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_backup_vehicles_feature_view
+		UNION ALL
+		SELECT *
+		FROM const_base_geo_zone_id_view
+		UNION ALL
+		SELECT *
+		FROM const_base_geo_zone_view
+		UNION ALL
+		SELECT *
+		FROM const_chart_step_min_view
+		UNION ALL
+		SELECT *
+		FROM const_day_shift_length_view
+		UNION ALL
+		SELECT *
+		FROM const_days_allowed_with_broken_tracker_view
+		UNION ALL
+		SELECT *
+		FROM const_def_order_unload_speed_view
+		UNION ALL
+		SELECT *
+		FROM const_demurrage_coast_per_hour_view
+		UNION ALL
+		SELECT *
+		FROM const_first_shift_start_time_view
+		UNION ALL
+		SELECT *
+		FROM const_geo_zone_check_points_count_view
+		UNION ALL
+		SELECT *
+		FROM const_map_default_lat_view
+		UNION ALL
+		SELECT *
+		FROM const_map_default_lon_view
+		UNION ALL
+		SELECT *
+		FROM const_max_hour_load_view
+		UNION ALL
+		SELECT *
+		FROM const_max_vehicle_at_work_view
+		UNION ALL
+		SELECT *
+		FROM const_min_demurrage_time_view
+		UNION ALL
+		SELECT *
+		FROM const_min_quant_for_ship_cost_view
+		UNION ALL
+		SELECT *
+		FROM const_no_tracker_signal_warn_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_ord_mark_if_no_ship_time_view
+		UNION ALL
+		SELECT *
+		FROM const_order_auto_place_tolerance_view
+		UNION ALL
+		SELECT *
+		FROM const_order_step_min_view
+		UNION ALL
+		SELECT *
+		FROM const_own_vehicles_feature_view
+		UNION ALL
+		SELECT *
+		FROM const_raw_mater_plcons_rep_def_days_view
+		UNION ALL
+		SELECT *
+		FROM const_self_ship_dest_id_view
+		UNION ALL
+		SELECT *
+		FROM const_self_ship_dest_view
+		UNION ALL
+		SELECT *
+		FROM const_shift_for_orders_length_time_view
+		UNION ALL
+		SELECT *
+		FROM const_shift_length_time_view
+		UNION ALL
+		SELECT *
+		FROM const_ship_coast_for_self_ship_destination_view
+		UNION ALL
+		SELECT *
+		FROM const_speed_change_for_order_autolocate_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_unload_time_view
+		UNION ALL
+		SELECT *
+		FROM const_avg_mat_cons_dev_day_count_view
+		UNION ALL
+		SELECT *
+		FROM const_days_for_plan_procur_view
+		UNION ALL
+		SELECT *
+		FROM const_lab_min_sample_count_view
+		UNION ALL
+		SELECT *
+		FROM const_lab_days_for_avg_view
+		UNION ALL
+		SELECT *
+		FROM const_city_ext_view
+		UNION ALL
+		SELECT *
+		FROM const_def_lang_view
+		UNION ALL
+		SELECT *
+		FROM const_efficiency_warn_k_view
+		UNION ALL
+		SELECT *
+		FROM const_zone_violation_alarm_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_weather_update_interval_sec_view
+		UNION ALL
+		SELECT *
+		FROM const_call_history_count_view
+		UNION ALL
+		SELECT *
+		FROM const_water_ship_cost_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_owner_accord_from_day_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_owner_accord_to_day_view
+		UNION ALL
+		SELECT *
+		FROM const_show_time_for_shipped_vehicles_view
+		UNION ALL
+		SELECT *
+		FROM const_tracker_malfunction_tel_list_view
+		UNION ALL
+		SELECT *
+		FROM const_low_efficiency_tel_list_view
+		UNION ALL
+		SELECT *
+		FROM const_material_closed_balance_date_view;
+		ALTER VIEW constants_list_view OWNER TO beton;
+	
+
+-- ******************* update 08/10/2019 13:29:07 ******************
+-- VIEW: shipments_for_veh_owner_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.destination_id,
+		sh.destinations_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.cost,
+		sh.ship_cost_edit,
+		sh.pump_cost_edit,
+		sh.demurrage,
+		sh.demurrage_cost,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		
+		CASE
+		WHEN sh.destination_id = const_self_ship_dest_id_val() THEN 0
+		ELSE
+			(WITH
+			act_price AS (
+				SELECT h.date AS d
+				FROM shipment_for_driver_costs_h h
+				WHERE h.date<=sh.ship_date_time::date
+				ORDER BY h.date DESC
+				LIMIT 1
+			)
+			SELECT shdr_cost.price
+			FROM shipment_for_driver_costs AS shdr_cost
+			WHERE
+				shdr_cost.date=(SELECT d FROM act_price)
+				AND shdr_cost.distance_to<=dest.distance
+				OR shdr_cost.id=(
+					SELECT t.id
+					FROM shipment_for_driver_costs t
+					WHERE t.date=(SELECT d FROM act_price)
+					ORDER BY t.distance_to LIMIT 1
+				)
+
+			ORDER BY shdr_cost.distance_to DESC
+			LIMIT 1
+			) * shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+		END AS cost_for_driver
+		
+	FROM shipments_list sh
+	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	;
+	
+ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 08/10/2019 13:34:59 ******************
+
+		ALTER TABLE destinations ADD COLUMN special_price_for_driver numeric(15,2) DEFAULT 0;
+
+
+-- ******************* update 08/10/2019 13:38:16 ******************
+-- View: public.destinations_dialog
+
+-- DROP VIEW public.destinations_dialog;
+
+CREATE OR REPLACE VIEW public.destinations_dialog AS 
+	WITH
+	last_price AS
+		(SELECT
+			max(t.date) AS date,
+			t.distance_to
+		FROM shipment_for_owner_costs AS t
+		GROUP BY t.distance_to
+		ORDER BY t.distance_to
+		)
+	,act_price AS
+		(SELECT
+			t.distance_to,
+			t.price
+		FROM last_price
+		LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
+		ORDER BY t.distance_to
+		)
+
+	SELECT
+		destinations.id,
+		destinations.name,
+		destinations.distance,
+		destinations.time_route,
+		
+		CASE
+			WHEN coalesce(destinations.special_price,FALSE) = TRUE THEN coalesce(destinations.price,0)
+			ELSE
+				coalesce(
+					coalesce(
+						(SELECT act_price.price
+						FROM act_price
+						WHERE destinations.distance <= act_price.distance_to
+						LIMIT 1
+						)
+					,destinations.price)
+				,0)
+		END AS price,
+		
+		destinations.special_price,
+		
+		replace(replace(st_astext(destinations.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS zone_str,
+		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str,
+		
+		price_for_driver
+		
+	FROM destinations;
+
+ALTER TABLE public.destinations_dialog OWNER TO beton;
+
+
+
+-- ******************* update 08/10/2019 13:38:46 ******************
+-- View: destination_list_view
+
+-- DROP VIEW destination_list_view;
+
+CREATE OR REPLACE VIEW destination_list_view AS 
+	WITH
+	last_price AS
+		(SELECT
+			max(t.date) AS date,
+			t.distance_to
+		FROM shipment_for_owner_costs AS t
+		GROUP BY t.distance_to
+		ORDER BY t.distance_to
+		)
+	,act_price AS
+		(SELECT
+			t.distance_to,
+			t.price
+		FROM last_price
+		LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
+		ORDER BY t.distance_to
+		)
+	SELECT
+		destinations.id,
+		destinations.name,
+		destinations.distance,
+		time5_descr(destinations.time_route) AS time_route,
+		CASE
+			WHEN coalesce(destinations.special_price,FALSE) = TRUE THEN coalesce(destinations.price,0)
+			ELSE
+				coalesce(
+					coalesce(
+						(SELECT act_price.price
+						FROM act_price
+						WHERE destinations.distance <= act_price.distance_to
+						LIMIT 1
+						)
+					,destinations.price)
+				,0)
+		END AS price,
+		
+		destinations.special_price,
+		
+		destinations.price_for_driver
+		
+	FROM destinations
+	
+	ORDER BY destinations.name;
+
+ALTER TABLE destination_list_view
+  OWNER TO beton;
+
+
+
+-- ******************* update 08/10/2019 13:58:34 ******************
+-- VIEW: shipments_for_veh_owner_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.destination_id,
+		sh.destinations_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.cost,
+		sh.ship_cost_edit,
+		sh.pump_cost_edit,
+		sh.demurrage,
+		sh.demurrage_cost,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		
+		CASE
+		WHEN sh.destination_id = const_self_ship_dest_id_val() THEN 0
+		WHEN dest.price_for_driver IS NOT NULL THEN dest.price_for_driver*shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+		ELSE
+			(WITH
+			act_price AS (
+				SELECT h.date AS d
+				FROM shipment_for_driver_costs_h h
+				WHERE h.date<=sh.ship_date_time::date
+				ORDER BY h.date DESC
+				LIMIT 1
+			)
+			SELECT shdr_cost.price
+			FROM shipment_for_driver_costs AS shdr_cost
+			WHERE
+				shdr_cost.date=(SELECT d FROM act_price)
+				AND shdr_cost.distance_to<=dest.distance
+				OR shdr_cost.id=(
+					SELECT t.id
+					FROM shipment_for_driver_costs t
+					WHERE t.date=(SELECT d FROM act_price)
+					ORDER BY t.distance_to LIMIT 1
+				)
+
+			ORDER BY shdr_cost.distance_to DESC
+			LIMIT 1
+			) * shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+		END AS cost_for_driver
+		
+	FROM shipments_list sh
+	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	;
+	
+ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 08/10/2019 14:14:03 ******************
+--DROP VIEW public.vehicle_states_all;
+CREATE OR REPLACE VIEW public.vehicle_states_all AS 
+	SELECT 
+		st.date_time,
+		vs.id,
+		CASE
+		    WHEN st.state <> 'out'::vehicle_states AND st.state <> 'out_from_shift'::vehicle_states AND st.state <> 'shift'::vehicle_states AND st.state <> 'shift_added'::vehicle_states 
+
+			THEN 1
+			ELSE 0
+		END AS vehicles_count,
+		
+		vehicles_ref(v) AS vehicles_ref,
+		
+		/*
+		CASE
+			WHEN v.vehicle_owner_id IS NULL THEN v.owner
+			ELSE v_own.name
+		END
+		*/
+		v_own.name::text AS owner,
+		
+		drivers_ref(d) AS drivers_ref,
+		d.phone_cel::text AS driver_phone_cel,
+		
+		st.state, 
+
+		CASE 
+			--WHEN st.state = 'busy'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone < CURRENT_TIMESTAMP
+				--THEN true
+			WHEN st.state = 'busy'::vehicle_states AND (st.date_time + coalesce(dest.time_route::interval,'00:00'::interval))::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN true
+			
+			WHEN st.state = 'left_for_base'::vehicle_states AND (st.date_time +  coalesce(dest.time_route,'00:00'::time)::interval)::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN true
+			ELSE false
+		END AS is_late,
+
+		CASE
+			WHEN st.state = 'at_dest'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*1 + constant_vehicle_unload_time())::interval)::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN true
+			ELSE false
+		END AS is_late_at_dest,
+		
+		CASE
+			--shift - no inf
+			WHEN st.state = 'shift'::vehicle_states OR st.state = 'shift_added'::vehicle_states
+				THEN ''
+
+			-- out_from_shift && out inf=out time
+			WHEN st.state = 'out_from_shift'::vehicle_states OR st.state = 'out'::vehicle_states
+				THEN time5_descr(st.date_time::time)::text
+
+			--free && assigned inf= time elapsed
+			WHEN st.state = 'free'::vehicle_states OR st.state = 'assigned'::vehicle_states
+				THEN to_char(CURRENT_TIMESTAMP-st.date_time,'HH24:MI')
+
+			--busy && late inf = -
+			--WHEN st.state = 'busy'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				--THEN '-'::text || time5_descr((CURRENT_TIMESTAMP - (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone)::time without time zone)::text
+			WHEN st.state = 'busy'::vehicle_states AND (st.date_time + coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN time5_descr((coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::time without time zone)::text
+				
+			-- busy not late
+			WHEN st.state = 'busy'::vehicle_states
+				--THEN time5_descr(((st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
+				THEN time5_descr((coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::time without time zone)::text
+
+			--at dest && late inf=route_time
+			WHEN st.state = 'at_dest'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*1+constant_vehicle_unload_time())::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN time5_descr(coalesce(dest.time_route,'00:00'::time))::text
+
+			--at dest NOT late
+			WHEN st.state = 'at_dest'::vehicle_states
+				THEN time5_descr( ((st.date_time + (coalesce(dest.time_route::interval,'00:00'::interval)+constant_vehicle_unload_time()::interval))::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
+
+			--left_for_base && LATE
+			WHEN st.state = 'left_for_base'::vehicle_states AND (st.date_time + coalesce(dest.time_route,'00:00'::time)::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN '-'::text || time5_descr((CURRENT_TIMESTAMP - (st.date_time + coalesce(dest.time_route,'00:00'::time)::interval)::timestamp with time zone)::time without time zone)::text
+
+			--left_for_base NOT late
+			WHEN st.state = 'left_for_base'::vehicle_states
+				THEN time5_descr( ((st.date_time + coalesce(dest.time_route,'00:00'::time)::interval)::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
+		    
+			ELSE ''
+		    
+		END AS inf_on_return, 
+		
+		v.load_capacity,
+		(SELECT COUNT(*)
+		FROM shipments
+		WHERE (shipments.vehicle_schedule_id = vs.id AND shipments.shipped)
+		) AS runs,
+
+		(SELECT 
+			(now()-(tr.period+AGE(now(),now() AT TIME ZONE 'UTC')) )>constant_no_tracker_signal_warn_interval()
+			FROM car_tracking AS tr
+			WHERE tr.car_id=v.tracker_id
+			ORDER BY tr.period DESC LIMIT 1
+		) AS tracker_no_data,
+		
+		(v.tracker_id IS NULL OR v.tracker_id='') AS no_tracker,
+		
+		vs.schedule_date,
+		
+		vehicle_schedules_ref(vs,v,d) AS vehicle_schedules_ref,
+		
+		d.phone_cel AS driver_tel
+		
+	FROM vehicle_schedules vs
+	
+	LEFT JOIN drivers d ON d.id = vs.driver_id
+	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+	
+	
+	LEFT JOIN vehicle_schedule_states st ON
+		st.id = (SELECT vehicle_schedule_states.id 
+			FROM vehicle_schedule_states
+			WHERE vehicle_schedule_states.schedule_id = vs.id
+			ORDER BY vehicle_schedule_states.date_time DESC NULLS LAST
+			LIMIT 1
+		)
+	
+	LEFT JOIN shipments AS sh ON sh.id=st.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id		
+	LEFT JOIN destinations AS dest ON dest.id=o.destination_id
+	LEFT JOIN vehicle_owners AS v_own ON v_own.id=v.vehicle_owner_id
+	;		
+	--WHERE vs.schedule_date=in_date
+
+
+ALTER TABLE public.vehicle_states_all OWNER TO beton;
+
+
+
+-- ******************* update 08/10/2019 14:15:00 ******************
+-- Function: public.vehicle_last_states(date)
+
+ DROP FUNCTION public.vehicle_last_states(date);
+
+CREATE OR REPLACE FUNCTION public.vehicle_last_states(IN in_date date)
+  RETURNS TABLE(
+	date_time timestamp,
+	id int,
+	vehicles_count int,	
+	vehicles_ref JSON,	
+	owner text,	
+	drivers_ref JSON,
+	driver_phone_cel text,	
+	state vehicle_states, 
+	is_late boolean,
+	is_late_at_dest boolean,
+	inf_on_return text, 	
+	load_capacity double precision,
+	runs bigint,
+	tracker_no_data boolean,	
+	no_tracker boolean,	
+	schedule_date date,
+	vehicle_schedules_ref json,
+	driver_tel text
+  ) AS
+$BODY$
+	--*****************************
+	WITH states_q AS (SELECT * FROM vehicle_states_all WHERE schedule_date=$1)
+	--assigned
+	(SELECT *
+	FROM states_q
+	WHERE  state='assigned'::vehicle_states
+	ORDER BY CURRENT_TIMESTAMP-date_time DESC)
+
+	UNION ALL
+
+	--free
+	(SELECT *	
+	FROM states_q
+	WHERE state='free'::vehicle_states
+	ORDER BY CURRENT_TIMESTAMP-date_time DESC)
+
+	UNION ALL
+
+	--late
+	(SELECT *
+	FROM states_q
+	WHERE is_late
+	ORDER BY CURRENT_TIMESTAMP-date_time DESC)
+
+
+	UNION ALL
+
+	--busy && at_dest(late/not late) && left_for_base
+	(SELECT *
+	FROM states_q
+	WHERE (state='busy'::vehicle_states OR state='at_dest'::vehicle_states OR state='left_for_base'::vehicle_states)
+		AND (NOT is_late)
+	ORDER BY inf_on_return ASC)
+
+
+	UNION ALL
+
+	--shift && shift_added
+	(SELECT *		
+	FROM states_q
+	WHERE  schedule_date=$1 AND (state='shift'::vehicle_states OR state='shift_added'::vehicle_states)
+	ORDER BY vehicles_ref->>'descr')
+
+	UNION ALL
+
+	--out
+	(SELECT *
+	FROM states_q
+	WHERE (state='out_from_shift'::vehicle_states OR state='out'::vehicle_states)
+	ORDER BY inf_on_return
+	);
+	
+	--*****************************
+$BODY$
+  LANGUAGE sql VOLATILE COST 100 ROWS 50;
+ALTER FUNCTION public.vehicle_last_states(date) OWNER TO beton;
+
+
+
+-- ******************* update 08/10/2019 15:57:05 ******************
+-- View: public.make_orders_for_lab_list
+
+-- DROP VIEW public.make_orders_for_lab_list;
+
+CREATE OR REPLACE VIEW public.make_orders_for_lab_list AS 
+	SELECT
+		o.*,
+		(need_t.need_cnt > 0) AS is_needed
+	FROM orders_make_list o
+	LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = (o.concrete_types_ref->'keys'->>'id')::int
+	WHERE o.date_time >= get_shift_start(now()::timestamp without time zone) AND o.date_time <= get_shift_end(get_shift_start(now()::timestamp without time zone));
+
+ALTER TABLE public.make_orders_for_lab_list OWNER TO beton;
+
+
+
+-- ******************* update 08/10/2019 16:00:04 ******************
+-- View: public.make_orders_for_lab_list
+
+ DROP VIEW public.make_orders_for_lab_list;
+
+CREATE OR REPLACE VIEW public.orders_make_for_lab_list AS 
+	SELECT
+		o.*,
+		(need_t.need_cnt > 0) AS is_needed
+	FROM orders_make_list o
+	LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = (o.concrete_types_ref->'keys'->>'id')::int
+	WHERE o.date_time >= get_shift_start(now()::timestamp without time zone) AND o.date_time <= get_shift_end(get_shift_start(now()::timestamp without time zone));
+
+ALTER TABLE public.orders_make_for_lab_list OWNER TO beton;
+
+
+
+-- ******************* update 08/10/2019 16:15:17 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'30017',
+		'Order_Controller',
+		'get_make_orders_for_lab_form',
+		'OrderMakeForLabList',
+		'Формы',
+		'Заявки онлайн (лаборант)',
+		FALSE
+		);
+	
+
+-- ******************* update 08/10/2019 16:50:17 ******************
+-- View: public.orders_make_for_lab_list
+
+-- DROP VIEW public.orders_make_for_lab_list;
+
+CREATE OR REPLACE VIEW public.orders_make_for_lab_list AS 
+	SELECT
+		o.*,
+		(need_t.need_cnt > 0) AS is_needed
+	FROM orders_make_list o
+	LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = (o.concrete_types_ref->'keys'->>'id')::int
+	WHERE o.date_time >= get_shift_start(now()::timestamp without time zone)
+		AND o.date_time <= get_shift_end(get_shift_start(now()::timestamp without time zone))
+	ORDER BY o.date_time;
+ALTER TABLE public.orders_make_for_lab_list OWNER TO beton;
+
+
+
+-- ******************* update 08/10/2019 16:51:14 ******************
+-- View: public.orders_make_for_lab_list
+
+-- DROP VIEW public.orders_make_for_lab_list;
+
+CREATE OR REPLACE VIEW public.orders_make_for_lab_list AS 
+	SELECT
+		o.*,
+		(need_t.need_cnt > 0) AS is_needed
+	FROM orders_make_list o
+	LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = (o.concrete_types_ref->'keys'->>'id')::int
+	WHERE o.date_time BETWEEN
+		get_shift_start(now()::timestamp without time zone)
+		AND get_shift_end(get_shift_start(now()::timestamp without time zone))
+	ORDER BY o.date_time;
+ALTER TABLE public.orders_make_for_lab_list OWNER TO beton;
+
+

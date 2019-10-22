@@ -103,7 +103,9 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 		
 		vs.schedule_date,
 		
-		vehicle_schedules_ref(vs,v,d) AS vehicle_schedules_ref
+		vehicle_schedules_ref(vs,v,d) AS vehicle_schedules_ref,
+		
+		d.phone_cel AS driver_tel
 		
 	FROM vehicle_schedules vs
 	

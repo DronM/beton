@@ -23,7 +23,10 @@ function OrderMakeGrid(id,options){
 	
 	var w = window.getWidthType();
 	
-	var model = options.models.OrderMakeList_Model;
+	var model = options.model;
+	
+	var role = window.getApp().getServVar("role_id");
+	var editable = (role=="admin"||role=="owmer"||role=="boss"||role=="manager"||role=="accountant"||role=="sales"||role=="plant_director"||role=="supervisor");
 	
 	var elements,foot;
 	if(w=="sm"){
@@ -216,7 +219,7 @@ function OrderMakeGrid(id,options){
 					})
 				]
 			})
-			,new GridCellHead(id+":order_make_grid:head:total",{
+			,!editable? null:new GridCellHead(id+":order_make_grid:head:total",{
 				"value":"Сумма",
 				"colAttrs":{"align":"right"},
 				"columns":[
@@ -233,7 +236,7 @@ function OrderMakeGrid(id,options){
 				]
 			})
 		
-			,new GridCellHead(id+":order_make_grid:head:payed",{
+			,!editable? null:new GridCellHead(id+":order_make_grid:head:payed",{
 				"value":"Оплата",
 				"colAttrs":{"align":"center"},
 				"columns":[
@@ -286,6 +289,20 @@ function OrderMakeGrid(id,options){
 					})
 				]
 			})
+			,(role!="lab_worker")? null:new GridCellHead(id+":order_make_grid:head:is_needed",{
+				"value":"Нужно",
+				"columns":[
+					new GridColumn({
+						"field":model.getField("is_needed"),
+						"assocValueList":{
+							"true":"нужно",
+							"null":"",
+							"false":""
+						}
+					})
+				]
+			})
+
 		];
 		foot = new GridFoot(id+"order_make_grid:foot",{
 			"autoCalc":true,			
@@ -319,7 +336,7 @@ function OrderMakeGrid(id,options){
 						,new GridCell(id+":order_make_grid:foot:total_sp2",{
 							"colSpan":"3"
 						})						
-						,new GridCellFoot(id+":order_make_grid:foot:tot_total",{
+						,!editable? null:new GridCellFoot(id+":order_make_grid:foot:tot_total",{
 							"attrs":{"align":"right"},
 							"calcOper":"sum",
 							"calcFieldId":"total",
@@ -335,15 +352,18 @@ function OrderMakeGrid(id,options){
 			]
 		});		
 	};
-	
+		
 	CommonHelper.merge(options,{
 		"model":model,
-		"className":OrderMakeList_View.prototype.TABLE_CLASS,
 		"attrs":{"style":"width:100%;"},
 		"editInline":false,
 		//"editWinClass":OrderDialog_Form,
 		"editViewClass":OrderDialog_View,
 		"commands":new GridCmdContainerAjx(id+":order_make_grid:cmd",{
+			"cmdInsert":editable,
+			"cmdDelete":editable,
+			"cmdCopy":editable,
+			"cmdEdit":editable,
 			"cmdSearch":false,
 			"cmdExport":false
 		}),
