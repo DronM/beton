@@ -26,8 +26,8 @@ function OrderMakeGrid(id,options){
 	var model = options.model;
 	
 	var role = window.getApp().getServVar("role_id");
-	var editable = (role=="admin"||role=="owmer"||role=="boss"||role=="manager"||role=="accountant"||role=="sales"||role=="plant_director"||role=="supervisor");
-	
+	var editable = (role=="admin"||role=="owner"||role=="boss"||role=="manager"||role=="accountant"||role=="sales"||role=="plant_director"||role=="supervisor");
+console.log("OrderMakeGrid editable="+editable+" role="+role)
 	var elements,foot;
 	if(w=="sm"){
 		elements = [

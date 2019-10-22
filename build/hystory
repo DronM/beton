@@ -268,7 +268,7 @@ update pump_vehicles
 set phone_cels = ('{"id": "TelList_Model", "rows": [{"fields": {"id": 1, "tel": "'||phone_cel||'"}}]}')::jsonb
 WHERE phone_cel IS NOT NULL
 
-1.055
+1.055 22/10/19
 1) Загрузка данных с заводов
 2) Журнла испытания образцов
 3) Звуковой сигнао при изменении формы оператора
@@ -277,8 +277,11 @@ WHERE phone_cel IS NOT NULL
 6) Нормы расхода не открывает подборы
 7) Цена для водителя по объекту "самовывоз" = 0 shipments_for_veh_owner_list
 8) Поле цена для водителя в объекте, при установке будет браться именно она shipments_for_veh_owner_list
-
 9) Звонок водителю из списка автомобилей
+
+1.056 22/10/19
+1) Опечатка в OrderMakeGrid нет кнопки  добавить заявку под owner
+
 
 - Интерфейс лаборанта SELECT * FROM lab_entry_30days_2 public function get_make_orders_for_lab_form
 - Изменил схему телефонов владельцев насосов, СМС! тоже поменять
