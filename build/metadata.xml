@@ -60,6 +60,7 @@
 		<version dateOpen="2019-08-07 13:08:38" dateClose="2019-09-30 16:09:33">1.00154</version>
 		<version dateOpen="2019-10-01 09:10:52" dateClose="2019-10-22 05:10:45">1.00155</version>
 		<version dateOpen="2019-10-22 06:10:00" dateClose="2019-10-22 06:10:00">1.00156</version>
+		<version dateOpen="2019-10-22 06:10:01" dateClose="2019-10-22 06:10:01">1.00157</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
