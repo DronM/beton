@@ -32,17 +32,32 @@ extend(VehicleScheduleGridCmdSetFree,GridCmd);
 
 
 /* public methods */
-VehicleScheduleGridCmdSetFree.prototype.onCommand = function(){
-	this.m_grid.setModelToCurrentRow();
+
+VehicleScheduleGridCmdSetFree.prototype.onCommandCont = function(id,vehDescr){
 	var pm = this.m_grid.getReadPublicMethod().getController().getPublicMethod("set_free");
-	
-	pm.setFieldValue("id",this.m_grid.getModel().getFieldValue("id"));
+	pm.setFieldValue("id",id);
 	var self = this;
 	pm.run({
 		"ok":function(resp){
 			self.m_grid.onRefresh(function(){
-				window.showNote("Переведен в статус 'свободен'");
+				window.showTempNote(vehDescr+" переведен в статус 'свободен'",null,3000);
 			});
 		}
-	})
+	});	
+}
+
+VehicleScheduleGridCmdSetFree.prototype.onCommand = function(){
+	this.m_grid.setModelToCurrentRow();
+	var model = this.m_grid.getModel();
+	var vehDescr = model.getFieldValue("drivers_ref").getDescr() +" "+model.getFieldValue("vehicles_ref").getDescr();
+	var self = this;
+	WindowQuestion.show({
+		"no":false,
+		"text":"Освободить "+vehDescr+"?",
+		"callBack":function(res){
+			if(res==WindowQuestion.RES_YES){
+				self.onCommandCont(model.getFieldValue("id"),vehDescr);
+			}
+		}
+	});
 }

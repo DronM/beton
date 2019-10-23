@@ -711,3 +711,7 @@ a.tel_in_list{
 	background-color:#CEB9D6;
 }
 
+.quant_consump_editable:hover{
+	border:3px solid black;	
+	background-color:red !important;
+}

@@ -170,6 +170,7 @@ MatTotalGrid.prototype.onEditCons = function(n,matId,dt){
 		"cmdOpen":true,
 		"precision":"3",
 		"unsigned":false,
+		"title":"Для отмены: ESC",
 		"value":val,
 		"events":{
 			"keydown":function(event){

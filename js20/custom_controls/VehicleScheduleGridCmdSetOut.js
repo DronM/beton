@@ -33,7 +33,11 @@ extend(VehicleScheduleGridCmdSetOut,GridCmd);
 
 /* public methods */
 VehicleScheduleGridCmdSetOut.prototype.onCommand = function(){
-
+	this.m_grid.setModelToCurrentRow();
+	var model = this.m_grid.getModel();
+	var vehDescr = model.getFieldValue("drivers_ref").getDescr() +" "+model.getFieldValue("vehicles_ref").getDescr();
+	var id = model.getFieldValue("id");
+	
 	var self = this;
 	this.m_view = new EditJSON("VSOut:cont",{
 		"elements":[
@@ -47,6 +51,7 @@ VehicleScheduleGridCmdSetOut.prototype.onCommand = function(){
 		"content":this.m_view,
 		"cmdCancel":true,
 		"cmdOk":true,
+		"contentHead":vehDescr,
 		"onClickCancel":function(){
 			self.closeComment();
 		},
@@ -55,7 +60,7 @@ VehicleScheduleGridCmdSetOut.prototype.onCommand = function(){
 			if(!res||!res.comment_text||!res.comment_text.length){
 				throw new Error("Не указана причина выхода со смены!");
 			}
-			self.setOutOnServer(res.comment_text);
+			self.setOutOnServer(id,res.comment_text,vehDescr);
 		}
 	});
 	
@@ -69,18 +74,20 @@ VehicleScheduleGridCmdSetOut.prototype.closeComment = function(){
 	delete this.m_form;			
 }
 
-VehicleScheduleGridCmdSetOut.prototype.setOutOnServer = function(commentText){
-	this.m_grid.setModelToCurrentRow();
-	var pm = this.m_grid.getReadPublicMethod().getController().getPublicMethod("set_out");
+VehicleScheduleGridCmdSetOut.prototype.setOutOnServer = function(id,commentText,vehDescr){	
+	this.closeComment();
+	window.showTempNote(vehDescr+" выведен со смены",null,5000);				
+	return;
 	
-	pm.setFieldValue("id",this.m_grid.getModel().getFieldValue("id"));
+	var pm = this.m_grid.getReadPublicMethod().getController().getPublicMethod("set_out");	
+	pm.setFieldValue("id",id);
 	pm.setFieldValue("comment_text",commentText);
 	var self = this;
 	pm.run({
 		"ok":function(resp){
-			self.m_grid.onRefresh(function(){
+			self.m_grid.onRefresh(function(){				
 				self.closeComment();
-				window.showTempNote("Выведен со смены",null,5000);				
+				window.showTempNote(vehDescr+" завершил смену",null,5000);				
 			});
 		}
 	})

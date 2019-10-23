@@ -123,7 +123,6 @@ function VehicleScheduleMakeOrderGrid(id,options){
 											c_tag.setAttribute("tel",tel);
 											EventHelper.add(c_tag,"click",function(e){
 												e = EventHelper.fixMouseEvent(e);
-												console.log(e.target)
 												window.getApp().makeCall(e.target.getAttribute("tel"));
 											});
 											cell_n.appendChild(c_tag);
@@ -187,6 +186,9 @@ function VehicleScheduleMakeOrderGrid(id,options){
 		"autoRefresh":false,
 		"refreshInterval":null,
 		"rowSelect":true,
+		"selectedRowClass":"order_current_row",
+		"navigate":true,
+		"navigateMouse":true,
 		"focus":false
 	});	
 	
@@ -204,4 +206,8 @@ extend(VehicleScheduleMakeOrderGrid,GridAjx);
 
 
 /* public methods */
+
+VehicleScheduleMakeOrderGrid.prototype.nodeClickable = function(node){
+	return (this.getEnabled() && (node.nodeName==this.DEF_CELL_TAG_NAME||node.nodeName=="SPAN") && DOMHelper.getParentByTagName(node,this.DEF_BODY_TAG_NAME));
+}
 
