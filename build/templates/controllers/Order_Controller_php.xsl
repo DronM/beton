@@ -452,6 +452,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		//Assigning		
 		$this->addModel(Shipment_Controller::getAssigningModel($db_link));
 		
+		//mat_totals
+		$this->addModel(RawMaterial_Controller::getTotalsModel($db_link,$date_for_db));
+		
 		//Vehicles		
 		$this->addModel(VehicleSchedule_Controller::getMakeListModel($db_link,$date_for_db));
 		

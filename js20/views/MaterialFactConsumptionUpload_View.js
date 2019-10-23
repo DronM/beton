@@ -38,7 +38,7 @@ function MaterialFactConsumptionUpload_View(id,options){
 				"template":window.getApp().getTemplate("EditFile"),
 				"mainView":this,
 				"onFileAdded":(function(productionId,fileCtrl){
-					console.log("FileAdded for productionId="+productionId)
+					//console.log("FileAdded for productionId="+productionId)
 				})(options.templateOptions.productions[i].productionId,file_ctrl)
 			});
 			this.addElement(file_ctrl);

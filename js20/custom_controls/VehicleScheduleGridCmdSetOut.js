@@ -75,10 +75,7 @@ VehicleScheduleGridCmdSetOut.prototype.closeComment = function(){
 }
 
 VehicleScheduleGridCmdSetOut.prototype.setOutOnServer = function(id,commentText,vehDescr){	
-	this.closeComment();
-	window.showTempNote(vehDescr+" выведен со смены",null,5000);				
-	return;
-	
+
 	var pm = this.m_grid.getReadPublicMethod().getController().getPublicMethod("set_out");	
 	pm.setFieldValue("id",id);
 	pm.setFieldValue("comment_text",commentText);

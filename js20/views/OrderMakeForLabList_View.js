@@ -75,6 +75,13 @@ function OrderMakeForLabList_View(id,options){
 			"noAutoRefresh":true
 		}));
 		
+		//material totals
+		var model = options.models.MatTotals_Model;
+		this.addElement(new MaterialMakeOrderGrid(id+":mat_totals_grid",{
+			"model":model,
+			"className":this.TABLE_CLASS
+		}));
+		
 		//vehicles
 		this.addElement(new VehicleScheduleMakeOrderGrid(id+":veh_schedule_grid",{"model":options.models.VehicleScheduleMakeOrderList_Model}));		
 		
@@ -266,6 +273,11 @@ OrderMakeForLabList_View.prototype.refresh = function(){
 				grid.getModel().setData(resp.getModelData("OrderMakeForLabList_Model"));
 				grid.onGetData();
 			}
+
+			//materials
+			var grid = self.getElement("mat_totals_grid");
+			grid.getModel().setData(resp.getModelData("MatTotals_Model"));
+			grid.onGetData();
 			
 			//assigning
 			self.getElement("veh_assigning").setData(resp.getModelData("AssignedVehicleList_Model"));

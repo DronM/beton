@@ -363,7 +363,7 @@ function OrderMakeGrid(id,options){
 			"cmdInsert":editable,
 			"cmdDelete":editable,
 			"cmdCopy":editable,
-			"cmdEdit":editable,
+			"cmdEdit":true,
 			"cmdSearch":false,
 			"cmdExport":false
 		}),

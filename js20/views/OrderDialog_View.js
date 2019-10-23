@@ -370,4 +370,10 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 		DOMHelper.setText(document.getElementById(id+":last_modif_user"), last_modif_users_ref.getDescr());
 		DOMHelper.setText(document.getElementById(id+":last_modif_date_time"), DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
 	}
+	
+	if(window.getApp().getServVar("role_id")=="lab_worker"){
+		this.setEnabled(false);
+		this.getElement("comment_text").setEnabled(true);
+		this.getControlOK().setEnabled(true);
+	}
 }

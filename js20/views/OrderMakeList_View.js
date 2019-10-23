@@ -82,6 +82,12 @@ function OrderMakeList_View(id,options){
 		
 		//material totals
 		var model = options.models.MatTotals_Model;
+		this.addElement(new MaterialMakeOrderGrid(id+":mat_totals_grid",{
+			"model":model,
+			"className":this.TABLE_CLASS
+		}));
+		/*
+		var model = options.models.MatTotals_Model;
 		this.addElement(new Grid(id+":mat_totals_grid",{
 			"model":model,
 			"className":this.TABLE_CLASS,
@@ -154,6 +160,7 @@ function OrderMakeList_View(id,options){
 			"navigate":false,
 			"navigateClick":false
 		}));
+		*/
 		
 		//assigning
 		this.addElement(new AssignedVehicleList_View(id+":veh_assigning",{
