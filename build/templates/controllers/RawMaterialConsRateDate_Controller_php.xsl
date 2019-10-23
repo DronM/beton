@@ -17,9 +17,9 @@
 
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
-class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
-	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
-		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
+class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
+	public function __construct($dbLinkMaster=NULL){
+		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
 	}	
 	<xsl:call-template name="extra_methods"/>
 }
@@ -27,6 +27,11 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+	public function recalc_consumption($pm){
+		$link_master = $this->getDbLinkMaster();
+		$link_master->query(sprintf("SELECT recalc_consumption(%d)",
+		$pm->getParamValue('period_id')));
+	}
 </xsl:template>
 
 </xsl:stylesheet>

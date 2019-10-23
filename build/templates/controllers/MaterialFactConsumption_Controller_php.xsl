@@ -42,9 +42,45 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$list_model = new $list_model_name($this->getDbLink());
 		$where = $this->conditionFromParams($pm,$list_model);
 		
+		$cond = '';
+		$oblig_cond = 'NOT coalesce(t_map.order_id,0)=0';
+		if($where){
+			$where_fields = $where->getFieldIterator();
+			while($where_fields->valid()){
+				$field = $where_fields->current();
+				$cond.=($cond=='')? '':' '.$field['cond'].' ';
+				if (!is_null($field['expression'])){
+					$cond.= $field['expression'];
+				}
+				else{
+					$pat = ($field['caseInsen'])?
+						$where::PAT_CASE_INSEN:$where::PAT_CASE_SEN;
+					$f_val = ($field['field']->getSQLExpression())?
+							$field['field']->getSQLExpression():
+							$field['field']->getValueForDb();
+					if ($field['signe']=='LIKE' &amp;&amp; strlen($f_val) &amp;&amp; $f_val[0]!="'"){
+						$f_val = "'".$f_val."'";
+					}
+					$field['field']->setTableName('t');
+					$f_sql = $field['field']->getSQLNoAlias(FALSE);
+					$cond.= sprintf($pat,
+						$f_sql . ( ($field['signe']=='LIKE')? '::text':'' ),
+						$field['signe'],
+						$f_val
+					);				
+				}
+				
+				$where_fields->next();
+			}
+			$cond.= 'AND '.$oblig_cond;
+		}
+		else{
+			$cond = $oblig_cond;
+		}
+		$cond = 'WHERE '.$cond;
+		
 		$mat_model = new ModelSQL($link,array('id'=>'MaterialFactConsumptionMaterialList_Model'));
 		$mat_model->addField(new FieldSQLString($link,null,null,"raw_material_production_descr"));
-		$oblig_cond = 'NOT coalesce(t_map.order_id,0)=0';
 		$mat_model->query(sprintf(
 			"SELECT DISTINCT ON (t.raw_material_production_descr,t_map.order_id)
 				t.raw_material_production_descr,
@@ -53,7 +89,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			LEFT JOIN raw_material_map_to_production_list AS t_map ON t_map.production_descr=t.raw_material_production_descr
 			%s
 			ORDER BY t_map.order_id",
-			$where? $where->getSQL().' AND '.$oblig_cond:'WHERE '.$oblig_cond
+			$cond
 		),
 		TRUE);
 		$this->addModel($mat_model);			

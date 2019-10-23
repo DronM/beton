@@ -119,11 +119,11 @@ function MaterialFactConsumptionRolledList_View(id,options){
 	grid.onGetData = function(resp){
 		if(resp){
 			var h = this.getHead();
-			var m = resp.getModel("MaterialFactConsumptionRolledList_Model");
+			this.m_model = resp.getModel("MaterialFactConsumptionRolledList_Model");
 			h.delDOM();
 			h.m_elements = self.getGridHead(
 				resp.getModel("MaterialFactConsumptionMaterialList_Model"),
-				m
+				this.m_model
 			);
 			h.toDOM(this.m_node);			
 		}

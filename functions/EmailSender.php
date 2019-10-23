@@ -2,7 +2,7 @@
 require("common/PHPMailer_5.2.4/class.phpmailer.php");
 
 class EmailSender {
-	public static function addEMail(
+	public static function addEMailForSendig(
 				$dbLink,
 				$from,$fromName,
 				$to,$toName,

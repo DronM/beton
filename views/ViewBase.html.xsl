@@ -142,6 +142,7 @@
 		application.m_weather.toDOM();
 	}	
 	<xsl:if test="count(/document/model[@id='AstCallCurrent_Model']/row) &gt;0">
+	console.log("WidthType="+window.getWidthType())
 	if(window.getWidthType()!="sm"){
 	//ВХОДЯЩИЙ ЗВОНОК!
 	var view_opts = {};

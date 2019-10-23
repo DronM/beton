@@ -1,16 +1,23 @@
--- View: public.orders_make_for_lab_list
+--DROP FUNCTION material_fact_consumptions_add_vehicle(text)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_vehicle(text)
+RETURNS int as $$
+DECLARE
+	v_vehicle_id int;
+BEGIN
+	v_vehicle_id = NULL;
+	SELECT vehicle_id INTO v_vehicle_id FROM vehicle_map_to_production WHERE production_descr = $1;
+	IF NOT FOUND THEN
+		SELECT id FROM vehicles INTO v_vehicle_id WHERE plate=$1 OR (length($1)=3 AND length(plate)=6 AND '%'||plate||'%' LIKE $1);
+		
+		INSERT INTO vehicle_map_to_production
+		(production_descr,vehicle_id)
+		VALUES
+		($1,v_vehicle_id)
+		;
+	END IF;
+	
+	RETURN v_vehicle_id;
+END;
+$$ language plpgsql;
 
--- DROP VIEW public.orders_make_for_lab_list;
-
-CREATE OR REPLACE VIEW public.orders_make_for_lab_list AS 
-	SELECT
-		o.*,
-		(need_t.need_cnt > 0) AS is_needed
-	FROM orders_make_list o
-	LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = (o.concrete_types_ref->'keys'->>'id')::int
-	WHERE o.date_time BETWEEN
-		get_shift_start(now()::timestamp without time zone)
-		AND get_shift_end(get_shift_start(now()::timestamp without time zone))
-	ORDER BY o.date_time;
-ALTER TABLE public.orders_make_for_lab_list OWNER TO beton;
-
+ALTER FUNCTION material_fact_consumptions_add_vehicle(text) OWNER TO beton;

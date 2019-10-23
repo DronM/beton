@@ -59,6 +59,6 @@ class CustomEmailSender extends EmailSender{
 				$smtpHost,$smtpPort,$smtpUser,$smtpPwd,
 				$delFiles);
 	}
-	
+
 }
 ?>

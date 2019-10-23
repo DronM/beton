@@ -64,7 +64,7 @@ function MaterialFactConsumptionUpload_View(id,options){
 									window.setGlobalWait(false);
 									if(matchingEnabled){
 										formContext.getElement("material_fact_consumptions_list").getElement("grid").onRefresh();
-									}									
+									}																		
 								}
 								,"ok":function(resp){
 									window.showOk("Файл успешно загружен",null);

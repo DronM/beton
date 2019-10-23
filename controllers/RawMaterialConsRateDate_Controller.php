@@ -22,8 +22,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
 
 
 class RawMaterialConsRateDate_Controller extends ControllerSQL{
-	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
-		parent::__construct($dbLinkMaster,$dbLink);
+	public function __construct($dbLinkMaster=NULL){
+		parent::__construct($dbLinkMaster);
 			
 
 		/* insert */
@@ -134,5 +134,11 @@ class RawMaterialConsRateDate_Controller extends ControllerSQL{
 		
 	}	
 	
+	public function recalc_consumption($pm){
+		$link_master = $this->getDbLinkMaster();
+		$link_master->query(sprintf("SELECT recalc_consumption(%d)",
+		$pm->getParamValue('period_id')));
+	}
+
 }
 ?>

@@ -774,7 +774,7 @@ class User_Controller extends ControllerSQL{
 	private function pwd_notify($userId,$pwd,$pwdDb,$email,$tel){
 		if (strlen($email)){
 			//email
-			CustomEmailSender::addEMail(
+			CustomEmailSender::regEMail(
 				$this->getDbLinkMaster(),
 				sprintf("email_user_reset_pwd(%d,%s)",
 					$userId,
@@ -796,7 +796,7 @@ class User_Controller extends ControllerSQL{
 	
 	private function email_confirm_notify($userId,$key){
 		//email
-		CustomEmailSender::addEMail(
+		CustomEmailSender::regEMail(
 			$this->getDbLinkMaster(),
 			sprintf("email_user_email_conf(%d,%s)",
 				$userId,$key
