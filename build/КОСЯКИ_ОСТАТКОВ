@@ -17,3 +17,17 @@ ra_materials_process()
 						RAISE EXCEPTION 'Период закрыт для редактировани!';
 					END IF;
 
+*************************************ИСПРАВЛЕНИЕ ОСТАТКОВ ПО ОДНОМУ МАТЕРИАЛУ
+update rg_materials
+set quant=(
+	(SELECT b.quant FROM rg_materials AS b WHERE b.material_id=4 AND b.date_time='2019-09-01 00:00:00')
+	+(SELECT sum(CASE WHEN ra.deb THEN 1 ELSE -1 END *ra.quant) FROM ra_materials AS ra WHERE ra.material_id=4 AND ra.date_time BETWEEN '2019-10-01 00:00:00' AND '2019-10-31 23:59:59')
+)
+WHERE material_id=4 AND date_time='2019-10-01 00:00:00'
+*****************
+update rg_materials
+set quant=(
+	SELECT b.quant FROM rg_materials AS b WHERE b.material_id=4 AND b.date_time='2019-10-01 00:00:00'
+)
+WHERE material_id=4 AND date_time='3000-01-01 00:00:00'
+

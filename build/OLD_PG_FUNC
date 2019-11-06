@@ -1,0 +1,91 @@
+ЕЩЕ Исправить в Строке 359
+
+					
+					v_loop_rg_period = CALC_DATE_TIME;
+					v_calc_interval = rg_calc_interval('<xsl:value-of select="$reg_type_id"/>'::reg_types);
+					LOOP
+						UPDATE <xsl:value-of select="$rg_table"/>
+						SET
+						<xsl:for-each select="field[@regFieldType='fact']">
+						<xsl:if test="position() &gt; 1">,</xsl:if>
+						<xsl:value-of select="concat(@id,' = ',@id,' + ','v_delta_',@id)"/>
+						</xsl:for-each>
+						WHERE 
+							date_time=v_loop_rg_period
+							<xsl:for-each select="field[@regFieldType='dimension']">
+							AND <xsl:value-of select="concat(@id,' = OLD.',@id)"/>
+							</xsl:for-each>;
+						IF NOT FOUND THEN
+							BEGIN
+								INSERT INTO <xsl:value-of select="$rg_table"/> (date_time
+								<xsl:for-each select="field[@regFieldType='dimension' or @regFieldType='fact']">
+								,<xsl:value-of select="@id"/>
+								</xsl:for-each>)				
+								VALUES (v_loop_rg_period
+								<xsl:for-each select="field[@regFieldType='dimension']">
+								,OLD.<xsl:value-of select="@id"/>
+								</xsl:for-each>
+								<xsl:for-each select="field[@regFieldType='fact']">
+								,v_delta_<xsl:value-of select="@id"/>
+								</xsl:for-each>);
+							EXCEPTION WHEN OTHERS THEN
+								UPDATE <xsl:value-of select="$rg_table"/>
+								SET
+								<xsl:for-each select="field[@regFieldType='fact']">
+								<xsl:if test="position() &gt; 1">,</xsl:if>
+								<xsl:value-of select="concat(@id,' = ',@id,' + ','v_delta_',@id)"/>
+								</xsl:for-each>
+								WHERE date_time = v_loop_rg_period
+								<xsl:for-each select="field[@regFieldType='dimension']">
+								AND <xsl:value-of select="concat(@id,' = OLD.',@id)"/>
+								</xsl:for-each>;
+							END;
+						END IF;
+
+						v_loop_rg_period = v_loop_rg_period + v_calc_interval;
+						IF v_loop_rg_period > CALC_DATE_TIME THEN
+							EXIT;  -- exit loop
+						END IF;
+					END LOOP;
+
+					--Current balance
+					CURRENT_BALANCE_DATE_TIME = reg_current_balance_time();
+					UPDATE <xsl:value-of select="$rg_table"/>
+					SET
+					<xsl:for-each select="field[@regFieldType='fact']">
+					<xsl:if test="position() &gt; 1">,</xsl:if>
+					<xsl:value-of select="concat(@id,' = ',@id,' + ','v_delta_',@id)"/>
+					</xsl:for-each>
+					WHERE 
+						date_time=CURRENT_BALANCE_DATE_TIME
+						<xsl:for-each select="field[@regFieldType='dimension']">
+						AND <xsl:value-of select="concat(@id,' = OLD.',@id)"/>
+						</xsl:for-each>;
+					IF NOT FOUND THEN
+						BEGIN
+							INSERT INTO <xsl:value-of select="$rg_table"/> (date_time
+							<xsl:for-each select="field[@regFieldType='dimension' or @regFieldType='fact']">
+							,<xsl:value-of select="@id"/>
+							</xsl:for-each>)				
+							VALUES (CURRENT_BALANCE_DATE_TIME
+							<xsl:for-each select="field[@regFieldType='dimension']">
+							,OLD.<xsl:value-of select="@id"/>
+							</xsl:for-each>
+							<xsl:for-each select="field[@regFieldType='fact']">
+							,v_delta_<xsl:value-of select="@id"/>
+							</xsl:for-each>);
+						EXCEPTION WHEN OTHERS THEN
+							UPDATE <xsl:value-of select="$rg_table"/>
+							SET
+							<xsl:for-each select="field[@regFieldType='fact']">
+							<xsl:if test="position() &gt; 1">,</xsl:if>
+							<xsl:value-of select="concat(@id,' = ',@id,' + ','v_delta_',@id)"/>
+							</xsl:for-each>
+							WHERE 
+								date_time=CURRENT_BALANCE_DATE_TIME
+								<xsl:for-each select="field[@regFieldType='dimension']">
+								AND <xsl:value-of select="concat(@id,' = OLD.',@id)"/>
+								</xsl:for-each>;
+						END;
+					END IF;					
+

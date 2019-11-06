@@ -137,6 +137,24 @@ function DOCMaterialProcurementList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.cement_silos_id = new FieldInt("cement_silos_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.cement_silos_ref = new FieldJSON("cement_silos_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.quant_gross = new FieldString("quant_gross",filed_options);
 	
 				

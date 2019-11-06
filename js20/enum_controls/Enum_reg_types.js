@@ -16,11 +16,19 @@ function Enum_reg_types(id,options){
 	options = options || {};
 	options.addNotSelected = (options.addNotSelected!=undefined)? options.addNotSelected:true;
 	var multy_lang_values = {"ru_material":"Учет материалов"
+,"ru_material_fact":"Учет материалов по факту"
+,"ru_cement":"Учет цемента"
 ,"ru_material_consumption":"Расход материалов"
 };
 	options.options = [{"value":"material",
 "descr":multy_lang_values[window.getApp().getLocale()+"_"+"material"],
 checked:(options.defaultValue&&options.defaultValue=="material")}
+,{"value":"material_fact",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"material_fact"],
+checked:(options.defaultValue&&options.defaultValue=="material_fact")}
+,{"value":"cement",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"cement"],
+checked:(options.defaultValue&&options.defaultValue=="cement")}
 ,{"value":"material_consumption",
 "descr":multy_lang_values[window.getApp().getLocale()+"_"+"material_consumption"],
 checked:(options.defaultValue&&options.defaultValue=="material_consumption")}

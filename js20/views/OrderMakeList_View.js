@@ -57,7 +57,10 @@ function OrderMakeList_View(id,options){
 			"dateFrom":init_dt,
 			"onChange":function(dateTime){
 				self.m_refreshMethod.setFieldValue("date",dateTime);
-				self.refresh();
+				window.setGlobalWait(true);
+				self.refresh(function(){
+					window.setGlobalWait(false);
+				});
 			}
 		});
 		this.addElement(per_select);	
@@ -86,81 +89,6 @@ function OrderMakeList_View(id,options){
 			"model":model,
 			"className":this.TABLE_CLASS
 		}));
-		/*
-		var model = options.models.MatTotals_Model;
-		this.addElement(new Grid(id+":mat_totals_grid",{
-			"model":model,
-			"className":this.TABLE_CLASS,
-			"attrs":{"style":"width:100%;"},
-			"keyIds":["material_id"],
-			"readPublicMethod":null,
-			"editInline":false,
-			"editWinClass":null,
-			"commands":null,
-			"popUpMenu":null,
-			"head":new GridHead(id+":mat_totals_grid:head",{
-				"elements":[
-					new GridRow(id+"mat_totals_grid:head:row0",{
-						"elements":[
-							new GridCellHead(id+":mat_totals_grid:head:material_descr",{
-								"value":"Материал",
-								"columns":[
-									new GridColumn({"field":model.getField("material_descr")})
-								]
-							})
-							,new GridCellHead(id+":mat_totals_grid:head:quant_ordered",{
-								"value":"Заявлено",
-								"colAttrs":{"align":"right"},
-								"columns":[
-									new GridColumnFloat({
-										"field":model.getField("quant_ordered"),
-										"precision":3
-									})
-								]
-							})
-							,new GridCellHead(id+":mat_totals_grid:head:quant_procured",{
-								"value":"Приход",
-								"colAttrs":{"align":"right"},
-								"columns":[
-									new GridColumnFloat({
-										"field":model.getField("quant_procured"),
-										"precision":3
-									})
-								]
-							})
-							,new GridCellHead(id+":mat_totals_grid:head:quant_balance",{
-								"value":"Ост.тек.",
-								"colAttrs":{"align":"right"},
-								"columns":[
-									new GridColumnFloat({
-										"field":model.getField("quant_balance"),
-										"precision":3
-									})
-								]
-							})
-							,new GridCellHead(id+":mat_totals_grid:head:quant_morn_balance",{
-								"value":"Ост.утро",
-								"colAttrs":{"align":"right"},
-								"columns":[
-									new GridColumnFloat({
-										"field":model.getField("quant_morn_balance"),
-										"precision":3
-									})
-								]
-							})
-						]
-					})
-				]
-			}),
-			"pagination":null,
-			"autoRefresh":false,
-			"refreshInterval":null,
-			"rowSelect":false,
-			"focus":false,
-			"navigate":false,
-			"navigateClick":false
-		}));
-		*/
 		
 		//assigning
 		this.addElement(new AssignedVehicleList_View(id+":veh_assigning",{
@@ -268,7 +196,7 @@ OrderMakeList_View.prototype.m_endShiftMS;
 /**
  * Все обновляется разом за один запрос из нескольких моделей
  */
-OrderMakeList_View.prototype.refresh = function(){
+OrderMakeList_View.prototype.refresh = function(callBack){
 //console.log("OrderMakeList_View.prototype.refresh")
 	this.m_refreshMethod.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
 	var self = this;
@@ -310,6 +238,10 @@ OrderMakeList_View.prototype.refresh = function(){
 			
 			//totals
 			self.showTotals();			
+			if(callBack){
+				callBack();
+			}
+			
 		}
 	})
 }

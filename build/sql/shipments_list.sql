@@ -70,10 +70,12 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		sh.production_site_id,
 		
 		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		--vehicle_owner_on_date(v.vehicle_owners,sh.date_time) AS vehicle_owners_ref,
 		
 		sh.acc_comment,
 		sh.acc_comment_shipment,
 		v_own.id AS vehicle_owner_id,
+		--((vehicle_owner_on_date(v.vehicle_owners,sh.date_time))-'keys'->>'id')::int AS vehicle_owner_id
 		
 		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
 		(SELECT

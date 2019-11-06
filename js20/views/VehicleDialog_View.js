@@ -14,14 +14,13 @@ function VehicleDialog_View(id,options){
 		"maxLength":"6",
 		"required":true
 	}));	
-	this.addElement(new EditInt(id+":load_capacity",{
+	this.addElement(new EditFloat(id+":load_capacity",{
+		"precision":"2",
 		"labelCaption":"Грузоподъемность:"
 	}));	
 	this.addElement(new DriverEditRef(id+":driver"));	
 	
 	this.addElement(new MakeEdit(id+":make"));	
-	
-	//this.addElement(new OwnerEdit(id+":owner"));		
 	
 	this.addElement(new FeatureEdit(id+":feature"));	
 	
@@ -41,7 +40,7 @@ function VehicleDialog_View(id,options){
 		"enabled":false
 	}));	
 
-	this.addElement(new VehicleOwnerEdit(id+":owner",{
+	this.addElement(new OwnerListGrid(id+":owners",{
 	}));	
 
 	
@@ -53,7 +52,7 @@ function VehicleDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("load_capacity")})
 		,new DataBinding({"control":this.getElement("driver")})
 		,new DataBinding({"control":this.getElement("make")})
-		,new DataBinding({"control":this.getElement("owner"),"fieldId":"vehicle_owners_ref"})
+		,new DataBinding({"control":this.getElement("owners"),"fieldId":"vehicle_owners"})
 		,new DataBinding({"control":this.getElement("feature")})
 		,new DataBinding({"control":this.getElement("tracker_id")})
 		,new DataBinding({"control":this.getElement("sim_id")})
@@ -68,7 +67,7 @@ function VehicleDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("load_capacity")})
 		,new CommandBinding({"control":this.getElement("driver"),"fieldId":"driver_id"})
 		,new CommandBinding({"control":this.getElement("make")})
-		,new CommandBinding({"control":this.getElement("owner"),"fieldId":"vehicle_owner_id"})
+		,new CommandBinding({"control":this.getElement("owners"),"fieldId":"vehicle_owners"})
 		,new CommandBinding({"control":this.getElement("feature")})
 		,new CommandBinding({"control":this.getElement("tracker_id")})
 		,new CommandBinding({"control":this.getElement("sim_id")})

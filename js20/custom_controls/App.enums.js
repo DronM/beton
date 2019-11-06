@@ -10,13 +10,11 @@
 		"locales":{"ru_ru":"Русский"
 }
 
-		,"role_types":{"ru_admin":"Администратор"
-}
-
 		,"data_types":{"ru_users":"Пользователи"
 }
 
-		,"role_types":{"ru_owner":"Администратор"
+		,"role_types":{"ru_admin":"Администратор"
+,"ru_owner":"Администратор"
 ,"ru_boss":"Руководитель"
 ,"ru_operator":"Оператор"
 ,"ru_manager":"Менеджер"
@@ -71,6 +69,8 @@
 }
 
 		,"reg_types":{"ru_material":"Учет материалов"
+,"ru_material_fact":"Учет материалов по факту"
+,"ru_cement":"Учет цемента"
 ,"ru_material_consumption":"Расход материалов"
 }
 

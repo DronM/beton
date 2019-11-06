@@ -502,6 +502,23 @@ class RawMaterial_Controller extends ControllerSQL{
 					$mat_params->getParamById('material')));
 				}
 				
+				//silo
+				$cement_silos_id = "NULL";
+				if(isset($doc->silo_name)){
+					$silo_params = new ParamsSQL($pm,$link);				
+					$silo_params->add('silo_name',DT_STRING,$doc->silo_name);
+					$silo_ar = $link->query_first(
+						sprintf("SELECT id
+							FROM cement_silos
+							WHERE weigh_app_name=%s",
+							$silo_params->getParamById('silo_name')
+						)
+					);
+					if(is_array($silo_ar) && count($silo_ar) && $silo_ar['id']){
+						$cement_silos_id = $silo_ar['id'];
+					}
+				}
+				
 				//doc				
 				$doc_params = new ParamsSQL($pm,$link);				
 				$doc_params->add('number',DT_STRING,$doc->number);
@@ -522,13 +539,26 @@ class RawMaterial_Controller extends ControllerSQL{
 					//new doc
 					$link_master->query_first(sprintf(
 					"INSERT INTO doc_material_procurements
-					(date_time,number,doc_ref,supplier_id,carrier_id,driver,vehicle_plate,material_id,quant_gross,quant_net)
-					VALUES (%s,%s,%s,%d,%d,%s,%s,%d,%f,%f) RETURNING id",
+					(	date_time,
+						number,
+						doc_ref,
+						supplier_id,
+						carrier_id,
+						cement_silos_id,
+						driver,
+						vehicle_plate,
+						material_id,
+						quant_gross,
+						quant_net
+					)
+					VALUES (%s,%s,%s,%d,%d,%s,%s,%s,%d,%f,%f)
+					RETURNING id",
 					$doc_params->getParamById('date_time'),
 					$doc_params->getParamById('number'),
 					$doc_params->getParamById('doc_ref'),
 					$supplier_ar['id'],
 					$carrier_ar['id'],
+					$cement_silos_id,
 					$doc_params->getParamById('driver'),
 					$doc_params->getParamById('vehicle_plate'),
 					$material_ar['id'],
@@ -540,10 +570,13 @@ class RawMaterial_Controller extends ControllerSQL{
 					//update doc
 					$link_master->query_first(sprintf(
 					"UPDATE doc_material_procurements
-					SET date_time=%s,number=%s,
-					supplier_id=%d,carrier_id=%d,driver=%s,
-					vehicle_plate=%s,material_id=%d,
-					quant_gross=%f,quant_net=%f
+					SET
+						date_time=%s,number=%s,
+						supplier_id=%d,carrier_id=%d,driver=%s,
+						vehicle_plate=%s,
+						material_id=%d,
+						cement_silos_id=%s,
+						quant_gross=%f,quant_net=%f
 					WHERE id=%d",
 					$doc_params->getParamById('date_time'),
 					$doc_params->getParamById('number'),
@@ -552,6 +585,7 @@ class RawMaterial_Controller extends ControllerSQL{
 					$doc_params->getParamById('driver'),
 					$doc_params->getParamById('vehicle_plate'),
 					$material_ar['id'],
+					$cement_silos_id,
 					$quant_gross,
 					$quant_net,
 					$doc_ar['id']
@@ -571,7 +605,7 @@ class RawMaterial_Controller extends ControllerSQL{
 			VALUES ('%s',%s,%s,%d)",
 			date('Y-m-d H:i:s'),$res,$descr,$doc_cnt));
 		if ($res == 'false'){
-			throw new $e;
+			throw $e;
 		}
 	}
 	public function oper_week_report($pm){

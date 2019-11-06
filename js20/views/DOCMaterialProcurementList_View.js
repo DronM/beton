@@ -63,6 +63,15 @@ function DOCMaterialProcurementList_View(id,options){
 							],
 							"sortable":true
 						})
+						,new GridCellHead(id+":grid:head:cement_silos_ref",{
+							"value":"Силос",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("cement_silos_ref")
+								})
+							],
+							"sortable":true
+						})
 						
 						,new GridCellHead(id+":grid:head:suppliers_ref",{
 							"value":"Поставщик",

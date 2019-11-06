@@ -70,8 +70,11 @@ class Vehicle_Controller extends ControllerSQL{
 		$pm->addParam($param);
 		$param = new FieldExtInt('vehicle_owner_id'
 				,array(
-				'alias'=>'Номер телефона SIM карты'
+				'alias'=>'Владелец'
 			));
+		$pm->addParam($param);
+		$param = new FieldExtJSONB('vehicle_owners'
+				,array());
 		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
@@ -140,7 +143,11 @@ class Vehicle_Controller extends ControllerSQL{
 		$param = new FieldExtInt('vehicle_owner_id'
 				,array(
 			
-				'alias'=>'Номер телефона SIM карты'
+				'alias'=>'Владелец'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtJSONB('vehicle_owners'
+				,array(
 			));
 			$pm->addParam($param);
 		

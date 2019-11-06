@@ -135,6 +135,16 @@ class DOCMaterialProcurement_Model extends ModelSQLDOC{
 		$this->addField($f_material_id);
 		//********************
 		
+		//*** Field cement_silos_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Силос';
+		$f_opts['id']="cement_silos_id";
+						
+		$f_cement_silos_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cement_silos_id",$f_opts);
+		$this->addField($f_cement_silos_id);
+		//********************
+		
 		//*** Field quant_gross ***
 		$f_opts = array();
 		

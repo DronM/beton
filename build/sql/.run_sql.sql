@@ -1,23 +1,48 @@
---DROP FUNCTION material_fact_consumptions_add_vehicle(text)
-CREATE OR REPLACE FUNCTION material_fact_consumptions_add_vehicle(text)
-RETURNS int as $$
-DECLARE
-	v_vehicle_id int;
-BEGIN
-	v_vehicle_id = NULL;
-	SELECT vehicle_id INTO v_vehicle_id FROM vehicle_map_to_production WHERE production_descr = $1;
-	IF NOT FOUND THEN
-		SELECT id FROM vehicles INTO v_vehicle_id WHERE plate=$1 OR (length($1)=3 AND length(plate)=6 AND '%'||plate||'%' LIKE $1);
-		
-		INSERT INTO vehicle_map_to_production
-		(production_descr,vehicle_id)
-		VALUES
-		($1,v_vehicle_id)
-		;
-	END IF;
-	
-	RETURN v_vehicle_id;
-END;
-$$ language plpgsql;
+﻿-- Function: sms_pump_order_upd(in_order_id int)
 
-ALTER FUNCTION material_fact_consumptions_add_vehicle(text) OWNER TO beton;
+-- DROP FUNCTION sms_pump_order_upd(in_order_id int);
+
+CREATE OR REPLACE FUNCTION sms_pump_order_upd(in_order_id int)
+  RETURNS TABLE(
+  	phone_cel text,
+  	message text  	
+  ) AS
+$$
+	SELECT
+		sub.r->'fields'->>'tel' AS tel,
+		sub.message AS message
+	FROM
+	(
+	SELECT
+		jsonb_array_elements(pvh.phone_cels->'rows') AS r,
+		sms_templates_text(
+			ARRAY[
+		    		format('("quant","%s")'::text, o.quant::text)::template_value,
+		    		format('("date","%s")'::text, date5_descr(o.date_time::date)::text)::template_value,
+		    		format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
+		    		format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+		    		format('("dest","%s")'::text, dest.name::text)::template_value,
+		    		format('("concrete","%s")'::text, ct.name::text)::template_value,
+		    		format('("client","%s")'::text, cl.name::text)::template_value,
+		    		format('("name","%s")'::text, o.descr)::template_value,
+		    		format('("tel","%s")'::text, format_cel_phone(o.phone_cel::text))::template_value,
+		    		format('("car","%s")'::text, vh.plate::text)::template_value
+			],
+			( SELECT t.pattern
+			FROM sms_patterns t
+			WHERE t.sms_type = 'order_for_pump_upd'::sms_types AND t.lang_id = 1
+			)
+		) AS message
+	
+	FROM orders o
+		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+		LEFT JOIN destinations dest ON dest.id = o.destination_id
+		LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+		LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+		LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE o.id=in_order_id
+	) AS sub;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION sms_pump_order_upd(in_order_id int) OWNER TO beton;

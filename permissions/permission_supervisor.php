@@ -986,6 +986,26 @@ $permissions = array();
 				
 					$permissions['MaterialFactConsumption_Controller_upload_production_file']=TRUE;
 				
+					$permissions['CementSilo_Controller_insert']=TRUE;
+				
+					$permissions['CementSilo_Controller_update']=TRUE;
+				
+					$permissions['CementSilo_Controller_delete']=TRUE;
+				
+					$permissions['CementSilo_Controller_get_list']=TRUE;
+				
+					$permissions['CementSilo_Controller_get_object']=TRUE;
+				
+					$permissions['OwnerList_Controller_insert']=TRUE;
+				
+					$permissions['OwnerList_Controller_update']=TRUE;
+				
+					$permissions['OwnerList_Controller_delete']=TRUE;
+				
+					$permissions['OwnerList_Controller_get_list']=TRUE;
+				
+					$permissions['OwnerList_Controller_get_object']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

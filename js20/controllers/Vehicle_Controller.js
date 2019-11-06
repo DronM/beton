@@ -104,8 +104,14 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Номер телефона SIM карты";
+	options.alias = "Владелец";
 	var field = new FieldInt("vehicle_owner_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldJSONB("vehicle_owners",options);
 	
 	pm.addField(field);
 	
@@ -176,8 +182,14 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Номер телефона SIM карты";
+	options.alias = "Владелец";
 	var field = new FieldInt("vehicle_owner_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldJSONB("vehicle_owners",options);
 	
 	pm.addField(field);
 	
@@ -245,6 +257,9 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("vehicle_owner_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSONB("vehicle_owners",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){

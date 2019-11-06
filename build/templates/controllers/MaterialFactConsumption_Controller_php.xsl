@@ -84,10 +84,14 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$mat_model->query(sprintf(
 			"SELECT DISTINCT ON (t.raw_material_production_descr,t_map.order_id)
 				t.raw_material_production_descr,
-				t_map.raw_materials_ref
+				(t_map.raw_materials_ref::text)::jsonb,
+				sum(t.concrete_quant) AS concrete_quant,
+				sum(t.material_quant) AS material_quant,
+				sum(t.material_quant_req) AS material_quant_req				
 			FROM material_fact_consumptions AS t
 			LEFT JOIN raw_material_map_to_production_list AS t_map ON t_map.production_descr=t.raw_material_production_descr
 			%s
+			GROUP BY t.raw_material_production_descr,t_map.order_id,t_map.raw_materials_ref::text
 			ORDER BY t_map.order_id",
 			$cond
 		),

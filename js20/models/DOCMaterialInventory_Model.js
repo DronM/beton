@@ -66,6 +66,8 @@ function DOCMaterialInventory_Model(options){
 			
 			
 				
+				
+				
 			
 		DOCMaterialInventory_Model.superclass.constructor.call(this,id,options);
 }

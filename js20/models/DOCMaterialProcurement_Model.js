@@ -136,6 +136,15 @@ function DOCMaterialProcurement_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Силос';
+	filed_options.autoInc = false;	
+	
+	options.fields.cement_silos_id = new FieldInt("cement_silos_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Брутто';
 	filed_options.autoInc = false;	
 	
@@ -157,6 +166,8 @@ function DOCMaterialProcurement_Model(options){
 			
 			
 			
+				
+				
 				
 			
 		DOCMaterialProcurement_Model.superclass.constructor.call(this,id,options);

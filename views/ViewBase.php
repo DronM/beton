@@ -1294,6 +1294,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryDetailList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderMakeForLabList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1393,6 +1394,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/TelListGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleMakeOrderGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MaterialMakeOrderGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OwnerListGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1657,6 +1659,17 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialConsRateList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/OrderMakeForLabList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/LabEntry30DaysList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/CementSilo_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RGCement_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RACement_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RGMaterialFact_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RAMaterialFact_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/CementSilo_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/CementSiloList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerHistory_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerHistoryList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/OwnerList_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/OwnerList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

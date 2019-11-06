@@ -121,3 +121,5 @@ VehicleMapToProductionList_View.prototype.HEAD_TITLE = "Соответствие
 RawMaterialMapToProductionList_View.prototype.HEAD_TITLE = "Соответствие материалов в производстве и в этой программе";
 
 LabEntryList_View.prototype.HEAD_TITLE = "Журнал испытания образцов";
+
+CementSiloList_View.prototype.HEAD_TITLE = "Соответствие силосов";

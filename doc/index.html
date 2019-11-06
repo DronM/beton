@@ -16,6 +16,7 @@
 <li><a href="#AstCall_Controller">AstCall_Controller</a></li>
 <li><a href="#Caller_Controller">Caller_Controller</a></li>
 <li><a href="#Captcha_Controller">Captcha_Controller</a></li>
+<li><a href="#CementSilo_Controller">CementSilo_Controller</a></li>
 <li><a href="#Client_Controller">Client_Controller</a></li>
 <li><a href="#ClientComeFrom_Controller">ClientComeFrom_Controller</a></li>
 <li><a href="#ClientTel_Controller">ClientTel_Controller</a></li>
@@ -50,6 +51,7 @@
 <li><a href="#Order_Controller">Order_Controller</a></li>
 <li><a href="#OrderFromClient_Controller">OrderFromClient_Controller</a></li>
 <li><a href="#OrderPump_Controller">OrderPump_Controller</a></li>
+<li><a href="#OwnerList_Controller">OwnerList_Controller</a></li>
 <li><a href="#ProductionSite_Controller">ProductionSite_Controller</a></li>
 <li><a href="#PumpPrice_Controller">PumpPrice_Controller</a></li>
 <li><a href="#PumpPriceValue_Controller">PumpPriceValue_Controller</a></li>
@@ -284,6 +286,13 @@
 <li><a href="#MaterialFactConsumption_Model">MaterialFactConsumption_Model</a></li>
 <li><a href="#MaterialFactConsumptionList_Model">MaterialFactConsumptionList_Model</a></li>
 <li><a href="#MaterialFactConsumptionRolledList_Model">MaterialFactConsumptionRolledList_Model</a></li>
+<li><a href="#CementSilo_Model">CementSilo_Model</a></li>
+<li><a href="#CementSiloList_Model">CementSiloList_Model</a></li>
+<li><a href="#RGCement_Model">RGCement_Model</a></li>
+<li><a href="#RACement_Model">RACement_Model</a></li>
+<li><a href="#RGMaterialFact_Model">RGMaterialFact_Model</a></li>
+<li><a href="#RAMaterialFact_Model">RAMaterialFact_Model</a></li>
+<li><a href="#OwnerList_Model">OwnerList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -521,6 +530,19 @@
 <h2>get</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
+</div>
+</div>
+<div id="CementSilo_Controller" class="content_box">
+<h1>CementSilo_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#CementSilo_Model">Model: CementSilo_Model</a><h2>update</h2>
+<a href="#CementSilo_Model">Model: CementSilo_Model</a><h2>delete</h2>
+<a href="#CementSilo_Model">Model: CementSilo_Model</a><h2>get_list</h2>
+<a href="#CementSiloList_Model">Model: CementSiloList_Model</a><h2>get_object</h2>
+<a href="#CementSiloList_Model">Model: CementSiloList_Model</a>
 </div>
 </div>
 <div id="Client_Controller" class="content_box">
@@ -1436,6 +1458,19 @@
 <a href="#OrderPump_Model">Model: OrderPump_Model</a><h2>get_list</h2>
 <a href="#OrderPumpList_Model">Model: OrderPumpList_Model</a><h2>get_object</h2>
 <a href="#OrderPumpList_Model">Model: OrderPumpList_Model</a>
+</div>
+</div>
+<div id="OwnerList_Controller" class="content_box">
+<h1>OwnerList_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#OwnerList_Model">Model: OwnerList_Model</a><h2>update</h2>
+<a href="#OwnerList_Model">Model: OwnerList_Model</a><h2>delete</h2>
+<a href="#OwnerList_Model">Model: OwnerList_Model</a><h2>get_list</h2>
+<a href="#OwnerList_Model">Model: OwnerList_Model</a><h2>get_object</h2>
+<a href="#OwnerList_Model">Model: OwnerList_Model</a>
 </div>
 </div>
 <div id="ProductionSite_Controller" class="content_box">
@@ -3256,6 +3291,90 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="CementSilo_Model" class="content_box">
+<h1>CementSilo_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>weigh_app_name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>load_capacity</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+</div>
+</div>
+<div id="CementSiloList_Model" class="content_box">
+<h1>CementSiloList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>weigh_app_name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>load_capacity</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+</div>
+</div>
 <div id="Client_Model" class="content_box">
 <h1>Client_Model</h1>
 <div class="content_item">
@@ -4274,6 +4393,12 @@
 <div>Required:TRUE</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>cement_silos_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>quant_gross</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
@@ -4359,6 +4484,18 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>materials_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silos_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silos_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -7588,6 +7725,30 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="OwnerList_Model" class="content_box">
+<h1>OwnerList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>dt_from</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>owner</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="ProductionSite_Model" class="content_box">
 <h1>ProductionSite_Model</h1>
 <div class="content_item">
@@ -7894,6 +8055,54 @@
 <div>Precision:2</div>
 </div>
 </div>
+<div id="RACement_Model" class="content_box">
+<h1>RACement_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>deb</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_type</h2>
+<div>Type:Enum</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silos_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:3</div>
+</div>
+</div>
 <div id="RAMaterial_Model" class="content_box">
 <h1>RAMaterial_Model</h1>
 <div class="content_item">
@@ -8188,6 +8397,84 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="RAMaterialFact_Model" class="content_box">
+<h1>RAMaterialFact_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>deb</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_type</h2>
+<div>Type:Enum</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:3</div>
+</div>
+</div>
+<div id="RGCement_Model" class="content_box">
+<h1>RGCement_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silos_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:3</div>
+</div>
+</div>
 <div id="RGMaterial_Model" class="content_box">
 <h1>RGMaterial_Model</h1>
 <div class="content_item">
@@ -8265,6 +8552,36 @@
 <div>Length:19</div>
 <div>Precision:3</div>
 <h2>material_quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:3</div>
+</div>
+</div>
+<div id="RGMaterialFact_Model" class="content_box">
+<h1>RGMaterialFact_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -12068,6 +12385,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>vehicle_owners</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleDialog_Model" class="content_box">
@@ -12142,6 +12465,12 @@
 <div>Precision:</div>
 <h2>vehicle_owner_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_owners</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -12977,6 +13306,10 @@
 <p class="big"></p>
 <p>Values:</p>
 <h2>material</h2>
+<div>Description:</div>
+<h2>material_fact</h2>
+<div>Description:</div>
+<h2>cement</h2>
 <div>Description:</div>
 <h2>material_consumption</h2>
 <div>Description:</div>

@@ -1,6 +1,6 @@
 -- View: public.vehicles_dialog
 
--- DROP VIEW public.vehicles_dialog;
+ DROP VIEW public.vehicles_dialog;
 
 CREATE OR REPLACE VIEW public.vehicles_dialog AS 
 	SELECT
@@ -23,8 +23,8 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 			LIMIT 1)
 		END AS tracker_last_dt,
 		drivers_ref(dr.*) AS drivers_ref,
-		
-		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		v.vehicle_owners,
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,		
 		v.vehicle_owner_id
 		
 	FROM vehicles v

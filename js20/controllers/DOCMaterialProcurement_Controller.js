@@ -110,6 +110,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Силос";
+	var field = new FieldInt("cement_silos_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Брутто";
 	var field = new FieldFloat("quant_gross",options);
 	
@@ -200,6 +206,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Силос";
+	var field = new FieldInt("cement_silos_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Брутто";
 	var field = new FieldFloat("quant_gross",options);
 	
@@ -275,6 +287,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("materials_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("cement_silos_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("cement_silos_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldString("quant_gross",f_opts));

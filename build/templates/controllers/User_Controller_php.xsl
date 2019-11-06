@@ -599,6 +599,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			sprintf(
 			"SELECT 
 				u.*,
+				usr.pwd AS pwd,
 				const_first_shift_start_time_val() AS first_shift_start_time,
 				CASE
 					WHEN const_shift_length_time_val()>='24 hours'::interval THEN
@@ -611,6 +612,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				
 			FROM user_mac_addresses AS ma
 			LEFT JOIN users_dialog AS u ON u.id=ma.user_id
+			LEFT JOIN users AS usr ON usr.id=ma.user_id
 			WHERE ma.mac_address=%s",
 			$k));
 			
@@ -623,6 +625,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			"SELECT '%s' AS id",session_id()
 			),'session');
 			
+			$this->add_auth_model($pub_key,session_id(),$ar['pwd'],$this->calc_session_expiration_time());			
 		}
 		else{
 			throw new Exception(ERR_AUTH);

@@ -577,25 +577,27 @@ class Order_Controller extends ControllerSQL{
 				
 				//насоснику
 				if ($pumpVehicleId!='null'){
-					$pump_sms_ar = $this->getDbLink()->query_first(sprintf(
-					"SELECT * FROM %s
-					WHERE order_id=%d",
+					$pump_sms_q_id = $this->getDbLink()->query(sprintf(
+					"SELECT * FROM %s(%d)",
 					($pumpInsert)? 'sms_pump_order_ins':'sms_pump_order_upd', 
 					$id
 					));
-					if (is_array($pump_sms_ar)&&count($pump_sms_ar)){
-						if (is_null($sms_service)){
-							$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
-						}					
+
+					if (is_null($sms_service)){
+						$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
+					}					
+					
+					while($pump_sms_ar = $this->getDbLink()->fetch_array($pump_sms_q_id)){
 						$sms_id_resp_pump = $sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
-						FieldSQLString::formatForDb($this->getDbLink(),$sms_id_resp_pump,$sms_id_pump);									
-						
-						//ответственному
-						$tel_id = $this->pumpActionRespTels( ( ($pumpInsert)? 'order_for_pump_ins':'order_for_pump_upd') );
-						while($tel = $this->getDbLink()->fetch_array($tel_id)){
-							$sms_service->send($tel['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
-						}															
+						FieldSQLString::formatForDb($this->getDbLink(),$sms_id_resp_pump,$sms_id_pump);															
 					}
+					
+					//ответственному
+					$tel_id = $this->pumpActionRespTels( ( ($pumpInsert)? 'order_for_pump_ins':'order_for_pump_upd') );
+					while($tel = $this->getDbLink()->fetch_array($tel_id)){
+						$sms_service->send($tel['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
+					}															
+					
 				}
 				
 				$q = '';
@@ -729,16 +731,15 @@ class Order_Controller extends ControllerSQL{
 			
 			$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');
 			
-			$pump_sms_ar = NULL;
+			$pump_sms_q_id = NULL;
 			//если был насос,а сейчас нет или замена насоса - запомним старые данные для удаления насоса
 			if ($ar['pump_vehicle_id'] && $new_pump_vehicle_id && $new_pump_vehicle_id!=$ar['pump_vehicle_id']){
-				$pump_sms_ar = $this->getDbLink()->query_first(sprintf(
-					"SELECT
-						*
-					FROM sms_pump_order_del
-					WHERE order_id=%d",
-					$this->getExtDbVal($pm,'old_id'))
-				);	
+				$pump_sms_q_id = $this->getDbLink()->query_first(
+					sprintf(
+						"SELECT * FROM sms_pump_order_del(%d)",
+						$this->getExtDbVal($pm,'old_id')
+					)
+				);					
 			}						
 		}	
 		
@@ -795,15 +796,18 @@ class Order_Controller extends ControllerSQL{
 				$this->getExtDbVal($pm,"old_id"),
 				$phone_cel,$quant,$total,$date_time,
 				$concrete_type_id,$destination_id,
-				$lang_id,$pump_vehicle_id,TRUE,$pumpInsert);
+				$lang_id,$pump_vehicle_id,TRUE,$pumpInsert
+			);
 				
 		}
 		
 		/* Послать на удаление насоснику если был насос а сейчас нет, или сейчас другой */
-		if (is_array($pump_sms_ar) && count($pump_sms_ar)){
+		if (!is_null($pump_sms_q_id)){
 			$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
-			$sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
 			
+			while($pump_sms_ar = $this->getDbLink()->fetch_array($pump_sms_q_id)){
+				$sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
+			}
 			//Ответственному
 			$tel_id = $this->pumpActionRespTels('order_for_pump_del');
 			while($tel = $this->getDbLink()->fetch_array($tel_id)){
@@ -868,6 +872,12 @@ class Order_Controller extends ControllerSQL{
 			date('Y-m-d H:i:s',$date_to)
 		),'OrderMakeList_Model'
 		);
+
+		//silos list
+		$this->addNewModel(
+			"SELECT * FROM cement_silos_list",
+			'CementSiloList_Model'
+		);
 		
 		//chart
 		$db_link_master = $this->getDbLinkMaster();
@@ -910,7 +920,13 @@ class Order_Controller extends ControllerSQL{
 		$db_link = $this->getDbLink();
 		
 		//list
-		$this->addNewModel("SELECT * FROM orders_make_for_lab_list",'OrderMakeForLabList_Model');
+		$this->addNewModel(sprintf(
+			"SELECT * FROM orders_make_for_lab_period_list
+			WHERE date_time BETWEEN '%s' AND '%s'",
+			date('Y-m-d H:i:s',$date_from),
+			date('Y-m-d H:i:s',$date_to)
+		),'OrderMakeForLabList_Model'
+		);
 		
 		//Lab list
 		$this->addNewModel('SELECT * FROM lab_entry_30days_2','LabEntry30DaysList_Model');

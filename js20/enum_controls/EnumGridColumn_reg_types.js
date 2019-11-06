@@ -20,6 +20,10 @@ function EnumGridColumn_reg_types(options){
 
 	options.multyLangValues["ru"]["material"] = "Учет материалов";
 
+	options.multyLangValues["ru"]["material_fact"] = "Учет материалов по факту";
+
+	options.multyLangValues["ru"]["cement"] = "Учет цемента";
+
 	options.multyLangValues["ru"]["material_consumption"] = "Расход материалов";
 
 	

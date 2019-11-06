@@ -117,10 +117,19 @@ function Vehicle_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Номер телефона SIM карты';
+	filed_options.alias = 'Владелец';
 	filed_options.autoInc = false;	
 	
 	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owners = new FieldJSONB("vehicle_owners",filed_options);
 	
 			
 			

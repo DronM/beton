@@ -13816,3 +13816,1397 @@ END;
 $$ language plpgsql;
 
 ALTER FUNCTION material_fact_consumptions_add_vehicle(text) OWNER TO beton;
+
+
+-- ******************* update 24/10/2019 13:16:38 ******************
+-- View: public.orders_make_for_lab_period_list
+
+-- DROP VIEW public.orders_make_for_lab_period_list;
+
+CREATE OR REPLACE VIEW public.orders_make_for_lab_period_list AS 
+	SELECT
+		o.*,
+		(need_t.need_cnt > 0) AS is_needed
+	FROM orders_make_list o
+	LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = (o.concrete_types_ref->'keys'->>'id')::int
+	ORDER BY o.date_time;
+ALTER TABLE public.orders_make_for_lab_period_list OWNER TO beton;
+
+
+
+-- ******************* update 30/10/2019 09:52:34 ******************
+
+					ALTER TYPE reg_types ADD VALUE 'material_fact';
+					ALTER TYPE reg_types ADD VALUE 'cement';
+	/* function */
+	CREATE OR REPLACE FUNCTION enum_reg_types_val(reg_types,locales)
+	RETURNS text AS $$
+		SELECT
+		CASE
+		WHEN $1='material'::reg_types AND $2='ru'::locales THEN 'Учет материалов'
+		WHEN $1='material_fact'::reg_types AND $2='ru'::locales THEN 'Учет материалов по факту'
+		WHEN $1='cement'::reg_types AND $2='ru'::locales THEN 'Учет цемента'
+		WHEN $1='material_consumption'::reg_types AND $2='ru'::locales THEN 'Расход материалов'
+		ELSE ''
+		END;		
+	$$ LANGUAGE sql;	
+	ALTER FUNCTION enum_reg_types_val(reg_types,locales) OWNER TO beton;		
+		
+
+-- ******************* update 30/10/2019 09:57:49 ******************
+
+		CREATE TABLE cement_silos
+		(id serial NOT NULL,production_site_id int REFERENCES production_sites(id),production_descr  varchar(100) NOT NULL,name  varchar(100) NOT NULL,weigh_app_name  varchar(100) NOT NULL,CONSTRAINT cement_silos_pkey PRIMARY KEY (id)
+		);
+		ALTER TABLE cement_silos OWNER TO beton;
+
+
+
+-- ******************* update 30/10/2019 10:00:05 ******************
+
+		ALTER TABLE doc_material_procurements ADD COLUMN cement_silos_id int REFERENCES cement_silos(id);
+
+
+
+-- ******************* update 30/10/2019 10:03:39 ******************
+-- Function: public.cement_silos_ref(cement_silos)
+
+-- DROP FUNCTION public.cement_silos_ref(cement_silos);
+
+CREATE OR REPLACE FUNCTION public.cement_silos_ref(cement_silos)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',$1.name,
+		'dataType','cement_silos'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silos_ref(cement_silos)
+  OWNER TO beton;
+
+
+
+-- ******************* update 30/10/2019 10:03:53 ******************
+-- View: doc_material_procurements_list
+
+ DROP VIEW doc_material_procurements_list;
+
+CREATE OR REPLACE VIEW doc_material_procurements_list AS 
+ SELECT
+ 	doc.id,
+	doc.number,
+	doc.date_time,
+	doc.processed,
+	doc.supplier_id,
+	suppliers_ref(sup) AS suppliers_ref,
+	doc.carrier_id,
+	suppliers_ref(car) AS carriers_ref,
+	doc.material_id,
+	materials_ref(mat) AS materials_ref,
+	doc.cement_silos_id,
+	cement_silos_ref(silo) AS cement_silos_ref,
+	doc.driver,
+	doc.vehicle_plate,
+	doc.quant_gross,
+	doc.quant_net
+   FROM doc_material_procurements doc
+     LEFT JOIN suppliers sup ON sup.id = doc.supplier_id
+     LEFT JOIN suppliers car ON car.id = doc.carrier_id
+     LEFT JOIN raw_materials mat ON mat.id = doc.material_id
+     LEFT JOIN cement_silos silo ON silo.id = doc.cement_silos_id
+  ORDER BY doc.date_time DESC;
+
+ALTER TABLE doc_material_procurements_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 30/10/2019 14:39:15 ******************
+-- VIEW: cement_silos_list
+
+--DROP VIEW cement_silos_list;
+
+CREATE OR REPLACE VIEW cement_silos_list AS
+	SELECT
+		t.*,
+		production_sites_ref(pst) AS production_sites_ref
+	FROM cement_silos AS t
+	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id
+	ORDER BY pst.name,t.name
+	;
+	
+ALTER VIEW cement_silos_list OWNER TO beton;
+
+
+-- ******************* update 30/10/2019 14:40:22 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10037',
+		'CementSilo_Controller',
+		'get_list',
+		'CementSiloList',
+		'Справочники',
+		'Соответствие силосов',
+		FALSE
+		);
+	
+
+-- ******************* update 31/10/2019 10:57:18 ******************
+		--constant get value
+		CREATE OR REPLACE FUNCTION const_cement_material_val()
+		RETURNS json AS
+		$BODY$
+			SELECT materials_ref(
+				(SELECT
+					ROW(raw_materials.*)::raw_materials
+				FROM raw_materials
+				WHERE id = (SELECT val FROM const_cement_material LIMIT 1) LIMIT 1)
+				) AS val ;			
+		$BODY$
+		LANGUAGE sql STABLE COST 100;
+		ALTER FUNCTION const_cement_material_val() OWNER TO beton;
+		--constant set value
+		CREATE OR REPLACE FUNCTION const_cement_material_set_val(Int)
+		RETURNS void AS
+		$BODY$
+			UPDATE const_cement_material SET val=$1;
+		$BODY$
+		LANGUAGE sql VOLATILE COST 100;
+		ALTER FUNCTION const_cement_material_set_val(Int) OWNER TO beton;
+		--edit view: all keys and descr
+		CREATE OR REPLACE VIEW const_cement_material_view AS
+		SELECT
+			'cement_material'::text AS id
+			,t.name
+			,t.descr
+		,const_cement_material_val()::text AS val
+		,t.val_type::text AS val_type
+		,t.ctrl_class::text
+		,t.ctrl_options::json
+		,t.view_class::text
+		,t.view_options::json
+		FROM const_cement_material AS t
+		;
+		ALTER VIEW const_cement_material_view OWNER TO beton;
+		CREATE OR REPLACE VIEW constants_list_view AS
+		SELECT *
+		FROM const_doc_per_page_count_view
+		UNION ALL
+		SELECT *
+		FROM const_grid_refresh_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_order_grid_refresh_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_backup_vehicles_feature_view
+		UNION ALL
+		SELECT *
+		FROM const_base_geo_zone_id_view
+		UNION ALL
+		SELECT *
+		FROM const_base_geo_zone_view
+		UNION ALL
+		SELECT *
+		FROM const_chart_step_min_view
+		UNION ALL
+		SELECT *
+		FROM const_day_shift_length_view
+		UNION ALL
+		SELECT *
+		FROM const_days_allowed_with_broken_tracker_view
+		UNION ALL
+		SELECT *
+		FROM const_def_order_unload_speed_view
+		UNION ALL
+		SELECT *
+		FROM const_demurrage_coast_per_hour_view
+		UNION ALL
+		SELECT *
+		FROM const_first_shift_start_time_view
+		UNION ALL
+		SELECT *
+		FROM const_geo_zone_check_points_count_view
+		UNION ALL
+		SELECT *
+		FROM const_map_default_lat_view
+		UNION ALL
+		SELECT *
+		FROM const_map_default_lon_view
+		UNION ALL
+		SELECT *
+		FROM const_max_hour_load_view
+		UNION ALL
+		SELECT *
+		FROM const_max_vehicle_at_work_view
+		UNION ALL
+		SELECT *
+		FROM const_min_demurrage_time_view
+		UNION ALL
+		SELECT *
+		FROM const_min_quant_for_ship_cost_view
+		UNION ALL
+		SELECT *
+		FROM const_no_tracker_signal_warn_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_ord_mark_if_no_ship_time_view
+		UNION ALL
+		SELECT *
+		FROM const_order_auto_place_tolerance_view
+		UNION ALL
+		SELECT *
+		FROM const_order_step_min_view
+		UNION ALL
+		SELECT *
+		FROM const_own_vehicles_feature_view
+		UNION ALL
+		SELECT *
+		FROM const_raw_mater_plcons_rep_def_days_view
+		UNION ALL
+		SELECT *
+		FROM const_self_ship_dest_id_view
+		UNION ALL
+		SELECT *
+		FROM const_self_ship_dest_view
+		UNION ALL
+		SELECT *
+		FROM const_shift_for_orders_length_time_view
+		UNION ALL
+		SELECT *
+		FROM const_shift_length_time_view
+		UNION ALL
+		SELECT *
+		FROM const_ship_coast_for_self_ship_destination_view
+		UNION ALL
+		SELECT *
+		FROM const_speed_change_for_order_autolocate_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_unload_time_view
+		UNION ALL
+		SELECT *
+		FROM const_avg_mat_cons_dev_day_count_view
+		UNION ALL
+		SELECT *
+		FROM const_days_for_plan_procur_view
+		UNION ALL
+		SELECT *
+		FROM const_lab_min_sample_count_view
+		UNION ALL
+		SELECT *
+		FROM const_lab_days_for_avg_view
+		UNION ALL
+		SELECT *
+		FROM const_city_ext_view
+		UNION ALL
+		SELECT *
+		FROM const_def_lang_view
+		UNION ALL
+		SELECT *
+		FROM const_efficiency_warn_k_view
+		UNION ALL
+		SELECT *
+		FROM const_zone_violation_alarm_interval_view
+		UNION ALL
+		SELECT *
+		FROM const_weather_update_interval_sec_view
+		UNION ALL
+		SELECT *
+		FROM const_call_history_count_view
+		UNION ALL
+		SELECT *
+		FROM const_water_ship_cost_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_owner_accord_from_day_view
+		UNION ALL
+		SELECT *
+		FROM const_vehicle_owner_accord_to_day_view
+		UNION ALL
+		SELECT *
+		FROM const_show_time_for_shipped_vehicles_view
+		UNION ALL
+		SELECT *
+		FROM const_tracker_malfunction_tel_list_view
+		UNION ALL
+		SELECT *
+		FROM const_low_efficiency_tel_list_view
+		UNION ALL
+		SELECT *
+		FROM const_material_closed_balance_date_view
+		UNION ALL
+		SELECT *
+		FROM const_cement_material_view;
+		ALTER VIEW constants_list_view OWNER TO beton;
+	
+
+
+-- ******************* update 31/10/2019 11:01:56 ******************
+-- Function: public.doc_material_procurements_process()
+
+-- DROP FUNCTION public.doc_material_procurements_process();
+
+CREATE OR REPLACE FUNCTION public.doc_material_procurements_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_act ra_materials%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER') AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN					
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		--register actions ra_materials
+		reg_act.date_time		= NEW.date_time;
+		reg_act.deb			= true;
+		reg_act.doc_type  		= 'material_procurement'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.material_id		= NEW.material_id;
+		reg_act.quant			= NEW.quant_net;
+		PERFORM ra_materials_add_act(reg_act);	
+		
+		IF NEW.material_id <> (const_cement_material_val()->'keys'->>'id')::int THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= true;
+			reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= NEW.quant_net;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.cement_silos_id IS NOT NULL THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= true;
+			reg_cement.doc_type  		= 'material_procurement'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.quant_net;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+				
+		RETURN NEW;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+						
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='DELETE') THEN
+		RETURN OLD;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		--detail tables
+		
+		--register actions										
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+		
+		--log
+		PERFORM doc_log_delete('material_procurement'::doc_types,OLD.id);
+		
+		RETURN OLD;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.doc_material_procurements_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 31/10/2019 11:02:50 ******************
+-- Function: public.doc_material_procurements_process()
+
+-- DROP FUNCTION public.doc_material_procurements_process();
+
+CREATE OR REPLACE FUNCTION public.doc_material_procurements_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_act ra_materials%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER') AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN					
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		--register actions ra_materials
+		reg_act.date_time		= NEW.date_time;
+		reg_act.deb			= true;
+		reg_act.doc_type  		= 'material_procurement'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.material_id		= NEW.material_id;
+		reg_act.quant			= NEW.quant_net;
+		PERFORM ra_materials_add_act(reg_act);	
+		
+		IF NEW.material_id <> (const_cement_material_val()->'keys'->>'id')::int THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= true;
+			reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= NEW.quant_net;
+			--PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.cement_silos_id IS NOT NULL THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= true;
+			reg_cement.doc_type  		= 'material_procurement'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.quant_net;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+				
+		RETURN NEW;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+						
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='DELETE') THEN
+		RETURN OLD;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		--detail tables
+		
+		--register actions										
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+		
+		--log
+		PERFORM doc_log_delete('material_procurement'::doc_types,OLD.id);
+		
+		RETURN OLD;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.doc_material_procurements_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 31/10/2019 11:43:45 ******************
+-- Function: public.doc_material_procurements_process()
+
+-- DROP FUNCTION public.doc_material_procurements_process();
+
+CREATE OR REPLACE FUNCTION public.doc_material_procurements_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_act ra_materials%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER') AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN					
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		--register actions ra_materials
+		reg_act.date_time		= NEW.date_time;
+		reg_act.deb			= true;
+		reg_act.doc_type  		= 'material_procurement'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.material_id		= NEW.material_id;
+		reg_act.quant			= NEW.quant_net;
+		PERFORM ra_materials_add_act(reg_act);	
+		
+		IF NEW.material_id <> (const_cement_material_val()->'keys'->>'id')::int THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= true;
+			reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= NEW.quant_net;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.cement_silos_id IS NOT NULL THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= true;
+			reg_cement.doc_type  		= 'material_procurement'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.quant_net;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+				
+		RETURN NEW;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+						
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='DELETE') THEN
+		RETURN OLD;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		--detail tables
+		
+		--register actions										
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+		
+		--log
+		PERFORM doc_log_delete('material_procurement'::doc_types,OLD.id);
+		
+		RETURN OLD;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.doc_material_procurements_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 31/10/2019 11:50:57 ******************
+-- Function: public.doc_material_procurements_process()
+
+-- DROP FUNCTION public.doc_material_procurements_process();
+
+CREATE OR REPLACE FUNCTION public.doc_material_procurements_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_act ra_materials%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER') AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN					
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		--register actions ra_materials
+		reg_act.date_time		= NEW.date_time;
+		reg_act.deb			= true;
+		reg_act.doc_type  		= 'material_procurement'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.material_id		= NEW.material_id;
+		reg_act.quant			= NEW.quant_net;
+		PERFORM ra_materials_add_act(reg_act);	
+		
+		IF NEW.material_id <> (const_cement_material_val()->'keys'->>'id')::int THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= true;
+			reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= NEW.quant_net;
+			--PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.cement_silos_id IS NOT NULL THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= true;
+			reg_cement.doc_type  		= 'material_procurement'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.quant_net;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+				
+		RETURN NEW;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+						
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='DELETE') THEN
+		RETURN OLD;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		--detail tables
+		
+		--register actions										
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+		
+		--log
+		PERFORM doc_log_delete('material_procurement'::doc_types,OLD.id);
+		
+		RETURN OLD;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.doc_material_procurements_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 31/10/2019 12:25:18 ******************
+﻿-- Function: rg_material_facts_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3))
+
+-- DROP FUNCTION rg_material_facts_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3));
+
+CREATE OR REPLACE FUNCTION rg_material_facts_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3))
+  RETURNS void AS
+$BODY$
+DECLARE
+	v_loop_rg_period timestamp;
+	v_calc_interval interval;			  			
+	CURRENT_BALANCE_DATE_TIME timestamp;
+BEGIN
+	v_loop_rg_period = rg_period('material_fact'::reg_types,in_date_time);
+	v_calc_interval = rg_calc_interval('material_fact'::reg_types);
+	LOOP
+		UPDATE rg_material_facts
+		SET
+			quant = quant + in_delta_quant
+		WHERE 
+			date_time=v_loop_rg_period
+			AND material_id = in_material_id;
+			
+		IF NOT FOUND THEN
+			BEGIN
+				INSERT INTO rg_material_facts (date_time
+				,material_id
+				,quant)				
+				VALUES (v_loop_rg_period
+				,in_material_id
+				,in_delta_quant);
+			EXCEPTION WHEN OTHERS THEN
+				UPDATE rg_material_facts
+				SET
+					quant = quant + in_delta_quant
+				WHERE date_time = v_loop_rg_period
+				AND material_id = in_material_id;
+			END;
+		END IF;
+		v_loop_rg_period = v_loop_rg_period + v_calc_interval;
+		IF v_loop_rg_period > in_date_time THEN
+			EXIT;  -- exit loop
+		END IF;
+	END LOOP;
+	
+	--Current balance
+	CURRENT_BALANCE_DATE_TIME = reg_current_balance_time();
+	UPDATE rg_material_facts
+	SET
+		quant = quant + in_delta_quant
+	WHERE 
+		date_time=CURRENT_BALANCE_DATE_TIME
+		AND material_id = in_material_id;
+		
+	IF NOT FOUND THEN
+		BEGIN
+			INSERT INTO rg_material_facts (date_time
+			,material_id
+			,quant)				
+			VALUES (CURRENT_BALANCE_DATE_TIME
+			,in_material_id
+			,in_delta_quant);
+		EXCEPTION WHEN OTHERS THEN
+			UPDATE rg_material_facts
+			SET
+				quant = quant + in_delta_quant
+			WHERE 
+				date_time=CURRENT_BALANCE_DATE_TIME
+				AND material_id = in_material_id;
+		END;
+	END IF;					
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION rg_material_facts_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3)) OWNER TO beton;
+
+
+-- ******************* update 31/10/2019 12:27:52 ******************
+﻿-- Function: rg_material_facts_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3))
+
+-- DROP FUNCTION rg_material_facts_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3));
+
+CREATE OR REPLACE FUNCTION rg_material_facts_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3))
+  RETURNS void AS
+$BODY$
+DECLARE
+	v_loop_rg_period timestamp;
+	v_calc_interval interval;			  			
+	CURRENT_BALANCE_DATE_TIME timestamp;
+	CALC_DATE_TIME timestamp;
+BEGIN
+	CALC_DATE_TIME = rg_calc_period('material_fact'::reg_types);
+	v_loop_rg_period = rg_period('material_fact'::reg_types,in_date_time);
+	v_calc_interval = rg_calc_interval('material_fact'::reg_types);
+	LOOP
+		UPDATE rg_material_facts
+		SET
+			quant = quant + in_delta_quant
+		WHERE 
+			date_time=v_loop_rg_period
+			AND material_id = in_material_id;
+			
+		IF NOT FOUND THEN
+			BEGIN
+				INSERT INTO rg_material_facts (date_time
+				,material_id
+				,quant)				
+				VALUES (v_loop_rg_period
+				,in_material_id
+				,in_delta_quant);
+			EXCEPTION WHEN OTHERS THEN
+				UPDATE rg_material_facts
+				SET
+					quant = quant + in_delta_quant
+				WHERE date_time = v_loop_rg_period
+				AND material_id = in_material_id;
+			END;
+		END IF;
+		v_loop_rg_period = v_loop_rg_period + v_calc_interval;
+		IF v_loop_rg_period > CALC_DATE_TIME THEN
+			EXIT;  -- exit loop
+		END IF;
+	END LOOP;
+	
+	--Current balance
+	CURRENT_BALANCE_DATE_TIME = reg_current_balance_time();
+	UPDATE rg_material_facts
+	SET
+		quant = quant + in_delta_quant
+	WHERE 
+		date_time=CURRENT_BALANCE_DATE_TIME
+		AND material_id = in_material_id;
+		
+	IF NOT FOUND THEN
+		BEGIN
+			INSERT INTO rg_material_facts (date_time
+			,material_id
+			,quant)				
+			VALUES (CURRENT_BALANCE_DATE_TIME
+			,in_material_id
+			,in_delta_quant);
+		EXCEPTION WHEN OTHERS THEN
+			UPDATE rg_material_facts
+			SET
+				quant = quant + in_delta_quant
+			WHERE 
+				date_time=CURRENT_BALANCE_DATE_TIME
+				AND material_id = in_material_id;
+		END;
+	END IF;					
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION rg_material_facts_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3)) OWNER TO beton;
+
+
+-- ******************* update 31/10/2019 12:56:47 ******************
+-- Function: public.doc_material_procurements_process()
+
+-- DROP FUNCTION public.doc_material_procurements_process();
+
+CREATE OR REPLACE FUNCTION public.doc_material_procurements_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_act ra_materials%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER') AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN					
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		--register actions ra_materials
+		reg_act.date_time		= NEW.date_time;
+		reg_act.deb			= true;
+		reg_act.doc_type  		= 'material_procurement'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.material_id		= NEW.material_id;
+		reg_act.quant			= NEW.quant_net;
+		PERFORM ra_materials_add_act(reg_act);	
+		
+		IF NEW.material_id <> (const_cement_material_val()->'keys'->>'id')::int THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= true;
+			reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= NEW.quant_net;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.cement_silos_id IS NOT NULL THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= true;
+			reg_cement.doc_type  		= 'material_procurement'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.quant_net;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+				
+		RETURN NEW;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+						
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='DELETE') THEN
+		RETURN OLD;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		--detail tables
+		
+		--register actions										
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+		
+		--log
+		PERFORM doc_log_delete('material_procurement'::doc_types,OLD.id);
+		
+		RETURN OLD;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.doc_material_procurements_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 31/10/2019 14:58:24 ******************
+﻿-- Function: rg_cements_update_periods(in_date_time timestamp, in_delta_quant numeric(19,3))
+
+-- DROP FUNCTION rg_cements_update_periods(in_date_time timestamp, in_delta_quant numeric(19,3));
+
+CREATE OR REPLACE FUNCTION rg_cements_update_periods(in_date_time timestamp, in_delta_quant numeric(19,3))
+  RETURNS void AS
+$BODY$
+DECLARE
+	v_loop_rg_period timestamp;
+	v_calc_interval interval;			  			
+	CURRENT_BALANCE_DATE_TIME timestamp;
+	CALC_DATE_TIME timestamp;
+BEGIN
+	CALC_DATE_TIME = rg_calc_period('cement'::reg_types);
+	v_loop_rg_period = rg_period('cement'::reg_types,in_date_time);
+	v_calc_interval = rg_calc_interval('cement'::reg_types);
+	LOOP
+		UPDATE rg_cements
+		SET
+			quant = quant + in_delta_quant
+		WHERE 
+			date_time=v_loop_rg_period;
+			
+		IF NOT FOUND THEN
+			BEGIN
+				INSERT INTO rg_cements (date_time
+				,quant)				
+				VALUES (v_loop_rg_period
+				,in_delta_quant);
+			EXCEPTION WHEN OTHERS THEN
+				UPDATE rg_cements
+				SET
+					quant = quant + in_delta_quant
+				WHERE date_time = v_loop_rg_period;
+			END;
+		END IF;
+		v_loop_rg_period = v_loop_rg_period + v_calc_interval;
+		IF v_loop_rg_period > CALC_DATE_TIME THEN
+			EXIT;  -- exit loop
+		END IF;
+	END LOOP;
+	
+	--Current balance
+	CURRENT_BALANCE_DATE_TIME = reg_current_balance_time();
+	UPDATE rg_cements
+	SET
+		quant = quant + in_delta_quant
+	WHERE 
+		date_time=CURRENT_BALANCE_DATE_TIME;
+		
+	IF NOT FOUND THEN
+		BEGIN
+			INSERT INTO rg_cements (date_time
+			,quant)				
+			VALUES (CURRENT_BALANCE_DATE_TIME
+			,in_delta_quant);
+		EXCEPTION WHEN OTHERS THEN
+			UPDATE rg_cements
+			SET
+				quant = quant + in_delta_quant
+			WHERE 
+				date_time=CURRENT_BALANCE_DATE_TIME;
+		END;
+	END IF;					
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION rg_cements_update_periods(in_date_time timestamp, in_delta_quant numeric(19,3)) OWNER TO beton;
+
+
+-- ******************* update 31/10/2019 15:05:59 ******************
+﻿-- Function: rg_materials_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3))
+
+-- DROP FUNCTION rg_materials_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3));
+
+CREATE OR REPLACE FUNCTION rg_materials_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3))
+  RETURNS void AS
+$BODY$
+DECLARE
+	v_loop_rg_period timestamp;
+	v_calc_interval interval;			  			
+	CURRENT_BALANCE_DATE_TIME timestamp;
+	CALC_DATE_TIME timestamp;
+BEGIN
+	CALC_DATE_TIME = rg_calc_period('material'::reg_types);
+	v_loop_rg_period = rg_period('material'::reg_types,in_date_time);
+	v_calc_interval = rg_calc_interval('material'::reg_types);
+	LOOP
+		UPDATE rg_materials
+		SET
+			quant = quant + in_delta_quant
+		WHERE 
+			date_time=v_loop_rg_period
+			AND material_id = in_material_id;
+			
+		IF NOT FOUND THEN
+			BEGIN
+				INSERT INTO rg_materials (date_time
+				,material_id
+				,quant)				
+				VALUES (v_loop_rg_period
+				,in_material_id
+				,in_delta_quant);
+			EXCEPTION WHEN OTHERS THEN
+				UPDATE rg_materials
+				SET
+					quant = quant + in_delta_quant
+				WHERE date_time = v_loop_rg_period
+				AND material_id = in_material_id;
+			END;
+		END IF;
+		v_loop_rg_period = v_loop_rg_period + v_calc_interval;
+		IF v_loop_rg_period > CALC_DATE_TIME THEN
+			EXIT;  -- exit loop
+		END IF;
+	END LOOP;
+	
+	--Current balance
+	CURRENT_BALANCE_DATE_TIME = reg_current_balance_time();
+	UPDATE rg_materials
+	SET
+		quant = quant + in_delta_quant
+	WHERE 
+		date_time=CURRENT_BALANCE_DATE_TIME
+		AND material_id = in_material_id;
+		
+	IF NOT FOUND THEN
+		BEGIN
+			INSERT INTO rg_materials (date_time
+			,material_id
+			,quant)				
+			VALUES (CURRENT_BALANCE_DATE_TIME
+			,in_material_id
+			,in_delta_quant);
+		EXCEPTION WHEN OTHERS THEN
+			UPDATE rg_materials
+			SET
+				quant = quant + in_delta_quant
+			WHERE 
+				date_time=CURRENT_BALANCE_DATE_TIME
+				AND material_id = in_material_id;
+		END;
+	END IF;					
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION rg_materials_update_periods(in_date_time timestamp, in_material_id int, in_delta_quant numeric(19,3)) OWNER TO beton;
+
+
+-- ******************* update 01/11/2019 13:34:39 ******************
+
+		ALTER TABLE vehicles ADD COLUMN vehicle_owners jsonb;
+
+
+
+-- ******************* update 01/11/2019 13:36:06 ******************
+-- View: public.vehicles_dialog
+
+ DROP VIEW public.vehicles_dialog;
+
+CREATE OR REPLACE VIEW public.vehicles_dialog AS 
+	SELECT
+		v.id,
+		v.plate,
+		v.load_capacity,
+		v.make,
+		v.owner,
+		v.feature,
+		v.tracker_id,
+		v.sim_id,
+		v.sim_number,
+		NULL::text AS tracker_last_data_descr,
+		CASE
+			WHEN v.tracker_id IS NULL OR v.tracker_id::text = ''::text THEN NULL::timestamp without time zone
+			ELSE ( SELECT tr.recieved_dt + (now() - timezone('utc'::text, now())::timestamp with time zone)
+			FROM car_tracking tr
+			WHERE tr.car_id::text = v.tracker_id::text
+			ORDER BY tr.period DESC
+			LIMIT 1)
+		END AS tracker_last_dt,
+		drivers_ref(dr.*) AS drivers_ref,
+		
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		v.vehicle_owners,
+		v.vehicle_owner_id
+		
+	FROM vehicles v
+	LEFT JOIN drivers dr ON dr.id = v.driver_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	ORDER BY v.plate
+	;
+
+ALTER TABLE public.vehicles_dialog
+  OWNER TO beton;
+
+
+
+-- ******************* update 01/11/2019 13:36:16 ******************
+-- View: public.vehicles_dialog
+
+ DROP VIEW public.vehicles_dialog;
+
+CREATE OR REPLACE VIEW public.vehicles_dialog AS 
+	SELECT
+		v.id,
+		v.plate,
+		v.load_capacity,
+		v.make,
+		v.owner,
+		v.feature,
+		v.tracker_id,
+		v.sim_id,
+		v.sim_number,
+		NULL::text AS tracker_last_data_descr,
+		CASE
+			WHEN v.tracker_id IS NULL OR v.tracker_id::text = ''::text THEN NULL::timestamp without time zone
+			ELSE ( SELECT tr.recieved_dt + (now() - timezone('utc'::text, now())::timestamp with time zone)
+			FROM car_tracking tr
+			WHERE tr.car_id::text = v.tracker_id::text
+			ORDER BY tr.period DESC
+			LIMIT 1)
+		END AS tracker_last_dt,
+		drivers_ref(dr.*) AS drivers_ref,
+		v.vehicle_owners,
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,		
+		v.vehicle_owner_id
+		
+	FROM vehicles v
+	LEFT JOIN drivers dr ON dr.id = v.driver_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	ORDER BY v.plate
+	;
+
+ALTER TABLE public.vehicles_dialog
+  OWNER TO beton;
+
+
+
+-- ******************* update 01/11/2019 14:58:10 ******************
+﻿-- Function: vehicle_owner_on_date(in_val JSONB,in_dt timestamp)
+
+-- DROP FUNCTION vehicle_owner_on_date(in_val JSONB,in_dt timestamp);
+
+CREATE OR REPLACE FUNCTION vehicle_owner_on_date(in_val JSONB,in_dt timestamp)
+  RETURNS jsonb AS
+$$
+	SELECT 
+		s.r->'fields'->'owner'
+	FROM
+	(SELECT jsonb_array_elements(in_val->'rows') As r) AS s
+	WHERE (s.r->'fields'->>'dt_from')::timestamp with time zone<=in_dt
+	ORDER BY (s.r->'fields'->>'dt_from')::timestamp with time zone DESC
+	LIMIT 1;
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION vehicle_owner_on_date(in_val JSONB,in_dt timestamp) OWNER TO beton;
+
+
+-- ******************* update 01/11/2019 15:35:29 ******************
+﻿-- Function: sms_pump_order_del(in_order_id int)
+
+-- DROP FUNCTION sms_pump_order_del(in_order_id int);
+
+CREATE OR REPLACE FUNCTION sms_pump_order_del(in_order_id int)
+  RETURNS TABLE(
+  	phone_cel text,
+  	message text  	
+  ) AS
+$$
+	SELECT
+		sub.r->'fields'->>'tel' AS tel,
+		sub.message AS message
+	FROM
+	(
+	SELECT
+		jsonb_array_elements(pvh.phone_cels->'rows') AS r,
+		sms_templates_text(
+			ARRAY[
+				format('("quant","%s")'::text, o.quant::text)::template_value,
+				format('("date","%s")'::text, date5_descr(o.date_time::date)::text)::template_value,
+				format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
+				format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+				format('("dest","%s")'::text, dest.name::text)::template_value,
+				format('("concrete","%s")'::text, ct.name::text)::template_value,
+				format('("client","%s")'::text, cl.name::text)::template_value,
+				format('("name","%s")'::text, o.descr)::template_value,
+				format('("tel","%s")'::text,format_cel_phone(o.phone_cel::text))::template_value, format('("car","%s")'::text,
+				vh.plate::text)::template_value
+			],
+			( SELECT t.pattern
+			FROM sms_patterns t
+			WHERE t.sms_type = 'order_for_pump_del'::sms_types AND t.lang_id = 1
+			)
+		) AS message
+	
+	FROM orders o
+		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+		LEFT JOIN destinations dest ON dest.id = o.destination_id
+		LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+		LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+		LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE o.id=in_order_id
+	) AS sub;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION sms_pump_order_del(in_order_id int) OWNER TO beton;
+
+
+-- ******************* update 01/11/2019 15:38:00 ******************
+﻿-- Function: sms_pump_order_ins(in_order_id int)
+
+-- DROP FUNCTION sms_pump_order_ins(in_order_id int);
+
+CREATE OR REPLACE FUNCTION sms_pump_order_ins(in_order_id int)
+  RETURNS TABLE(
+  	phone_cel text,
+  	message text  	
+  ) AS
+$$
+	SELECT
+		sub.r->'fields'->>'tel' AS tel,
+		sub.message AS message
+	FROM
+	(
+	SELECT
+		jsonb_array_elements(pvh.phone_cels->'rows') AS r,
+		sms_templates_text(
+			ARRAY[
+		    		format('("quant","%s")'::text, o.quant::text)::template_value,
+		    		format('("date","%s")'::text, date5_descr(o.date_time::date)::text)::template_value,
+		    		format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
+		    		format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+		    		format('("dest","%s")'::text, dest.name::text)::template_value,
+		    		format('("concrete","%s")'::text, ct.name::text)::template_value,
+		    		format('("client","%s")'::text, cl.name::text)::template_value,
+		    		format('("name","%s")'::text, o.descr)::template_value,
+		    		format('("tel","%s")'::text,format_cel_phone(o.phone_cel::text))::template_value,
+		    		format('("car","%s")'::text, vh.plate::text)::template_value
+			],
+			( SELECT t.pattern
+			FROM sms_patterns t
+			WHERE t.sms_type = 'order_for_pump_ins'::sms_types AND t.lang_id = 1
+			)
+		) AS message
+	
+	FROM orders o
+		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+		LEFT JOIN destinations dest ON dest.id = o.destination_id
+		LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+		LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+		LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE o.id=in_order_id
+	) AS sub;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION sms_pump_order_ins(in_order_id int) OWNER TO beton;
+
+
+-- ******************* update 01/11/2019 15:38:26 ******************
+﻿-- Function: sms_pump_order_ins(in_order_id int)
+
+-- DROP FUNCTION sms_pump_order_ins(in_order_id int);
+
+CREATE OR REPLACE FUNCTION sms_pump_order_ins(in_order_id int)
+  RETURNS TABLE(
+  	phone_cel text,
+  	message text  	
+  ) AS
+$$
+	SELECT
+		sub.r->'fields'->>'tel' AS tel,
+		sub.message AS message
+	FROM
+	(
+	SELECT
+		jsonb_array_elements(pvh.phone_cels->'rows') AS r,
+		sms_templates_text(
+			ARRAY[
+		    		format('("quant","%s")'::text, o.quant::text)::template_value,
+		    		format('("date","%s")'::text, date5_descr(o.date_time::date)::text)::template_value,
+		    		format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
+		    		format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+		    		format('("dest","%s")'::text, dest.name::text)::template_value,
+		    		format('("concrete","%s")'::text, ct.name::text)::template_value,
+		    		format('("client","%s")'::text, cl.name::text)::template_value,
+		    		format('("name","%s")'::text, o.descr)::template_value,
+		    		format('("tel","%s")'::text,format_cel_phone(o.phone_cel::text))::template_value,
+		    		format('("car","%s")'::text, vh.plate::text)::template_value
+			],
+			( SELECT t.pattern
+			FROM sms_patterns t
+			WHERE t.sms_type = 'order_for_pump_ins'::sms_types AND t.lang_id = 1
+			)
+		) AS message
+	
+	FROM orders o
+		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+		LEFT JOIN destinations dest ON dest.id = o.destination_id
+		LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+		LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+		LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE o.id=in_order_id
+	) AS sub;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION sms_pump_order_ins(in_order_id int) OWNER TO beton;
+
+
+-- ******************* update 01/11/2019 15:40:02 ******************
+﻿-- Function: sms_pump_order_upd(in_order_id int)
+
+-- DROP FUNCTION sms_pump_order_upd(in_order_id int);
+
+CREATE OR REPLACE FUNCTION sms_pump_order_upd(in_order_id int)
+  RETURNS TABLE(
+  	phone_cel text,
+  	message text  	
+  ) AS
+$$
+	SELECT
+		sub.r->'fields'->>'tel' AS tel,
+		sub.message AS message
+	FROM
+	(
+	SELECT
+		jsonb_array_elements(pvh.phone_cels->'rows') AS r,
+		sms_templates_text(
+			ARRAY[
+		    		format('("quant","%s")'::text, o.quant::text)::template_value,
+		    		format('("date","%s")'::text, date5_descr(o.date_time::date)::text)::template_value,
+		    		format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
+		    		format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+		    		format('("dest","%s")'::text, dest.name::text)::template_value,
+		    		format('("concrete","%s")'::text, ct.name::text)::template_value,
+		    		format('("client","%s")'::text, cl.name::text)::template_value,
+		    		format('("name","%s")'::text, o.descr)::template_value,
+		    		format('("tel","%s")'::text, format_cel_phone(o.phone_cel::text))::template_value,
+		    		format('("car","%s")'::text, vh.plate::text)::template_value
+			],
+			( SELECT t.pattern
+			FROM sms_patterns t
+			WHERE t.sms_type = 'order_for_pump_upd'::sms_types AND t.lang_id = 1
+			)
+		) AS message
+	
+	FROM orders o
+		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+		LEFT JOIN destinations dest ON dest.id = o.destination_id
+		LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+		LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+		LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE o.id=in_order_id
+	) AS sub;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION sms_pump_order_upd(in_order_id int) OWNER TO beton;
+
+
+-- ******************* update 05/11/2019 11:34:30 ******************
+
+		ALTER TABLE cement_silos ADD COLUMN load_capacity  numeric(19,4);

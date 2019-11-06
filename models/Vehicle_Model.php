@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class Vehicle_Model extends ModelSQLBeton{
 	
@@ -118,11 +119,19 @@ class Vehicle_Model extends ModelSQLBeton{
 		//*** Field vehicle_owner_id ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Номер телефона SIM карты';
+		$f_opts['alias']='Владелец';
 		$f_opts['id']="vehicle_owner_id";
 						
 		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
 		$this->addField($f_vehicle_owner_id);
+		//********************
+		
+		//*** Field vehicle_owners ***
+		$f_opts = array();
+		$f_opts['id']="vehicle_owners";
+						
+		$f_vehicle_owners=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners",$f_opts);
+		$this->addField($f_vehicle_owners);
 		//********************
 	
 		$order = new ModelOrderSQL();		

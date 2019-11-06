@@ -47,7 +47,10 @@ function OrderMakeForLabList_View(id,options){
 			"dateFrom":init_dt,
 			"onChange":function(dateTime){
 				self.m_refreshMethod.setFieldValue("date",dateTime);
-				self.refresh();
+				window.setGlobalWait(true);
+				self.refresh(function(){
+					window.setGlobalWait(false);
+				});
 			}
 		});
 		this.addElement(per_select);	
@@ -257,7 +260,7 @@ OrderMakeForLabList_View.prototype.m_endShiftMS;
 /**
  * Все обновляется разом за один запрос из нескольких моделей
  */
-OrderMakeForLabList_View.prototype.refresh = function(){
+OrderMakeForLabList_View.prototype.refresh = function(callBack){
 //console.log("OrderMakeForLabList_View.prototype.refresh")
 	this.m_refreshMethod.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
 	var self = this;
@@ -287,8 +290,11 @@ OrderMakeForLabList_View.prototype.refresh = function(){
 			grid.getModel().setData(resp.getModelData("VehicleScheduleMakeOrderList_Model"));
 			grid.onGetData();
 
+			if(callBack){
+				callBack();
+			}
 		}
-	})
+	});
 }
 
 OrderMakeForLabList_View.prototype.enableRefreshing = function(v){

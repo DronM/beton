@@ -1,0 +1,12 @@
+update vehicles
+set vehicle_owners = s.owner_list
+FROM
+(select
+	v.id,
+	('{"id": "OwnerList_Model", "rows": [{"fields": {"id": 1, "owner": {"keys": {"id": '||v.vehicle_owner_id||'}, "descr": "'||vo.name||'"}, "dt_from": "2000-01-01T00:00:00.000Z"}}]}')::jsonb AS owner_list
+from vehicles AS v
+LEFT JOIN vehicle_owners AS vo ON vo.id=v.vehicle_owner_id
+where v.vehicle_owner_id is not null
+) AS s
+WHERE s.id=vehicles.id 
+

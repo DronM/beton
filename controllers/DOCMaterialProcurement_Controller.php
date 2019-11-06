@@ -81,6 +81,11 @@ class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
 				'alias'=>'Материал'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtInt('cement_silos_id'
+				,array(
+				'alias'=>'Силос'
+			));
+		$pm->addParam($param);
 		$param = new FieldExtFloat('quant_gross'
 				,array(
 				'alias'=>'Брутто'
@@ -165,6 +170,12 @@ class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
 				,array(
 			
 				'alias'=>'Материал'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('cement_silos_id'
+				,array(
+			
+				'alias'=>'Силос'
 			));
 			$pm->addParam($param);
 		$param = new FieldExtFloat('quant_gross'

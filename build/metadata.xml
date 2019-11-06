@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-10-23 12:23:11</lastBuild></version>
+		<lastBuild>2019-11-06 06:28:30</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -64,6 +64,7 @@
 		<version dateOpen="2019-10-22 09:10:38" dateClose="2019-10-23 05:10:58">1.00158</version>
 		<version dateOpen="2019-10-23 10:10:54" dateClose="2019-10-23 10:10:54">1.00159</version>
 		<version dateOpen="2019-10-23 11:10:21" dateClose="2019-10-23 12:10:23">1.00160</version>
+		<version dateOpen="2019-10-24 13:10:18" dateClose="2019-11-06 06:11:28">1.00161</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -224,6 +225,12 @@
 		<enum id="reg_types">
 			<value id="material">
 				<ru descr="Учет материалов"/>
+			</value>
+			<value id="material_fact">
+				<ru descr="Учет материалов по факту"/>
+			</value>
+			<value id="cement">
+				<ru descr="Учет цемента"/>
 			</value>
 			<value id="material_consumption">
 				<ru descr="Расход материалов"/>
@@ -578,7 +585,8 @@
 			<field id="tracker_id" dataType="String" alias="Трэкер"/>
 			<field id="sim_id" dataType="String" alias="Идентификатор SIM карты"/>
 			<field id="sim_number" dataType="String" alias="Номер телефона SIM карты"/>
-			<field id="vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" alias="Номер телефона SIM карты"/>
+			<field id="vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" alias="Владелец"/>
+			<field id="vehicle_owners" dataType="JSONB"/>
 			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
 				<field id="vehicle_owner_id"/>
@@ -606,6 +614,7 @@
 			<field id="tracker_last_dt" dataType="DateTimeTZ"/>
 			<field id="vehicle_owners_ref" dataType="JSONB"/>
 			<field id="vehicle_owner_id" dataType="Int"/>
+			<field id="vehicle_owners" dataType="JSONB"/>
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="Driver" parent="ModelSQLBeton" dataTable="drivers" virtual="FALSE">
@@ -1440,6 +1449,7 @@
 			<field id="driver" dataType="String" length="100" alias="Водитель"/>
 			<field id="vehicle_plate" dataType="String" length="10" alias="гос.номер"/>
 			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id" required="TRUE"/>
+			<field id="cement_silos_id" dataType="Int" alias="Силос" refTable="cement_silos" refField="id"/>
 			<field id="quant_gross" dataType="Float" length="19" alias="Брутто" precision="2"/>
 			<field id="quant_net" dataType="Float" length="19" alias="Нетто" precision="2"/>
 			<index id="doc_material_procurements_date_time_index">
@@ -1456,6 +1466,8 @@
 			</index>
 			<registerAtcs>
 				<register id="RAMaterial"/>
+				<register id="RAMaterialFact"/>
+				<register id="RACement"/>
 			</registerAtcs>
 		</model>
 		<model id="DOCMaterialProcurementList" parent="ModelSQLDOC" dataTable="doc_material_procurements_list" virtual="TRUE">
@@ -1471,6 +1483,8 @@
 			<field id="vehicle_plate" dataType="String"/>
 			<field id="material_id" dataType="Int"/>
 			<field id="materials_ref" dataType="JSON"/>
+			<field id="cement_silos_id" dataType="Int"/>
+			<field id="cement_silos_ref" dataType="JSON"/>
 			<field id="quant_gross" dataType="String"/>
 			<field id="quant_net" dataType="String"/>
 		</model>
@@ -1497,6 +1511,8 @@
 			</index>
 			<registerAtcs>
 				<register id="RAMaterial"/>
+				<register id="RAMaterialFact"/>
+				<register id="RACement"/>
 			</registerAtcs>
 		</model>
 		<model id="DOCMaterialInventoryList" parent="ModelSQLDOC" dataTable="doc_material_inventories_list_view" virtual="TRUE">
@@ -2635,6 +2651,110 @@
 			<field id="concrete_quant" dataType="Float" length="19" precision="4"/>
 			<field id="materials" dataType="JSONB"/>
 		</model>
+		<model id="CementSilo" parent="ModelSQLBeton" dataTable="cement_silos" virtual="FALSE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
+			<field id="production_descr" dataType="String" length="100" required="TRUE"/>
+			<field id="name" dataType="String" length="100" required="TRUE"/>
+			<field id="weigh_app_name" dataType="String" length="100" required="TRUE"/>
+			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
+		</model>
+		<model id="CementSiloList" parent="ModelSQLBeton" dataTable="cement_silos_list" virtual="TRUE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="production_sites_ref" dataType="JSON"/>
+			<field id="production_descr" dataType="String" length="100" required="TRUE"/>
+			<field id="name" dataType="String" length="100" required="TRUE"/>
+			<field id="weigh_app_name" dataType="String" length="100" required="TRUE"/>
+			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
+		</model>
+		<!--
+		<model id="CementSiloForOrderList" parent="ModelSQLBeton" dataTable="cement_silos_for_order_list" virtual="TRUE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE" />
+			<field id="production_sites_ref" dataType="JSON" />
+			<field id="name" dataType="String" length="100" required="TRUE" />
+			<field id="load_capacity" dataType="Float" length="19" precision="4" />
+			<field id="balance" dataType="Float" length="19" precision="4" />
+		</model>
+		-->
+		<model id="RGCement" parent="ModelSQLBeton" dataTable="rg_cement" virtual="FALSE" modelType="RG" period="1 month">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период"/>
+			<field id="cement_silos_id" dataType="Int" refTable="cement_silos" refField="id"/>
+			<field id="quant" dataType="Float" alias="Количество" length="19" precision="3"/>
+			<index id="rg_cement_date_time_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="rg_cement_cement_silos_id_idx">
+				<field id="cement_silos_id"/>
+			</index>
+		</model>
+		<model id="RACement" parent="ModelSQLBeton" dataTable="ra_cement" virtual="FALSE" modelType="RA" regTypeId="cement">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период"/>
+			<field id="deb" dataType="Bool" alias="Дебет"/>
+			<field id="doc_type" dataType="Enum" enumId="doc_types" alias="Вид документа" required="TRUE"/>
+			<field id="doc_id" dataType="Int"/>
+			<field id="cement_silos_id" dataType="Int" refTable="cement_silos" refField="id" regFieldType="dimension" required="TRUE"/>
+			<field id="quant" dataType="Float" alias="Количество" length="19" precision="3" regFieldType="fact"/>
+			<index id="ra_cement_date_time_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="ra_cement_doc_idx">
+				<field id="doc_type"/>
+				<field id="doc_id"/>
+			</index>
+			<index id="ra_cement_cement_silos_id_idx">
+				<field id="cement_silos_id"/>
+			</index>
+		</model>
+		<model id="RGMaterialFact" parent="ModelSQLBeton" dataTable="rg_material_facts" virtual="FALSE" modelType="RG" period="1 month">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период"/>
+			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id"/>
+			<field id="quant" dataType="Float" alias="Количество" length="19" precision="3"/>
+			<index id="rg_material_facts_date_time_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="rg_material_facts_material_id_idx">
+				<field id="material_id"/>
+			</index>
+		</model>
+		<model id="RAMaterialFact" parent="ModelSQLBeton" dataTable="ra_material_facts" virtual="FALSE" modelType="RA" regTypeId="material_fact">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период"/>
+			<field id="deb" dataType="Bool" alias="Дебет"/>
+			<field id="doc_type" dataType="Enum" enumId="doc_types" alias="Вид документа" required="TRUE"/>
+			<field id="doc_id" dataType="Int"/>
+			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id" regFieldType="dimension" required="TRUE"/>
+			<field id="quant" dataType="Float" alias="Количество" length="19" precision="3" regFieldType="fact"/>
+			<index id="ra_material_facts_date_time_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="ra_material_facts_doc_idx">
+				<field id="doc_type"/>
+				<field id="doc_id"/>
+			</index>
+			<index id="ra_material_facts_material_id_idx">
+				<field id="material_id"/>
+			</index>
+		</model>
+		<model id="OwnerList" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="dt_from" dataType="DateTime"/>
+			<field id="owner" dataType="JSONB"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -2686,6 +2806,7 @@
 		<constant id="tracker_malfunction_tel_list" name="Список телефонов для сообщений о неисправном трекере" descr="На какие телефоны отправлять сообщение о неработающих трекерах" dataType="JSON"/>
 		<constant id="low_efficiency_tel_list" name="Список телефонов для сообщений о низком состоянии эффективности" descr="На какие телефоны отправлять сообщение о низком состоянии эффективности" dataType="JSON"/>
 		<constant id="material_closed_balance_date" name="Дата закрытого периода остатков" descr="Дата, раньше который период закрыт для редактирования" dataType="Date"/>
+		<constant id="cement_material" name="Материал цемент" descr="Материал цемент" dataType="Int" refTable="raw_materials" refField="id" defaultValue="5"/>
 	</constants>
 	<controllers>
 		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -3675,6 +3796,20 @@
 				<field id="production_file" dataType="Text"/>
 			</publicMethod>
 		</controller>
+		<controller id="CementSilo" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="CementSilo"/>
+			<publicMethod id="update" modelId="CementSilo"/>
+			<publicMethod id="delete" modelId="CementSilo"/>
+			<publicMethod id="get_list" modelId="CementSiloList"/>
+			<publicMethod id="get_object" modelId="CementSiloList"/>
+		</controller>
+		<controller id="OwnerList" parentIdJS="ControllerObjClient" server="FALSE">
+			<publicMethod id="insert" modelId="OwnerList"/>
+			<publicMethod id="update" modelId="OwnerList"/>
+			<publicMethod id="delete" modelId="OwnerList"/>
+			<publicMethod id="get_list" modelId="OwnerList"/>
+			<publicMethod id="get_object" modelId="OwnerList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -3771,6 +3906,9 @@
 		<view id="10032" c="RawMaterialMapToProduction_Controller" t="RawMaterialMapToProductionList" f="get_list" section="Справочники" descr="Соответствие материалов в производстве и в бетоне"/>
 		<view id="10033" c="VehicleMapToProduction_Controller" t="VehicleMapToProductionList" f="get_list" section="Справочники" descr="Соответствие ТС в производстве и в бетоне"/>
 		<view id="10034" c="ConcreteTypeMapToProduction_Controller" t="ConcreteTypeMapToProductionList" f="get_list" section="Справочники" descr="Соответствие марок в производстве и в бетоне"/>
+		<view id="10035" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionList" f="get_list" section="Формы" descr="Фактический расход материалов"/>
+		<view id="10036" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionRolledList" f="get_rolled_list" section="Формы" descr="Фактический расход материалов (свернуто)"/>
+		<view id="10037" c="CementSilo_Controller" t="CementSiloList" f="get_list" section="Справочники" descr="Соответствие силосов"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -3801,8 +3939,6 @@
 		<view id="30015" t="MaterialFactConsumptionUpload" section="Формы" descr="Загрузка данных с завода"/>
 		<view id="30016" c="LabEntry_Controller" t="LabEntryList" f="get_list" section="Формы" descr="Журнал испытания образцов"/>
 		<view id="30017" c="Order_Controller" t="OrderMakeForLabList" f="get_make_orders_for_lab_form" section="Формы" descr="Заявки онлайн (лаборант)"/>
-		<view id="10035" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionList" f="get_list" section="Формы" descr="Фактический расход материалов"/>
-		<view id="10036" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionRolledList" f="get_rolled_list" section="Формы" descr="Фактический расход материалов (свернуто)"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -3904,6 +4040,7 @@
 		<serverTemplate id="MaterialFactConsumptionRolledList"/>
 		<serverTemplate id="LabEntryList"/>
 		<serverTemplate id="LabEntryDetailList"/>
+		<serverTemplate id="CementSiloList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -4445,6 +4582,7 @@
 		<jsScript file="views/LabEntryList_View.js"/>
 		<jsScript file="views/LabEntryDetailList_View.js"/>
 		<jsScript file="views/OrderMakeForLabList_View.js"/>
+		<jsScript file="views/CementSiloList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -4544,6 +4682,7 @@
 		<jsScript file="custom_controls/TelListGrid.js"/>
 		<jsScript file="custom_controls/VehicleScheduleMakeOrderGrid.js"/>
 		<jsScript file="custom_controls/MaterialMakeOrderGrid.js"/>
+		<jsScript file="custom_controls/OwnerListGrid.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -4808,6 +4947,17 @@
 		<jsScript file="models/RawMaterialConsRateList_Model.js"/>
 		<jsScript file="models/OrderMakeForLabList_Model.js"/>
 		<jsScript file="models/LabEntry30DaysList_Model.js"/>
+		<jsScript file="models/CementSilo_Model.js"/>
+		<jsScript file="models/RGCement_Model.js"/>
+		<jsScript file="models/RACement_Model.js"/>
+		<jsScript file="models/RGMaterialFact_Model.js"/>
+		<jsScript file="models/RAMaterialFact_Model.js"/>
+		<jsScript file="controllers/CementSilo_Controller.js"/>
+		<jsScript file="models/CementSiloList_Model.js"/>
+		<jsScript file="models/VehicleOwnerHistory_Model.js"/>
+		<jsScript file="models/VehicleOwnerHistoryList_Model.js"/>
+		<jsScript file="controllers/OwnerList_Controller.js"/>
+		<jsScript file="models/OwnerList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>
