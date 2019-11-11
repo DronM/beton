@@ -6,6 +6,10 @@ function OrderMakeList_View(id,options){
 	this.m_lowResDevice = (window.getWidthType()=="sm");
 	options.templateOptions = options.templateOptions || {};	
 	options.templateOptions.showChart = !this.m_lowResDevice;
+	
+	this.m_showProductionSites = !this.m_lowResDevice;
+	options.templateOptions.showProductionSites = this.m_showProductionSites;
+	
 //alert("getWidthType="+window.getWidthType())	
 	options.className = "row";
 	this.m_refreshMethod = (new Order_Controller()).getPublicMethod("get_make_orders_form");
@@ -83,6 +87,13 @@ function OrderMakeList_View(id,options){
 			self.refresh();
 		}
 		
+		//production sites
+		if (this.m_showProductionSites){
+			this.addElement(new CementSiloForOrderList_View(id+":production_sites",{
+				"model":options.models.CementSiloForOrderList_Model
+			}));
+		}
+				
 		//material totals
 		var model = options.models.MatTotals_Model;
 		this.addElement(new MaterialMakeOrderGrid(id+":mat_totals_grid",{
@@ -218,6 +229,11 @@ OrderMakeList_View.prototype.refresh = function(callBack){
 			if(!self.m_lowResDevice){
 				self.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
 			}
+			
+			if(self.m_showProductionSites){
+				self.getElement("production_sites").setData(resp.getModel("CementSiloForOrderList_Model"));
+			}
+			
 			//mat totals
 			var grid = self.getElement("mat_totals_grid");
 			grid.getModel().setData(resp.getModelData("MatTotals_Model"));

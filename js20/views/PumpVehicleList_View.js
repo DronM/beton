@@ -137,11 +137,13 @@ function PumpVehicleList_View(id,options){
 												
 												var t_tag = document.createElement("A");
 												t_tag.className = "tel_in_list";
-												t_tag.setAttribute("href","tel:"+tel_m);
+												t_tag.setAttribute("href","tel:"+tel_m);												
 												if(window.getWidthType()!="sm"){
 													t_tag.setAttribute("tel",tel_m);
 													EventHelper.add(t_tag,"click",function(e){
 														e.preventDefault();
+														window.getApp().makeCall(this.getAttribute("tel"));
+														/*
 														var pm = (new Caller_Controller()).getPublicMethod("call");
 														pm.setFieldValue("tel",this.getAttribute("tel"));
 														var tel_el = this;
@@ -150,10 +152,12 @@ function PumpVehicleList_View(id,options){
 																window.showTempNote("Пытаемся позвонить на номер: "+tel_el.getAttribute("tel"),null,10000);
 															}
 														})
+														*/
 													});
 												}
 												t_tag.textContent = CommonHelper.maskFormat(tel,window.getApp().getPhoneEditMask());
-												cell_n.appendChild(t_tag);												
+												t_tag.setAttribute("title","Позвонить на номер "+t_tag.textContent);
+												cell_n.appendChild(t_tag);
 											}
 										}
 										return "";
@@ -162,16 +166,28 @@ function PumpVehicleList_View(id,options){
 							]
 						})
 						
-						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_prices_ref",{
-							"value":"Ценовая схема",
+						,is_v_owner? null:new GridCellHead(id+":grid:head:pump_prices",{
+							"value":"Ценовые схемы",
 							"columns":[
-								new GridColumnRef({
-									"field":model.getField("pump_prices_ref"),
-									"ctrlClass":PumpPriceEdit,
-									"ctrlOptions":{
-										"labelCaption":""
+								new GridColumn({
+									"field":model.getField("pump_prices"),
+									"formatFunction":function(fields){
+										var res = "";
+										var v = fields.pump_prices.getValue();
+										if(v&&v.rows){
+											for(var j=0;j<v.rows.length;j++){
+												res+= (res=="")? "":", ";
+												res+=  v.rows[j].fields.pump_price.getDescr();
+											}
+										}
+										return res;
 									},
-									"ctrlBindFieldId":"pump_price_id"
+									"ctrlClass":PumpVehiclePriceListGrid,//PumpPriceEdit
+									"ctrlOptions":{
+										"labelCaption":"",
+										"contTagName":"TD"
+									},
+									"ctrlBindFieldId":"pump_prices"
 								})
 							]
 						})

@@ -10,3 +10,10 @@ where v.vehicle_owner_id is not null
 ) AS s
 WHERE s.id=vehicles.id 
 
+
+//*************Прайсы насосов ******************
+update pump_vehicles
+set pump_prices =
+('{"id": "PumpVehiclePriceList_Model", "rows": [{"fields": {"id": 1, "pump_price": {"keys": {"id": '||pump_price_id||'}, "descr": "'||(SELECT pump_prices.name FROM pump_prices WHERE pump_prices.id=pump_vehicles.pump_price_id)||'"}, "dt_from": "2000-01-01T00:00:00.000Z"}}]}')::jsonb
+WHERE pump_vehicles.pump_price_id IS NOT NULL
+

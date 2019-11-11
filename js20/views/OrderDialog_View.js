@@ -189,7 +189,8 @@ function OrderDialog_View(id,options){
 			},
 			"getPayCash":function(){
 				return self.getElement("pay_cash").getValue();
-			}
+			},
+			"dialogContext":this
 		}));	
 		
 	}

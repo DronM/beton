@@ -69,13 +69,13 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		production_sites_ref(ps) AS production_sites_ref,
 		sh.production_site_id,
 		
-		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
-		--vehicle_owner_on_date(v.vehicle_owners,sh.date_time) AS vehicle_owners_ref,
+		--vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		vehicle_owner_on_date(v.vehicle_owners,sh.date_time) AS vehicle_owners_ref,
 		
 		sh.acc_comment,
 		sh.acc_comment_shipment,
-		v_own.id AS vehicle_owner_id,
-		--((vehicle_owner_on_date(v.vehicle_owners,sh.date_time))-'keys'->>'id')::int AS vehicle_owner_id
+		--v_own.id AS vehicle_owner_id,
+		((vehicle_owner_on_date(v.vehicle_owners,sh.date_time))->'keys'->>'id')::int AS vehicle_owner_id,
 		
 		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
 		(SELECT
@@ -94,7 +94,8 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 									ELSE coalesce(pr_vals.price_m,0)*o.quant
 								END
 							FROM pump_prices_values AS pr_vals
-							WHERE pr_vals.pump_price_id = pvh.pump_price_id
+							WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,sh.date_time)->'keys'->>'id')::int
+								--pvh.pump_price_id
 								AND o.quant<=pr_vals.quant_to
 							ORDER BY pr_vals.quant_to ASC
 							LIMIT 1
@@ -147,7 +148,8 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 									ELSE coalesce(pr_vals.price_m,0)*o.quant
 								END
 							FROM pump_prices_values AS pr_vals
-							WHERE pr_vals.pump_price_id = pvh.pump_price_id
+							WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,sh.date_time)->'keys'->>'id')::int
+								--pvh.pump_price_id
 								AND o.quant<=pr_vals.quant_to
 							ORDER BY pr_vals.quant_to ASC
 							LIMIT 1

@@ -56,6 +56,7 @@
 <li><a href="#PumpPrice_Controller">PumpPrice_Controller</a></li>
 <li><a href="#PumpPriceValue_Controller">PumpPriceValue_Controller</a></li>
 <li><a href="#PumpVehicle_Controller">PumpVehicle_Controller</a></li>
+<li><a href="#PumpVehiclePriceList_Controller">PumpVehiclePriceList_Controller</a></li>
 <li><a href="#Quarry_Controller">Quarry_Controller</a></li>
 <li><a href="#RAMaterialConsumption_Controller">RAMaterialConsumption_Controller</a></li>
 <li><a href="#RawMaterial_Controller">RawMaterial_Controller</a></li>
@@ -288,11 +289,13 @@
 <li><a href="#MaterialFactConsumptionRolledList_Model">MaterialFactConsumptionRolledList_Model</a></li>
 <li><a href="#CementSilo_Model">CementSilo_Model</a></li>
 <li><a href="#CementSiloList_Model">CementSiloList_Model</a></li>
+<li><a href="#CementSiloForOrderList_Model">CementSiloForOrderList_Model</a></li>
 <li><a href="#RGCement_Model">RGCement_Model</a></li>
 <li><a href="#RACement_Model">RACement_Model</a></li>
 <li><a href="#RGMaterialFact_Model">RGMaterialFact_Model</a></li>
 <li><a href="#RAMaterialFact_Model">RAMaterialFact_Model</a></li>
 <li><a href="#OwnerList_Model">OwnerList_Model</a></li>
+<li><a href="#PumpVehiclePriceList_Model">PumpVehiclePriceList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1543,6 +1546,19 @@
 <p>Precision:3</p>
 </div>
 </div>
+</div>
+</div>
+<div id="PumpVehiclePriceList_Controller" class="content_box">
+<h1>PumpVehiclePriceList_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#PumpVehiclePriceList_Model">Model: PumpVehiclePriceList_Model</a><h2>update</h2>
+<a href="#PumpVehiclePriceList_Model">Model: PumpVehiclePriceList_Model</a><h2>delete</h2>
+<a href="#PumpVehiclePriceList_Model">Model: PumpVehiclePriceList_Model</a><h2>get_list</h2>
+<a href="#PumpVehiclePriceList_Model">Model: PumpVehiclePriceList_Model</a><h2>get_object</h2>
+<a href="#PumpVehiclePriceList_Model">Model: PumpVehiclePriceList_Model</a>
 </div>
 </div>
 <div id="Quarry_Controller" class="content_box">
@@ -3331,6 +3347,48 @@
 <div>Required:</div>
 <div>Length:19</div>
 <div>Precision:4</div>
+<h2>visible</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="CementSiloForOrderList_Model" class="content_box">
+<h1>CementSiloForOrderList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>load_capacity</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>balance</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
 </div>
 </div>
 <div id="CementSiloList_Model" class="content_box">
@@ -3373,6 +3431,12 @@
 <div>Required:</div>
 <div>Length:19</div>
 <div>Precision:4</div>
+<h2>visible</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="Client_Model" class="content_box">
@@ -7879,6 +7943,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>pump_prices</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="PumpVehicleList_Model" class="content_box">
@@ -7963,6 +8033,36 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>pump_prices</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="PumpVehiclePriceList_Model" class="content_box">
+<h1>PumpVehiclePriceList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>dt_from</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_price</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="PumpVehicleWorkList_Model" class="content_box">
@@ -8030,6 +8130,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>phone_cels</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_prices</h2>
 <div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>

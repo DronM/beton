@@ -1295,6 +1295,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LabEntryDetailList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderMakeForLabList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloForOrderList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1395,6 +1396,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleMakeOrderGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MaterialMakeOrderGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OwnerListGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PumpVehiclePriceListGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
@@ -1670,6 +1672,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleOwnerHistoryList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/OwnerList_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/OwnerList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/PumpVehiclePriceList_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/PumpVehiclePriceList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/CementSiloForOrderList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

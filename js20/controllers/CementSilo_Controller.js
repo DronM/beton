@@ -74,6 +74,12 @@ extend(CementSilo_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("visible",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -119,6 +125,12 @@ extend(CementSilo_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldFloat("load_capacity",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("visible",options);
 	
 	pm.addField(field);
 	
@@ -168,6 +180,9 @@ extend(CementSilo_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldFloat("load_capacity",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("visible",f_opts));
 }
 
 			CementSilo_Controller.prototype.addGetObject = function(){

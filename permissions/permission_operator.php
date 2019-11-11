@@ -1006,6 +1006,16 @@ $permissions = array();
 				
 					$permissions['OwnerList_Controller_get_object']=TRUE;
 				
+					$permissions['PumpVehiclePriceList_Controller_insert']=TRUE;
+				
+					$permissions['PumpVehiclePriceList_Controller_update']=TRUE;
+				
+					$permissions['PumpVehiclePriceList_Controller_delete']=TRUE;
+				
+					$permissions['PumpVehiclePriceList_Controller_get_list']=TRUE;
+				
+					$permissions['PumpVehiclePriceList_Controller_get_object']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

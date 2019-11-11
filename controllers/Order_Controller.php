@@ -587,17 +587,20 @@ class Order_Controller extends ControllerSQL{
 						$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
 					}					
 					
+					$pump_sms_mes = NULL;
 					while($pump_sms_ar = $this->getDbLink()->fetch_array($pump_sms_q_id)){
 						$sms_id_resp_pump = $sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
 						FieldSQLString::formatForDb($this->getDbLink(),$sms_id_resp_pump,$sms_id_pump);															
+						$pump_sms_mes = $pump_sms_ar['message'];
 					}
 					
 					//ответственному
-					$tel_id = $this->pumpActionRespTels( ( ($pumpInsert)? 'order_for_pump_ins':'order_for_pump_upd') );
-					while($tel = $this->getDbLink()->fetch_array($tel_id)){
-						$sms_service->send($tel['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
-					}															
-					
+					if(!is_null($pump_sms_mes)){
+						$tel_id = $this->pumpActionRespTels( ( ($pumpInsert)? 'order_for_pump_ins':'order_for_pump_upd') );
+						while($tel = $this->getDbLink()->fetch_array($tel_id)){
+							$sms_service->send($tel['phone_cel'],$pump_sms_mes,SMS_SIGN,SMS_TEST);
+						}															
+					}
 				}
 				
 				$q = '';
@@ -713,6 +716,8 @@ class Order_Controller extends ControllerSQL{
 			WHERE o.id=%d",
 			$this->getExtDbVal($pm,'old_id')
 		));
+		
+		$new_pump_vehicle_id = NULL;
 		if (is_array($ar)){
 			$old_date_time = strtotime($ar['date_time']);
 			$new_date_time = $pm->getParamValue("date_time");
@@ -729,18 +734,7 @@ class Order_Controller extends ControllerSQL{
 				Graph_Controller::clearCacheOnDate($dbLink,$new_date_time);
 			}			
 			
-			$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');
-			
-			$pump_sms_q_id = NULL;
-			//если был насос,а сейчас нет или замена насоса - запомним старые данные для удаления насоса
-			if ($ar['pump_vehicle_id'] && $new_pump_vehicle_id && $new_pump_vehicle_id!=$ar['pump_vehicle_id']){
-				$pump_sms_q_id = $this->getDbLink()->query_first(
-					sprintf(
-						"SELECT * FROM sms_pump_order_del(%d)",
-						$this->getExtDbVal($pm,'old_id')
-					)
-				);					
-			}						
+			$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');						
 		}	
 		
 		$resend_sms = (
@@ -801,19 +795,34 @@ class Order_Controller extends ControllerSQL{
 				
 		}
 		
-		/* Послать на удаление насоснику если был насос а сейчас нет, или сейчас другой */
-		if (!is_null($pump_sms_q_id)){
+		//если был насос,а сейчас нет или замена насоса - запомним старые данные для удаления насоса
+		if (is_array($ar)
+		&& count($ar)
+		&& $ar['pump_vehicle_id']
+		&& $new_pump_vehicle_id
+		&& $new_pump_vehicle_id!=$ar['pump_vehicle_id']
+		){
+			$pump_sms_q_id = $this->getDbLink()->query(
+				sprintf(
+					"SELECT * FROM sms_pump_order_del(%d)",
+					$this->getExtDbVal($pm,'old_id')
+				)
+			);					
 			$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
 			
+			$pump_sms_mes = NULL;
 			while($pump_sms_ar = $this->getDbLink()->fetch_array($pump_sms_q_id)){
 				$sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
+				$pump_sms_mes = $pump_sms_ar['message'];
 			}
 			//Ответственному
-			$tel_id = $this->pumpActionRespTels('order_for_pump_del');
-			while($tel = $this->getDbLink()->fetch_array($tel_id)){
-				$sms_service->send($tel['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
-			}			
-		}
+			if(!is_null($pump_sms_mes)){
+				$tel_id = $this->pumpActionRespTels('order_for_pump_del');
+				while($tel = $this->getDbLink()->fetch_array($tel_id)){
+					$sms_service->send($tel['phone_cel'],$pump_sms_mes,SMS_SIGN,SMS_TEST);
+				}			
+			}
+		}						
 	}
 	
 	private function pumpActionRespTels($action){
@@ -830,24 +839,30 @@ class Order_Controller extends ControllerSQL{
 	
 	public function delete($pm){
 		/* SMS насоснику */
-		$pump_sms_ar = $this->getDbLink()->query_first(sprintf(
-			"SELECT
-				sms_pump_order_del.*
-			FROM sms_pump_order_del
-			WHERE order_id=%d",
-			$this->getExtDbVal($pm,'id'))
-		);	
-		if (is_array($pump_sms_ar)&&count($pump_sms_ar)){
+		$pump_sms_q_id = $this->getDbLink()->query(sprintf(
+			"SELECT *
+			FROM sms_pump_order_del(%d)",
+			$this->getExtDbVal($pm,'id')
+			)
+		);
+		if (!is_null($pump_sms_q_id)){	
 			$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
-			$sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
-			
+		
+			$pump_sms_mes = NULL;
+			while($pump_sms_ar = $this->getDbLink()->fetch_array($pump_sms_q_id)){
+				$sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
+				$pump_sms_mes = $pump_sms_ar['message'];
+			}
+		
 			//Ответственному
-			$tel_id = $this->pumpActionRespTels('order_for_pump_del');
-			while($tel = $this->getDbLink()->fetch_array($tel_id)){
-				$sms_service->send($tel['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
+			if(!is_null($pump_sms_mes)){
+				$tel_id = $this->pumpActionRespTels('order_for_pump_del');
+				while($tel = $this->getDbLink()->fetch_array($tel_id)){
+					$sms_service->send($tel['phone_cel'],$pump_sms_mes,SMS_SIGN,SMS_TEST);
+				}
 			}
 		}
-	
+			
 		Graph_Controller::clearCacheOnOrderId($this->getDbLink(),$pm->getParamValue('id'));
 		parent::delete($pm);
 	}
@@ -875,8 +890,8 @@ class Order_Controller extends ControllerSQL{
 
 		//silos list
 		$this->addNewModel(
-			"SELECT * FROM cement_silos_list",
-			'CementSiloList_Model'
+			"SELECT * FROM cement_silos_for_order_list",
+			'CementSiloForOrderList_Model'
 		);
 		
 		//chart

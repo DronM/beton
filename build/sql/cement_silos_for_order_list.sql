@@ -17,4 +17,4 @@ CREATE OR REPLACE VIEW cement_silos_for_order_list AS
 	ORDER BY pst.name,t.name
 	;
 	
-ALTER VIEW cement_silos_for_order_list OWNER TO beton;
+ALTER VIEW cement_silos_for_order_list OWNER TO ;

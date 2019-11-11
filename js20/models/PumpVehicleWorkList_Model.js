@@ -121,6 +121,15 @@ function PumpVehicleWorkList_Model(options){
 	
 	options.fields.phone_cels = new FieldJSONB("phone_cels",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_prices = new FieldJSONB("pump_prices",filed_options);
+	
 			
 		PumpVehicleWorkList_Model.superclass.constructor.call(this,id,options);
 }

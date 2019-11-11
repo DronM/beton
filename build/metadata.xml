@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-11-06 06:28:30</lastBuild></version>
+		<lastBuild>2019-11-11 07:22:11</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -65,6 +65,7 @@
 		<version dateOpen="2019-10-23 10:10:54" dateClose="2019-10-23 10:10:54">1.00159</version>
 		<version dateOpen="2019-10-23 11:10:21" dateClose="2019-10-23 12:10:23">1.00160</version>
 		<version dateOpen="2019-10-24 13:10:18" dateClose="2019-11-06 06:11:28">1.00161</version>
+		<version dateOpen="2019-11-06 14:11:50" dateClose="2019-11-11 07:11:22">1.00162</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -746,6 +747,7 @@
 			<field id="deleted" dataType="Bool" defaultValue="FALSE"/>
 			<field id="comment_text" dataType="String" length="100"/>
 			<field id="phone_cels" dataType="JSONB"/>
+			<field id="pump_prices" dataType="JSONB"/>
 		</model>
 		<model id="PumpVehicleList" parent="ModelSQLBeton" dataTable="pump_veh_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -761,6 +763,7 @@
 			<field id="comment_text" dataType="String"/>
 			<field id="vehicle_owner_id" dataType="Int"/>
 			<field id="phone_cels" dataType="JSONB"/>
+			<field id="pump_prices" dataType="JSONB"/>
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
 		<model id="PumpVehicleWorkList" parent="ModelSQLBeton" dataTable="pump_veh_work_list" virtual="TRUE">
@@ -775,6 +778,7 @@
 			<field id="plate" dataType="String"/>
 			<field id="pump_length" dataType="Int"/>
 			<field id="phone_cels" dataType="JSONB"/>
+			<field id="pump_prices" dataType="JSONB"/>
 			<globalFilter id="vehicle_owner_id" fieldId="pump_vehicle_owner_id"/>
 		</model>
 		<model id="Order" parent="ModelSQLBeton" dataTable="orders" virtual="FALSE">
@@ -2658,6 +2662,7 @@
 			<field id="name" dataType="String" length="100" required="TRUE"/>
 			<field id="weigh_app_name" dataType="String" length="100" required="TRUE"/>
 			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
+			<field id="visible" dataType="Bool" defaultValue="FALSE"/>
 		</model>
 		<model id="CementSiloList" parent="ModelSQLBeton" dataTable="cement_silos_list" virtual="TRUE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
@@ -2666,16 +2671,15 @@
 			<field id="name" dataType="String" length="100" required="TRUE"/>
 			<field id="weigh_app_name" dataType="String" length="100" required="TRUE"/>
 			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
+			<field id="visible" dataType="Bool" defaultValue="FALSE"/>
 		</model>
-		<!--
 		<model id="CementSiloForOrderList" parent="ModelSQLBeton" dataTable="cement_silos_for_order_list" virtual="TRUE">
-			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE" />
-			<field id="production_sites_ref" dataType="JSON" />
-			<field id="name" dataType="String" length="100" required="TRUE" />
-			<field id="load_capacity" dataType="Float" length="19" precision="4" />
-			<field id="balance" dataType="Float" length="19" precision="4" />
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="production_sites_ref" dataType="JSON"/>
+			<field id="name" dataType="String" length="100" required="TRUE"/>
+			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
+			<field id="balance" dataType="Float" length="19" precision="4"/>
 		</model>
-		-->
 		<model id="RGCement" parent="ModelSQLBeton" dataTable="rg_cement" virtual="FALSE" modelType="RG" period="1 month">
 			<defaultOrder>
 				<field id="date_time"/>
@@ -2754,6 +2758,11 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="dt_from" dataType="DateTime"/>
 			<field id="owner" dataType="JSONB"/>
+		</model>
+		<model id="PumpVehiclePriceList" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="dt_from" dataType="DateTime"/>
+			<field id="pump_price" dataType="JSONB"/>
 		</model>
 	</models>
 	<constants>
@@ -3810,6 +3819,13 @@
 			<publicMethod id="get_list" modelId="OwnerList"/>
 			<publicMethod id="get_object" modelId="OwnerList"/>
 		</controller>
+		<controller id="PumpVehiclePriceList" parentIdJS="ControllerObjClient" server="FALSE">
+			<publicMethod id="insert" modelId="PumpVehiclePriceList"/>
+			<publicMethod id="update" modelId="PumpVehiclePriceList"/>
+			<publicMethod id="delete" modelId="PumpVehiclePriceList"/>
+			<publicMethod id="get_list" modelId="PumpVehiclePriceList"/>
+			<publicMethod id="get_object" modelId="PumpVehiclePriceList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -4073,6 +4089,7 @@
 		<jsTemplate id="OrderCalc" file="tmpl/OrderCalc.html"/>
 		<jsTemplate id="MatTotalGridInner" file="tmpl/MatTotalGridInner.html"/>
 		<jsTemplate id="MatCorrectGridInner" file="tmpl/MatCorrectGridInner.html"/>
+		<jsTemplate id="CementSiloForOrderList_View" file="tmpl/CementSiloForOrderList_View.html"/>
 	</jsTemplates>
 	<jsScripts>
 		<!-- Core JS files -->
@@ -4583,6 +4600,7 @@
 		<jsScript file="views/LabEntryDetailList_View.js"/>
 		<jsScript file="views/OrderMakeForLabList_View.js"/>
 		<jsScript file="views/CementSiloList_View.js"/>
+		<jsScript file="views/CementSiloForOrderList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -4683,6 +4701,7 @@
 		<jsScript file="custom_controls/VehicleScheduleMakeOrderGrid.js"/>
 		<jsScript file="custom_controls/MaterialMakeOrderGrid.js"/>
 		<jsScript file="custom_controls/OwnerListGrid.js"/>
+		<jsScript file="custom_controls/PumpVehiclePriceListGrid.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -4958,6 +4977,9 @@
 		<jsScript file="models/VehicleOwnerHistoryList_Model.js"/>
 		<jsScript file="controllers/OwnerList_Controller.js"/>
 		<jsScript file="models/OwnerList_Model.js"/>
+		<jsScript file="controllers/PumpVehiclePriceList_Controller.js"/>
+		<jsScript file="models/PumpVehiclePriceList_Model.js"/>
+		<jsScript file="models/CementSiloForOrderList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

@@ -16,8 +16,8 @@
  * @param {Object} options
  */
 
-function CementSiloList_Model(options){
-	var id = 'CementSiloList_Model';
+function CementSiloForOrderList_Model(options){
+	var id = 'CementSiloForOrderList_Model';
 	options = options || {};
 	
 	options.fields = {};
@@ -48,31 +48,9 @@ function CementSiloList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.production_descr = new FieldString("production_descr",filed_options);
-	options.fields.production_descr.getValidator().setRequired(true);
-	options.fields.production_descr.getValidator().setMaxLength('100');
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
 	options.fields.name = new FieldString("name",filed_options);
 	options.fields.name.getValidator().setRequired(true);
 	options.fields.name.getValidator().setMaxLength('100');
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.weigh_app_name = new FieldString("weigh_app_name",filed_options);
-	options.fields.weigh_app_name.getValidator().setRequired(true);
-	options.fields.weigh_app_name.getValidator().setMaxLength('100');
 	
 				
 	
@@ -88,13 +66,13 @@ function CementSiloList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.defValue = true;
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.visible = new FieldBool("visible",filed_options);
+	options.fields.balance = new FieldFloat("balance",filed_options);
+	options.fields.balance.getValidator().setMaxLength('19');
 	
-		CementSiloList_Model.superclass.constructor.call(this,id,options);
+		CementSiloForOrderList_Model.superclass.constructor.call(this,id,options);
 }
-extend(CementSiloList_Model,ModelXML);
+extend(CementSiloForOrderList_Model,ModelXML);
 

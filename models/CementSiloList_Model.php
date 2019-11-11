@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class CementSiloList_Model extends ModelSQLBeton{
@@ -73,6 +74,15 @@ class CementSiloList_Model extends ModelSQLBeton{
 						
 		$f_load_capacity=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"load_capacity",$f_opts);
 		$this->addField($f_load_capacity);
+		//********************
+		
+		//*** Field visible ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="visible";
+						
+		$f_visible=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"visible",$f_opts);
+		$this->addField($f_visible);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

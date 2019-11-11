@@ -93,7 +93,7 @@ function CementSiloList_View(id,options){
 							]
 						})						
 						,new GridCellHead(id+":grid:head:load_capacity",{
-							"value":"Вместимость, кг",
+							"value":"Вместимость, т.",
 							"columns":[
 								new GridColumn({
 									"field":model.getField("load_capacity"),
@@ -102,6 +102,14 @@ function CementSiloList_View(id,options){
 										"labelCaption":"",
 										"precision":"4"
 									}
+								})
+							]
+						})						
+						,new GridCellHead(id+":grid:head:visible",{
+							"value":"Показывать",
+							"columns":[
+								new GridColumnBool({
+									"field":model.getField("visible")
 								})
 							]
 						})						

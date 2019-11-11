@@ -715,3 +715,17 @@ a.tel_in_list{
 	border:3px solid black;	
 	background-color:red !important;
 }
+
+.cementSiloPic{
+	width:200px;
+}
+.productionSiteGroup{
+	display:inline;
+}
+.siloContainer{
+	display:inline;
+	clear:right;
+}
+.siloName{
+	font-size:70%;	
+}

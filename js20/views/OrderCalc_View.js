@@ -20,6 +20,8 @@ function OrderCalc_View(id,options){
 	this.m_getAvailSpots = options.getAvailSpots;
 	this.m_getPayCash = options.getPayCash;
 	
+	this.m_dialogContext = options.dialogContext;
+	
 	var self = this;
 	
 	options.addElement = function(){
@@ -299,14 +301,33 @@ OrderCalc_View.prototype.onSelectPumpVehicle = function(f){
 	if(this.getElement("pump_vehicle").isNull()){
 		this.onSelectPumpVehicleCont();
 	}
-	else{	
-		if (f.pump_prices_ref.isNull()){
+	else{
+		//есть список ценовых схем по датам вместо pump_prices_ref с 06/11/19
+		if (f.pump_prices.isNull()){
 			throw new Error("Не задана ценовая схема для насоса!")
+		}
+		
+		//определение схемы 06/11/19
+		var pump_prices = f.pump_prices.getValue();
+		if(!pump_prices.rows || !pump_prices.rows.length){
+			throw new Error("Не верное значение для ценовых схем!")
+		}
+		var pump_price_id,pump_price_dt;
+		var dt = this.m_dialogContext.getElement("date_time_date").getValue().getTime();
+		for(var j=0;j<pump_prices.rows.length;j++){
+			var pump_price_dt_tmp =  DateHelper.strtotime(pump_prices.rows[j].fields.dt_from);
+			if (pump_price_dt_tmp.getTime()<=dt && (!pump_price_dt || pump_price_dt.getTime()<pump_price_dt_tmp.getTime()) ){
+				pump_price_id = pump_prices.rows[j].fields.pump_price.getKey("id");
+				pump_price_dt = pump_price_dt_tmp;
+			}
+		}
+		if(this.m_dialogContext.getElement("pay_cash").getValue() && pump_prices.rows.length>=2){
+			window.showTempNote("Используется ценовая схема насоса на "+DateHelper.format(pump_price_dt,"d/m/y"));
 		}
 		var contr = new PumpPriceValue_Controller();
 		var pm = contr.getPublicMethod("get_list");
 		pm.setFieldValue(contr.PARAM_COND_FIELDS,"pump_price_id");
-		pm.setFieldValue(contr.PARAM_COND_VALS,f.pump_prices_ref.getValue().getKey());
+		pm.setFieldValue(contr.PARAM_COND_VALS,pump_price_id);
 		pm.setFieldValue(contr.PARAM_COND_SGNS,contr.PARAM_SGN_EQUAL);
 		var self = this;
 		pm.run({

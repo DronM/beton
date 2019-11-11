@@ -49,6 +49,9 @@ class PumpVehicle_Controller extends ControllerSQL{
 		$param = new FieldExtJSONB('phone_cels'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtJSONB('pump_prices'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -92,6 +95,10 @@ class PumpVehicle_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtJSONB('phone_cels'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtJSONB('pump_prices'
 				,array(
 			));
 			$pm->addParam($param);

@@ -43,6 +43,9 @@ class CementSilo_Controller extends ControllerSQL{
 		$param = new FieldExtFloat('load_capacity'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtBool('visible'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -78,6 +81,10 @@ class CementSilo_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtFloat('load_capacity'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('visible'
 				,array(
 			));
 			$pm->addParam($param);

@@ -1,0 +1,16 @@
+<div id={{id}} class="row">
+	{{#productionSites}}
+	<div id="{{id}}:productionSite_{{productionSiteId}}" class="col-{{widthType}}-6">
+		 <legend>{{productionSiteName}}
+		 </legend>
+		{{#silos}}
+		<div id="{{id}}:silo_{{siloId}}" class="col-{{widthType}}-4">
+			<div class="siloName">{{siloName}}
+			</div>
+			<canvas id="silo_canvas_{{siloId}}" class="cementSiloPic">
+			</canvas>
+		</div>
+		{{/silos}}
+	</div>
+	{{/productionSites}}
+</div>

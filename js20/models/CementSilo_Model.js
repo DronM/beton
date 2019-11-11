@@ -84,6 +84,16 @@ function CementSilo_Model(options){
 	options.fields.load_capacity = new FieldFloat("load_capacity",filed_options);
 	options.fields.load_capacity.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.visible = new FieldBool("visible",filed_options);
+	
 		CementSilo_Model.superclass.constructor.call(this,id,options);
 }
 extend(CementSilo_Model,ModelXML);

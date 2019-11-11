@@ -17,7 +17,8 @@ CREATE OR REPLACE VIEW public.pump_veh_work_list AS
 		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
 		v.vehicle_owner_id AS pump_vehicle_owner_id,
 		
-		pv.phone_cels
+		pv.phone_cels,
+		pv.pump_prices
 		
 	FROM pump_vehicles pv
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id

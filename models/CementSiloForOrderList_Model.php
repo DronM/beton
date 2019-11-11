@@ -10,16 +10,16 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
-class CementSilo_Model extends ModelSQLBeton{
+class CementSiloForOrderList_Model extends ModelSQLBeton{
 	
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
 		$this->setDbName("public");
 		
-		$this->setTableName("cement_silos");
+		$this->setTableName("cement_silos_for_order_list");
 			
 		//*** Field id ***
 		$f_opts = array();
@@ -31,21 +31,12 @@ class CementSilo_Model extends ModelSQLBeton{
 		$this->addField($f_id);
 		//********************
 		
-		//*** Field production_site_id ***
+		//*** Field production_sites_ref ***
 		$f_opts = array();
-		$f_opts['id']="production_site_id";
+		$f_opts['id']="production_sites_ref";
 						
-		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
-		$this->addField($f_production_site_id);
-		//********************
-		
-		//*** Field production_descr ***
-		$f_opts = array();
-		$f_opts['length']=100;
-		$f_opts['id']="production_descr";
-						
-		$f_production_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_descr",$f_opts);
-		$this->addField($f_production_descr);
+		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
+		$this->addField($f_production_sites_ref);
 		//********************
 		
 		//*** Field name ***
@@ -57,15 +48,6 @@ class CementSilo_Model extends ModelSQLBeton{
 		$this->addField($f_name);
 		//********************
 		
-		//*** Field weigh_app_name ***
-		$f_opts = array();
-		$f_opts['length']=100;
-		$f_opts['id']="weigh_app_name";
-						
-		$f_weigh_app_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"weigh_app_name",$f_opts);
-		$this->addField($f_weigh_app_name);
-		//********************
-		
 		//*** Field load_capacity ***
 		$f_opts = array();
 		$f_opts['length']=19;
@@ -75,13 +57,13 @@ class CementSilo_Model extends ModelSQLBeton{
 		$this->addField($f_load_capacity);
 		//********************
 		
-		//*** Field visible ***
+		//*** Field balance ***
 		$f_opts = array();
-		$f_opts['defaultValue']='FALSE';
-		$f_opts['id']="visible";
+		$f_opts['length']=19;
+		$f_opts['id']="balance";
 						
-		$f_visible=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"visible",$f_opts);
-		$this->addField($f_visible);
+		$f_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"balance",$f_opts);
+		$this->addField($f_balance);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

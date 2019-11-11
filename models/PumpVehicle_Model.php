@@ -89,6 +89,14 @@ class PumpVehicle_Model extends ModelSQLBeton{
 		$f_phone_cels=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cels",$f_opts);
 		$this->addField($f_phone_cels);
 		//********************
+		
+		//*** Field pump_prices ***
+		$f_opts = array();
+		$f_opts['id']="pump_prices";
+						
+		$f_pump_prices=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_prices",$f_opts);
+		$this->addField($f_pump_prices);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 
