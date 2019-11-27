@@ -15758,3 +15758,424 @@ CREATE OR REPLACE VIEW cement_silos_for_order_list AS
 	;
 	
 ALTER VIEW cement_silos_for_order_list OWNER TO beton;
+
+
+-- ******************* update 11/11/2019 08:44:41 ******************
+-- VIEW: shipments_for_veh_owner_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.destination_id,
+		sh.destinations_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.cost,
+		sh.ship_cost_edit,
+		sh.pump_cost_edit,
+		sh.demurrage,
+		sh.demurrage_cost,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		
+		CASE
+		WHEN sh.destination_id = const_self_ship_dest_id_val() THEN 0
+		WHEN dest.price_for_driver IS NOT NULL THEN dest.price_for_driver*shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+		ELSE
+			(WITH
+			act_price AS (
+				SELECT h.date AS d
+				FROM shipment_for_driver_costs_h h
+				WHERE h.date<=sh.ship_date_time::date
+				ORDER BY h.date DESC
+				LIMIT 1
+			)
+			SELECT shdr_cost.price
+			FROM shipment_for_driver_costs AS shdr_cost
+			WHERE
+				shdr_cost.date=(SELECT d FROM act_price)
+				AND shdr_cost.distance_to<=dest.distance
+				OR shdr_cost.id=(
+					SELECT t.id
+					FROM shipment_for_driver_costs t
+					WHERE t.date=(SELECT d FROM act_price)
+					ORDER BY t.distance_to LIMIT 1
+				)
+
+			ORDER BY shdr_cost.distance_to DESC
+			LIMIT 1
+			) * shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+		END AS cost_for_driver
+		
+	FROM shipments_list sh
+	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	;
+	
+ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 11/11/2019 08:44:43 ******************
+-- View: shipment_dates_list
+
+-- DROP VIEW shipment_dates_list;
+
+CREATE OR REPLACE VIEW shipment_dates_list AS 
+	SELECT
+		sh.ship_date_time::date AS ship_date,
+		
+		sh.concrete_type_id,
+		sh.concrete_types_ref::text,
+		
+		sh.destination_id,
+		sh.destinations_ref::text,
+		
+		sh.client_id,
+		sh.clients_ref::text,
+		
+		sh.production_site_id,
+		sh.production_sites_ref::text,
+		
+		sum(sh.quant) AS quant,
+		sum(sh.cost) AS ship_cost,
+		
+		sum(sh.demurrage) AS demurrage,
+		sum(sh.demurrage_cost) AS demurrage_cost
+		
+	FROM shipments_list sh
+	/*LEFT JOIN shipments sh_t ON sh_t.id = sh.id
+	LEFT JOIN orders o ON o.id = sh_t.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	*/
+	GROUP BY
+		sh.ship_date_time::date,
+		sh.concrete_type_id,
+		sh.concrete_types_ref::text,
+		sh.destination_id,
+		sh.destinations_ref::text,
+		sh.client_id,
+		sh.clients_ref::text,
+		sh.production_site_id,
+		sh.production_sites_ref::text
+		
+	ORDER BY sh.ship_date_time::date DESC;
+
+ALTER TABLE shipment_dates_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 11/11/2019 09:48:54 ******************
+-- VIEW: cement_silo_productions_list
+
+--DROP VIEW cement_silo_productions_list;
+
+CREATE OR REPLACE VIEW cement_silo_productions_list AS
+	SELECT
+		t.id,
+		cement_silos_ref(cs) AS cement_silos_ref,
+		t.date_time,
+		t.production_vehicle_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_state
+		
+	FROM cement_silo_productions AS t
+	LEFT JOIN cement_silos AS cs ON cs.id=t.cement_silo_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	;
+	
+ALTER VIEW cement_silo_productions_list OWNER TO beton;
+
+
+-- ******************* update 11/11/2019 09:58:20 ******************
+-- VIEW: cement_silo_productions_list
+
+--DROP VIEW cement_silo_productions_list;
+
+CREATE OR REPLACE VIEW cement_silo_productions_list AS
+	SELECT
+		t.id,
+		cement_silos_ref(cs) AS cement_silos_ref,
+		t.date_time,
+		t.production_vehicle_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_state
+		
+	FROM cement_silo_productions AS t
+	LEFT JOIN cement_silos AS cs ON cs.id=t.cement_silo_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	ORDER BY cs.name,t.date_time DESC
+	;
+	
+ALTER VIEW cement_silo_productions_list OWNER TO beton;
+
+
+-- ******************* update 11/11/2019 10:01:02 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10038',
+		'CementSiloProduction_Controller',
+		'get_list',
+		'CementSiloProductionList',
+		'Справочники',
+		'Производство',
+		FALSE
+		);
+	
+
+-- ******************* update 11/11/2019 12:09:45 ******************
+-- Function: public.cement_silo_productions_process()
+
+-- DROP FUNCTION public.shipment_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_OP='INSERT' THEN
+		--пытаемся определить авто по описанию элкон
+		NEW.vehicle_id = vehicles_define_on_production_descr(NEW.vehicle_production_descr);
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 11/11/2019 12:42:43 ******************
+﻿-- Function: vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp)
+
+-- DROP FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp)
+  RETURNS int AS
+$$
+	-- выбираем из in_production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+	SELECT vh.id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_date_time-'40 minutes'::interval AND in_date_time
+		AND vh.plate LIKE '%'||regexp_replace(in_production_descr, '\D','','g')||'%'
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp) OWNER TO beton;
+
+
+-- ******************* update 11/11/2019 12:46:53 ******************
+
+		ALTER TABLE cement_silo_productions ADD COLUMN production_date_time timestampTZ NOT NULL;
+
+
+
+-- ******************* update 11/11/2019 12:47:15 ******************
+-- VIEW: cement_silo_productions_list
+
+DROP VIEW cement_silo_productions_list;
+
+CREATE OR REPLACE VIEW cement_silo_productions_list AS
+	SELECT
+		t.id,
+		cement_silos_ref(cs) AS cement_silos_ref,
+		t.date_time,
+		t.production_date_time,
+		t.production_vehicle_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_state
+		
+	FROM cement_silo_productions AS t
+	LEFT JOIN cement_silos AS cs ON cs.id=t.cement_silo_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	ORDER BY cs.name,t.date_time DESC
+	;
+	
+ALTER VIEW cement_silo_productions_list OWNER TO beton;
+
+
+-- ******************* update 11/11/2019 12:49:43 ******************
+-- Function: public.cement_silo_productions_process()
+
+-- DROP FUNCTION public.shipment_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_OP='INSERT' THEN
+		--пытаемся определить авто по описанию элкон
+		NEW.vehicle_id = vehicles_define_on_production_descr(NEW.vehicle_production_descr,NEW.production_date_time);
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 11/11/2019 12:51:23 ******************
+-- Function: public.cement_silo_productions_process()
+
+-- DROP FUNCTION public.shipment_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_OP='INSERT' THEN
+		--пытаемся определить авто по описанию элкон
+		NEW.vehicle_id = vehicles_define_on_production_descr(NEW.vehicle_production_descr,NEW.production_date_time);
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 11/11/2019 12:56:10 ******************
+﻿-- Function: vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp)
+
+-- DROP FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp)
+  RETURNS int AS
+$$
+	-- выбираем из in_production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+	SELECT vh.id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_date_time-'60 minutes'::interval AND in_date_time
+		AND vh.plate LIKE '%'||regexp_replace(in_production_descr, '\D','','g')||'%'
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp) OWNER TO beton;
+
+
+-- ******************* update 11/11/2019 13:10:37 ******************
+-- Function: public.cement_silo_productions_process()
+
+-- DROP FUNCTION public.shipment_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_OP='INSERT' THEN
+		--пытаемся определить авто по описанию элкон
+		NEW.vehicle_id = vehicles_define_on_production_descr(NEW.production_vehicle_descr,NEW.production_date_time);
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 11/11/2019 13:11:32 ******************
+-- Function: public.cement_silo_productions_process()
+
+-- DROP FUNCTION public.shipment_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_OP='INSERT' THEN
+		--пытаемся определить авто по описанию элкон
+		NEW.vehicle_id = vehicles_define_on_production_descr(NEW.production_vehicle_descr,NEW.production_date_time::timestamp);
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 11/11/2019 13:32:13 ******************
+-- VIEW: cement_silos_for_order_list
+
+--DROP VIEW cement_silos_for_order_list;
+
+CREATE OR REPLACE VIEW cement_silos_for_order_list AS
+	SELECT
+		t.id,
+		t.name,
+		production_sites_ref(pst) AS production_sites_ref,
+		t.load_capacity,
+		bal.quant AS balance,
+		jsonb_build_object(
+			'vehicles_ref',cs_state.vehicles_ref,
+			'vehicle_state',cs_state.vehicle_state
+		) AS vehicle
+		
+	FROM cement_silos AS t	
+	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id
+	LEFT JOIN rg_cement_balance(NULL) AS bal ON bal.cement_silos_id=t.id
+	LEFT JOIN
+		(SELECT
+			cs.cement_silo_id,
+			cs.date_time,
+			vehicles_ref(vh) AS vehicles_ref,
+			cs.vehicle_state
+		FROM
+			(SELECT cement_silo_id,
+				max(date_time) AS date_time
+			FROM cement_silo_productions
+			GROUP BY cement_silo_id
+			) AS m_period
+		LEFT JOIN cement_silo_productions AS cs ON cs.cement_silo_id=m_period.cement_silo_id AND cs.date_time=m_period.date_time	
+		LEFT JOIN vehicles AS vh ON vh.id=cs.vehicle_id
+	) AS cs_state ON cs_state.cement_silo_id = t.id
+	
+	WHERE coalesce(t.visible,FALSE)=TRUE
+	ORDER BY pst.name,t.name
+	;
+	
+ALTER VIEW cement_silos_for_order_list OWNER TO beton;

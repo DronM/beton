@@ -313,7 +313,15 @@ OrderCalc_View.prototype.onSelectPumpVehicle = function(f){
 			throw new Error("Не верное значение для ценовых схем!")
 		}
 		var pump_price_id,pump_price_dt;
-		var dt = this.m_dialogContext.getElement("date_time_date").getValue().getTime();
+		var dt;
+		var dt_ctrl = this.m_dialogContext.getElement("date_time_date");
+		if(dt_ctrl){
+			dt = dt_ctrl.getValue().getTime();
+		}
+		else{
+			//а это форма из звонка - там нет даты!!!
+			dt = DateHelper.time().getTime();
+		}
 		for(var j=0;j<pump_prices.rows.length;j++){
 			var pump_price_dt_tmp =  DateHelper.strtotime(pump_prices.rows[j].fields.dt_from);
 			if (pump_price_dt_tmp.getTime()<=dt && (!pump_price_dt || pump_price_dt.getTime()<pump_price_dt_tmp.getTime()) ){
@@ -321,7 +329,8 @@ OrderCalc_View.prototype.onSelectPumpVehicle = function(f){
 				pump_price_dt = pump_price_dt_tmp;
 			}
 		}
-		if(this.m_dialogContext.getElement("pay_cash").getValue() && pump_prices.rows.length>=2){
+		var pay_cash_ctrl = this.m_dialogContext.getElement("pay_cash");
+		if(pay_cash_ctrl&&pay_cash_ctrl.getValue() && pump_prices.rows.length>=2){
 			window.showTempNote("Используется ценовая схема насоса на "+DateHelper.format(pump_price_dt,"d/m/y"));
 		}
 		var contr = new PumpPriceValue_Controller();

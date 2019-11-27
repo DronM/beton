@@ -251,7 +251,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		));
 		
 		$new_pump_vehicle_id = NULL;
-		if (is_array($ar)){
+		$pump_sms_q_id = NULL;
+		if (is_array($ar) &amp;&amp; count($ar)){
 			$old_date_time = strtotime($ar['date_time']);
 			$new_date_time = $pm->getParamValue("date_time");
 			
@@ -268,6 +269,20 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			}			
 			
 			$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');						
+			
+			//если был насос,а сейчас нет или замена насоса - запомним старые данные для удаления насоса
+			//СТАРОГО насоса
+			if ($ar['pump_vehicle_id']
+			&amp;&amp; $new_pump_vehicle_id
+			&amp;&amp; $new_pump_vehicle_id!=$ar['pump_vehicle_id']
+			){
+				$pump_sms_q_id = $this->getDbLink()->query(
+					sprintf(
+						"SELECT * FROM sms_pump_order_del(%d)",
+						$this->getExtDbVal($pm,'old_id')
+					)
+				);					
+			}
 		}	
 		
 		$resend_sms = (
@@ -329,18 +344,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 		
 		//если был насос,а сейчас нет или замена насоса - запомним старые данные для удаления насоса
-		if (is_array($ar)
-		&amp;&amp; count($ar)
-		&amp;&amp; $ar['pump_vehicle_id']
-		&amp;&amp; $new_pump_vehicle_id
-		&amp;&amp; $new_pump_vehicle_id!=$ar['pump_vehicle_id']
-		){
-			$pump_sms_q_id = $this->getDbLink()->query(
-				sprintf(
-					"SELECT * FROM sms_pump_order_del(%d)",
-					$this->getExtDbVal($pm,'old_id')
-				)
-			);					
+		if (!is_null($pump_sms_q_id)){
 			$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
 			
 			$pump_sms_mes = NULL;

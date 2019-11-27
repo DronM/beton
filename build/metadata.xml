@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2019-11-11 07:22:11</lastBuild></version>
+		<lastBuild>2019-11-27 10:30:40</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -66,6 +66,7 @@
 		<version dateOpen="2019-10-23 11:10:21" dateClose="2019-10-23 12:10:23">1.00160</version>
 		<version dateOpen="2019-10-24 13:10:18" dateClose="2019-11-06 06:11:28">1.00161</version>
 		<version dateOpen="2019-11-06 14:11:50" dateClose="2019-11-11 07:11:22">1.00162</version>
+		<version dateOpen="2019-11-11 09:11:42" dateClose="2019-11-27 10:11:30">1.00163</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2679,6 +2680,29 @@
 			<field id="name" dataType="String" length="100" required="TRUE"/>
 			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
 			<field id="balance" dataType="Float" length="19" precision="4"/>
+			<field id="vehicle" dataType="JSONB"/>
+		</model>
+		<model id="CementSiloProduction" parent="ModelSQLBeton" dataTable="cement_silo_productions" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE" autoInc="TRUE"/>
+			<field id="cement_silo_id" dataType="Int" refTable="cement_silos" refField="id" required="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ" primaryKey="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
+			<field id="production_date_time" dataType="DateTimeTZ" required="TRUE"/>
+			<field id="production_vehicle_descr" dataType="String" length="5" required="TRUE"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
+			<field id="vehicle_state" dataType="Enum" enumId="vehicle_states" required="TRUE"/>
+			<index id="cement_silo_productions_cement_silo_idx">
+				<field id="cement_silo_id"/>
+				<field id="date_time"/>
+			</index>
+		</model>
+		<model id="CementSiloProductionList" parent="ModelSQLBeton" dataTable="cement_silo_productions_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="cement_silos_ref" dataType="JSON"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="production_date_time" dataType="DateTimeTZ"/>
+			<field id="production_vehicle_descr" dataType="String"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="vehicle_state" dataType="Enum" enumId="vehicle_states"/>
 		</model>
 		<model id="RGCement" parent="ModelSQLBeton" dataTable="rg_cement" virtual="FALSE" modelType="RG" period="1 month">
 			<defaultOrder>
@@ -3812,6 +3836,13 @@
 			<publicMethod id="get_list" modelId="CementSiloList"/>
 			<publicMethod id="get_object" modelId="CementSiloList"/>
 		</controller>
+		<controller id="CementSiloProduction" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="CementSiloProduction"/>
+			<publicMethod id="update" modelId="CementSiloProduction"/>
+			<publicMethod id="delete" modelId="CementSiloProduction"/>
+			<publicMethod id="get_list" modelId="CementSiloProductionList"/>
+			<publicMethod id="get_object" modelId="CementSiloProductionList"/>
+		</controller>
 		<controller id="OwnerList" parentIdJS="ControllerObjClient" server="FALSE">
 			<publicMethod id="insert" modelId="OwnerList"/>
 			<publicMethod id="update" modelId="OwnerList"/>
@@ -3925,6 +3956,7 @@
 		<view id="10035" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionList" f="get_list" section="Формы" descr="Фактический расход материалов"/>
 		<view id="10036" c="MaterialFactConsumption_Controller" t="MaterialFactConsumptionRolledList" f="get_rolled_list" section="Формы" descr="Фактический расход материалов (свернуто)"/>
 		<view id="10037" c="CementSilo_Controller" t="CementSiloList" f="get_list" section="Справочники" descr="Соответствие силосов"/>
+		<view id="10038" c="CementSiloProduction_Controller" t="CementSiloProductionList" f="get_list" section="Справочники" descr="Производство"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -4057,6 +4089,7 @@
 		<serverTemplate id="LabEntryList"/>
 		<serverTemplate id="LabEntryDetailList"/>
 		<serverTemplate id="CementSiloList"/>
+		<serverTemplate id="CementSiloProductionList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -4601,6 +4634,7 @@
 		<jsScript file="views/OrderMakeForLabList_View.js"/>
 		<jsScript file="views/CementSiloList_View.js"/>
 		<jsScript file="views/CementSiloForOrderList_View.js"/>
+		<jsScript file="views/CementSiloProductionList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -4702,6 +4736,7 @@
 		<jsScript file="custom_controls/MaterialMakeOrderGrid.js"/>
 		<jsScript file="custom_controls/OwnerListGrid.js"/>
 		<jsScript file="custom_controls/PumpVehiclePriceListGrid.js"/>
+		<jsScript file="custom_controls/CementSiloEdit.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -4980,6 +5015,9 @@
 		<jsScript file="controllers/PumpVehiclePriceList_Controller.js"/>
 		<jsScript file="models/PumpVehiclePriceList_Model.js"/>
 		<jsScript file="models/CementSiloForOrderList_Model.js"/>
+		<jsScript file="controllers/CementSiloProduction_Controller.js"/>
+		<jsScript file="models/CementSiloProduction_Model.js"/>
+		<jsScript file="models/CementSiloProductionList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

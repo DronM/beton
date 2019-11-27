@@ -603,7 +603,7 @@ throw Error(CommonHelper.longString(function () {/*
 						
 						<li class="divider"></li>
 						<!-- index.php?c=User_Controller&amp;f=logout_html{$TOKEN} -->
-						<li><a href="#" onclick="window.getApp().quit()"><i class="icon-switch2"></i> Выход</a></li>
+						<li><a href="#" onclick="return window.getApp().quit()"><i class="icon-switch2"></i> Выход</a></li>
 					</ul>
 				</li>				
 			</ul>

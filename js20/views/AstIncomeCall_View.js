@@ -113,6 +113,7 @@ function AstIncomeCall_View(id,options){
 
 		this.addElement(new OrderCalc_View(id+":calc",{
 			"calc":true,
+			"dialogContext":this,
 			"getPayCash":function(){
 				return true;
 			}

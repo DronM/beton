@@ -44,22 +44,39 @@ CementSiloForOrderList_View.prototype.setData = function(model){
 	var redraw = false;
 	
 	if(!is_init){
+		var silo_cnt = 0;
+		var silo_id;
 		while(model.getNextRow()){
-			if(!this.m_silos["silo_"+model.getFieldValue("id")]
-			||!document.getElementById("silo_canvas_"+model.getFieldValue("id"))
+			silo_id = model.getFieldValue("id"); 
+			if(!this.m_silos["silo_"+silo_id]
+			||!document.getElementById("silo_canvas_"+silo_id)
 			){
 				redraw = true;
-				break;
 			}
+			else if(this.m_silos["silo_"+silo_id]){
+				var veh = model.getFieldValue("vehicle");
+				
+				this.m_silos["silo_"+silo_id].balance = model.getFieldValue("balance");
+				this.m_silos["silo_"+silo_id].vehicleUpdated = (
+					(!this.m_silos["silo_"+silo_id].vehicle.vehicles_ref && veh.vehicles_ref)
+					||(this.m_silos["silo_"+silo_id].vehicle.vehicles_ref && !veh.vehicles_ref)
+					||(this.m_silos["silo_"+silo_id].vehicle.vehicle_state != veh.vehicle_state)
+					||(this.m_silos["silo_"+silo_id].vehicle.vehicles_ref
+						&&veh.vehicles_ref
+						&&(this.m_silos["silo_"+silo_id].vehicle.vehicles_ref.getKey("id") != veh.vehicles_ref.getKey("id"))
+					)
+				);
+				this.m_silos["silo_"+silo_id].vehicle = veh;
+			}
+			silo_cnt++;
 		}
-		model.reset();
-		var silo_cnt = 0;
-		for(p in this.m_silos)silo_cnt++;
+		//for(p in this.m_silos)silo_cnt++;
 		if(!redraw && (model.getRowCount()!=silo_cnt)){
 			console.log("this.m_silos.length="+silo_cnt)
 			console.log("model.getRowCount()="+model.getRowCount())
 			redraw = true;
 		}
+		model.reset();
 	}	
 console.log("is_init="+is_init)
 console.log("redraw="+redraw)		
@@ -92,7 +109,9 @@ console.log("redraw="+redraw)
 				"name":s_name,
 				"id":s_id,
 				"balance":model.getFieldValue("balance"),
-				"load_capacity":model.getFieldValue("load_capacity")
+				"load_capacity":model.getFieldValue("load_capacity"),
+				"vehicle":model.getFieldValue("vehicle"),
+				"vehicleUpdated":true
 			}
 		}
 		this.setTemplateOptions(templ_opts);		
@@ -113,11 +132,10 @@ console.log("redraw="+redraw)
 }
 
 CementSiloForOrderList_View.prototype.fillSilos = function(){	
-	var cx;
 	for(var silo_id in this.m_silos){
 		var silo_n = document.getElementById("silo_canvas_"+this.m_silos[silo_id].id);
-		if(silo_n){
-			cx = silo_n.getContext("2d");
+		var silo_cont_n = document.getElementById("silo_cont_"+this.m_silos[silo_id].id);
+		if(silo_n && silo_cont_n){
 			var percent = (!this.m_silos[silo_id].load_capacity
 					||isNaN(this.m_silos[silo_id].load_capacity)
 					||!this.m_silos[silo_id].balance
@@ -126,16 +144,19 @@ CementSiloForOrderList_View.prototype.fillSilos = function(){
 				0:(this.m_silos[silo_id].balance / this.m_silos[silo_id].load_capacity * 100);
 			if(percent>100)percent=100;
 			console.log("Silo "+this.m_silos[silo_id].id+" Capac:"+this.m_silos[silo_id].load_capacity+" balance="+this.m_silos[silo_id].balance+" percent="+percent)
-			if(this.m_silos[silo_id].load_percent!=percent){
+			
+			if(this.m_silos[silo_id].load_percent!=percent
+			||this.m_silos[silo_id].vehicleUpdated
+			){
 				silo_n.title = "Остаток:"+((this.m_silos[silo_id].balance && !isNaN(this.m_silos[silo_id].balance))? this.m_silos[silo_id].balance:0);
 				this.m_silos[silo_id].load_percent = percent;
-				this.drawSilo(cx,0,0,percent,false);
+				this.drawSilo(silo_n,silo_cont_n,0,0,percent,this.m_silos[silo_id].vehicle);
 			}
 		}
 	}
 }
 
-CementSiloForOrderList_View.prototype.drawSilo = function(cx,posLeft,posTop,fillPercent,loading){
+CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,posLeft,posTop,fillPercent,vehicle){
 	var silo_height = 100;
 	var silo_cone_height_k = 0.25;// 1/5		
 	var silo_cone_width = 8;//point part width
@@ -147,7 +168,7 @@ CementSiloForOrderList_View.prototype.drawSilo = function(cx,posLeft,posTop,fill
 	var silo_cone_parts_one_side = (silo_cone_parts-1) / 2;
 	
 	var fill_style = "grey";//#ff0000
-			
+	var cx = siloNode.getContext("2d");		
 	cx.lineWidth = "2";
 	cx.beginPath();
 	cx.moveTo(posLeft, posTop);
@@ -214,35 +235,42 @@ CementSiloForOrderList_View.prototype.drawSilo = function(cx,posLeft,posTop,fill
 	//cx.stroke(); 
 	
 	//text percent
+	DOMHelper.setText(siloContNode,fillPercent+"%");
+	siloContNode.style = "position:relative;top:-"+( (silo_height+silo_cone_height)/2 + 20)+"px;left:"+( (silo_width+silo_cone_width)/2-25)+"px";
+	/*
 	var t_div = document.createElement("DIV");
 	t_div.style="position:relative;top:"+(posTop + (silo_height+silo_cone_height)/2)+"px;left:"+(posLeft + (silo_width+silo_cone_width)/2-15)+"px";
 	var t_node = document.createTextNode(fillPercent+"%"); 
 	t_div.appendChild(t_node);
-	document.body.appendChild(t_div);
+	siloNode.appendChild(t_div);
+	*/
 	
-	if(loading){
+	DOMHelper.delAllChildren(siloContNode);
+	
+	if(vehicle.vehicles_ref){
 		/*
 		var img = document.createElement("IMG");
-		img.src = "../img/wait-sm.gif";
+		img.src = "img/wait-sm.gif";
 		img.style="position:absolute;top:"+(posTop+fill_tolerance*2+10)+"px;left:"+(posLeft + (silo_width+silo_cone_width)/2-7)+"px";
-		document.body.appendChild(img);
+		siloContNode.appendChild(img);
 		*/
 		
 		//download
-		var img_download_top = (posTop+silo_height+silo_cone_height+10);
+		//var img_download_top = (silo_height+silo_cone_height+10-32);
 		var img_dl = document.createElement("IMG");
-		img_dl.src = "../img/cement_download.gif";
+		img_dl.src = "img/cement_download.gif";
 		img_dl.height = "32";
 		img_dl.width = "32";
-		img_dl.style="position:relative;top:"+img_download_top+"px;left:"+(posLeft + (silo_width+silo_cone_width)/2-12)+"px";
-		document.body.appendChild(img_dl);
+		img_dl.style="position:relative;top:50px;left:-5px";
+		siloContNode.appendChild(img_dl);
 		
-		
+		/*
 		//mixer
 		var img = document.createElement("IMG");
-		img.src = "../img/mixer.png";
-		img.style="position:absolute;top:"+(img_download_top+img_dl.height-5)+"px;left:"+(posLeft + (silo_width+silo_cone_width)/2-10)+"px";
-		document.body.appendChild(img);
+		img.src = "img/mixer.png";
+		img.style="position:relative;top:"+(img_download_top+img_dl.height-5)+"px;left:"+(posLeft + (silo_width+silo_cone_width)/2-10)+"px";
+		siloNode.appendChild(img);
+		*/
 	}
 }
 	

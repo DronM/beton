@@ -1,0 +1,20 @@
+sqlcmd -Snp:\\.\pipe\MSSQL$SQLEXPRESS\sql\query
+sqlcmd -S tcp:DESKTOP-9SIFEV3\SQSQL10_50.GEOTEK
+
+
+https://www.mssqltips.com/sqlservertip/5133/different-ways-to-connect-to-sql-server-using-sqlcmd/
+\\[COMPUTER NAME OR IP ADDRESS]\pipe\MSSQL$[SQL Server Instance Name]\sql\query
+
+sqlcmd -Snp:\\.\pipe\MSSQL$SQLEXPRESS\sql\query
+
+
+https://social.msdn.microsoft.com/Forums/sqlserver/en-US/45f53277-6da7-4084-85ff-22b985e1dc5b/i-can-not-connect-to-local-sql2008-server-locally-by-sqlcmd?forum=sqlgetstarted
+sqlcmd -L
+Check the SQL Server errorlog file to see why the error 18465 refused the login
+
+
+
+https://www.mssqltips.com/sqlservertip/2478/connecting-to-sql-server-using-sqlcmd-utility/
+
+!!!!
+https://blog.sqlauthority.com/2009/05/21/sql-server-fix-error-provider-named-pipes-provider-error-40-could-not-open-a-connection-to-sql-server-microsoft-sql-server-error/

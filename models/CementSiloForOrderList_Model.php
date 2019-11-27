@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class CementSiloForOrderList_Model extends ModelSQLBeton{
 	
@@ -64,6 +65,14 @@ class CementSiloForOrderList_Model extends ModelSQLBeton{
 						
 		$f_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"balance",$f_opts);
 		$this->addField($f_balance);
+		//********************
+		
+		//*** Field vehicle ***
+		$f_opts = array();
+		$f_opts['id']="vehicle";
+						
+		$f_vehicle=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle",$f_opts);
+		$this->addField($f_vehicle);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

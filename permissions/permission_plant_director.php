@@ -996,6 +996,16 @@ $permissions = array();
 				
 					$permissions['CementSilo_Controller_get_object']=TRUE;
 				
+					$permissions['CementSiloProduction_Controller_insert']=TRUE;
+				
+					$permissions['CementSiloProduction_Controller_update']=TRUE;
+				
+					$permissions['CementSiloProduction_Controller_delete']=TRUE;
+				
+					$permissions['CementSiloProduction_Controller_get_list']=TRUE;
+				
+					$permissions['CementSiloProduction_Controller_get_object']=TRUE;
+				
 					$permissions['OwnerList_Controller_insert']=TRUE;
 				
 					$permissions['OwnerList_Controller_update']=TRUE;

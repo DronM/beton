@@ -729,3 +729,8 @@ a.tel_in_list{
 .siloName{
 	font-size:70%;	
 }
+
+.silo_cont{
+	position:relative;
+	font-size:70%;	
+}

@@ -16,8 +16,8 @@
  * @param {Object} options
  */
 
-function CementSiloForOrderList_Model(options){
-	var id = 'CementSiloForOrderList_Model';
+function CementSiloProductionList_Model(options){
+	var id = 'CementSiloProductionList_Model';
 	options = options || {};
 	
 	options.fields = {};
@@ -27,10 +27,9 @@ function CementSiloForOrderList_Model(options){
 	var filed_options = {};
 	filed_options.primaryKey = true;	
 	
-	filed_options.autoInc = true;	
+	filed_options.autoInc = false;	
 	
 	options.fields.id = new FieldInt("id",filed_options);
-	options.fields.id.getValidator().setRequired(true);
 	
 				
 	
@@ -39,7 +38,7 @@ function CementSiloForOrderList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
+	options.fields.cement_silos_ref = new FieldJSON("cement_silos_ref",filed_options);
 	
 				
 	
@@ -48,9 +47,7 @@ function CementSiloForOrderList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.name = new FieldString("name",filed_options);
-	options.fields.name.getValidator().setRequired(true);
-	options.fields.name.getValidator().setMaxLength('100');
+	options.fields.date_time = new FieldDateTimeTZ("date_time",filed_options);
 	
 				
 	
@@ -59,8 +56,7 @@ function CementSiloForOrderList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.load_capacity = new FieldFloat("load_capacity",filed_options);
-	options.fields.load_capacity.getValidator().setMaxLength('19');
+	options.fields.production_date_time = new FieldDateTimeTZ("production_date_time",filed_options);
 	
 				
 	
@@ -69,8 +65,7 @@ function CementSiloForOrderList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.balance = new FieldFloat("balance",filed_options);
-	options.fields.balance.getValidator().setMaxLength('19');
+	options.fields.production_vehicle_descr = new FieldString("production_vehicle_descr",filed_options);
 	
 				
 	
@@ -79,9 +74,19 @@ function CementSiloForOrderList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.vehicle = new FieldJSONB("vehicle",filed_options);
+	options.fields.vehicles_ref = new FieldJSON("vehicles_ref",filed_options);
 	
-		CementSiloForOrderList_Model.superclass.constructor.call(this,id,options);
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_state = new FieldEnum("vehicle_state",filed_options);
+	filed_options.enumValues = 'shift,free,assigned,busy,left_for_dest,at_dest,left_for_base,out_from_shift,out,shift_added';
+	
+		CementSiloProductionList_Model.superclass.constructor.call(this,id,options);
 }
-extend(CementSiloForOrderList_Model,ModelXML);
+extend(CementSiloProductionList_Model,ModelXML);
 
