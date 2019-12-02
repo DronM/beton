@@ -113,7 +113,7 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		$f_order_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_id",$f_opts);
 		$this->addField($f_order_id);
 		//********************
-	$this->setLimitConstant('doc_per_page_count');
+	$this->setRowsPerPage(0);
 	}
 
 }

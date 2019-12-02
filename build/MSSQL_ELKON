@@ -1,5 +1,8 @@
+данные сервера
+192.168.2.1
+
 sqlcmd -Snp:\\.\pipe\MSSQL$SQLEXPRESS\sql\query
-sqlcmd -S tcp:DESKTOP-9SIFEV3\SQSQL10_50.GEOTEK
+sqlcmd -S tcp:DESKTOP-9SIFEV3\MSSQL10_50.GEOTEK
 
 
 https://www.mssqltips.com/sqlservertip/5133/different-ways-to-connect-to-sql-server-using-sqlcmd/
@@ -18,3 +21,8 @@ https://www.mssqltips.com/sqlservertip/2478/connecting-to-sql-server-using-sqlcm
 
 !!!!
 https://blog.sqlauthority.com/2009/05/21/sql-server-fix-error-provider-named-pipes-provider-error-40-could-not-open-a-connection-to-sql-server-microsoft-sql-server-error/
+
+
+Что было:
+- запущена только одна служба
+- доступ только SharedMemory
