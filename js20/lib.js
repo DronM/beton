@@ -3243,7 +3243,7 @@ var key;if(self.m_detailDataSets[ds_id].field){key=self.m_detailDataSets[ds_id].
 else if(self.m_detailDataSets[ds_id].value){if(typeof(self.m_detailDataSets[ds_id].value)=="function"){key=self.m_detailDataSets[ds_id].value();}
 else{key=self.m_detailDataSets[ds_id].value;}}
 var o=this.getEditViewOptions()||{};o.keys={};o.keys[self.m_detailDataSets[ds_id].controlFieldId]=key;this.setEditViewOptions(o);this.initEditWinObjOrig(cmd);}
-if(dsParams.control&&dsParams.value){var key;if(typeof(dsParams.value)=="function"){key=dsParams.value();}
+if(dsParams.control&&dsParams.control.getInsertPublicMethod()&&dsParams.value){var key;if(typeof(dsParams.value)=="function"){key=dsParams.value();}
 else{key=dsParams.value;}
 if(key){dsParams.control.setFilter({"field":dsParams.controlFieldId,"sign":dsParams.control.getInsertPublicMethod().getController().PARAM_SGN_EQUAL,"val":key});}}}
 ViewObjectAjx.prototype.copyControl=function(fromName,toName){var name=this.getElement(fromName).getValue();if(name&&!this.getElement(toName).getValue()){this.getElement(toName).setValue(name);}}

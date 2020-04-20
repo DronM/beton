@@ -333,6 +333,10 @@ orders_make_list.sql,pump_veh_list,pump_veh_work_list
 update vehicle_schedule_states set destination_id=1225 where shipment_id=97949 and destination_id=1008
 
 
+1.066 20/04/20
+1) Ошибка при открытии звонка ViewObjectAjx.addDetailDataSet()
+dsParams.control.getInsertPublicMethod()
+
 -- Откорректировать модули проведения документов: корректировка остатка материала,фактический расход, все как поступление материалов
 -- В чем хранить остатки : тонны или кг???
 ---3)!!!Форматирование даты в Сафари и Edge
