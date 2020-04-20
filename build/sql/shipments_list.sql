@@ -105,7 +105,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 			END
 		) AS pump_cost,
 		
-		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
+		pump_vehicles_ref(pvh,pvh_v,pvh_own) AS pump_vehicles_ref,
 		pvh.vehicle_id AS pump_vehicle_id,
 		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
 		sh.owner_agreed,

@@ -178,6 +178,9 @@ extend(OrderPump_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("pump_vehicle_owner_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldArray("pump_vehicle_owners_ar",f_opts));
 }
 
 			OrderPump_Controller.prototype.addGetObject = function(){

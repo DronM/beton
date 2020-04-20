@@ -359,6 +359,21 @@ table,tr,td.noBorder{
 .messageNewDay{
 	margin: 0 auto;
 }
+.detailToggle{
+	cursor:pointer;
+}
+.periodLabel{
+	cursor:pointer;
+	font-size:120%;
+	font-weight:bold;
+}
+
+.grid_details{
+	position:relative;
+	left:2%;
+	width:98%  !important;
+}
+
 /*
 .appDialog{
 	padding-top:0px;
@@ -485,20 +500,6 @@ table td{
 
 .selected_time{
 	border:2px solid black;
-}
-
-.detailToggle{
-	cursor:pointer;
-}
-.periodLabel{
-	cursor:pointer;
-	font-size:120%;
-	font-weight:bold;
-}
-
-.grid_details{
-	position:relative;
-	left:50px;	
 }
 
 #OrderMakeList\:mat_totals_grid\:cont{
@@ -718,7 +719,9 @@ a.tel_in_list{
 
 .cementSiloPic{
 	width:200px;
+	cursor:pointer;	
 }
+
 .productionSiteGroup{
 	display:inline;
 }
@@ -733,4 +736,36 @@ a.tel_in_list{
 .silo_cont{
 	position:relative;
 	font-size:70%;	
+}
+
+td.elkonDifConcreteType{
+	border:3px solid black;	
+	background-color:red !important;	
+}
+td.factQuantCorrected{
+	border:3px solid black;	
+	background-color:red !important;	
+}
+td.factQuantCorrectedElkon{
+	font-weight:bolder;
+	border:3px solid black;	
+	background-color:red !important;	
+}
+td.factQuantViolation{
+	font-weight:bolder;
+	border:3px solid black;	
+	background-color:red !important;	
+
+}
+
+#OrderMakeList\:mat_totals_grid td.quant_editable{
+	cursor:pointer;
+	background-color:#fcffaa !important;
+}
+#OrderMakeList\:mat_totals_grid td.quant_editable:hover{
+	background-color:yellow !important;
+}
+
+.productionMaterialList td.quant_editable:hover{
+	background-color:yellow !important;
 }

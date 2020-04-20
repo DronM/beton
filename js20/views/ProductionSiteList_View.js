@@ -17,7 +17,7 @@ function ProductionSiteList_View(id,options){
 	ProductionSiteList_View.superclass.constructor.call(this,id,options);
 	
 	
-	var model = options.models.ProductionSite_Model;
+	var model = options.models.ProductionSiteList_Model;
 	var contr = new ProductionSite_Controller();
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};

@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 /**
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_php.xsl
@@ -468,7 +469,7 @@ class User_Controller extends ControllerSQL{
 		
 		//global filters				
 		if ($ar['role_id']=='vehicle_owner'){
-			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
+			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d LIMIT 1",$ar['id']));
 			if(is_array($ar_veh_owner) && count($ar_veh_owner)){
 				$_SESSION['global_vehicle_owner_id'] = $ar_veh_owner['id'];
 				$ar_clients = $this->getDbLink()->query_first(
@@ -490,27 +491,6 @@ class User_Controller extends ControllerSQL{
 			else{
 				$_SESSION['global_vehicle_owner_id'] = 0;
 			}
-						
-			$model = new VehicleDialog_Model($this->getDbLink());
-			$filter = new ModelWhereSQL();
-			$field = clone $model->getFieldById('vehicle_owner_id');
-			$field->setValue($_SESSION['global_vehicle_owner_id']);
-			$filter->addField($field,'=');
-			GlobalFilter::set('VehicleDialog_Model',$filter);
-						
-			$model = new PumpVehicleList_Model($this->getDbLink());
-			$filter = new ModelWhereSQL();
-			$field = clone $model->getFieldById('vehicle_owner_id');
-			$field->setValue($_SESSION['global_vehicle_owner_id']);
-			$filter->addField($field,'=');
-			GlobalFilter::set('PumpVehicleList_Model',$filter);
-						
-			$model = new PumpVehicleWorkList_Model($this->getDbLink());
-			$filter = new ModelWhereSQL();
-			$field = clone $model->getFieldById('pump_vehicle_owner_id');
-			$field->setValue($_SESSION['global_vehicle_owner_id']);
-			$filter->addField($field,'=');
-			GlobalFilter::set('PumpVehicleWorkList_Model',$filter);
 						
 			$model = new OrderPumpList_Model($this->getDbLink());
 			$filter = new ModelWhereSQL();
@@ -569,6 +549,43 @@ class User_Controller extends ControllerSQL{
 			$filter->addExpression('vehicle_owner_client_list',$expr,'AND');
 			GlobalFilter::set('ShipmentForClientVehOwnerList_Model',$filter);
 						
+			
+			//** owner list ***
+			
+			//ALWAYS fieldId
+			$filter = new ModelWhereSQL();
+			$filter->addExpression(
+				'vehicle_owner_list',
+				sprintf('%d =ANY(vehicle_owners_ar)',
+					$_SESSION['global_vehicle_owner_id']
+				),
+				'AND'
+			);
+			GlobalFilter::set('VehicleDialog_Model',$filter);
+			
+			//ALWAYS fieldId
+			$filter = new ModelWhereSQL();
+			$filter->addExpression(
+				'vehicle_owner_list',
+				sprintf('%d =ANY(vehicle_owners_ar)',
+					$_SESSION['global_vehicle_owner_id']
+				),
+				'AND'
+			);
+			GlobalFilter::set('PumpVehicleList_Model',$filter);
+			
+			//ALWAYS fieldId
+			$filter = new ModelWhereSQL();
+			$filter->addExpression(
+				'vehicle_owner_list',
+				sprintf('%d =ANY(pump_vehicle_owners_ar)',
+					$_SESSION['global_vehicle_owner_id']
+				),
+				'AND'
+			);
+			GlobalFilter::set('PumpVehicleWorkList_Model',$filter);
+						
+			
 		}
 		
 		$log_ar = $this->getDbLinkMaster()->query_first(

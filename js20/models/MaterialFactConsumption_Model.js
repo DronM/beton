@@ -171,6 +171,24 @@ function MaterialFactConsumption_Model(options){
 	options.fields.material_quant_req = new FieldFloat("material_quant_req",filed_options);
 	options.fields.material_quant_req.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.cement_silo_id = new FieldInt("cement_silo_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_id = new FieldInt("production_id",filed_options);
+	
 			
 			
 			

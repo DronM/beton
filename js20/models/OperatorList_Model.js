@@ -166,6 +166,60 @@ function OperatorList_Model(options){
 	
 	options.fields.ship_bal_min = new FieldInt("ship_bal_min",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Номер производства elkon';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_id = new FieldInt("production_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Марка elkon';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_concrete_types_ref = new FieldJSON("production_concrete_types_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Начало производства elkon';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_dt_start = new FieldDateTime("production_dt_start",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Окончание производства elkon';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_dt_end = new FieldDateTime("production_dt_end",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Пользователь elkon';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_user = new FieldString("production_user",filed_options);
+	
 		OperatorList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OperatorList_Model,ModelXML);

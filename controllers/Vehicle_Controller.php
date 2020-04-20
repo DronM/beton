@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 /**
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_php.xsl
@@ -70,10 +71,15 @@ class Vehicle_Controller extends ControllerSQL{
 		$pm->addParam($param);
 		$param = new FieldExtInt('vehicle_owner_id'
 				,array(
-				'alias'=>'Владелец'
+				'alias'=>'УДАЛИТЬ Владелец'
 			));
 		$pm->addParam($param);
 		$param = new FieldExtJSONB('vehicle_owners'
+				,array(
+				'alias'=>'История владелецев'
+			));
+		$pm->addParam($param);
+		$param = new FieldExtArray('vehicle_owners_ar'
 				,array());
 		$pm->addParam($param);
 		
@@ -143,10 +149,16 @@ class Vehicle_Controller extends ControllerSQL{
 		$param = new FieldExtInt('vehicle_owner_id'
 				,array(
 			
-				'alias'=>'Владелец'
+				'alias'=>'УДАЛИТЬ Владелец'
 			));
 			$pm->addParam($param);
 		$param = new FieldExtJSONB('vehicle_owners'
+				,array(
+			
+				'alias'=>'История владелецев'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtArray('vehicle_owners_ar'
 				,array(
 			));
 			$pm->addParam($param);

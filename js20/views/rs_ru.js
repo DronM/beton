@@ -54,8 +54,6 @@ ShipmentForClientVehOwnerList_View.prototype.HEAD_TITLE = "Самовывоз";
 
 VehicleScheduleReportAll_View.prototype.HEAD_TITLE = "Печать графиков";
 
-ProductionSiteList_View.prototype.HEAD_TITLE = "Заводы";
-
 ShipQuantForCostGradeList_View.prototype.HEAD_TITLE = "Минимальные объемы для расчета стоимости доставки";
 
 ShipmentDateList_View.prototype.HEAD_TITLE = "Отгрузки (по дням)";
@@ -117,10 +115,20 @@ MatTotalList_View.prototype.HEAD_TITLE = "Общая таблица";
 MatCorrectList_View.prototype.HEAD_TITLE = "Корректировка расхода материалов";
 
 ConcreteTypeMapToProductionList_View.prototype.HEAD_TITLE = "Соответствие марок в производстве и в этой программе";
-VehicleMapToProductionList_View.prototype.HEAD_TITLE = "Соответствие ТС в производстве и в этой программе";
 RawMaterialMapToProductionList_View.prototype.HEAD_TITLE = "Соответствие материалов в производстве и в этой программе";
 
 LabEntryList_View.prototype.HEAD_TITLE = "Журнал испытания образцов";
 
 CementSiloList_View.prototype.HEAD_TITLE = "Соответствие силосов";
-CementSiloProductionList_View.prototype.HEAD_TITLE = "Производство";
+
+ProductionSiteList_View.prototype.HEAD_TITLE = "Список заводов";
+ProductionSiteForEditList_View.prototype.HEAD_TITLE = "Список заводов (редактирование)";
+ELKONLogList_View.prototype.HEAD_TITLE = "Журнал загрузки из ELKON";
+
+ProductionList_View.prototype.HEAD_TITLE = "Производство ELKON";
+
+MaterialFactBalanceCorretionList_View.prototype.HEAD_TITLE = "Производство ELKON";
+MaterialFactConsumptionCorretionList_View.prototype.HEAD_TITLE = "Корректировки фактического расхода материалов";
+CementSiloBalanceResetList_View.prototype.HEAD_TITLE = "Обнуление остатков силосов";
+
+

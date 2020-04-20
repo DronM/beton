@@ -1,6 +1,6 @@
 -- View: public.orders_make_list
 
--- DROP VIEW public.orders_make_list;
+-- DROP VIEW public.orders_make_list CASCADE;
 
 CREATE OR REPLACE VIEW public.orders_make_list AS 
 	SELECT
@@ -89,7 +89,18 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
 		
 		vh.owner AS pump_vehicle_owner,
 		o.unload_type,
-		vehicle_owners_ref(v_own) AS pump_vehicle_owners_ref,
+		--vehicle_owners_ref(v_own) AS pump_vehicle_owners_ref,
+		(SELECT
+			owners.row->'fields'->'owner'
+		FROM
+		(
+			SELECT jsonb_array_elements(vh.vehicle_owners->'rows') AS row
+		) AS owners
+		WHERE o.date_time >= (owners.row->'fields'->>'dt_from')::timestamp
+		ORDER BY (owners.row->'fields'->>'dt_from')::timestamp DESC
+		LIMIT 1
+		) AS pump_vehicle_owners_ref,
+		
 		pvh.pump_length AS pump_vehicle_length,
 		pvh.comment_text AS pump_vehicle_comment
 		
@@ -100,7 +111,7 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
 	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
-	LEFT JOIN vehicle_owners v_own ON v_own.id = vh.vehicle_owner_id
+	--LEFT JOIN vehicle_owners v_own ON v_own.id = vh.vehicle_owner_id
 	ORDER BY o.date_time;
 
 ALTER TABLE public.orders_make_list OWNER TO beton;

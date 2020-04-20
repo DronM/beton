@@ -121,7 +121,7 @@ function VehicleDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Последний владелец';
 	filed_options.autoInc = false;	
 	
 	options.fields.vehicle_owners_ref = new FieldJSONB("vehicle_owners_ref",filed_options);
@@ -130,7 +130,7 @@ function VehicleDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Последний владелец';
 	filed_options.autoInc = false;	
 	
 	options.fields.vehicle_owner_id = new FieldInt("vehicle_owner_id",filed_options);
@@ -139,10 +139,19 @@ function VehicleDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'История владелецев';
 	filed_options.autoInc = false;	
 	
 	options.fields.vehicle_owners = new FieldJSONB("vehicle_owners",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owners_ar = new FieldArray("vehicle_owners_ar",filed_options);
 	
 			
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);

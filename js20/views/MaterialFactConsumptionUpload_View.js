@@ -78,9 +78,6 @@ function MaterialFactConsumptionUpload_View(id,options){
 		
 		if (options.templateOptions.matchingEnabled){
 			this.addElement(
-				new VehicleMapToProductionList_View(id+":vehicle_map_to_production_list")
-			);
-			this.addElement(
 				new ConcreteTypeMapToProductionList_View(id+":concrete_type_map_to_production_list")
 			);
 			this.addElement(
@@ -89,6 +86,10 @@ function MaterialFactConsumptionUpload_View(id,options){
 
 			this.addElement(
 				new MaterialFactConsumptionRolledList_View(id+":material_fact_consumptions_list")
+			);
+
+			this.addElement(
+				new UserMapToProductionList_View(id+":user_map_to_production_list")
 			);
 			
 		}

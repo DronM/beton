@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLArray.php');
  
 class OrderPumpList_Model extends ModelSQLBeton{
 	
@@ -235,6 +236,15 @@ class OrderPumpList_Model extends ModelSQLBeton{
 						
 		$f_pump_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owner_id",$f_opts);
 		$this->addField($f_pump_vehicle_owner_id);
+		//********************
+		
+		//*** Field pump_vehicle_owners_ar ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="pump_vehicle_owners_ar";
+						
+		$f_pump_vehicle_owners_ar=new FieldSQLArray($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owners_ar",$f_opts);
+		$this->addField($f_pump_vehicle_owners_ar);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

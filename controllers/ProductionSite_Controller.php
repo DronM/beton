@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 /**
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_php.xsl
@@ -22,6 +23,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
 
 
 class ProductionSite_Controller extends ControllerSQL{
+
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);
 			
@@ -29,6 +31,17 @@ class ProductionSite_Controller extends ControllerSQL{
 		/* insert */
 		$pm = new PublicMethod('insert');
 		$param = new FieldExtString('name'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtJSONB('elkon_connection'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtBool('active'
+				,array(
+				'alias'=>'Активен'
+			));
+		$pm->addParam($param);
+		$param = new FieldExtInt('last_elkon_production_id'
 				,array());
 		$pm->addParam($param);
 		
@@ -52,6 +65,20 @@ class ProductionSite_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('name'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtJSONB('elkon_connection'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('active'
+				,array(
+			
+				'alias'=>'Активен'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('last_elkon_production_id'
 				,array(
 			));
 			$pm->addParam($param);
@@ -116,8 +143,21 @@ class ProductionSite_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 		$this->setObjectModelId('ProductionSite_Model');		
 
+			
+		$pm = new PublicMethod('get_list_for_edit');
+		
+		$this->addPublicMethod($pm);
+
 		
 	}	
 	
+	public function get_list_for_edit($pm){
+		$link = $this->getDbLink();		
+		$model = new ProductionSiteForEditList_Model($this->getDbLink());
+		$model->query("SELECT * FROM production_sites_for_edit_list",TRUE);
+		$this->addModel($model);
+		
+	}
+
 }
 ?>

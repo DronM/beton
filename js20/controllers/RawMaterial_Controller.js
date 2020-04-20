@@ -105,6 +105,18 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldFloat("max_required_quant_tolerance_percent",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("max_fact_quant_tolerance_percent",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -171,6 +183,18 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldFloat("max_required_quant_tolerance_percent",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("max_fact_quant_tolerance_percent",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -226,6 +250,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldFloat("min_end_quant",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("max_required_quant_tolerance_percent",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("max_fact_quant_tolerance_percent",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("ord");
 	
 }

@@ -28,7 +28,7 @@ function ConcreteTypeMapToProductionList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						,new GridCellHead(id+":grid:head:concrete_types_ref",{
+						new GridCellHead(id+":grid:head:concrete_types_ref",{
 							"value":"Марка в этой программе",
 							"columns":[
 								new GridColumnRef({

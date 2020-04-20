@@ -1,0 +1,35 @@
+instance MSSQL10_50.GEOTEK
+
+sqlcmd -S np:\\.\pipe\MSSQL$GEOTEK\sql\qury
+sqlcmd -S tcp:.\GEOTEK
+
+CREATE LOGIN andreymikhalevich WITH PASSWORD = 'wimaf2020ii42'
+go
+CREATE USER andreymikhalevich FOR LOGIN andreymikhalevich
+go
+
+exec sp_addrolemember 'db_datareader','andreymikhalevich'
+go
+
+sqlcmd -S tcp:.\GEOTEK -U andreymikhalevich -P wimaf2020ii42 -d Santral
+
+Запустить службы
+SQLServer
+SQLServerBrowser
+
+Protocols for GEOTEK
+SharedMemory
+NamedPipes
+TCPIP
+
+**************************************
+sqlcmd -S tcp:ZAVOD\SQLEXPRESS
+
+еще делал
+ALTER LOGIN andreymikhalevich ENABLE
+go
+
+Поменял режим входа (authentication method)
+Реестр
+HKey_LOCAL_MACHINE\Software\MICROSOFTSQLServer\MSSQL.1\MSSQLServer\LoginMode было 1, сделал 2
+и MSSQL.2 тоже самое!

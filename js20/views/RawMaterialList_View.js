@@ -109,6 +109,18 @@ function RawMaterialList_View(id,options){
 									})
 								]
 							})
+							,new GridCellHead(id+":grid:head:max_fact_quant_tolerance_percent",{
+								"value":"% отклонения от подборов",
+								"columns":[
+									new GridColumnFloat({
+										"field":model.getField("max_fact_quant_tolerance_percent"),
+										"ctrlClass":EditFloat,
+										"ctrlOptions":{
+											"precision":"2"
+										}
+									})
+								]
+							})
 						
 						]
 					})

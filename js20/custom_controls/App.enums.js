@@ -64,8 +64,13 @@
 ,"ru_reset_pwd":"Сброс пароля пользователя"
 }
 
-		,"doc_types":{"ru_material_procuremen":"Поступление материалов"
+		,"doc_types":{"ru_material_procurement":"Поступление материалов"
 ,"ru_shipment":"Отгрузка"
+,"ru_material_fact_consumption":"Фактический расход материалов"
+,"ru_material_fact_consumption_correction":"Корректировка фактического расхода материалов"
+,"ru_material_fact_balance_correction":"Корректировка остатка материала"
+,"ru_cement_silo_reset":"Обнуление силоса"
+,"ru_cement_silo_balance_reset":"Обнуление остатка силоса"
 }
 
 		,"reg_types":{"ru_material":"Учет материалов"

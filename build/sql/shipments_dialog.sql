@@ -109,6 +109,8 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 			END
 		) AS pump_for_client_cost_default
 		
+		,orders_ref(o) AS orders_ref
+		
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id

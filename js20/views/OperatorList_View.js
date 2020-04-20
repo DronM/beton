@@ -15,7 +15,85 @@ function OperatorList_View(id,options){
 	
 	var self = this;
 	var elements = [
-		new GridCellHead(id+":grid:head:date_time",{
+		new GridCellHead(id+":grid:head:production_id",{
+			"value":"№ произ-ва",
+			"colAttrs":{"align":"center"},
+			"columns":[
+				new GridColumn({
+					"field":model.getField("production_id"),
+					"formatFunction":function(fields,gridCell){
+						var col = gridCell.getGridColumn();
+						col.tooltip = new ToolTip({
+								"node":gridCell.getNode(),
+								"wait":500,
+								"onHover":function(ev){
+									var tr = DOMHelper.getParentByTagName(ev.target,"TR");
+									if(tr){
+										var gr = self.getElement("grid")
+										gr.setModelToCurrentRow(tr);
+										var f = gr.getModel().getFields();
+										var t_params = {};
+										/*
+										t_params.productionId = "123";
+										t_params.productionDtStart = DateHelper.format(DateHelper.time(),"H:i");
+										t_params.productionDtEnd = DateHelper.format(DateHelper.time(),"H:i");
+										t_params.productionUser = "Миша";
+										t_params.productionConcreteType = "M350";
+										*/
+										var t = window.getApp().getTemplate("ElkonProdInf");
+										t_params.bsCol = window.getBsCol();
+										t_params.widthType = window.getWidthType();
+										Mustache.parse(t);
+										
+										t_params.productionId = f.production_id.getValue();
+										t_params.productionDtStart = DateHelper.format(f.production_dt_start.getValue(),"H:i");
+										t_params.productionDtEnd = DateHelper.format(f.production_dt_end.getValue(),"H:i");
+										t_params.productionUser = f.production_user.getValue();
+										t_params.productionConcreteType = f.production_concrete_types_ref.getValue().getDescr();
+										
+										
+										col.tooltip.popup(
+											Mustache.render(t,t_params)
+											,{"width":200,
+											"title":"Производство Elkon",
+											"className":"",
+											"event":ev
+											}
+										);
+									}
+								}
+						});
+						
+						var res = fields.production_id.getValue();
+						return res? res:"";
+					},
+					"master":true,
+					"detailViewClass":ProductionMaterialList_View,
+					"detailViewOptions":{
+						"detailFilters":{
+							"ProductionMaterialList_Model":[
+								{
+								"masterFieldId":"production_site_id",
+								"field":"production_site_id",
+								"sign":"e",
+								"val":"0"
+								}	
+								,{
+								"masterFieldId":"production_id",
+								"field":"production_id",
+								"sign":"e",
+								"val":"0"
+								}	
+								
+							]
+						}													
+					}																											
+					
+				})
+			]
+		})
+	
+		,new GridCellHead(id+":grid:head:date_time",{
 			"value":"Назначен",
 			"colAttrs":{"align":"center"},
 			"columns":[
@@ -91,8 +169,30 @@ function OperatorList_View(id,options){
 			"value":"Марка",
 			"colAttrs":{"align":"right"},
 			"columns":[
-				new GridColumnRef({
-					"field":model.getField("concrete_types_ref")
+				new GridColumn({
+					"field":model.getField("concrete_types_ref"),
+					"formatFunction":function(fields,gridCell){
+						var res = "";
+						var ct = fields.concrete_types_ref.getValue();	
+						var p_ct = fields.production_concrete_types_ref.getValue();
+						//var p_ct = new RefType({"descr":"M350","keys":{"id":"111"}});
+						if(!p_ct.isNull()){
+							 if(!ct.isNull()){
+								 res = ct.getDescr();
+								 if(ct.getKey("id")!=p_ct.getKey("id")){
+								 	res+="/"+p_ct.getDescr();
+									 gridCell.setAttr("title","Другая марка Elkon!");
+									 DOMHelper.addClass(gridCell.getNode(),"elkonDifConcreteType");
+								 }
+							}							
+						}
+						else{							 
+							 if(!ct.isNull()){
+								 res = ct.getDescr();
+							}
+						}
+						return res;
+					}
 				})
 			]
 		})

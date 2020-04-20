@@ -14,4 +14,6 @@ $dbLink->password	= DB_PASSWORD;
 $dbLink->database	= DB_NAME;
 $dbLink->connect(DB_SERVER_MASTER, DB_USER, DB_PASSWORD);
 
+//ВНИМАНИЕ!!! БЕЗ reportError=TRUE исключение не генерится!!!!
+
 ?>

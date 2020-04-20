@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLArray.php');
  
 class PumpVehicleWorkList_Model extends ModelSQLBeton{
 	
@@ -116,6 +117,14 @@ class PumpVehicleWorkList_Model extends ModelSQLBeton{
 						
 		$f_pump_prices=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_prices",$f_opts);
 		$this->addField($f_pump_prices);
+		//********************
+		
+		//*** Field pump_vehicle_owners_ar ***
+		$f_opts = array();
+		$f_opts['id']="pump_vehicle_owners_ar";
+						
+		$f_pump_vehicle_owners_ar=new FieldSQLArray($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_vehicle_owners_ar",$f_opts);
+		$this->addField($f_pump_vehicle_owners_ar);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

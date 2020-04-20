@@ -406,12 +406,14 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			m_descr = headModel.getFieldValue("raw_material_production_descr");
 			
 			var col_q_id = "m_"+m_ind+"_q";
-			   var col_q_r_id = "m_"+m_ind+"_q_r";				
+			var col_q_r_id = "m_"+m_ind+"_q_r";
+			var col_q_sh_id = "m_"+m_ind+"_q_sh";
 			mat_col_ids[m_descr] = m_ind;
 			m_ind++;
 			
 			var f_q = new FieldFloat(col_q_id,{"precision":4,"length":19});
-			var f_q_r = new FieldFloat(col_q_r_id,{"precision":4,"length":19}); 
+			var f_q_r = new FieldFloat(col_q_r_id,{"precision":4,"length":19});
+			var f_q_sh = new FieldFloat(col_q_sh_id,{"precision":4,"length":19});			  
 			model.addField(f_q);
 			model.addField(f_q_r);
 			/*
@@ -430,7 +432,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			*/
 			row2_elem.push(
 				new GridCellHead(id+":grid:head:row2:"+col_q_id,{
-					"value":"Кол-во",
+					"value":"Расход факт",
 					"colAttrs":{"align":"right"},
 					"columns":[
 						new GridColumn({
@@ -441,7 +443,18 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			);	
 			row2_elem.push(
 				new GridCellHead(id+":grid:head:row2:m_"+col_q_r_id,{
-					"value":"Кол-во треб.",
+					"value":"Подбор завод",
+					"colAttrs":{"align":"right"},
+					"columns":[
+						new GridColumn({
+							"field":f_q_r
+						})
+					]
+				})		
+			);
+			row2_elem.push(
+				new GridCellHead(id+":grid:head:row2:m_"+col_q_sh_id,{
+					"value":"Подбор отгузка",
 					"colAttrs":{"align":"right"},
 					"columns":[
 						new GridColumn({
@@ -465,9 +478,10 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 					if(materials[j].production_descr==m_descr){					
 						var col_q_id = "m_"+mat_col_ids[m_descr]+"_q";
 						var col_q_r_id = "m_"+mat_col_ids[m_descr]+"_q_r";
+						var col_q_sh_id = "m_"+mat_col_ids[m_descr]+"_q_sh";
 					
 						model.setFieldValue(col_q_id,materials[j].quant);
-						model.setFieldValue(col_q_r_id,materials[j].quant_req);									
+						model.setFieldValue(col_q_sh_id,materials[j].quant_shipped);									
 						break;
 					}
 				}

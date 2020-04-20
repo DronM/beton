@@ -22,7 +22,8 @@ $$
 								ELSE coalesce(pr_vals.price_m,0)*in_orders.quant
 							END
 						FROM pump_prices_values AS pr_vals
-						WHERE pr_vals.pump_price_id = in_pump_vehicles.pump_price_id
+						WHERE pr_vals.pump_price_id =(pump_vehicle_price_on_date(in_pump_vehicles.pump_prices,in_shipments.date_time)->'keys'->>'id')::int
+							--in_pump_vehicles.pump_price_id
 							AND in_orders.quant<=pr_vals.quant_to
 						ORDER BY pr_vals.quant_to ASC
 						LIMIT 1

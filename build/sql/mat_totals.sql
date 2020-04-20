@@ -3,7 +3,17 @@
 -- DROP FUNCTION public.mat_totals(date);
 
 CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
-  RETURNS TABLE(material_id integer, material_descr text, quant_ordered numeric, quant_procured numeric, quant_balance numeric, quant_morn_balance numeric) AS
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
 $BODY$
 	/*
 	WITH rates AS(
@@ -25,9 +35,35 @@ $BODY$
 		COALESCE(bal.quant,0)::numeric AS quant_balance,
 		
 		--остатки на завтра на утро
-		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
 		
 	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	
 	LEFT JOIN (
 		SELECT *
 		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
@@ -74,6 +110,5 @@ $BODY$
   LANGUAGE sql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION public.mat_totals(date)
-  OWNER TO beton;
+ALTER FUNCTION public.mat_totals(date) OWNER TO ;
 

@@ -109,6 +109,24 @@ class RawMaterial_Model extends ModelSQLBeton{
 		$f_min_end_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"min_end_quant",$f_opts);
 		$this->addField($f_min_end_quant);
 		//********************
+		
+		//*** Field max_required_quant_tolerance_percent ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="max_required_quant_tolerance_percent";
+						
+		$f_max_required_quant_tolerance_percent=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"max_required_quant_tolerance_percent",$f_opts);
+		$this->addField($f_max_required_quant_tolerance_percent);
+		//********************
+		
+		//*** Field max_fact_quant_tolerance_percent ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="max_fact_quant_tolerance_percent";
+						
+		$f_max_fact_quant_tolerance_percent=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"max_fact_quant_tolerance_percent",$f_opts);
+		$this->addField($f_max_fact_quant_tolerance_percent);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

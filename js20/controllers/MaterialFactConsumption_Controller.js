@@ -31,6 +31,7 @@ function MaterialFactConsumption_Controller(options){
 	this.add_get_rolled_list();
 	this.addGetObject();
 	this.add_upload_production_file();
+	this.add_get_report();
 		
 }
 extend(MaterialFactConsumption_Controller,ControllerObjServer);
@@ -127,6 +128,18 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldFloat("material_quant_req",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("cement_silo_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("production_id",options);
 	
 	pm.addField(field);
 	
@@ -232,6 +245,18 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldInt("cement_silo_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("production_id",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -311,6 +336,18 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldFloat("material_quant_req",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("material_quant_shipped",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("material_quant_tolerance_exceeded",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("err_concrete_type",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("order_concrete_types_ref",f_opts));
 }
 
 			MaterialFactConsumption_Controller.prototype.add_get_rolled_list = function(){
@@ -348,6 +385,28 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	pm.setRequestType('post');
 	
 	pm.setEncType(ServConnector.prototype.ENCTYPES.MULTIPART);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("production_site_id",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldText("production_file",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			MaterialFactConsumption_Controller.prototype.add_get_report = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_report',opts);
 	
 				
 	

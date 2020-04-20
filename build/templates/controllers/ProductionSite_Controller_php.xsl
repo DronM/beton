@@ -18,6 +18,7 @@
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
+
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
 	}	
@@ -27,6 +28,13 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+	public function get_list_for_edit($pm){
+		$link = $this->getDbLink();		
+		$model = new ProductionSiteForEditList_Model($this->getDbLink());
+		$model->query("SELECT * FROM production_sites_for_edit_list",TRUE);
+		$this->addModel($model);
+		
+	}
 </xsl:template>
 
 </xsl:stylesheet>

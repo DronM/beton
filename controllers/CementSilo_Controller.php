@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 /**
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_php.xsl
@@ -139,8 +140,39 @@ class CementSilo_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 		$this->setObjectModelId('CementSiloList_Model');		
 
+			
+		$pm = new PublicMethod('reset_balance');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('cement_silo_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=500;				
+		$pm->addParam(new FieldExtString('comment_text',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}	
 	
+
+	public function reset_balance($pm){
+		$this->getDbLinkMaster()->query(sprintf(
+			"INSERT INTO cement_silo_balance_resets
+			(user_id,cement_silo_id,comment_text)
+			VALUES (%d,%d,%s)",
+		$_SESSION['user_id'],		
+		$this->getExtDbVal($pm,'cement_silo_id'),
+		$this->getExtDbVal($pm,'comment_text')
+		));		
+	}
+
+
 }
 ?>

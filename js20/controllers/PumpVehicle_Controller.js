@@ -230,6 +230,9 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSONB("pump_prices",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldArray("vehicle_owners_ar",f_opts));
 }
 
 			PumpVehicle_Controller.prototype.add_get_work_list = function(){

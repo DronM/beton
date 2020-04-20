@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 /**
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_php.xsl
@@ -74,6 +75,12 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		$param = new FieldExtFloat('material_quant_req'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtInt('cement_silo_id'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtInt('production_id'
 				,array());
 		$pm->addParam($param);
 		
@@ -150,6 +157,14 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 				,array(
 			));
 			$pm->addParam($param);
+		$param = new FieldExtInt('cement_silo_id'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('production_id'
+				,array(
+			));
+			$pm->addParam($param);
 		
 			$param = new FieldExtInt('id',array(
 			));
@@ -218,6 +233,23 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 
 			
 		$pm = new PublicMethod('upload_production_file');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('production_site_id',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtText('production_file',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_report');
 		
 				
 	$opts=array();
@@ -363,11 +395,14 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 		
 		$link = $this->getDbLinkMaster();
 		
+		$production_site_id = $this->getExtDbVal($pm,"production_site_id");
+		
 		$link->query('BEGIN');
 		try{
 			$materials = [];
 			$concrete_types = [];
 			$vehicles = [];
+			$silo_ids = [];
 			
 			//materials
 			$col = $MAT_COL_FROM;		
@@ -394,7 +429,7 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 				
 				//build date time
 				$data_dt = "'".date('Y-m-d',$data->sheets[0]['cellsInfo'][$row][$COL_DATE]['raw']-24*60*60).' '.trim($data->sheets[0]['cells'][$row][$COL_TIME])."'";
-				
+								
 				if(!isset($concrete_types[$concrete_type_descr])){
 					$ar = $link->query_first(sprintf("SELECT material_fact_consumptions_add_concrete_type('%s') AS concrete_type_id",$concrete_type_descr));
 					$concrete_types[$concrete_type_descr] = is_null($ar['concrete_type_id'])? 'NULL':$ar['concrete_type_id'];
@@ -407,14 +442,21 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 				//materials
 				$col = $MAT_COL_FROM;		
 				foreach($materials as $mat_descr=>$mat_id){
-					$mat_quant = floatval((string) $data->sheets[0]['cells'][$row][$col]);
-					$mat_quant_req = floatval((string) $data->sheets[0]['cells'][$row][$col+1]);
+					//У нас в программе учет в тоннах!
+					$mat_quant = floatval((string) $data->sheets[0]['cells'][$row][$col]) / 1000;
+					$mat_quant_req = floatval((string) $data->sheets[0]['cells'][$row][$col+1]) / 1000;
 					$col+= 3;
 					
 					$mat_id = is_null($mat_id)? 'NULL':$mat_id;
 					
 					if(!$errors){
 						$errors = is_null($mat_id) || is_null($concrete_type_id) || is_null($vehicle_id);
+					}
+					
+					$silo_key = $production_site_id.$mat_descr;
+					if(!isset($silo_ids[$silo_key])){
+						$ar = $link->query_first(sprintf("SELECT id FROM cement_silos WHERE production_site_id=%d AND production_descr='%s'",$production_site_id,$mat_descr));
+						$silo_ids[$silo_key] = is_null($ar['id'])? 'NULL':$ar['id'];
 					}
 					
 					//to database
@@ -434,9 +476,10 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 							NULL,
 							%f,
 							%f,
-							%f
+							%f,
+							%d
 							)::material_fact_consumptions)",
-								$this->getExtDbVal($pm,"production_site_id"),
+								$production_site_id,
 								$_SESSION['user_id'],
 								$data_dt,
 								$concrete_type_descr,
@@ -447,7 +490,8 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 								$vehicles[$vehicle_descr],							
 								$quant_v,
 								$mat_quant,
-								$mat_quant_req
+								$mat_quant_req,
+								$silo_ids[$silo_key]
 							)
 					);
 				}
@@ -463,6 +507,9 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 		if($errors){
 			throw new Exception('Файл загружен, но есть несопоставленные данные!');
 		}
+	}
+	
+	public function get_report($pm){
 	}
 
 

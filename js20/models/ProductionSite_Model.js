@@ -44,6 +44,33 @@ function ProductionSite_Model(options){
 	options.fields.name = new FieldString("name",filed_options);
 	options.fields.name.getValidator().setMaxLength('100');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.elkon_connection = new FieldJSONB("elkon_connection",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Активен';
+	filed_options.autoInc = false;	
+	
+	options.fields.active = new FieldBool("active",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.last_elkon_production_id = new FieldInt("last_elkon_production_id",filed_options);
+	
 		ProductionSite_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionSite_Model,ModelXML);

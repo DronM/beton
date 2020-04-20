@@ -1,6 +1,6 @@
 -- View: public.shipments_pump_list
 
- DROP VIEW public.shipments_pump_list;
+-- DROP VIEW public.shipments_pump_list;
 
 CREATE OR REPLACE VIEW public.shipments_pump_list AS 
 	SELECT
@@ -21,9 +21,8 @@ CREATE OR REPLACE VIEW public.shipments_pump_list AS
 		sh_last.acc_comment,
 		sh_last.owner_pump_agreed_date_time,
 		sh_last.owner_pump_agreed,
-		
 		/*
-		CASE
+		(CASE
 			WHEN coalesce(sh_last.pump_cost_edit,FALSE) THEN sh_last.pump_cost
 			--last ship only!!!
 			WHEN coalesce(o.unload_price,0)>0 THEN o.unload_price
@@ -34,12 +33,14 @@ CREATE OR REPLACE VIEW public.shipments_pump_list AS
 						ELSE coalesce(pr_vals.price_m,0)*o.quant
 					END
 				FROM pump_prices_values AS pr_vals
-				WHERE pr_vals.pump_price_id = pvh.pump_price_id
-					AND dest.distance<=pr_vals.quant_to
+				WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,sh_last.ship_date_time)->'keys'->>'id')::int
+					--pvh.pump_price_id
+					AND o.quant<=pr_vals.quant_to
 				ORDER BY pr_vals.quant_to ASC
 				LIMIT 1
 				)
-		END*/
+		END)::numeric AS pump_cost,
+		*/
 		shipments_pump_cost(
 			(SELECT shipments FROM shipments WHERE shipments.id=sh_last.id),
 			o,dest,pvh,

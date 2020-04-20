@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 /**
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_php.xsl
@@ -21,13 +22,14 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
  */
 
 
-require_once('models/ShipmentRep_Model.php');
-require_once('models/ShipmentOperator_Model.php');
-require_once('models/ShipmentForOrderList_Model.php');
-require_once('models/ShipmentPumpList_Model.php');
-require_once('models/ShipmentTimeList_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentRep_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentOperator_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentForOrderList_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentPumpList_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentTimeList_Model.php');
 
-require_once('controllers/Graph_Controller.php');
+require_once(USER_CONTROLLERS_PATH.'Graph_Controller.php');
+
 require_once('common/SMSService.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQL.php');
@@ -813,7 +815,12 @@ class Shipment_Controller extends ControllerSQL{
 			o.comment_text,
 			sh.production_site_id,
 			production_sites_ref(ps) AS production_sites_ref,
-			users_ref(op_u) AS operators_ref
+			users_ref(op_u) AS operators_ref,
+			prd.production_id,
+			concrete_types_ref(prd_ct) AS production_concrete_types_ref,
+			prd.production_dt_start,
+			prd.production_dt_end,
+			prd.production_user 
 			%s
 		FROM shipments AS sh
 		LEFT JOIN orders o ON o.id = sh.order_id
@@ -825,6 +832,8 @@ class Shipment_Controller extends ControllerSQL{
 		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
 		LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
 		LEFT JOIN users AS op_u ON op_u.id=sh.operator_user_id
+		LEFT JOIN productions AS prd ON prd.shipment_id=sh.id
+		LEFT JOIN concrete_types prd_ct ON prd_ct.id = prd.concrete_type_id
 		%s
 		WHERE (sh.shipped = FALSE OR (sh.ship_date_time BETWEEN %s AND %s))".$operator_cond."
 		)
@@ -877,7 +886,126 @@ class Shipment_Controller extends ControllerSQL{
 		$this->addNewModel($prod_site_q,'OperatorProductionSite_Model');		
 	}
 	
+	public static function setShipped($dbLinkMaster,$dbLink,$idForDb,$operatorUserId,$smsResOk,$smsResStr,$interactiveMode){
+		$dbLinkMaster->query(
+			sprintf(
+			"UPDATE shipments SET
+				shipped=TRUE,
+				operator_user_id=%d
+			WHERE id=%d",
+			$_SESSION["user_id"],
+			$idForDb
+			)
+		);
+		
+		Graph_Controller::clearCacheOnShipId($dbLink,$idForDb);		
+			
+		//SMS service
+		if (SMS_ACTIVE) {
+			$ar = $dbLink->query_first(sprintf(
+			"SELECT
+				orders.id AS order_id,
+				orders.phone_cel,
+				shipments.quant,
+				concrete_types.name AS concrete,
+				d.name AS d_name,
+				coalesce(d.phone_cel,'') AS d_phone,
+				v.plate AS v_plate,
+				(SELECT pattern FROM sms_patterns
+					WHERE sms_type='ship'::sms_types
+					AND lang_id= orders.lang_id
+				) AS text	
+			FROM orders
+			LEFT JOIN shipments ON shipments.order_id=orders.id
+			LEFT JOIN concrete_types ON concrete_types.id=orders.concrete_type_id
+			LEFT JOIN vehicle_schedules AS vs ON vs.id=shipments.vehicle_schedule_id
+			LEFT JOIN drivers AS d ON d.id=vs.driver_id
+			LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id									
+			WHERE shipments.id=%d",
+			$idForDb
+			));
+			
+			if (strlen($ar['phone_cel'])){
+				$text = $ar['text'];
+				$text = str_replace('[quant]',$ar['quant'],$text);
+				$text = str_replace('[concrete]',$ar['concrete'],$text);
+				$text = str_replace('[car]',$ar['v_plate'],$text);
+				
+				$driver = $ar['d_name'];
+				$d_phone = $ar['d_phone'];
+				$d_phone = str_replace('_','',$d_phone);
+				$driver.= ($d_phone!='' && strlen($d_phone)==15)? ' '.$d_phone:'';				
+				$text = str_replace('[driver]',$driver,$text);
+				
+				if($interactiveMode){
+					try{
+						$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
+						$sms_id_resp = $sms_service->send($ar['phone_cel'],$text,SMS_SIGN,SMS_TEST);
+						$sms_id = NULL;
+						FieldSQLString::formatForDb($dbLink,$sms_id_resp,$sms_id);
+						$dbLinkMaster->query(sprintf(
+						"UPDATE sms_service SET
+							shipment_id=%d,
+							sms_id_shipment=%s,
+							shipment_sms_time='%s'
+						WHERE order_id=%d",
+							$idForDb,
+							$sms_id,
+							date('Y-m-d H:i:s'),
+							$ar['order_id'])
+						);
+					
+						$smsResStr = '';
+						$smsResOk = 1;
+					}
+					catch (Exception $e){
+						$smsResStr = $e->getMessage();
+						$smsResOk = 0;
+					}				
+				}
+				else{
+					//Отложенная отправка - по-новому (используется из автоотгрузки Production_Controller)
+					$dbLinkMaster->query(sprintf(
+						"INSERT INTO sms_for_sending
+						(tel,body,sms_type)
+						VALUES (%s,%s,'ship')",
+						$ar['phone_cel'],
+						$text
+					));					
+				}
+			}
+		}	
+	}
+	
 	public function set_shipped($pm){
+		$sms_res_ok = 0;
+		$sms_res_str = '';
+		
+		self::setShipped(
+			$this->getDbLinkMaster(),
+			$this->getDbLink(),
+			$this->getExtDbVal($pm,"id"),
+			$_SESSION["user_id"],
+			$sms_res_ok,
+			$sms_res_str,
+			TRUE
+		);
+		
+		$this->addModel(new ModelVars(
+			array('id'=>'SMSSend',
+				'values'=>array(
+					new Field('sent',DT_INT,
+						array('value'=>$sms_res_ok))
+					,					
+					new Field('resp',DT_STRING,
+						array('value'=>$sms_res_str))
+					)
+				)
+			)
+		);				
+	
+	
+		/*
 		$id = $pm->getParamValue("id");	
 		$this->getDbLinkMaster()->query(
 			sprintf(
@@ -967,6 +1095,7 @@ class Shipment_Controller extends ControllerSQL{
 				);				
 			}
 		}
+		*/
 	}
 	public function unset_shipped(){
 		$pm = $this->getPublicMethod("unset_shipped");

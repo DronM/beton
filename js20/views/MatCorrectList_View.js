@@ -13,7 +13,8 @@
  */
 function MatCorrectList_View(id,options){
 	options = options || {};	
-console.log("MatCorrectList_View")
+
+//console.log("MatCorrectList_View")
 	MatCorrectList_View.superclass.constructor.call(this,id,options);
 	
 	var self = this;
@@ -42,7 +43,7 @@ console.log("MatCorrectList_View")
 			});
 		}
 	}));
-console.dir(options.models)	
+//console.dir(options.models)	
 	this.addElement(new MatCorrectGrid(id+":grid",{
 		"model":options.models.correct_list,
 		"modelMaterial":options.models.material_list

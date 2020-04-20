@@ -113,6 +113,18 @@ BEGIN
 		ELSEIF (OLD.shipped AND NEW.shipped=false) THEN
 			NEW.ship_date_time = null;
 		END IF;
+		
+		IF (NEW.order_id <> OLD.order_id) THEN
+			/* смена заявки
+			 * 1) Удалить vehicle_schedule_states сданным id отгрузки и статусом at_dest, как будто и не доехал еще
+			 * 2) Исправить все оставшиеся vehicle_schedule_states where shipment_id = NEW.id на новый destionation_id из orders
+			 */
+			DELETE FROM vehicle_schedule_states WHERE shipment_id = NEW.id AND state= 'at_dest'::vehicle_states;
+			UPDATE vehicle_schedule_states
+			SET
+				destination_id = (SELECT orders.destination_id FROM orders WHERE orders.id=NEW.order_id)
+			WHERE shipment_id = NEW.id;
+		END IF;
 	END IF;
 	
 	RETURN NEW;

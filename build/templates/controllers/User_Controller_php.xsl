@@ -122,7 +122,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		//global filters				
 		if ($ar['role_id']=='vehicle_owner'){
-			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d",$ar['id']));
+			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d LIMIT 1",$ar['id']));
 			if(is_array($ar_veh_owner) &amp;&amp; count($ar_veh_owner)){
 				$_SESSION['global_vehicle_owner_id'] = $ar_veh_owner['id'];
 				$ar_clients = $this->getDbLink()->query_first(
@@ -175,6 +175,22 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$filter->addExpression('vehicle_owner_client_list',$expr,'AND');
 			GlobalFilter::set('<xsl:value-of select="$model_id"/>',$filter);
 			</xsl:for-each>			
+			
+			//** owner list ***
+			<xsl:for-each select="/metadata/models/model/globalFilter[@id='vehicle_owner_list']">
+			<xsl:variable name="model_id" select="concat(../@id,'_Model')"/>
+			//ALWAYS fieldId
+			$filter = new ModelWhereSQL();
+			$filter->addExpression(
+				'vehicle_owner_list',
+				sprintf('%d =ANY(<xsl:value-of select="@fieldId"/>)',
+					$_SESSION['global_vehicle_owner_id']
+				),
+				'AND'
+			);
+			GlobalFilter::set('<xsl:value-of select="$model_id"/>',$filter);
+			</xsl:for-each>			
+			
 		}
 		
 		$log_ar = $this->getDbLinkMaster()->query_first(

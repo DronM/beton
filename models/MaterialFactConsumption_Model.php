@@ -148,6 +148,22 @@ class MaterialFactConsumption_Model extends ModelSQLBeton{
 		$f_material_quant_req=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant_req",$f_opts);
 		$this->addField($f_material_quant_req);
 		//********************
+		
+		//*** Field cement_silo_id ***
+		$f_opts = array();
+		$f_opts['id']="cement_silo_id";
+						
+		$f_cement_silo_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cement_silo_id",$f_opts);
+		$this->addField($f_cement_silo_id);
+		//********************
+		
+		//*** Field production_id ***
+		$f_opts = array();
+		$f_opts['id']="production_id";
+						
+		$f_production_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_id",$f_opts);
+		$this->addField($f_production_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

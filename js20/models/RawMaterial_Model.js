@@ -112,6 +112,26 @@ function RawMaterial_Model(options){
 	options.fields.min_end_quant = new FieldFloat("min_end_quant",filed_options);
 	options.fields.min_end_quant.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.max_required_quant_tolerance_percent = new FieldFloat("max_required_quant_tolerance_percent",filed_options);
+	options.fields.max_required_quant_tolerance_percent.getValidator().setMaxLength('19');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.max_fact_quant_tolerance_percent = new FieldFloat("max_fact_quant_tolerance_percent",filed_options);
+	options.fields.max_fact_quant_tolerance_percent.getValidator().setMaxLength('19');
+	
 			
 			
 			

@@ -14,6 +14,7 @@
 function CementSiloForOrderList_View(id,options){
 	options = options || {};	
 	
+	this.m_listView = options.listView;
 	this.setData(options.model);
 	options.templateOptions = this.getTemplateOptions();
 	
@@ -54,32 +55,24 @@ CementSiloForOrderList_View.prototype.setData = function(model){
 				redraw = true;
 			}
 			else if(this.m_silos["silo_"+silo_id]){
-				var veh = model.getFieldValue("vehicle");
 				
-				this.m_silos["silo_"+silo_id].balance = model.getFieldValue("balance");
-				this.m_silos["silo_"+silo_id].vehicleUpdated = (
-					(!this.m_silos["silo_"+silo_id].vehicle.vehicles_ref && veh.vehicles_ref)
-					||(this.m_silos["silo_"+silo_id].vehicle.vehicles_ref && !veh.vehicles_ref)
-					||(this.m_silos["silo_"+silo_id].vehicle.vehicle_state != veh.vehicle_state)
-					||(this.m_silos["silo_"+silo_id].vehicle.vehicles_ref
-						&&veh.vehicles_ref
-						&&(this.m_silos["silo_"+silo_id].vehicle.vehicles_ref.getKey("id") != veh.vehicles_ref.getKey("id"))
-					)
-				);
-				this.m_silos["silo_"+silo_id].vehicle = veh;
+				this.m_silos["silo_"+silo_id].balance = parseFloat(model.getFieldValue("balance"),10);
+				if(isNaN(this.m_silos["silo_"+silo_id].balance)){
+					this.m_silos["silo_"+silo_id].balance = 0;
+				}
 			}
 			silo_cnt++;
 		}
 		//for(p in this.m_silos)silo_cnt++;
 		if(!redraw && (model.getRowCount()!=silo_cnt)){
-			console.log("this.m_silos.length="+silo_cnt)
-			console.log("model.getRowCount()="+model.getRowCount())
+			//console.log("this.m_silos.length="+silo_cnt)
+			//console.log("model.getRowCount()="+model.getRowCount())
 			redraw = true;
 		}
 		model.reset();
 	}	
-console.log("is_init="+is_init)
-console.log("redraw="+redraw)		
+//console.log("is_init="+is_init)
+//console.log("redraw="+redraw)		
 	if(is_init || redraw){
 		this.m_silos = [];//reinitialize
 		var templ_opts = {
@@ -109,9 +102,7 @@ console.log("redraw="+redraw)
 				"name":s_name,
 				"id":s_id,
 				"balance":model.getFieldValue("balance"),
-				"load_capacity":model.getFieldValue("load_capacity"),
-				"vehicle":model.getFieldValue("vehicle"),
-				"vehicleUpdated":true
+				"load_capacity":model.getFieldValue("load_capacity")
 			}
 		}
 		this.setTemplateOptions(templ_opts);		
@@ -141,22 +132,31 @@ CementSiloForOrderList_View.prototype.fillSilos = function(){
 					||!this.m_silos[silo_id].balance
 					||isNaN(this.m_silos[silo_id].balance)
 				)?
-				0:(this.m_silos[silo_id].balance / this.m_silos[silo_id].load_capacity * 100);
-			if(percent>100)percent=100;
-			console.log("Silo "+this.m_silos[silo_id].id+" Capac:"+this.m_silos[silo_id].load_capacity+" balance="+this.m_silos[silo_id].balance+" percent="+percent)
+				0:Math.floor((this.m_silos[silo_id].balance / this.m_silos[silo_id].load_capacity * 100));
+			if(percent>100){
+				percent=100;
+			}
+			else if(isNaN(percent)){
+				percent = 0;
+			}
+			//console.log("Silo "+this.m_silos[silo_id].id+" Capac:"+this.m_silos[silo_id].load_capacity+" balance="+this.m_silos[silo_id].balance+" percent="+percent)
 			
-			if(this.m_silos[silo_id].load_percent!=percent
-			||this.m_silos[silo_id].vehicleUpdated
-			){
-				silo_n.title = "Остаток:"+((this.m_silos[silo_id].balance && !isNaN(this.m_silos[silo_id].balance))? this.m_silos[silo_id].balance:0);
+			if(this.m_silos[silo_id].load_percent!=percent){
+				silo_n.setAttribute("silo_id",this.m_silos[silo_id].id);
+				silo_n.title = "Остаток:"+((this.m_silos[silo_id].balance && !isNaN(this.m_silos[silo_id].balance))? this.m_silos[silo_id].balance:0)+", двойной клик для обнуления.";
 				this.m_silos[silo_id].load_percent = percent;
-				this.drawSilo(silo_n,silo_cont_n,0,0,percent,this.m_silos[silo_id].vehicle);
+				//console.log("Redraw silo №"+silo_id)
+				this.drawSilo(silo_n,silo_cont_n,0,0,percent);
+				var self = this;
+				EventHelper.add(silo_n,"dblclick",function(e){
+					self.onCorrectQuant(e.target.getAttribute("silo_id"));
+				});
 			}
 		}
 	}
 }
 
-CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,posLeft,posTop,fillPercent,vehicle){
+CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,posLeft,posTop,fillPercent){
 	var silo_height = 100;
 	var silo_cone_height_k = 0.25;// 1/5		
 	var silo_cone_width = 8;//point part width
@@ -169,6 +169,7 @@ CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,
 	
 	var fill_style = "grey";//#ff0000
 	var cx = siloNode.getContext("2d");		
+	cx.clearRect(posLeft, posTop,silo_width,silo_height+silo_height*silo_cone_height_k);
 	cx.lineWidth = "2";
 	cx.beginPath();
 	cx.moveTo(posLeft, posTop);
@@ -234,6 +235,8 @@ CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,
 	cx.fill();
 	//cx.stroke(); 
 	
+	DOMHelper.delAllChildren(siloContNode);
+	
 	//text percent
 	DOMHelper.setText(siloContNode,fillPercent+"%");
 	siloContNode.style = "position:relative;top:-"+( (silo_height+silo_cone_height)/2 + 20)+"px;left:"+( (silo_width+silo_cone_width)/2-25)+"px";
@@ -245,9 +248,7 @@ CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,
 	siloNode.appendChild(t_div);
 	*/
 	
-	DOMHelper.delAllChildren(siloContNode);
-	
-	if(vehicle.vehicles_ref){
+	//if(vehicle.vehicles_ref){
 		/*
 		var img = document.createElement("IMG");
 		img.src = "img/wait-sm.gif";
@@ -257,13 +258,14 @@ CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,
 		
 		//download
 		//var img_download_top = (silo_height+silo_cone_height+10-32);
+		/*
 		var img_dl = document.createElement("IMG");
 		img_dl.src = "img/cement_download.gif";
 		img_dl.height = "32";
 		img_dl.width = "32";
 		img_dl.style="position:relative;top:50px;left:-5px";
 		siloContNode.appendChild(img_dl);
-		
+		*/
 		/*
 		//mixer
 		var img = document.createElement("IMG");
@@ -271,6 +273,79 @@ CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,
 		img.style="position:relative;top:"+(img_download_top+img_dl.height-5)+"px;left:"+(posLeft + (silo_width+silo_cone_width)/2-10)+"px";
 		siloNode.appendChild(img);
 		*/
-	}
+	//}
 }
 	
+CementSiloForOrderList_View.prototype.setCorrectionOnServer = function(newValues,fieldValues){
+	var self = this;
+	var pm = (new CementSilo_Controller()).getPublicMethod("reset_balance");
+	pm.setFieldValue("cement_silo_id",fieldValues.silo_id);
+	pm.setFieldValue("comment_text",newValues.comment_text);
+	pm.run({
+		"ok":function(){
+			window.showTempNote(fieldValues.silo_descr+": остаток обнулен",null,5000);				
+			self.closeCorrection();
+			self.m_listView.refresh();
+		}
+	})	
+}
+	
+CementSiloForOrderList_View.prototype.onCorrectQuant = function(siloId){
+	if(!siloId || !parseInt(siloId,10))return;
+	var elem_id = "silo_"+siloId;
+	
+	if(!this.m_silos[elem_id].balance){
+		throw new Error("Нет остатка в силосе "+this.m_silos[elem_id]["name"]);
+	}
+	
+	this.closeCorrection();
+	
+	var self = this;
+	this.m_view = new EditJSON("CorrectQuant:cont",{
+		"elements":[
+			new ControlContainer("CorrectQuant:cont:text","DIV",{
+				"className":"alert alert-info alert-styled-left alert-bordered"
+				,"elements":[
+					new Control("CorrectQuant:cont:text:p","DIV",{
+						"className":"no-margin text-semibold",
+						"value":"Количество по данному силосу будет обнулено, для продолжение нажмите ОК"
+					})
+				]
+				
+			})
+			,new EditText("CorrectQuant:cont:comment_text",{
+				"labelCaption":"Комментарий:",
+				"rows":3,
+				"focus":true
+			})
+		]
+	});
+	this.m_form = new WindowFormModalBS("CorrectQuant",{
+		"content":this.m_view,
+		"cmdCancel":true,
+		"cmdOk":true,
+		"contentHead":"Обнуление силоса "+this.m_silos[elem_id]["name"],
+		"onClickCancel":function(){
+			self.closeCorrection();
+		},
+		"onClickOk":function(){
+			var res = self.m_view.getValueJSON();
+			self.setCorrectionOnServer(res,self.m_view.fieldValues);
+		}
+	});
+	this.m_view.fieldValues = {
+		"silo_id":siloId,
+		"silo_descr":this.m_silos[elem_id]["name"]
+	}
+	
+	this.m_form.open();
+	
+}
+
+CementSiloForOrderList_View.prototype.closeCorrection = function(){
+	if(this.m_view)this.m_view.delDOM()
+	if(this.m_form)this.m_form.delDOM();
+	if(this.m_view)delete this.m_view;
+	if(this.m_form)delete this.m_form;			
+}
+

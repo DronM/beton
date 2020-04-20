@@ -10,6 +10,7 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 		(production_sites_ref::text)::jsonb AS production_sites_ref,
 		production_site_id,
 		(concrete_types_ref::text)::jsonb AS concrete_types_ref,
+		(order_concrete_types_ref::text)::jsonb AS order_concrete_types_ref,
 		concrete_type_production_descr,
 		(vehicles_ref::text)::jsonb AS vehicles_ref,
 		vehicle_production_descr,
@@ -21,9 +22,12 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 				'production_descr',raw_material_production_descr,
 				'ref',raw_materials_ref,
 				'quant',material_quant,
-				'quant_req',material_quant_req
+				'quant_req',material_quant_req,
+				'quant_shipped',material_quant_shipped,
+				'quant_tolerance_exceeded',material_quant_tolerance_exceeded
 			)
-		) AS materials
+		) AS materials,
+		err_concrete_type
 	FROM material_fact_consumptions_list
 	GROUP BY date_time,
 		concrete_quant,
@@ -32,11 +36,13 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 		production_sites_ref::text,
 		production_site_id,
 		concrete_types_ref::text,
+		order_concrete_types_ref::text,
 		concrete_type_production_descr,
 		vehicles_ref::text,
 		vehicle_production_descr,
 		orders_ref::text,
-		shipments_inf
+		shipments_inf,
+		err_concrete_type
 	ORDER BY date_time DESC
 
 	;

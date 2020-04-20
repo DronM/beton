@@ -15,15 +15,35 @@
 function Enum_doc_types(id,options){
 	options = options || {};
 	options.addNotSelected = (options.addNotSelected!=undefined)? options.addNotSelected:true;
-	var multy_lang_values = {"ru_material_procuremen":"Поступление материалов"
+	var multy_lang_values = {"ru_material_procurement":"Поступление материалов"
 ,"ru_shipment":"Отгрузка"
+,"ru_material_fact_consumption":"Фактический расход материалов"
+,"ru_material_fact_consumption_correction":"Корректировка фактического расхода материалов"
+,"ru_material_fact_balance_correction":"Корректировка остатка материала"
+,"ru_cement_silo_reset":"Обнуление силоса"
+,"ru_cement_silo_balance_reset":"Обнуление остатка силоса"
 };
-	options.options = [{"value":"material_procuremen",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"material_procuremen"],
-checked:(options.defaultValue&&options.defaultValue=="material_procuremen")}
+	options.options = [{"value":"material_procurement",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"material_procurement"],
+checked:(options.defaultValue&&options.defaultValue=="material_procurement")}
 ,{"value":"shipment",
 "descr":multy_lang_values[window.getApp().getLocale()+"_"+"shipment"],
 checked:(options.defaultValue&&options.defaultValue=="shipment")}
+,{"value":"material_fact_consumption",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"material_fact_consumption"],
+checked:(options.defaultValue&&options.defaultValue=="material_fact_consumption")}
+,{"value":"material_fact_consumption_correction",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"material_fact_consumption_correction"],
+checked:(options.defaultValue&&options.defaultValue=="material_fact_consumption_correction")}
+,{"value":"material_fact_balance_correction",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"material_fact_balance_correction"],
+checked:(options.defaultValue&&options.defaultValue=="material_fact_balance_correction")}
+,{"value":"cement_silo_reset",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"cement_silo_reset"],
+checked:(options.defaultValue&&options.defaultValue=="cement_silo_reset")}
+,{"value":"cement_silo_balance_reset",
+"descr":multy_lang_values[window.getApp().getLocale()+"_"+"cement_silo_balance_reset"],
+checked:(options.defaultValue&&options.defaultValue=="cement_silo_balance_reset")}
 ];
 	
 	Enum_doc_types.superclass.constructor.call(this,id,options);

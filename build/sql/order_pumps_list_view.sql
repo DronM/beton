@@ -24,9 +24,32 @@ CREATE OR REPLACE VIEW public.order_pumps_list_view AS
 		o.phone_cel,
 		
 		pump_vehicles_ref(pvh,pvh_v) AS pump_vehicles_ref,
-		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		
+		--vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		(SELECT
+			owners.r->'fields'->'owner'
+		FROM
+		(
+			SELECT jsonb_array_elements(pvh_v.vehicle_owners->'rows') AS r
+		) AS owners
+		WHERE (owners.r->'fields'->>'dt_from')::timestamp without time zone < o.date_time
+		ORDER BY (owners.r->'fields'->>'dt_from')::timestamp without time zone DESC
+		LIMIT 1
+		) AS pump_vehicle_owners_ref,
+		
 		pvh.vehicle_id AS pump_vehicle_id,
-		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id
+		
+		--pvh_v.vehicle_owner_id AS pump_vehicle_owner_id
+		(SELECT
+			(owners.r->'fields'->'owner'->'keys'->>'id')::int
+		FROM
+		(
+			SELECT jsonb_array_elements(pvh_v.vehicle_owners->'rows') AS r
+		) AS owners
+		WHERE (owners.r->'fields'->>'dt_from')::timestamp without time zone < o.date_time
+		ORDER BY (owners.r->'fields'->>'dt_from')::timestamp without time zone DESC
+		LIMIT 1
+		) AS pump_vehicle_owner_id
 		
 		
 	FROM orders o
@@ -37,7 +60,8 @@ CREATE OR REPLACE VIEW public.order_pumps_list_view AS
 	LEFT JOIN users u ON u.id = o.user_id
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
-	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	--LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	
 	LEFT JOIN (
 		SELECT
 			t.order_id,

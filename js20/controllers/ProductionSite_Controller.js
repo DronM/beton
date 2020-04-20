@@ -29,6 +29,7 @@ function ProductionSite_Controller(options){
 	this.addDelete();
 	this.addGetList();
 	this.addGetObject();
+	this.add_get_list_for_edit();
 		
 }
 extend(ProductionSite_Controller,ControllerObjServer);
@@ -47,6 +48,24 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var options = {};
 	options.primaryKey = true;
 	var field = new FieldString("name",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldJSONB("elkon_connection",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Активен";
+	var field = new FieldBool("active",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("last_elkon_production_id",options);
 	
 	pm.addField(field);
 	
@@ -75,6 +94,24 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	field = new FieldString("old_name",{});
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldJSONB("elkon_connection",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Активен";
+	var field = new FieldBool("active",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("last_elkon_production_id",options);
+	
 	pm.addField(field);
 	
 	
@@ -114,6 +151,15 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldString("name",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSONB("elkon_connection",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Активен";
+	pm.addField(new FieldBool("active",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("last_elkon_production_id",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }
@@ -130,6 +176,13 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	pm.addField(new FieldString("name",f_opts));
 	
 	pm.addField(new FieldString("mode"));
+}
+
+			ProductionSite_Controller.prototype.add_get_list_for_edit = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_list_for_edit',opts);
+	
+	this.addPublicMethod(pm);
 }
 
 		

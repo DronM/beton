@@ -35,6 +35,16 @@ class ShipmentDialog_Model extends ModelSQLBeton{
 		$this->addField($f_id);
 		//********************
 		
+		//*** Field orders_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Заявка';
+		$f_opts['id']="orders_ref";
+						
+		$f_orders_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"orders_ref",$f_opts);
+		$this->addField($f_orders_ref);
+		//********************
+		
 		//*** Field clients_ref ***
 		$f_opts = array();
 		

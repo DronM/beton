@@ -61,7 +61,7 @@ function RACement_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.doc_type = new FieldEnum("doc_type",filed_options);
-	filed_options.enumValues = 'material_procuremen,shipment';
+	filed_options.enumValues = 'material_procurement,shipment,material_fact_consumption,material_fact_consumption_correction,material_fact_balance_correction,cement_silo_reset,cement_silo_balance_reset';
 	options.fields.doc_type.getValidator().setRequired(true);
 	
 				

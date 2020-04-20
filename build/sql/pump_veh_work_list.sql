@@ -1,6 +1,7 @@
 -- View: public.pump_veh_work_list
 
--- DROP VIEW public.pump_veh_work_list CASCADE;
+-- DROP VIEW public.pump_veh_work_list;
+-- CASCADE;
 
 CREATE OR REPLACE VIEW public.pump_veh_work_list AS 
 	SELECT
@@ -14,11 +15,37 @@ CREATE OR REPLACE VIEW public.pump_veh_work_list AS
 		v.feature,
 		v.plate,
 		pv.pump_length,
+		
 		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		/*
+		(SELECT
+			owners.r->'fields'->'owner'
+		FROM
+		(
+			SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+		) AS owners
+		ORDER BY owners.r->'fields'->'dt_from' DESC
+		LIMIT 1
+		) AS vehicle_owners_ref,		
+		*/
+		
 		v.vehicle_owner_id AS pump_vehicle_owner_id,
+		/*
+		(SELECT
+			(owners.r->'fields'->'owner'->'keys'->>'id')::int
+		FROM
+		(
+			SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+		) AS owners
+		ORDER BY owners.r->'fields'->'dt_from' DESC
+		LIMIT 1
+		) AS pump_vehicle_owner_id,		
+		*/
 		
 		pv.phone_cels,
-		pv.pump_prices
+		pv.pump_prices,
+		
+		v.vehicle_owners_ar AS pump_vehicle_owners_ar
 		
 	FROM pump_vehicles pv
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id

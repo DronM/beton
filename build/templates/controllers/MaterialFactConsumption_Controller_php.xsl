@@ -161,11 +161,14 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		
 		$link = $this->getDbLinkMaster();
 		
+		$production_site_id = $this->getExtDbVal($pm,"production_site_id");
+		
 		$link->query('BEGIN');
 		try{
 			$materials = [];
 			$concrete_types = [];
 			$vehicles = [];
+			$silo_ids = [];
 			
 			//materials
 			$col = $MAT_COL_FROM;		
@@ -192,7 +195,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 				
 				//build date time
 				$data_dt = "'".date('Y-m-d',$data->sheets[0]['cellsInfo'][$row][$COL_DATE]['raw']-24*60*60).' '.trim($data->sheets[0]['cells'][$row][$COL_TIME])."'";
-				
+								
 				if(!isset($concrete_types[$concrete_type_descr])){
 					$ar = $link->query_first(sprintf("SELECT material_fact_consumptions_add_concrete_type('%s') AS concrete_type_id",$concrete_type_descr));
 					$concrete_types[$concrete_type_descr] = is_null($ar['concrete_type_id'])? 'NULL':$ar['concrete_type_id'];
@@ -205,14 +208,21 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 				//materials
 				$col = $MAT_COL_FROM;		
 				foreach($materials as $mat_descr=>$mat_id){
-					$mat_quant = floatval((string) $data->sheets[0]['cells'][$row][$col]);
-					$mat_quant_req = floatval((string) $data->sheets[0]['cells'][$row][$col+1]);
+					//У нас в программе учет в тоннах!
+					$mat_quant = floatval((string) $data->sheets[0]['cells'][$row][$col]) / 1000;
+					$mat_quant_req = floatval((string) $data->sheets[0]['cells'][$row][$col+1]) / 1000;
 					$col+= 3;
 					
 					$mat_id = is_null($mat_id)? 'NULL':$mat_id;
 					
 					if(!$errors){
 						$errors = is_null($mat_id) || is_null($concrete_type_id) || is_null($vehicle_id);
+					}
+					
+					$silo_key = $production_site_id.$mat_descr;
+					if(!isset($silo_ids[$silo_key])){
+						$ar = $link->query_first(sprintf("SELECT id FROM cement_silos WHERE production_site_id=%d AND production_descr='%s'",$production_site_id,$mat_descr));
+						$silo_ids[$silo_key] = is_null($ar['id'])? 'NULL':$ar['id'];
 					}
 					
 					//to database
@@ -232,9 +242,10 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 							NULL,
 							%f,
 							%f,
-							%f
+							%f,
+							%d
 							)::material_fact_consumptions)",
-								$this->getExtDbVal($pm,"production_site_id"),
+								$production_site_id,
 								$_SESSION['user_id'],
 								$data_dt,
 								$concrete_type_descr,
@@ -245,7 +256,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 								$vehicles[$vehicle_descr],							
 								$quant_v,
 								$mat_quant,
-								$mat_quant_req
+								$mat_quant_req,
+								$silo_ids[$silo_key]
 							)
 					);
 				}
@@ -261,6 +273,9 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		if($errors){
 			throw new Exception('Файл загружен, но есть несопоставленные данные!');
 		}
+	}
+	
+	public function get_report($pm){
 	}
 
 </xsl:template>

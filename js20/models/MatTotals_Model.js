@@ -77,8 +77,27 @@ function MatTotals_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.quant_morn_balance = new FieldFloat("quant_morn_balance",filed_options);
-	options.fields.quant_morn_balance.getValidator().setMaxLength('15');
+	options.fields.quant_morn_cur_balance = new FieldFloat("quant_morn_cur_balance",filed_options);
+	options.fields.quant_morn_cur_balance.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.quant_morn_next_balance = new FieldFloat("quant_morn_next_balance",filed_options);
+	options.fields.quant_morn_next_balance.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.balance_corrected_data = new FieldJSON("balance_corrected_data",filed_options);
 	
 		MatTotals_Model.superclass.constructor.call(this,id,options);
 }

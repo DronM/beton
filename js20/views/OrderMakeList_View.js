@@ -7,7 +7,7 @@ function OrderMakeList_View(id,options){
 	options.templateOptions = options.templateOptions || {};	
 	options.templateOptions.showChart = !this.m_lowResDevice;
 	
-	this.m_showProductionSites = false;//!this.m_lowResDevice;
+	this.m_showProductionSites = !this.m_lowResDevice;
 	options.templateOptions.showProductionSites = this.m_showProductionSites;
 	
 //alert("getWidthType="+window.getWidthType())	
@@ -90,7 +90,8 @@ function OrderMakeList_View(id,options){
 		//production sites
 		if (this.m_showProductionSites){
 			this.addElement(new CementSiloForOrderList_View(id+":production_sites",{
-				"model":options.models.CementSiloForOrderList_Model
+				"model":options.models.CementSiloForOrderList_Model,
+				"listView":this
 			}));
 		}
 				
@@ -98,7 +99,10 @@ function OrderMakeList_View(id,options){
 		var model = options.models.MatTotals_Model;
 		this.addElement(new MaterialMakeOrderGrid(id+":mat_totals_grid",{
 			"model":model,
-			"className":this.TABLE_CLASS
+			"className":this.TABLE_CLASS,
+			"refresh":function(){
+				self.refresh();
+			}
 		}));
 		
 		//assigning

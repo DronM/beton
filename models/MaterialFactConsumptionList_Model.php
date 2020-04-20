@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
@@ -160,6 +161,39 @@ class MaterialFactConsumptionList_Model extends ModelSQLBeton{
 						
 		$f_material_quant_req=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant_req",$f_opts);
 		$this->addField($f_material_quant_req);
+		//********************
+		
+		//*** Field material_quant_shipped ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="material_quant_shipped";
+						
+		$f_material_quant_shipped=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant_shipped",$f_opts);
+		$this->addField($f_material_quant_shipped);
+		//********************
+		
+		//*** Field material_quant_tolerance_exceeded ***
+		$f_opts = array();
+		$f_opts['id']="material_quant_tolerance_exceeded";
+						
+		$f_material_quant_tolerance_exceeded=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_quant_tolerance_exceeded",$f_opts);
+		$this->addField($f_material_quant_tolerance_exceeded);
+		//********************
+		
+		//*** Field err_concrete_type ***
+		$f_opts = array();
+		$f_opts['id']="err_concrete_type";
+						
+		$f_err_concrete_type=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"err_concrete_type",$f_opts);
+		$this->addField($f_err_concrete_type);
+		//********************
+		
+		//*** Field order_concrete_types_ref ***
+		$f_opts = array();
+		$f_opts['id']="order_concrete_types_ref";
+						
+		$f_order_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_concrete_types_ref",$f_opts);
+		$this->addField($f_order_concrete_types_ref);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

@@ -1,6 +1,6 @@
 ﻿-- Function: vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp)
 
--- DROP FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp);
+ DROP FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp);
 
 CREATE OR REPLACE FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp)
   RETURNS int AS
@@ -20,3 +20,4 @@ $$
   LANGUAGE sql VOLATILE CALLED ON NULL INPUT
   COST 100;
 ALTER FUNCTION vehicles_define_on_production_descr(in_production_descr text,in_date_time timestamp) OWNER TO ;
+

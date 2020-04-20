@@ -1,0 +1,15 @@
+instance MSSQL10_50.GEOTEK
+
+sqlcmd -S np:\\.\pipe\MSSQL$GEOTEK\sql\qury
+sqlcmd -S tcp:.\GEOTEK
+
+CREATE LOGIN andreymikhalevich WITH PASSWORD = 'wimaf2020ii42'
+CREATE USER andreymikhalevich FOR LOGIN andreymikhalevich
+
+exec sp_addrolemember 'db_datareader','andreymikhalevich'
+
+sqlcmd -S tcp:.\GEOTEK -U andreymikhalevich -P wimaf2020ii42 -d Santral
+
+Запустить службы
+SQLServer
+SQLServerBrowser

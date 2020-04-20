@@ -44,7 +44,7 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 						ELSE coalesce(pr_vals.price_m,0)*o.quant
 					END
 				FROM pump_prices_values AS pr_vals
-				WHERE pr_vals.pump_price_id = pvh.pump_price_id
+				WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,o.date_time)->'keys'->>'id')::int
 					AND o.quant<=pr_vals.quant_to
 				ORDER BY pr_vals.quant_to ASC
 				LIMIT 1
@@ -88,7 +88,7 @@ CREATE OR REPLACE VIEW shipments_for_client_veh_owner_list AS
 						ELSE coalesce(pr_vals.price_m,0)*o.quant
 					END
 				FROM pump_prices_values AS pr_vals
-				WHERE pr_vals.pump_price_id = pvh.pump_price_id
+				WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,o.date_time)->'keys'->>'id')::int
 					AND o.quant<=pr_vals.quant_to
 				ORDER BY pr_vals.quant_to ASC
 				LIMIT 1

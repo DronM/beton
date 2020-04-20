@@ -1,4 +1,6 @@
 <?php
+echo substr(phpversion(),0,1);
+/*
 	while(1==1){
 		$res = exec("curl 'https://booking.pobeda.aero/sorry/' | grep 'Please come back later'");
 		echo $res.PHP_EOL;
@@ -8,4 +10,5 @@
 		}
 		sleep(10);
 	}
+*/	
 ?>

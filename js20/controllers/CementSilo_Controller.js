@@ -29,6 +29,7 @@ function CementSilo_Controller(options){
 	this.addDelete();
 	this.addGetList();
 	this.addGetObject();
+	this.add_reset_balance();
 		
 }
 extend(CementSilo_Controller,ControllerObjServer);
@@ -194,6 +195,30 @@ extend(CementSilo_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("id",f_opts));
 	
 	pm.addField(new FieldString("mode"));
+}
+
+			CementSilo_Controller.prototype.add_reset_balance = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('reset_balance',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("cement_silo_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.maxlength = "500";
+	
+		pm.addField(new FieldString("comment_text",options));
+	
+			
+	this.addPublicMethod(pm);
 }
 
 		

@@ -774,6 +774,8 @@ $permissions = array();
 				
 					$permissions['ProductionSite_Controller_get_object']=TRUE;
 				
+					$permissions['ProductionSite_Controller_get_list_for_edit']=TRUE;
+				
 					$permissions['ShipQuantForCostGrade_Controller_insert']=TRUE;
 				
 					$permissions['ShipQuantForCostGrade_Controller_update']=TRUE;
@@ -952,6 +954,16 @@ $permissions = array();
 				
 					$permissions['ConcreteTypeMapToProduction_Controller_get_object']=TRUE;
 				
+					$permissions['UserMapToProduction_Controller_insert']=TRUE;
+				
+					$permissions['UserMapToProduction_Controller_update']=TRUE;
+				
+					$permissions['UserMapToProduction_Controller_delete']=TRUE;
+				
+					$permissions['UserMapToProduction_Controller_get_list']=TRUE;
+				
+					$permissions['UserMapToProduction_Controller_get_object']=TRUE;
+				
 					$permissions['RawMaterialMapToProduction_Controller_insert']=TRUE;
 				
 					$permissions['RawMaterialMapToProduction_Controller_update']=TRUE;
@@ -961,16 +973,6 @@ $permissions = array();
 					$permissions['RawMaterialMapToProduction_Controller_get_list']=TRUE;
 				
 					$permissions['RawMaterialMapToProduction_Controller_get_object']=TRUE;
-				
-					$permissions['VehicleMapToProduction_Controller_insert']=TRUE;
-				
-					$permissions['VehicleMapToProduction_Controller_update']=TRUE;
-				
-					$permissions['VehicleMapToProduction_Controller_delete']=TRUE;
-				
-					$permissions['VehicleMapToProduction_Controller_get_list']=TRUE;
-				
-					$permissions['VehicleMapToProduction_Controller_get_object']=TRUE;
 				
 					$permissions['MaterialFactConsumption_Controller_insert']=TRUE;
 				
@@ -986,6 +988,20 @@ $permissions = array();
 				
 					$permissions['MaterialFactConsumption_Controller_upload_production_file']=TRUE;
 				
+					$permissions['MaterialFactConsumption_Controller_get_report']=TRUE;
+				
+					$permissions['MaterialFactConsumptionCorretion_Controller_insert']=TRUE;
+				
+					$permissions['MaterialFactConsumptionCorretion_Controller_update']=TRUE;
+				
+					$permissions['MaterialFactConsumptionCorretion_Controller_delete']=TRUE;
+				
+					$permissions['MaterialFactConsumptionCorretion_Controller_get_list']=TRUE;
+				
+					$permissions['MaterialFactConsumptionCorretion_Controller_get_object']=TRUE;
+				
+					$permissions['MaterialFactConsumptionCorretion_Controller_operator_insert_correction']=TRUE;
+				
 					$permissions['CementSilo_Controller_insert']=TRUE;
 				
 					$permissions['CementSilo_Controller_update']=TRUE;
@@ -996,15 +1012,17 @@ $permissions = array();
 				
 					$permissions['CementSilo_Controller_get_object']=TRUE;
 				
-					$permissions['CementSiloProduction_Controller_insert']=TRUE;
+					$permissions['CementSilo_Controller_reset_balance']=TRUE;
 				
-					$permissions['CementSiloProduction_Controller_update']=TRUE;
+					$permissions['CementSiloBalanceReset_Controller_insert']=TRUE;
 				
-					$permissions['CementSiloProduction_Controller_delete']=TRUE;
+					$permissions['CementSiloBalanceReset_Controller_update']=TRUE;
 				
-					$permissions['CementSiloProduction_Controller_get_list']=TRUE;
+					$permissions['CementSiloBalanceReset_Controller_delete']=TRUE;
 				
-					$permissions['CementSiloProduction_Controller_get_object']=TRUE;
+					$permissions['CementSiloBalanceReset_Controller_get_list']=TRUE;
+				
+					$permissions['CementSiloBalanceReset_Controller_get_object']=TRUE;
 				
 					$permissions['OwnerList_Controller_insert']=TRUE;
 				
@@ -1025,6 +1043,34 @@ $permissions = array();
 					$permissions['PumpVehiclePriceList_Controller_get_list']=TRUE;
 				
 					$permissions['PumpVehiclePriceList_Controller_get_object']=TRUE;
+				
+					$permissions['ELKONLog_Controller_get_list']=TRUE;
+				
+					$permissions['ELKONLog_Controller_get_object']=TRUE;
+				
+					$permissions['Production_Controller_insert']=TRUE;
+				
+					$permissions['Production_Controller_update']=TRUE;
+				
+					$permissions['Production_Controller_delete']=TRUE;
+				
+					$permissions['Production_Controller_get_list']=TRUE;
+				
+					$permissions['Production_Controller_get_object']=TRUE;
+				
+					$permissions['Production_Controller_check_data']=TRUE;
+				
+					$permissions['Production_Controller_get_production_material_list']=TRUE;
+				
+					$permissions['MaterialFactBalanceCorretion_Controller_insert']=TRUE;
+				
+					$permissions['MaterialFactBalanceCorretion_Controller_update']=TRUE;
+				
+					$permissions['MaterialFactBalanceCorretion_Controller_delete']=TRUE;
+				
+					$permissions['MaterialFactBalanceCorretion_Controller_get_list']=TRUE;
+				
+					$permissions['MaterialFactBalanceCorretion_Controller_get_object']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

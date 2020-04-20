@@ -27,6 +27,18 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+
+	public function reset_balance($pm){
+		$this->getDbLinkMaster()->query(sprintf(
+			"INSERT INTO cement_silo_balance_resets
+			(user_id,cement_silo_id,comment_text)
+			VALUES (%d,%d,%s)",
+		$_SESSION['user_id'],		
+		$this->getExtDbVal($pm,'cement_silo_id'),
+		$this->getExtDbVal($pm,'comment_text')
+		));		
+	}
+
 </xsl:template>
 
 </xsl:stylesheet>

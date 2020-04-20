@@ -35,6 +35,15 @@ function ShipmentDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Заявка';
+	filed_options.autoInc = false;	
+	
+	options.fields.orders_ref = new FieldJSON("orders_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Клиент';
 	filed_options.autoInc = false;	
 	

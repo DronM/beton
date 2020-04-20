@@ -104,14 +104,20 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Владелец";
+	options.alias = "УДАЛИТЬ Владелец";
 	var field = new FieldInt("vehicle_owner_id",options);
 	
 	pm.addField(field);
 	
 	var options = {};
-	
+	options.alias = "История владелецев";
 	var field = new FieldJSONB("vehicle_owners",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldArray("vehicle_owners_ar",options);
 	
 	pm.addField(field);
 	
@@ -182,14 +188,20 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Владелец";
+	options.alias = "УДАЛИТЬ Владелец";
 	var field = new FieldInt("vehicle_owner_id",options);
 	
 	pm.addField(field);
 	
 	var options = {};
-	
+	options.alias = "История владелецев";
 	var field = new FieldJSONB("vehicle_owners",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldArray("vehicle_owners_ar",options);
 	
 	pm.addField(field);
 	
@@ -252,14 +264,17 @@ extend(Vehicle_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldDateTimeTZ("tracker_last_dt",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Последний владелец";
 	pm.addField(new FieldJSONB("vehicle_owners_ref",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Последний владелец";
 	pm.addField(new FieldInt("vehicle_owner_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "История владелецев";
 	pm.addField(new FieldJSONB("vehicle_owners",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldArray("vehicle_owners_ar",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){

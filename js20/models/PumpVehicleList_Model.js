@@ -148,6 +148,15 @@ function PumpVehicleList_Model(options){
 	
 	options.fields.pump_prices = new FieldJSONB("pump_prices",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_owners_ar = new FieldArray("vehicle_owners_ar",filed_options);
+	
 			
 		PumpVehicleList_Model.superclass.constructor.call(this,id,options);
 }

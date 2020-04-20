@@ -12,6 +12,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLArray.php');
  
 class VehicleDialog_Model extends ModelSQLBeton{
 	
@@ -124,6 +125,8 @@ class VehicleDialog_Model extends ModelSQLBeton{
 		
 		//*** Field vehicle_owners_ref ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Последний владелец';
 		$f_opts['id']="vehicle_owners_ref";
 						
 		$f_vehicle_owners_ref=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ref",$f_opts);
@@ -132,6 +135,8 @@ class VehicleDialog_Model extends ModelSQLBeton{
 		
 		//*** Field vehicle_owner_id ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Последний владелец';
 		$f_opts['id']="vehicle_owner_id";
 						
 		$f_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owner_id",$f_opts);
@@ -140,10 +145,20 @@ class VehicleDialog_Model extends ModelSQLBeton{
 		
 		//*** Field vehicle_owners ***
 		$f_opts = array();
+		
+		$f_opts['alias']='История владелецев';
 		$f_opts['id']="vehicle_owners";
 						
 		$f_vehicle_owners=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners",$f_opts);
 		$this->addField($f_vehicle_owners);
+		//********************
+		
+		//*** Field vehicle_owners_ar ***
+		$f_opts = array();
+		$f_opts['id']="vehicle_owners_ar";
+						
+		$f_vehicle_owners_ar=new FieldSQLArray($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_owners_ar",$f_opts);
+		$this->addField($f_vehicle_owners_ar);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

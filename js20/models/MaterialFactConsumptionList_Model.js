@@ -178,6 +178,43 @@ function MaterialFactConsumptionList_Model(options){
 	options.fields.material_quant_req = new FieldFloat("material_quant_req",filed_options);
 	options.fields.material_quant_req.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.material_quant_shipped = new FieldFloat("material_quant_shipped",filed_options);
+	options.fields.material_quant_shipped.getValidator().setMaxLength('19');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.material_quant_tolerance_exceeded = new FieldBool("material_quant_tolerance_exceeded",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.err_concrete_type = new FieldBool("err_concrete_type",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.order_concrete_types_ref = new FieldJSON("order_concrete_types_ref",filed_options);
+	
 		MaterialFactConsumptionList_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialFactConsumptionList_Model,ModelXML);

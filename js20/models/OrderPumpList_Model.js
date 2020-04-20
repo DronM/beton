@@ -220,6 +220,15 @@ function OrderPumpList_Model(options){
 	
 	options.fields.pump_vehicle_owner_id = new FieldInt("pump_vehicle_owner_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.pump_vehicle_owners_ar = new FieldArray("pump_vehicle_owners_ar",filed_options);
+	
 			
 		OrderPumpList_Model.superclass.constructor.call(this,id,options);
 }

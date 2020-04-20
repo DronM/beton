@@ -14,6 +14,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 /**
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_php.xsl
@@ -65,6 +66,12 @@ class RawMaterial_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		$param = new FieldExtFloat('min_end_quant'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtFloat('max_required_quant_tolerance_percent'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtFloat('max_fact_quant_tolerance_percent'
 				,array());
 		$pm->addParam($param);
 		
@@ -124,6 +131,14 @@ class RawMaterial_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtFloat('min_end_quant'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('max_required_quant_tolerance_percent'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('max_fact_quant_tolerance_percent'
 				,array(
 			));
 			$pm->addParam($param);

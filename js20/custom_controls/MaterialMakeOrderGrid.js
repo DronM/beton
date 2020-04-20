@@ -16,6 +16,10 @@ function MaterialMakeOrderGrid(id,options){
 	
 	var model = options.model;
 	
+	this.m_refresh = options.refresh;
+	
+	var self = this;
+	
 	CommonHelper.merge(options,
 		{
 			"attrs":{"style":"width:100%;"},
@@ -25,6 +29,16 @@ function MaterialMakeOrderGrid(id,options){
 			"editWinClass":null,
 			"commands":null,
 			"popUpMenu":null,
+			"onEventSetCellOptions":function(opts){				
+				if (opts.gridColumn.getId()=="quant_morn_cur_balance" ){
+					var rows = this.getModel().getFieldValue("balance_corrected_data");
+					if(rows && rows.length){
+						opts.className = opts.className||"";
+						opts.className+= ((opts.className=="")? "":" ")+"factQuantCorrected";
+					}
+				}
+			},
+			
 			"head":new GridHead(id+":head",{
 				"elements":[
 					new GridRow(id+":head:row0",{
@@ -36,7 +50,7 @@ function MaterialMakeOrderGrid(id,options){
 								]
 							})
 							,new GridCellHead(id+":head:quant_ordered",{
-								"value":"Заявлено",
+								"value":"Заявл.",
 								"colAttrs":{"align":"right"},
 								"columns":[
 									new GridColumnFloat({
@@ -45,6 +59,70 @@ function MaterialMakeOrderGrid(id,options){
 									})
 								]
 							})
+							,new GridCellHead(id+":head:quant_morn_cur_balance",{
+								"value":"Ост.утро",
+								"colAttrs":{
+									"align":"right",
+									"class":"quant_editable",
+									"title":"Двойной клик для корректировки остатка"
+								},
+								"columns":[
+									new GridColumnFloat({
+										"field":model.getField("quant_morn_cur_balance"),
+										"precision":3,
+										"cellOptions":{
+											"events":{
+												"dblclick":function(ev){
+													self.setModelToCurrentRow(DOMHelper.getParentByTagName(ev.target,"TR"));
+													self.correctQuant(self.getModel().getFields());
+												}
+											}										
+										},
+										"formatFunction":function(fields,gridCell){
+											var col = gridCell.getGridColumn();
+											col.tooltip = new ToolTip({
+													"node":gridCell.getNode(),
+													"wait":500,
+													"onHover":function(ev){
+														var tr = DOMHelper.getParentByTagName(ev.target,"TR");
+														if(tr){
+															self.setModelToCurrentRow(tr);
+															var f = self.getModel().getFields();
+															var t_params = {
+																"rows":f.balance_corrected_data.getValue()
+															};
+															if(t_params.rows && t_params.rows.length){
+																for(var i=0;i<t_params.rows.length;i++){
+																	t_params.rows[i].user_descr = t_params.rows[i].users_ref.m_descr;
+																	t_params.rows[i].date_time_descr = DateHelper.format(DateHelper.strtotime(t_params.rows[i].date_time),"d/m/y H:i");
+																}
+																console.log(t_params.rows)
+																
+																var t = window.getApp().getTemplate("MaterialFactBalanceCorretionInf");
+																t_params.bsCol = window.getBsCol();
+																t_params.widthType = window.getWidthType();
+																Mustache.parse(t);
+																
+																col.tooltip.popup(
+																	Mustache.render(t,t_params)
+																	,{"width":200,
+																	"title":"Коорректировки остатка по материалу",
+																	"className":"",
+																	"event":ev
+																	}
+																);
+																
+															}
+														}
+													}
+											});
+										
+											return CommonHelper.numberFormat(fields.quant_morn_cur_balance.getValue(),3,"."," ");
+										}
+									})
+								],
+							})
+							
 							,new GridCellHead(id+":head:quant_procured",{
 								"value":"Приход",
 								"colAttrs":{"align":"right"},
@@ -65,12 +143,12 @@ function MaterialMakeOrderGrid(id,options){
 									})
 								]
 							})
-							,new GridCellHead(id+":head:quant_morn_balance",{
-								"value":"Ост.утро",
+							,new GridCellHead(id+":head:quant_morn_next_balance",{
+								"value":"Ост.веч.",
 								"colAttrs":{"align":"right"},
 								"columns":[
 									new GridColumnFloat({
-										"field":model.getField("quant_morn_balance"),
+										"field":model.getField("quant_morn_next_balance"),
 										"precision":3
 									})
 								]
@@ -103,4 +181,66 @@ extend(MaterialMakeOrderGrid,Grid);
 
 
 /* public methods */
+MaterialMakeOrderGrid.prototype.setCorrectionOnServer = function(newValues,fieldValues){
+	var self = this;
+	var pm = (new MaterialFactBalanceCorretion_Controller()).getPublicMethod("insert");
+	pm.setFieldValue("material_id",fieldValues.material_id);
+	pm.setFieldValue("comment_text",newValues.comment_text);
+	pm.setFieldValue("required_balance_quant",newValues.quant);
+	pm.run({
+		"ok":function(){
+			window.showTempNote(fieldValues.material_descr+": откорректирован остаток на утро",null,5000);				
+			self.closeCorrection();
+			self.m_refresh();
+		}
+	})	
+}
+
+MaterialMakeOrderGrid.prototype.correctQuant = function(fields){
+	var self = this;
+	this.m_view = new EditJSON("CorrectQuant:cont",{
+		"elements":[
+			new EditFloat("CorrectQuant:cont:quant",{
+				"labelCaption":"Количество:",
+				"length":19,
+				"precision":4,
+				"focus":true
+			})
+			,new EditText("CorrectQuant:cont:comment_text",{
+				"labelCaption":"Комментарий:",
+				"rows":3
+			})
+		]
+	});
+	this.m_form = new WindowFormModalBS("CorrectQuant",{
+		"content":this.m_view,
+		"cmdCancel":true,
+		"cmdOk":true,
+		"contentHead":"Корректировка количества "+fields.material_descr.getValue(),
+		"onClickCancel":function(){
+			self.closeCorrection();
+		},
+		"onClickOk":function(){
+			var res = self.m_view.getValueJSON();
+			/*if(!res||!res.comment_text||!res.comment_text.length){
+				throw new Error("Не указан комментарий корректировки!");
+			}*/
+			self.setCorrectionOnServer(res,self.m_view.fieldValues);
+		}
+	});
+	this.m_view.fieldValues = {
+		"material_id":fields.material_id.getValue(),
+		"material_descr":fields.material_descr.getValue()
+	}
+	
+	this.m_form.open();
+	
+}
+
+MaterialMakeOrderGrid.prototype.closeCorrection = function(){
+	this.m_view.delDOM()
+	this.m_form.delDOM();
+	delete this.m_view;
+	delete this.m_form;			
+}
 

@@ -118,6 +118,9 @@ function ShipmentDialog_View(id,options){
 			}
 		}));
 			
+		this.addElement(new OrderEdit(id+":orders_ref",{
+			"labelCaption":"Заявка:"
+		}));
 
 	}
 	
@@ -141,6 +144,7 @@ function ShipmentDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("pump_cost")})
 		,new DataBinding({"control":this.getElement("pump_for_client_cost")})
 		,new DataBinding({"control":this.getElement("ship_cost")})
+		,new DataBinding({"control":this.getElement("orders_ref"),"fieldId":"orders_ref"})
 	]);
 	
 	//write
@@ -200,6 +204,7 @@ function ShipmentDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("pump_cost")})
 		,new CommandBinding({"control":this.getElement("pump_for_client_cost")})
 		,new CommandBinding({"control":this.getElement("ship_cost")})
+		,new CommandBinding({"control":this.getElement("orders_ref"),"fieldId":"order_id"})
 	]);
 	
 }

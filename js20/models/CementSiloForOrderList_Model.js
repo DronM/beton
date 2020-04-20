@@ -72,15 +72,6 @@ function CementSiloForOrderList_Model(options){
 	options.fields.balance = new FieldFloat("balance",filed_options);
 	options.fields.balance.getValidator().setMaxLength('19');
 	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.vehicle = new FieldJSONB("vehicle",filed_options);
-	
 		CementSiloForOrderList_Model.superclass.constructor.call(this,id,options);
 }
 extend(CementSiloForOrderList_Model,ModelXML);
