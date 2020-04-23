@@ -220,6 +220,15 @@ function OperatorList_Model(options){
 	
 	options.fields.production_user = new FieldString("production_user",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.tolerance_exceeded = new FieldBool("tolerance_exceeded",filed_options);
+	
 		OperatorList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OperatorList_Model,ModelXML);

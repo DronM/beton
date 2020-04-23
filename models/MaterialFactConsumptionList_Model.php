@@ -195,6 +195,14 @@ class MaterialFactConsumptionList_Model extends ModelSQLBeton{
 		$f_order_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_concrete_types_ref",$f_opts);
 		$this->addField($f_order_concrete_types_ref);
 		//********************
+		
+		//*** Field production_id ***
+		$f_opts = array();
+		$f_opts['id']="production_id";
+						
+		$f_production_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_id",$f_opts);
+		$this->addField($f_production_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

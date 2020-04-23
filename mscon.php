@@ -3,7 +3,7 @@
 //exit;
 
 //"192.168.1.12:59900"
-$serverName = "86.109.193.160:50203"; //serverName\instanceName
+$serverName = "86.109.193.160:59900"; //serverName\instanceName 50203
 
 $link = mssql_connect($serverName, 'andreymikhalevich', 'wimaf2020ii42');
 
@@ -14,41 +14,24 @@ else{
 	echo 'Connected!</BR>';
 		
 	mssql_select_db('Santral', $link);
-	
-	//$q = 'SELECT MAX(Uretim.Id) AS id FROM Uretim';
-	/*
-	$productionId = 0;
-	$q  = sprintf(
-		'SELECT TOP 15
-			Uretim.Id AS id,
-			Uretim.BasTarih AS dt_start,
-			Recete.ReceteAdi AS concrete_type_descr,
-			Uretim.AracPlaka AS vehicle_descr,
-			Uretim.Olusturan AS user_descr
-		FROM Uretim
-		LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
-		WHERE Uretim.Id>%d',
-		$productionId
-	);
-	*/
-	
-	//UretimSonuc missing: UretimSonuc.ReceteAdi1 AS concrete_descr,
-	//$q = "SELECT TOP 1 * FROM UretimSonuc WHERE Id=1000";
-	//$q = "SELECT * FROM Recete";
-//	$q = "SELECT * FROM SYSOBJECTS WHERE xtype = 'U'";	
 $q = "
-SELECT TOP 1 *
-			FROM Uretim			
-			WHERE Uretim.Id=90639
+SELECT TOP 1 * FROM UretimSonuc";
+	
+/*	
+$q = "
+SELECT * FROM
+  SYSOBJECTS
+WHERE
+  xtype = 'U'
 ";
+*/
 /*
-		$q  = sprintf(
-			"WITH manual_correction AS
-			(
+		$q  = "WITH
+			manual_correction AS (
 				SELECT TOP 1
 					*
 				FROM ManuelKayit
-				WHERE ManuelKayit.M_Tarih < (SELECT Uretim.BasTarih FROM Uretim WHERE Uretim.Id=%d)
+				WHERE ManuelKayit.M_Tarih < (SELECT Uretim.BasTarih FROM Uretim WHERE Uretim.Id=91581)
 				ORDER BY ManuelKayit.M_Tarih DESC
 			)
 			SELECT
@@ -160,10 +143,9 @@ SELECT TOP 1 *
 			LEFT JOIN UretimSonuc ON UretimSonuc.UretimId=Uretim.id
 			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
 			
-			WHERE Uretim.Id=%d AND UretimSonuc.BitisTarihi IS NOT NULL",
-			1000,
-			1000
-		);
+			WHERE Uretim.Id=91581 AND UretimSonuc.BitisTarihi IS NOT NULL"
+		;
+
 */
 	$res = mssql_query($q, $link);
 	try{

@@ -9,9 +9,11 @@ CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
   	quant_ordered numeric,
   	quant_procured numeric,
   	quant_balance numeric,
+  	quant_fact_balance numeric,
   	quant_morn_balance numeric,--depricated
   	quant_morn_next_balance numeric,--use instead  	
   	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
   	balance_corrected_data json
   ) AS
 $BODY$
@@ -34,11 +36,15 @@ $BODY$
 		--остатки
 		COALESCE(bal.quant,0)::numeric AS quant_balance,
 		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
 		--остатки на завтра на утро
 		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
 		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
 		
 		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
 		
 		--Корректировки
 		(SELECT
@@ -63,12 +69,19 @@ $BODY$
 		SELECT *
 		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
 	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
 	
 	LEFT JOIN (
 		SELECT *
 		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
 		FROM rg_materials_balance('{}')
 	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance('{}')
+	) AS bal_fact ON bal_fact.material_id=m.id
 	
 	LEFT JOIN (
 		SELECT

@@ -74,6 +74,11 @@ class RawMaterial_Controller extends ControllerSQL{
 		$param = new FieldExtFloat('max_fact_quant_tolerance_percent'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtBool('is_cement'
+				,array(
+				'alias'=>'Цемент,учет в силосе'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -140,6 +145,12 @@ class RawMaterial_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		$param = new FieldExtFloat('max_fact_quant_tolerance_percent'
 				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('is_cement'
+				,array(
+			
+				'alias'=>'Цемент,учет в силосе'
 			));
 			$pm->addParam($param);
 		

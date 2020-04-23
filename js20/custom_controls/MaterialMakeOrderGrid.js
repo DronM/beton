@@ -30,7 +30,7 @@ function MaterialMakeOrderGrid(id,options){
 			"commands":null,
 			"popUpMenu":null,
 			"onEventSetCellOptions":function(opts){				
-				if (opts.gridColumn.getId()=="quant_morn_cur_balance" ){
+				if (opts.gridColumn.getId()=="quant_morn_fact_cur_balance" ){
 					var rows = this.getModel().getFieldValue("balance_corrected_data");
 					if(rows && rows.length){
 						opts.className = opts.className||"";
@@ -59,7 +59,7 @@ function MaterialMakeOrderGrid(id,options){
 									})
 								]
 							})
-							,new GridCellHead(id+":head:quant_morn_cur_balance",{
+							,new GridCellHead(id+":head:quant_morn_fact_cur_balance",{
 								"value":"Ост.утро",
 								"colAttrs":{
 									"align":"right",
@@ -68,7 +68,7 @@ function MaterialMakeOrderGrid(id,options){
 								},
 								"columns":[
 									new GridColumnFloat({
-										"field":model.getField("quant_morn_cur_balance"),
+										"field":model.getField("quant_morn_fact_cur_balance"),
 										"precision":3,
 										"cellOptions":{
 											"events":{
@@ -117,7 +117,7 @@ function MaterialMakeOrderGrid(id,options){
 													}
 											});
 										
-											return CommonHelper.numberFormat(fields.quant_morn_cur_balance.getValue(),3,"."," ");
+											return CommonHelper.numberFormat(fields.quant_morn_fact_cur_balance.getValue(),3,"."," ");
 										}
 									})
 								],
@@ -133,12 +133,12 @@ function MaterialMakeOrderGrid(id,options){
 									})
 								]
 							})
-							,new GridCellHead(id+":head:quant_balance",{
+							,new GridCellHead(id+":head:quant_fact_balance",{
 								"value":"Ост.тек.",
 								"colAttrs":{"align":"right"},
 								"columns":[
 									new GridColumnFloat({
-										"field":model.getField("quant_balance"),
+										"field":model.getField("quant_fact_balance"),
 										"precision":3
 									})
 								]

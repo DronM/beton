@@ -3,6 +3,8 @@
  */
 function MaterialFactBalanceCorretionList_View(id,options){	
 
+	this.HEAD_TITLE = "Корректировки фактических остатков материалов";
+
 	MaterialFactBalanceCorretionList_View.superclass.constructor.call(this,id,options);
 
 	var model = options.models.MaterialFactBalanceCorretionList_Model;
@@ -128,7 +130,9 @@ function MaterialFactBalanceCorretionList_View(id,options){
 							"value":"Желаемое количество",
 							"columns":[
 								new GridColumnFloat({
-									"field":model.getField("required_balance_quant")									
+									"field":model.getField("required_balance_quant"),
+									"length":"19",
+									"precision":"4"
 								})
 							]
 						})

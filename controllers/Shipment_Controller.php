@@ -820,7 +820,12 @@ class Shipment_Controller extends ControllerSQL{
 			concrete_types_ref(prd_ct) AS production_concrete_types_ref,
 			prd.production_dt_start,
 			prd.production_dt_end,
-			prd.production_user 
+			prd.production_user,
+			CASE
+				WHEN prd.production_id IS NOT NULL THEN
+					mat_list.tolerance_exceeded
+				ELSE FALSE
+			END tolerance_exceeded
 			%s
 		FROM shipments AS sh
 		LEFT JOIN orders o ON o.id = sh.order_id
@@ -834,6 +839,15 @@ class Shipment_Controller extends ControllerSQL{
 		LEFT JOIN users AS op_u ON op_u.id=sh.operator_user_id
 		LEFT JOIN productions AS prd ON prd.shipment_id=sh.id
 		LEFT JOIN concrete_types prd_ct ON prd_ct.id = prd.concrete_type_id
+		LEFT JOIN (
+			SELECT
+				production_site_id,production_id,
+				bool_or(dif_violation) AS tolerance_exceeded
+			FROM production_material_list
+			GROUP BY production_site_id,production_id
+		) AS mat_list ON
+			mat_list.production_site_id = sh.production_site_id
+			AND mat_list.production_id = prd.production_id
 		%s
 		WHERE (sh.shipped = FALSE OR (sh.ship_date_time BETWEEN %s AND %s))".$operator_cond."
 		)

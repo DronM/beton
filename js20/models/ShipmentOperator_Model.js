@@ -121,6 +121,15 @@ function ShipmentOperator_Model(options){
 	
 	options.fields.ship_bal_min = new FieldInt("ship_bal_min",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.tolerance_exceeded = new FieldBool("tolerance_exceeded",filed_options);
+	
 		ShipmentOperator_Model.superclass.constructor.call(this,id,options);
 }
 extend(ShipmentOperator_Model,ModelXML);

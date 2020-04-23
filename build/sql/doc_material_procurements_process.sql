@@ -27,17 +27,18 @@ BEGIN
 		reg_act.quant			= NEW.quant_net;
 		PERFORM ra_materials_add_act(reg_act);	
 		
-		IF NEW.material_id <> (const_cement_material_val()->'keys'->>'id')::int THEN
-			--register actions ra_material_facts
-			reg_material_facts.date_time		= NEW.date_time;
-			reg_material_facts.deb			= true;
-			reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
-			reg_material_facts.doc_id  		= NEW.id;
-			reg_material_facts.material_id		= NEW.material_id;
-			reg_material_facts.quant		= NEW.quant_net;
-			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		--По материалам делаем всегда движения, а если есть учет по силосам и есть силос - то и по силосам
+		--register actions ra_material_facts
+		reg_material_facts.date_time		= NEW.date_time;
+		reg_material_facts.deb			= true;
+		reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
+		reg_material_facts.doc_id  		= NEW.id;
+		reg_material_facts.material_id		= NEW.material_id;
+		reg_material_facts.quant		= NEW.quant_net;
+		PERFORM ra_material_facts_add_act(reg_material_facts);	
 		
-		ELSIF NEW.cement_silos_id IS NOT NULL THEN
+		IF coalesce( (SELECT is_cement FROM raw_materials WHERE id = NEW.material_id),FALSE)
+		AND NEW.cement_silos_id IS NOT NULL THEN
 			--register actions ra_cement
 			reg_cement.date_time		= NEW.date_time;
 			reg_cement.deb			= true;
@@ -49,6 +50,7 @@ BEGIN
 		END IF;
 				
 		RETURN NEW;
+		
 	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
 		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
 		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);

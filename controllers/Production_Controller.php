@@ -553,7 +553,7 @@ UPDATE public.production_sites
 						
 							$production_dt_end = strtotime($material_data['production_dt_end']);
 							if($production_dt_end===FALSE || $production_dt_end===-1){
-								$this->log_action($serv['id'],'Ошибка преобразования даты начала производства:"'.$production_data['dt_start'].'", Производство элкон:'.$production_data['id'],self::LOG_LEVEL_ERROR,$elkon_con->logLevel);	
+								$this->log_action($serv['id'],'Ошибка преобразования даты окончания производства:"'.$material_data['production_dt_end'].'", Производство элкон:'.$production_data['id'],self::LOG_LEVEL_ERROR,$elkon_con->logLevel);	
 								continue;
 							}
 							$production_dt_end_db = NULL;		
@@ -602,7 +602,11 @@ UPDATE public.production_sites
 							//По каждому материалу
 							for($m_ind=1;$m_ind<=$MT_FIELD_CNT;$m_ind++){
 								$m_id_pref = 'mat'.$m_ind;
-								if(isset($material_data[$m_id_pref.'_quant']) && ($qt=intval($material_data[$m_id_pref.'_quant'])) ){
+								if(
+								 (isset($material_data[$m_id_pref.'_quant']) && ($qt=intval($material_data[$m_id_pref.'_quant'])) )
+								 ||
+								 (isset($material_data[$m_id_pref.'_quant_req']) && ($qt=intval($material_data[$m_id_pref.'_quant_req'])) )
+								){
 
 									//******* Силос (только у цемента!) **********
 									$silo_id = 'NULL';
@@ -645,8 +649,9 @@ UPDATE public.production_sites
 									$mat_id = 'NULL';
 									if(!isset($materials[$mat_descr])){
 										$ar = $this->getDbLink()->query_first(sprintf(
-											"SELECT material_fact_consumptions_add_material(%s) AS material_id",
-											$mat_descr_db
+											"SELECT material_fact_consumptions_add_material(%s,%s) AS material_id",
+											$mat_descr_db,
+											$production_dt_end_db
 										));
 										$mat_id = is_null($ar['material_id'])? 'NULL':$ar['material_id'];
 										$materials[$mat_descr] = $mat_id;
@@ -834,8 +839,16 @@ UPDATE public.production_sites
 									$this->getDbLinkMaster()->query($q_head.' '.$q_body);
 								
 									if(strlen($q_body_cor)){
+										$cor_exists = $this->getDbLinkMaster()->query_first(sprintf(
+											"SELECT TRUE AS cor_exists
+											FROM material_fact_consumption_corrections
+											WHERE production_site_id=%d AND elkon_id=%d",
+											$serv['id'],$material_data['correction_id']
+										));
 										//correction
-										$this->getDbLinkMaster()->query($q_head_cor.' '.$q_body_cor);
+										if(!count($cor_exists)||!isset($cor_exists['cor_exists'])||$cor_exists['cor_exists']!='t'){
+											$this->getDbLinkMaster()->query($q_head_cor.' '.$q_body_cor);
+										}
 									}
 								
 									//Закрытие производства
@@ -910,7 +923,9 @@ UPDATE public.production_sites
 
 					$dt_start = strtotime($production_data['dt_start']);
 					if($dt_start===FALSE || $dt_start===-1){
-						throw new Exception('Ошибка преобразования даты начала производства:"'.$production_data['dt_start'].'", Производство элкон:'.$production_data['id']);
+						//throw new Exception('Ошибка преобразования даты начала производства:"'.$production_data['dt_start'].'", Производство элкон:'.$production_data['id']);
+						$this->log_action($serv['id'],'Ошибка преобразования даты начала производства:"'.$production_data['dt_start'].'"',self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
+						continue;
 					}
 					$dt_start_db = '';
 					FieldSQLDateTime::formatForDb($dt_start,$dt_start_db);

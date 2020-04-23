@@ -243,6 +243,14 @@ class OperatorList_Model extends ModelSQLBeton{
 		$f_production_user=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_user",$f_opts);
 		$this->addField($f_production_user);
 		//********************
+		
+		//*** Field tolerance_exceeded ***
+		$f_opts = array();
+		$f_opts['id']="tolerance_exceeded";
+						
+		$f_tolerance_exceeded=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tolerance_exceeded",$f_opts);
+		$this->addField($f_tolerance_exceeded);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

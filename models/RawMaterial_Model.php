@@ -127,6 +127,17 @@ class RawMaterial_Model extends ModelSQLBeton{
 		$f_max_fact_quant_tolerance_percent=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"max_fact_quant_tolerance_percent",$f_opts);
 		$this->addField($f_max_fact_quant_tolerance_percent);
 		//********************
+		
+		//*** Field is_cement ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Цемент,учет в силосе';
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="is_cement";
+						
+		$f_is_cement=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"is_cement",$f_opts);
+		$this->addField($f_is_cement);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

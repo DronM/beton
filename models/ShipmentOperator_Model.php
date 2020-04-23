@@ -109,6 +109,14 @@ class ShipmentOperator_Model extends ModelSQLBeton{
 		$f_ship_bal_min=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_bal_min",$f_opts);
 		$this->addField($f_ship_bal_min);
 		//********************
+		
+		//*** Field tolerance_exceeded ***
+		$f_opts = array();
+		$f_opts['id']="tolerance_exceeded";
+						
+		$f_tolerance_exceeded=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tolerance_exceeded",$f_opts);
+		$this->addField($f_tolerance_exceeded);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

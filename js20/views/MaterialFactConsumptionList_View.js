@@ -3,8 +3,10 @@
  */
 function MaterialFactConsumptionList_View(id,options){	
 
-	options = options || {};
+	options = options || {};	
 	options.models = options.models || {};
+	
+	this.HEAD_TITLE = "Фактический расход материалов";
 	
 	MaterialFactConsumptionList_View.superclass.constructor.call(this,id,options);
 	
@@ -21,7 +23,7 @@ function MaterialFactConsumptionList_View(id,options){
 	
 	var filters;
 	if(!options.detailFilters){
-		filter = {
+		filters = {
 		"period":{
 			"binding":new CommandBinding({
 				"control":period_ctrl,
@@ -72,6 +74,9 @@ function MaterialFactConsumptionList_View(id,options){
 		"editInline":true,
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"cmdInsert":false,
+			"cmdDelete":false,
+			"cmdEdit":false,
 			"cmdFilter":!options.detailFilters,
 			"filters":filters,
 			"variantStorage":options.variantStorage,
@@ -110,7 +115,8 @@ function MaterialFactConsumptionList_View(id,options){
 										"enabled":false
 									}
 								})
-							]
+							],
+							"sort":"desc"																					
 						})
 						,
 						options.detailFilters? null:
@@ -129,7 +135,7 @@ function MaterialFactConsumptionList_View(id,options){
 							]
 						})
 					
-						,
+						/*,
 						options.detailFilters? null:
 						new GridCellHead(id+":grid:head:upload_users_ref",{
 							"value":"Кто загрузил",
@@ -163,7 +169,7 @@ function MaterialFactConsumptionList_View(id,options){
 								})
 							]
 						})
-						
+						*/
 						,
 						options.detailFilters? null:
 						new GridCellHead(id+":grid:head:concrete_types_ref",{
@@ -300,8 +306,8 @@ function MaterialFactConsumptionList_View(id,options){
 				})
 			]
 		}),
-		"pagination":new pagClass(id+"_page",
-			{"countPerPage":constants.doc_per_page_count.getValue()}),		
+		"pagination":options.detailFilters?
+			null:(new pagClass(id+"_page",{"countPerPage":constants.doc_per_page_count.getValue()})),
 		"filters":options.detailFilters? options.detailFilters.MaterialFactConsumptionList_Model:null,
 		"autoRefresh":auto_refresh,
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,

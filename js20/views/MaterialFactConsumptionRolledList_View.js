@@ -15,6 +15,8 @@ function MaterialFactConsumptionRolledList_View(id,options){
 	options = options || {};
 	options.models = options.models || {};
 	
+	this.HEAD_TITLE = "Фактический расход материалов (свернуто)";
+	
 	MaterialFactConsumptionRolledList_View.superclass.constructor.call(this,id,options);
 	
 	var auto_refresh = options.models.MaterialFactConsumptionRolledList_Model? false:true;
@@ -72,7 +74,7 @@ function MaterialFactConsumptionRolledList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	var grid = new GridAjx(id+":grid",{
-		"keyIds":["date_time","production_site_id"],
+		"keyIds":["production_site_id","production_id"],
 		"model":model,
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_rolled_list"),
@@ -162,6 +164,28 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 						"enabled":false
 					},
 					"master":true,
+					"detailViewClass":ProductionMaterialList_View,
+					"detailViewOptions":{
+						"detailFilters":{
+							"ProductionMaterialList_Model":[
+								{
+								"masterFieldId":"production_site_id",
+								"field":"production_site_id",
+								"sign":"e",
+								"val":"0"
+								}	
+								,{
+								"masterFieldId":"production_id",
+								"field":"production_id",
+								"sign":"e",
+								"val":"0"
+								}	
+								
+							]
+						}													
+					}																											
+					
+					/*
 					"detailViewClass":MaterialFactConsumptionList_View,
 					"detailViewOptions":{
 						"detailFilters":{
@@ -182,7 +206,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 							]
 						}													
 					}									
-					
+					*/
 				})
 			],
 			"sortable":true,
@@ -203,7 +227,18 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 				})
 			]
 		})
-	
+		,new GridCellHead(id+":grid:head:row0:production_id",{
+			"value":"№ пр-ва",
+			"attrs":{"rowspan":"3"},
+			"columns":[
+				new GridColumn({
+					"field":model.getField("production_id"),
+					"ctrlClass":EditNum
+				})
+			]
+		})
+		
+		/*
 		,new GridCellHead(id+":grid:head:row0:upload_users_ref",{
 			"value":"Кто загрузил",
 			"attrs":{"rowspan":"3"},
@@ -235,6 +270,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 				})
 			]
 		})
+		*/
 		,new GridCellHead(id+":grid:head:row0:concrete_types_ref",{
 			"value":"Марка",
 			"attrs":{"rowspan":"3"},
@@ -327,18 +363,19 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 		var prev_mat_descr;
 		var col_span_ar;		
 		var row0_id = 0,row1_id = 0;
-		
+		var mat_ind = 0;
 		var add_rows = function(){
-			if(col_span_ar && col_span_ar.length){
+			if(col_span_ar && col_span_ar.length){				
 				//previous
 				var attrs0 = {};
 				var attrs1 = {};
 				if(!prev_mat_id){
 					attrs0["class"] = "production_upload_no_match";
 					attrs1["class"] = "production_upload_no_match";
-				}
+				}								
+				
 				if(col_span_ar.length>1){
-					attrs0.colspan = col_span_ar.length * 2;//quant+quant required
+					attrs0.colspan = col_span_ar.length * 3;//Расход факт/Подбор завод/Подбор отгузка
 					row0_elem.push(
 						new GridCellHead(id+":grid:head:row0:mat_"+row0_id,{
 							"name":"mat_"+row0_id,
@@ -348,23 +385,33 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 						})
 					);						
 					row0_id++;
-					
-					attrs1.colspan = "2";
+										
+					attrs1.colspan = "3";
+					var attrs1_tmp;
 					for(var i=0;i<col_span_ar.length;i++){
+						mat_ind++;
+						attrs1_tmp = CommonHelper.clone(attrs1);
+						attrs1_tmp["class"] = attrs1_tmp["class"] || "";
+						attrs1_tmp["class"]+= ( (attrs1_tmp["class"]=="")? "":" ")+( (mat_ind%2)? "mat_odd":"mat_even");
+						
 						row1_elem.push(
 							new GridCellHead(id+":grid:head:row1:mat_"+row1_id,{
 								"name":"mat_"+row1_id,
 								"value":col_span_ar[i],
 								"colAttrs":{"align":"center"},
-								"attrs":attrs1
+								"attrs":attrs1_tmp
 							})
 						);
 						row1_id++;					
 					}
 				}
-				else{
+				else{	
+					mat_ind++;						
+					attrs0["class"] =attrs0["class"] || "";
+					attrs0["class"]+= ( (attrs0["class"]=="")? "":" ")+( (mat_ind%2)? "mat_odd":"mat_even");
+							
 					attrs0.rowspan = "2";
-					attrs0.colspan = "2";
+					attrs0.colspan = "3";
 					row0_elem.push(
 						new GridCellHead(id+":grid:head:row0:mat_"+row0_id,{
 							"name":"mat_"+row0_id,
@@ -389,12 +436,9 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 				add_rows();
 				prev_mat_id = cur_mat_id;
 				prev_mat_descr = cur_mat_id? mat_ref.getDescr():headModel.getFieldValue("raw_material_production_descr");
-				col_span_ar = [headModel.getFieldValue("raw_material_production_descr")];
+				col_span_ar = [];//init
 			}
-			else{
-				//same material
-				col_span_ar.push(headModel.getFieldValue("raw_material_production_descr"));
-			}
+			col_span_ar.push(headModel.getFieldValue("raw_material_production_descr"));
 		}
 		add_rows();
 		
@@ -416,6 +460,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			var f_q_sh = new FieldFloat(col_q_sh_id,{"precision":4,"length":19});			  
 			model.addField(f_q);
 			model.addField(f_q_r);
+			model.addField(f_q_sh);
 			/*
 			var attrs = {"colspan":"2"};
 			if(CommonHelper.unserialize(headModel.getFieldValue("raw_materials_ref")).isNull()){
@@ -433,10 +478,14 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			row2_elem.push(
 				new GridCellHead(id+":grid:head:row2:"+col_q_id,{
 					"value":"Расход факт",
-					"colAttrs":{"align":"right"},
+					"attrs":{"class":((m_ind%2)? "mat_odd":"mat_even")},
+					"colAttrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
 					"columns":[
-						new GridColumn({
+						new GridColumnFloat({
 							"field":f_q
+							,"ctrlOptions":{
+								"precision":"4"
+							}
 						})
 					]
 				})		
@@ -444,10 +493,14 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			row2_elem.push(
 				new GridCellHead(id+":grid:head:row2:m_"+col_q_r_id,{
 					"value":"Подбор завод",
-					"colAttrs":{"align":"right"},
+					"attrs":{"class":((m_ind%2)? "mat_odd":"mat_even")},
+					"colAttrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
 					"columns":[
-						new GridColumn({
+						new GridColumnFloat({
 							"field":f_q_r
+							,"ctrlOptions":{
+								"precision":"4"
+							}							
 						})
 					]
 				})		
@@ -455,10 +508,14 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			row2_elem.push(
 				new GridCellHead(id+":grid:head:row2:m_"+col_q_sh_id,{
 					"value":"Подбор отгузка",
-					"colAttrs":{"align":"right"},
+					"attrs":{"class":((m_ind%2)? "mat_odd":"mat_even")},
+					"colAttrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
 					"columns":[
-						new GridColumn({
-							"field":f_q_r
+						new GridColumnFloat({
+							"field":f_q_sh
+							,"ctrlOptions":{
+								"precision":"4"
+							}							
 						})
 					]
 				})		
@@ -481,7 +538,8 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 						var col_q_sh_id = "m_"+mat_col_ids[m_descr]+"_q_sh";
 					
 						model.setFieldValue(col_q_id,materials[j].quant);
-						model.setFieldValue(col_q_sh_id,materials[j].quant_shipped);									
+						model.setFieldValue(col_q_r_id,materials[j].quant_req);
+						model.setFieldValue(col_q_sh_id,materials[j].quant_shipped);
 						break;
 					}
 				}

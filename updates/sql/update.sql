@@ -25341,3 +25341,5611 @@ $BODY$
   COST 100;
 ALTER FUNCTION public.shipment_process()
   OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 10:43:00 ******************
+-- Function: public.mat_totals(date)
+
+ DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		COALESCE(bal.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_material_facts_balance('{}')
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+		get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+		now()::timestamp,
+		now()::timestamp,
+		NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 10:45:44 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_material_facts_balance('{}')
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+		get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+		now()::timestamp,
+		now()::timestamp,
+		NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 11:08:37 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT *
+		FROM rg_material_facts_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_material_facts_balance('{}')
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+		get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+		now()::timestamp,
+		now()::timestamp,
+		NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 12:01:12 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		--
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+		add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+				- NEW.required_balance_quant;
+		IF add_quant <> 0 THEN
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+					
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 12:04:48 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		--
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+		add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+				- NEW.required_balance_quant;
+		IF add_quant <> 0 THEN
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+					
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 12:07:09 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		--
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+		add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+				- NEW.required_balance_quant;
+		IF add_quant <> 0 THEN
+			RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+					
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 12:09:32 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		--
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+		add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+				- NEW.required_balance_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+					
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 12:56:20 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+			
+		IF NEW.material_id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			--ЦЕМЕНТ
+			add_quant = coalesce((SELECT quant FROM rg_cement_balance(ra_date_time)),0)
+					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				reg_cement.date_time		= ra_date_time;
+				reg_cement.deb			= (add_quant<0);
+				reg_cement.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_cement.doc_id  		= NEW.id;
+				reg_cement.cement_silos_id	= NEW.cement_silo_id;
+				reg_cement.quant		= abs(add_quant);
+				PERFORM ra_cement_add_act(reg_cement);	
+				
+			END IF;
+		
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 12:57:15 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+			
+		IF NEW.material_id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			--ЦЕМЕНТ
+			IF NEW.cement_silo_id IS NULL THEN
+				RAISE EXCEPTION 'Не выбран силос по цементу';
+			END IF;
+			add_quant = coalesce((SELECT quant FROM rg_cement_balance(ra_date_time)),0)
+					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				reg_cement.date_time		= ra_date_time;
+				reg_cement.deb			= (add_quant<0);
+				reg_cement.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_cement.doc_id  		= NEW.id;
+				reg_cement.cement_silos_id	= NEW.cement_silo_id;
+				reg_cement.quant		= abs(add_quant);
+				PERFORM ra_cement_add_act(reg_cement);	
+				
+			END IF;
+		
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 13:01:34 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+			
+		IF NEW.material_id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			--ЦЕМЕНТ
+			IF NEW.cement_silo_id IS NULL THEN
+				RAISE EXCEPTION 'Не выбран силос по цементу';
+			END IF;
+			add_quant = coalesce((SELECT quant FROM rg_cement_balance(ra_date_time,ARRAY[NEW.cement_silo_id])),0)
+					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				reg_cement.date_time		= ra_date_time;
+				reg_cement.deb			= (add_quant<0);
+				reg_cement.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_cement.doc_id  		= NEW.id;
+				reg_cement.cement_silos_id	= NEW.cement_silo_id;
+				reg_cement.quant		= abs(add_quant);
+				PERFORM ra_cement_add_act(reg_cement);	
+				
+			END IF;
+		
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 14:06:34 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+			
+		IF NEW.material_id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			--ЦЕМЕНТ
+			RAISE EXCEPTION 'Остатки по цементу обнуляются в разрезе силосов!';
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 14:23:48 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		CASE WHEN m.id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			-- Цемент
+			COALESCE(
+				(SELECT sum(quant) from rg_cement_balance('{}'))
+			,0)::numeric
+		ELSE
+			COALESCE(bal_fact.quant,0)::numeric
+		END AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		CASE WHEN m.id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			-- Цемент
+			COALESCE(
+				(SELECT sum(quant) from rg_cement_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}'))
+			,0)::numeric
+		ELSE
+			COALESCE(bal_morn_fact.quant,0)::numeric
+		END AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance('{}')
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+		get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+		now()::timestamp,
+		now()::timestamp,
+		NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 20/04/2020 14:35:57 ******************
+--DROP FUNCTION material_fact_consumptions_add_material(text,timestamp)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(text,timestamp)
+RETURNS int as $$
+DECLARE
+	v_raw_material_id int;
+BEGIN
+	v_raw_material_id = NULL;
+	SELECT raw_material_id INTO v_raw_material_id
+	FROM raw_material_map_to_production
+	WHERE production_descr = $1 AND date_time<=$2
+	ORDER BY date_time DESC
+	LIMIT 1;
+	
+	IF NOT FOUND THEN
+		SELECT id FROM raw_materials INTO v_raw_material_id WHERE name=$1;
+	
+		INSERT INTO raw_material_map_to_production
+		(date_time,production_descr,raw_material_id)
+		VALUES
+		(now(),$1,v_raw_material_id)
+		;
+	END IF;
+	
+	RETURN v_raw_material_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_material(text,timestamp) OWNER TO beton;
+
+
+-- ******************* update 21/04/2020 08:06:59 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+			
+		IF NEW.material_id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			--ЦЕМЕНТ
+			RAISE EXCEPTION 'Остатки по цементу обнуляются в разрезе силосов!';
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)
+					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 08:16:15 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+			
+		IF NEW.material_id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			--ЦЕМЕНТ
+			RAISE EXCEPTION 'Остатки по цементу обнуляются в разрезе силосов!';
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0);
+			RAISE EXCEPTION 'BALANCE=%',add_quant;
+--					- NEW.required_balance_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 08:19:12 ******************
+-- Function: public.rg_total_recalc_material_facts()
+
+-- DROP FUNCTION public.rg_total_recalc_material_facts();
+
+CREATE OR REPLACE FUNCTION public.rg_total_recalc_material_facts()
+  RETURNS void AS
+$BODY$  
+DECLARE
+	period_row RECORD;
+	v_act_date_time timestamp without time zone;
+	v_cur_period timestamp without time zone;
+BEGIN	
+	v_act_date_time = reg_current_balance_time();
+	SELECT date_time INTO v_cur_period FROM rg_calc_periods;
+	
+	FOR period_row IN
+		WITH
+		periods AS (
+			(SELECT
+				DISTINCT date_trunc('month', date_time) AS d,
+				material_id
+			FROM ra_material_facts)
+			UNION		
+			(SELECT
+				date_time AS d,
+				material_id
+			FROM rg_material_facts WHERE date_time<=v_cur_period
+			)
+			ORDER BY d			
+		)
+		SELECT sub.d,sub.material_id,sub.balance_fact,sub.balance_paper
+		FROM
+		(
+		SELECT
+			periods.d,
+			periods.material_id,
+			COALESCE((
+				SELECT SUM(CASE WHEN deb THEN quant ELSE 0 END)-SUM(CASE WHEN NOT deb THEN quant ELSE 0 END)
+				FROM ra_material_facts AS ra WHERE ra.date_time <= last_month_day(periods.d::date)+'23:59:59'::interval AND ra.material_id=periods.material_id
+			),0) AS balance_fact,
+			
+			(
+			SELECT SUM(quant) FROM rg_material_facts WHERE date_time=periods.d AND material_id=periods.material_id
+			) AS balance_paper
+			
+		FROM periods
+		) AS sub
+		WHERE sub.balance_fact<>sub.balance_paper ORDER BY sub.d	
+	LOOP
+		
+		UPDATE rg_material_facts AS rg
+		SET quant = period_row.balance_fact
+		WHERE rg.date_time=period_row.d AND rg.material_id=period_row.material_id;
+		
+		IF NOT FOUND THEN
+			INSERT INTO rg_material_facts (date_time,material_id,quant)
+			VALUES (period_row.d,period_row.material_id,period_row.balance_fact);
+		END IF;
+	END LOOP;
+
+	--АКТУАЛЬНЫЕ ИТОГИ
+	DELETE FROM rg_material_facts WHERE date_time>v_cur_period;
+	
+	INSERT INTO rg_material_facts (date_time,material_id,quant)
+	(
+	SELECT
+		v_act_date_time,
+		rg.material_id,
+		COALESCE(rg.quant,0) +
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.material_id=rg.material_id
+			AND ra.deb=TRUE
+		),0) - 
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.material_id=rg.material_id
+			AND ra.deb=FALSE
+		),0)
+		
+	FROM rg_material_facts AS rg
+	WHERE date_time=(v_cur_period-'1 month'::interval)
+	);	
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.rg_total_recalc_material_facts()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 08:20:22 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+			
+		IF NEW.material_id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			--ЦЕМЕНТ
+			RAISE EXCEPTION 'Остатки по цементу обнуляются в разрезе силосов!';
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)			
+					- NEW.required_balance_quant;
+			--RAISE EXCEPTION 'BALANCE=%',add_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 08:32:07 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+			
+		IF NEW.material_id = (const_cement_material_val()->'keys'->>'id')::int THEN
+			--ЦЕМЕНТ
+			RAISE EXCEPTION 'Остатки по цементу обнуляются в разрезе силосов!';
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)			
+					- NEW.required_balance_quant;
+			--RAISE EXCEPTION 'BALANCE=%',add_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 09:50:01 ******************
+-- Function: public.rg_material_facts_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_material_facts_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_material_id_ar integer[])
+  RETURNS TABLE(material_id integer, quant numeric) AS
+$BODY$
+	WITH
+	cur_per AS (SELECT rg_period('material_fact'::reg_types, in_date_time) AS v ),
+	act_forward AS (
+		SELECT
+			rg_period_balance('material_fact'::reg_types,in_date_time) - in_date_time >
+			(SELECT t.v FROM cur_per t) - in_date_time
+			AS v
+	),
+	act_sg AS (SELECT CASE WHEN t.v THEN 1 ELSE -1 END AS v FROM act_forward t),
+	last_calc_per AS (SELECT rg_period_balance('material_fact'::reg_types,rg_calc_period('material_fact'::reg_types)) AS v)
+	SELECT 
+	sub.material_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		(SELECT
+		b.material_id
+		,b.quant				
+		FROM rg_material_facts AS b
+		WHERE
+		(
+			--date bigger than last calc period
+			(in_date_time > (SELECT v FROM last_calc_per) AND b.date_time = (SELECT rg_current_balance_time()))
+			OR (
+				in_date_time < (SELECT v FROM last_calc_per)
+				AND (
+					--forward from previous period
+					( (SELECT t.v FROM act_forward t) AND b.date_time = (SELECT t.v FROM cur_per t)-rg_calc_interval('material_fact'::reg_types)
+					)
+					--backward from current
+					OR			
+					( NOT (SELECT t.v FROM act_forward t) AND b.date_time = (SELECT t.v FROM cur_per t)				
+					)
+				)
+			)
+		)	
+		AND ( (in_material_id_ar IS NULL OR ARRAY_LENGTH(in_material_id_ar,1) IS NULL) OR (b.material_id=ANY(in_material_id_ar)))
+		AND (
+		b.quant<>0
+		)
+		)
+		UNION ALL
+		(SELECT
+		act.material_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant * (SELECT t.v FROM act_sg t)
+			ELSE -act.quant * (SELECT t.v FROM act_sg t)
+		END AS quant
+		FROM doc_log
+		LEFT JOIN ra_material_facts AS act ON act.doc_type=doc_log.doc_type AND act.doc_id=doc_log.doc_id
+		WHERE
+		(
+			--forward from previous period
+			( (SELECT t.v FROM act_forward t) AND
+					act.date_time >= (SELECT t.v FROM cur_per t)
+					AND act.date_time <= 
+						(SELECT l.date_time FROM doc_log l
+						WHERE date_trunc('second',l.date_time)<=date_trunc('second',in_date_time)
+						ORDER BY l.date_time DESC LIMIT 1
+						)
+			)
+			--backward from current
+			OR			
+			( NOT (SELECT t.v FROM act_forward t) AND
+					act.date_time >= 
+						(SELECT l.date_time FROM doc_log l
+						WHERE date_trunc('second',l.date_time)>=date_trunc('second',in_date_time)
+						ORDER BY l.date_time ASC LIMIT 1
+						)			
+					AND act.date_time <= (SELECT t.v FROM cur_per t)
+			)
+		)
+		AND (in_material_id_ar IS NULL OR ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		AND (
+		act.quant<>0
+		)
+		ORDER BY doc_log.date_time,doc_log.id)
+	) AS sub
+	WHERE
+	 (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (sub.material_id=ANY(in_material_id_ar)))
+	GROUP BY
+		sub.material_id
+	HAVING
+		SUM(sub.quant)<>0
+	ORDER BY
+		sub.material_id;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 10:25:56 ******************
+-- Function: public.rg_material_facts_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_material_facts_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_material_id_ar integer[])
+  RETURNS TABLE(material_id integer, quant numeric) AS
+$BODY$
+DECLARE
+	v_cur_per timestamp;
+	v_act_direct boolean;
+	v_act_direct_sgn int;
+	v_calc_interval interval;
+BEGIN
+	v_cur_per = rg_period('material_fact'::reg_types, in_date_time);
+	v_calc_interval = rg_calc_interval('material_fact'::reg_types);
+	v_act_direct = TRUE;--( (rg_calc_period_end('material_fact'::reg_types,v_cur_per)-in_date_time)>(in_date_time - v_cur_per) );
+	v_act_direct_sgn = 1;
+	/*
+	IF v_act_direct THEN
+		v_act_direct_sgn = 1;
+	ELSE
+		v_act_direct_sgn = -1;
+	END IF;
+	*/
+	--RAISE 'v_act_direct=%, v_cur_per=%, v_calc_interval=%',v_act_direct,v_cur_per,v_calc_interval;
+	RETURN QUERY 
+	SELECT 
+	
+	sub.material_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		SELECT
+		
+		b.material_id
+		,b.quant				
+		FROM rg_material_facts AS b
+		WHERE (v_act_direct AND b.date_time = (v_cur_per-v_calc_interval)) OR (NOT v_act_direct AND b.date_time = v_cur_per)
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (b.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		b.quant<>0
+		)
+		
+		UNION ALL
+		
+		(SELECT
+		
+		act.material_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant*v_act_direct_sgn
+			ELSE -act.quant*v_act_direct_sgn
+		END AS quant
+										
+		FROM doc_log
+		LEFT JOIN ra_material_facts AS act ON act.doc_type=doc_log.doc_type AND act.doc_id=doc_log.doc_id
+		WHERE (v_act_direct AND (doc_log.date_time>=v_cur_per AND doc_log.date_time<in_date_time) )
+			OR (NOT v_act_direct AND (doc_log.date_time<(v_cur_per+v_calc_interval) AND doc_log.date_time>=in_date_time) )
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		
+		act.quant<>0
+		)
+		ORDER BY doc_log.date_time,doc_log.id)
+
+
+		UNION ALL
+		--РУЧНЫЕ ИЗМЕНЕНИЯ
+		(SELECT
+		act.material_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant
+			ELSE -act.quant
+		END AS quant
+										
+		FROM ra_material_facts AS act
+		
+		WHERE (v_act_direct AND (act.date_time>=v_cur_per AND act.date_time<in_date_time)
+			OR (NOT v_act_direct AND (act.date_time<(v_cur_per+v_calc_interval) AND act.date_time>=in_date_time) )
+			)
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		AND act.doc_type IS NULL AND act.doc_id IS NULL
+		AND (
+		
+		act.quant<>0
+		)
+		)
+		
+	) AS sub
+	WHERE (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (sub.material_id=ANY(in_material_id_ar)))
+	
+	GROUP BY
+		
+		sub.material_id
+	HAVING
+		
+		SUM(sub.quant)<>0
+						
+	ORDER BY
+		
+		sub.material_id;
+END;			
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:06:46 ******************
+-- Function: public.rg_material_facts_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_material_facts_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_material_id_ar integer[])
+  RETURNS TABLE(material_id integer, quant numeric) AS
+$BODY$
+DECLARE
+	v_cur_per timestamp;
+	v_act_direct boolean;
+	v_act_direct_sgn int;
+	v_calc_interval interval;
+BEGIN
+	v_cur_per = rg_period('material_fact'::reg_types, in_date_time);
+	v_calc_interval = rg_calc_interval('material_fact'::reg_types);
+	v_act_direct = TRUE;--( (rg_calc_period_end('material_fact'::reg_types,v_cur_per)-in_date_time)>(in_date_time - v_cur_per) );
+	v_act_direct_sgn = 1;
+	/*
+	IF v_act_direct THEN
+		v_act_direct_sgn = 1;
+	ELSE
+		v_act_direct_sgn = -1;
+	END IF;
+	*/
+	--RAISE 'v_act_direct=%, v_cur_per=%, v_calc_interval=%',v_act_direct,v_cur_per,v_calc_interval;
+	RETURN QUERY 
+	SELECT 
+	
+	sub.material_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		SELECT
+		
+		b.material_id
+		,b.quant				
+		FROM rg_material_facts AS b
+		WHERE (v_act_direct AND b.date_time = (v_cur_per-v_calc_interval)) OR (NOT v_act_direct AND b.date_time = v_cur_per)
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (b.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		b.quant<>0
+		)
+		
+		UNION ALL
+		
+		(SELECT
+		
+		act.material_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant*v_act_direct_sgn
+			ELSE -act.quant*v_act_direct_sgn
+		END AS quant
+										
+		FROM doc_log
+		LEFT JOIN ra_material_facts AS act ON act.doc_type=doc_log.doc_type AND act.doc_id=doc_log.doc_id
+		WHERE (v_act_direct AND (doc_log.date_time>=v_cur_per AND doc_log.date_time<in_date_time) )
+			OR (NOT v_act_direct AND (doc_log.date_time<(v_cur_per+v_calc_interval) AND doc_log.date_time>=in_date_time) )
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		
+		act.quant<>0
+		)
+		ORDER BY doc_log.date_time,doc_log.id)
+
+
+		UNION ALL
+		--РУЧНЫЕ ИЗМЕНЕНИЯ
+		(SELECT
+		act.material_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant
+			ELSE -act.quant
+		END AS quant
+										
+		FROM ra_material_facts AS act
+		
+		WHERE (v_act_direct AND (act.date_time>=v_cur_per AND act.date_time<in_date_time)
+			--OR (NOT v_act_direct AND (act.date_time<(v_cur_per+v_calc_interval) AND act.date_time>=in_date_time) )
+			)
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		--AND act.doc_type IS NULL AND act.doc_id IS NULL
+		AND (
+		
+		act.quant<>0
+		)
+		)
+		
+	) AS sub
+	WHERE (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (sub.material_id=ANY(in_material_id_ar)))
+	
+	GROUP BY
+		
+		sub.material_id
+	HAVING
+		
+		SUM(sub.quant)<>0
+						
+	ORDER BY
+		
+		sub.material_id;
+END;			
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:14:02 ******************
+-- Function: public.rg_material_facts_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_material_facts_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_material_id_ar integer[])
+  RETURNS TABLE(material_id integer, quant numeric) AS
+$BODY$
+DECLARE
+	v_cur_per timestamp;
+	v_act_direct boolean;
+	v_act_direct_sgn int;
+	v_calc_interval interval;
+BEGIN
+	v_cur_per = rg_period('material_fact'::reg_types, in_date_time);
+	v_calc_interval = rg_calc_interval('material_fact'::reg_types);
+	v_act_direct = TRUE;--( (rg_calc_period_end('material_fact'::reg_types,v_cur_per)-in_date_time)>(in_date_time - v_cur_per) );
+	v_act_direct_sgn = 1;
+	/*
+	IF v_act_direct THEN
+		v_act_direct_sgn = 1;
+	ELSE
+		v_act_direct_sgn = -1;
+	END IF;
+	*/
+	--RAISE 'v_act_direct=%, v_cur_per=%, v_calc_interval=%',v_act_direct,v_cur_per,v_calc_interval;
+	RETURN QUERY 
+	SELECT 
+	
+	sub.material_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		SELECT
+		
+		b.material_id
+		,b.quant				
+		FROM rg_material_facts AS b
+		WHERE (v_act_direct AND b.date_time = (v_cur_per-v_calc_interval)) OR (NOT v_act_direct AND b.date_time = v_cur_per)
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (b.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		b.quant<>0
+		)
+		
+		UNION ALL
+		
+		(SELECT
+		
+		act.material_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant*v_act_direct_sgn
+			ELSE -act.quant*v_act_direct_sgn
+		END AS quant
+										
+		FROM doc_log
+		LEFT JOIN ra_material_facts AS act ON act.doc_type=doc_log.doc_type AND act.doc_id=doc_log.doc_id
+		WHERE (v_act_direct AND (doc_log.date_time>=v_cur_per AND doc_log.date_time<in_date_time) )
+			OR (NOT v_act_direct AND (doc_log.date_time<(v_cur_per+v_calc_interval) AND doc_log.date_time>=in_date_time) )
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		
+		act.quant<>0
+		)
+		ORDER BY doc_log.date_time,doc_log.id)
+
+
+	) AS sub
+	WHERE (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (sub.material_id=ANY(in_material_id_ar)))
+	
+	GROUP BY
+		
+		sub.material_id
+	HAVING
+		
+		SUM(sub.quant)<>0
+						
+	ORDER BY
+		
+		sub.material_id;
+END;			
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:17:37 ******************
+-- Function: public.rg_material_facts_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_material_facts_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_material_id_ar integer[])
+  RETURNS TABLE(material_id integer, quant numeric) AS
+$BODY$
+DECLARE
+	v_cur_per timestamp;
+	v_act_direct boolean;
+	v_act_direct_sgn int;
+	v_calc_interval interval;
+BEGIN
+	v_cur_per = rg_period('material_fact'::reg_types, in_date_time);
+	v_calc_interval = rg_calc_interval('material_fact'::reg_types);
+	v_act_direct = TRUE;--( (rg_calc_period_end('material_fact'::reg_types,v_cur_per)-in_date_time)>(in_date_time - v_cur_per) );
+	v_act_direct_sgn = 1;
+	/*
+	IF v_act_direct THEN
+		v_act_direct_sgn = 1;
+	ELSE
+		v_act_direct_sgn = -1;
+	END IF;
+	*/
+	--RAISE 'v_act_direct=%, v_cur_per=%, v_calc_interval=%',v_act_direct,v_cur_per,v_calc_interval;
+	RETURN QUERY 
+	SELECT 
+	
+	sub.material_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		SELECT
+		
+		b.material_id
+		,b.quant				
+		FROM rg_material_facts AS b
+		WHERE (v_act_direct AND b.date_time = (v_cur_per-v_calc_interval)) OR (NOT v_act_direct AND b.date_time = v_cur_per)
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (b.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		b.quant<>0
+		)
+		
+		UNION ALL
+		
+		(SELECT
+		
+		act.material_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant*v_act_direct_sgn
+			ELSE -act.quant*v_act_direct_sgn
+		END AS quant
+										
+		FROM ra_material_facts AS act
+		WHERE (v_act_direct AND (act.date_time>=v_cur_per AND act<in_date_time) )
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		
+		act.quant<>0
+		)
+		ORDER BY act.date_time,act.id)
+
+
+	) AS sub
+	WHERE (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (sub.material_id=ANY(in_material_id_ar)))
+	
+	GROUP BY
+		
+		sub.material_id
+	HAVING
+		
+		SUM(sub.quant)<>0
+						
+	ORDER BY
+		
+		sub.material_id;
+END;			
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:18:38 ******************
+-- Function: public.rg_material_facts_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_material_facts_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_material_id_ar integer[])
+  RETURNS TABLE(material_id integer, quant numeric) AS
+$BODY$
+DECLARE
+	v_cur_per timestamp;
+	v_act_direct boolean;
+	v_act_direct_sgn int;
+	v_calc_interval interval;
+BEGIN
+	v_cur_per = rg_period('material_fact'::reg_types, in_date_time);
+	v_calc_interval = rg_calc_interval('material_fact'::reg_types);
+	v_act_direct = TRUE;--( (rg_calc_period_end('material_fact'::reg_types,v_cur_per)-in_date_time)>(in_date_time - v_cur_per) );
+	v_act_direct_sgn = 1;
+	/*
+	IF v_act_direct THEN
+		v_act_direct_sgn = 1;
+	ELSE
+		v_act_direct_sgn = -1;
+	END IF;
+	*/
+	--RAISE 'v_act_direct=%, v_cur_per=%, v_calc_interval=%',v_act_direct,v_cur_per,v_calc_interval;
+	RETURN QUERY 
+	SELECT 
+	
+	sub.material_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		SELECT
+		
+		b.material_id
+		,b.quant				
+		FROM rg_material_facts AS b
+		WHERE (v_act_direct AND b.date_time = (v_cur_per-v_calc_interval)) OR (NOT v_act_direct AND b.date_time = v_cur_per)
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (b.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		b.quant<>0
+		)
+		
+		UNION ALL
+		
+		(SELECT
+		
+		act.material_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant*v_act_direct_sgn
+			ELSE -act.quant*v_act_direct_sgn
+		END AS quant
+										
+		FROM ra_material_facts AS act
+		WHERE (v_act_direct AND (act.date_time>=v_cur_per AND act.date_time<in_date_time) )
+		
+		AND (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		
+		AND (
+		
+		act.quant<>0
+		)
+		ORDER BY act.date_time,act.id)
+
+
+	) AS sub
+	WHERE (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (sub.material_id=ANY(in_material_id_ar)))
+	
+	GROUP BY
+		
+		sub.material_id
+	HAVING
+		
+		SUM(sub.quant)<>0
+						
+	ORDER BY
+		
+		sub.material_id;
+END;			
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:28:58 ******************
+-- Function: public.rg_total_recalc_cement()
+
+-- DROP FUNCTION public.rg_total_recalc_cement();
+
+CREATE OR REPLACE FUNCTION public.rg_total_recalc_cement()
+  RETURNS void AS
+$BODY$  
+DECLARE
+	period_row RECORD;
+	v_act_date_time timestamp without time zone;
+	v_cur_period timestamp without time zone;
+BEGIN	
+	v_act_date_time = reg_current_balance_time();
+	SELECT date_time INTO v_cur_period FROM rg_calc_periods;
+	
+	FOR period_row IN
+		WITH
+		periods AS (
+			(SELECT
+				DISTINCT date_trunc('month', date_time) AS d,
+				cement_silos_id
+			FROM ra_cement)
+			UNION		
+			(SELECT
+				date_time AS d,
+				cement_silos_id
+			FROM rg_cement WHERE date_time<=v_cur_period
+			)
+			ORDER BY d			
+		)
+		SELECT sub.d,sub.cement_silos_id,sub.balance_fact,sub.balance_paper
+		FROM
+		(
+		SELECT
+			periods.d,
+			periods.cement_silos_id,
+			COALESCE((
+				SELECT SUM(CASE WHEN deb THEN quant ELSE 0 END)-SUM(CASE WHEN NOT deb THEN quant ELSE 0 END)
+				FROM ra_cement AS ra WHERE ra.date_time <= last_month_day(periods.d::date)+'23:59:59'::interval AND ra.cement_silos_id=periods.material_id
+			),0) AS balance_fact,
+			
+			(
+			SELECT SUM(quant) FROM rg_cement WHERE date_time=periods.d AND cement_silos_id=periods.cement_silos_id
+			) AS balance_paper
+			
+		FROM periods
+		) AS sub
+		WHERE sub.balance_fact<>sub.balance_paper ORDER BY sub.d	
+	LOOP
+		
+		UPDATE rg_cement AS rg
+		SET quant = period_row.balance_fact
+		WHERE rg.date_time=period_row.d AND rg.cement_silos_id=period_row.cement_silos_id;
+		
+		IF NOT FOUND THEN
+			INSERT INTO rg_cement (date_time,cement_silos_id,quant)
+			VALUES (period_row.d,period_row.cement_silos_id,period_row.balance_fact);
+		END IF;
+	END LOOP;
+
+	--АКТУАЛЬНЫЕ ИТОГИ
+	DELETE FROM rg_cement WHERE date_time>v_cur_period;
+	
+	INSERT INTO rg_cement (date_time,cement_silos_id,quant)
+	(
+	SELECT
+		v_act_date_time,
+		rg.cement_silos_id,
+		COALESCE(rg.quant,0) +
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_cement AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.cement_silos_id=rg.cement_silos_id
+			AND ra.deb=TRUE
+		),0) - 
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_cement AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.cement_silos_id=rg.cement_silos_id
+			AND ra.deb=FALSE
+		),0)
+		
+	FROM rg_cement AS rg
+	WHERE date_time=(v_cur_period-'1 month'::interval)
+	);	
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.rg_total_recalc_material_facts()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:29:25 ******************
+-- Function: public.rg_total_recalc_cement()
+
+-- DROP FUNCTION public.rg_total_recalc_cement();
+
+CREATE OR REPLACE FUNCTION public.rg_total_recalc_cement()
+  RETURNS void AS
+$BODY$  
+DECLARE
+	period_row RECORD;
+	v_act_date_time timestamp without time zone;
+	v_cur_period timestamp without time zone;
+BEGIN	
+	v_act_date_time = reg_current_balance_time();
+	SELECT date_time INTO v_cur_period FROM rg_calc_periods;
+	
+	FOR period_row IN
+		WITH
+		periods AS (
+			(SELECT
+				DISTINCT date_trunc('month', date_time) AS d,
+				cement_silos_id
+			FROM ra_cement)
+			UNION		
+			(SELECT
+				date_time AS d,
+				cement_silos_id
+			FROM rg_cement WHERE date_time<=v_cur_period
+			)
+			ORDER BY d			
+		)
+		SELECT sub.d,sub.cement_silos_id,sub.balance_fact,sub.balance_paper
+		FROM
+		(
+		SELECT
+			periods.d,
+			periods.cement_silos_id,
+			COALESCE((
+				SELECT SUM(CASE WHEN deb THEN quant ELSE 0 END)-SUM(CASE WHEN NOT deb THEN quant ELSE 0 END)
+				FROM ra_cement AS ra WHERE ra.date_time <= last_month_day(periods.d::date)+'23:59:59'::interval AND ra.cement_silos_id=periods.material_id
+			),0) AS balance_fact,
+			
+			(
+			SELECT SUM(quant) FROM rg_cement WHERE date_time=periods.d AND cement_silos_id=periods.cement_silos_id
+			) AS balance_paper
+			
+		FROM periods
+		) AS sub
+		WHERE sub.balance_fact<>sub.balance_paper ORDER BY sub.d	
+	LOOP
+		
+		UPDATE rg_cement AS rg
+		SET quant = period_row.balance_fact
+		WHERE rg.date_time=period_row.d AND rg.cement_silos_id=period_row.cement_silos_id;
+		
+		IF NOT FOUND THEN
+			INSERT INTO rg_cement (date_time,cement_silos_id,quant)
+			VALUES (period_row.d,period_row.cement_silos_id,period_row.balance_fact);
+		END IF;
+	END LOOP;
+
+	--АКТУАЛЬНЫЕ ИТОГИ
+	DELETE FROM rg_cement WHERE date_time>v_cur_period;
+	
+	INSERT INTO rg_cement (date_time,cement_silos_id,quant)
+	(
+	SELECT
+		v_act_date_time,
+		rg.cement_silos_id,
+		COALESCE(rg.quant,0) +
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_cement AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.cement_silos_id=rg.cement_silos_id
+			AND ra.deb=TRUE
+		),0) - 
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_cement AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.cement_silos_id=rg.cement_silos_id
+			AND ra.deb=FALSE
+		),0)
+		
+	FROM rg_cement AS rg
+	WHERE date_time=(v_cur_period-'1 month'::interval)
+	);	
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.rg_total_recalc_material_facts()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:30:07 ******************
+-- Function: public.rg_cement_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_cement_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_cement_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_cement_silos_id_ar integer[])
+  RETURNS TABLE(cement_silos_id integer, quant numeric) AS
+$BODY$
+DECLARE
+	v_cur_per timestamp;
+	v_act_direct boolean;
+	v_act_direct_sgn int;
+	v_calc_interval interval;
+BEGIN
+	v_cur_per = rg_period('cement'::reg_types, in_date_time);
+	v_calc_interval = rg_calc_interval('cement'::reg_types);
+	v_act_direct = TRUE;--( (rg_calc_period_end('cement'::reg_types,v_cur_per)-in_date_time)>(in_date_time - v_cur_per) );
+	v_act_direct_sgn = 1;
+	/*
+	IF v_act_direct THEN
+		v_act_direct_sgn = 1;
+	ELSE
+		v_act_direct_sgn = -1;
+	END IF;
+	*/
+	--RAISE 'v_act_direct=%, v_cur_per=%, v_calc_interval=%',v_act_direct,v_cur_per,v_calc_interval;
+	RETURN QUERY 
+	SELECT 
+	
+	sub.cement_silos_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		SELECT
+		
+		b.cement_silos_id
+		,b.quant				
+		FROM rg_cement AS b
+		WHERE (v_act_direct AND b.date_time = (v_cur_per-v_calc_interval)) OR (NOT v_act_direct AND b.date_time = v_cur_per)
+		
+		AND (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (b.cement_silos_id=ANY(in_cement_silos_id_ar)))
+		
+		AND (
+		b.quant<>0
+		)
+		
+		UNION ALL
+		
+		(SELECT
+		
+		act.cement_silos_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant*v_act_direct_sgn
+			ELSE -act.quant*v_act_direct_sgn
+		END AS quant
+										
+		FROM ra_cement AS act
+		WHERE (v_act_direct AND (act.date_time>=v_cur_per AND act.date_time<in_date_time) )
+		
+		AND (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (act.cement_silos_id=ANY(in_cement_silos_id_ar)))
+		
+		AND (
+		
+		act.quant<>0
+		)
+		ORDER BY act.date_time,act.id)
+
+
+	) AS sub
+	WHERE (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (sub.cement_silos_id=ANY(in_cement_silos_id_ar)))
+	
+	GROUP BY
+		
+		sub.cement_silos_id
+	HAVING
+		
+		SUM(sub.quant)<>0
+						
+	ORDER BY
+		
+		sub.cement_silos_id;
+END;			
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_cement_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:30:44 ******************
+-- Function: public.rg_total_recalc_cement()
+
+-- DROP FUNCTION public.rg_total_recalc_cement();
+
+CREATE OR REPLACE FUNCTION public.rg_total_recalc_cement()
+  RETURNS void AS
+$BODY$  
+DECLARE
+	period_row RECORD;
+	v_act_date_time timestamp without time zone;
+	v_cur_period timestamp without time zone;
+BEGIN	
+	v_act_date_time = reg_current_balance_time();
+	SELECT date_time INTO v_cur_period FROM rg_calc_periods;
+	
+	FOR period_row IN
+		WITH
+		periods AS (
+			(SELECT
+				DISTINCT date_trunc('month', date_time) AS d,
+				cement_silos_id
+			FROM ra_cement)
+			UNION		
+			(SELECT
+				date_time AS d,
+				cement_silos_id
+			FROM rg_cement WHERE date_time<=v_cur_period
+			)
+			ORDER BY d			
+		)
+		SELECT sub.d,sub.cement_silos_id,sub.balance_fact,sub.balance_paper
+		FROM
+		(
+		SELECT
+			periods.d,
+			periods.cement_silos_id,
+			COALESCE((
+				SELECT SUM(CASE WHEN deb THEN quant ELSE 0 END)-SUM(CASE WHEN NOT deb THEN quant ELSE 0 END)
+				FROM ra_cement AS ra WHERE ra.date_time <= last_month_day(periods.d::date)+'23:59:59'::interval AND ra.cement_silos_id=periods.material_id
+			),0) AS balance_fact,
+			
+			(
+			SELECT SUM(quant) FROM rg_cement WHERE date_time=periods.d AND cement_silos_id=periods.cement_silos_id
+			) AS balance_paper
+			
+		FROM periods
+		) AS sub
+		WHERE sub.balance_fact<>sub.balance_paper ORDER BY sub.d	
+	LOOP
+		
+		UPDATE rg_cement AS rg
+		SET quant = period_row.balance_fact
+		WHERE rg.date_time=period_row.d AND rg.cement_silos_id=period_row.cement_silos_id;
+		
+		IF NOT FOUND THEN
+			INSERT INTO rg_cement (date_time,cement_silos_id,quant)
+			VALUES (period_row.d,period_row.cement_silos_id,period_row.balance_fact);
+		END IF;
+	END LOOP;
+
+	--АКТУАЛЬНЫЕ ИТОГИ
+	DELETE FROM rg_cement WHERE date_time>v_cur_period;
+	
+	INSERT INTO rg_cement (date_time,cement_silos_id,quant)
+	(
+	SELECT
+		v_act_date_time,
+		rg.cement_silos_id,
+		COALESCE(rg.quant,0) +
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_cement AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.cement_silos_id=rg.cement_silos_id
+			AND ra.deb=TRUE
+		),0) - 
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_cement AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.cement_silos_id=rg.cement_silos_id
+			AND ra.deb=FALSE
+		),0)
+		
+	FROM rg_cement AS rg
+	WHERE date_time=(v_cur_period-'1 month'::interval)
+	);	
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.rg_total_recalc_cement()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 12:31:02 ******************
+-- Function: public.rg_total_recalc_cement()
+
+-- DROP FUNCTION public.rg_total_recalc_cement();
+
+CREATE OR REPLACE FUNCTION public.rg_total_recalc_cement()
+  RETURNS void AS
+$BODY$  
+DECLARE
+	period_row RECORD;
+	v_act_date_time timestamp without time zone;
+	v_cur_period timestamp without time zone;
+BEGIN	
+	v_act_date_time = reg_current_balance_time();
+	SELECT date_time INTO v_cur_period FROM rg_calc_periods;
+	
+	FOR period_row IN
+		WITH
+		periods AS (
+			(SELECT
+				DISTINCT date_trunc('month', date_time) AS d,
+				cement_silos_id
+			FROM ra_cement)
+			UNION		
+			(SELECT
+				date_time AS d,
+				cement_silos_id
+			FROM rg_cement WHERE date_time<=v_cur_period
+			)
+			ORDER BY d			
+		)
+		SELECT sub.d,sub.cement_silos_id,sub.balance_fact,sub.balance_paper
+		FROM
+		(
+		SELECT
+			periods.d,
+			periods.cement_silos_id,
+			COALESCE((
+				SELECT SUM(CASE WHEN deb THEN quant ELSE 0 END)-SUM(CASE WHEN NOT deb THEN quant ELSE 0 END)
+				FROM ra_cement AS ra WHERE ra.date_time <= last_month_day(periods.d::date)+'23:59:59'::interval AND ra.cement_silos_id=periods.cement_silos_id
+			),0) AS balance_fact,
+			
+			(
+			SELECT SUM(quant) FROM rg_cement WHERE date_time=periods.d AND cement_silos_id=periods.cement_silos_id
+			) AS balance_paper
+			
+		FROM periods
+		) AS sub
+		WHERE sub.balance_fact<>sub.balance_paper ORDER BY sub.d	
+	LOOP
+		
+		UPDATE rg_cement AS rg
+		SET quant = period_row.balance_fact
+		WHERE rg.date_time=period_row.d AND rg.cement_silos_id=period_row.cement_silos_id;
+		
+		IF NOT FOUND THEN
+			INSERT INTO rg_cement (date_time,cement_silos_id,quant)
+			VALUES (period_row.d,period_row.cement_silos_id,period_row.balance_fact);
+		END IF;
+	END LOOP;
+
+	--АКТУАЛЬНЫЕ ИТОГИ
+	DELETE FROM rg_cement WHERE date_time>v_cur_period;
+	
+	INSERT INTO rg_cement (date_time,cement_silos_id,quant)
+	(
+	SELECT
+		v_act_date_time,
+		rg.cement_silos_id,
+		COALESCE(rg.quant,0) +
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_cement AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.cement_silos_id=rg.cement_silos_id
+			AND ra.deb=TRUE
+		),0) - 
+		COALESCE((
+		SELECT sum(ra.quant) FROM
+		ra_cement AS ra
+		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
+			AND ra.cement_silos_id=rg.cement_silos_id
+			AND ra.deb=FALSE
+		),0)
+		
+	FROM rg_cement AS rg
+	WHERE date_time=(v_cur_period-'1 month'::interval)
+	);	
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.rg_total_recalc_cement()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 13:25:12 ******************
+-- Function: public.rg_cement_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_cement_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_cement_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_cement_silos_id_ar integer[])
+  RETURNS TABLE(cement_silos_id integer, quant numeric) AS
+$BODY$
+DECLARE
+	v_cur_per timestamp;
+	v_act_direct boolean;
+	v_act_direct_sgn int;
+	v_calc_interval interval;
+BEGIN
+	v_cur_per = rg_period('cement'::reg_types, in_date_time);
+	v_calc_interval = rg_calc_interval('cement'::reg_types);
+	v_act_direct = TRUE;--( (rg_calc_period_end('cement'::reg_types,v_cur_per)-in_date_time)>(in_date_time - v_cur_per) );
+	v_act_direct_sgn = 1;
+	/*
+	IF v_act_direct THEN
+		v_act_direct_sgn = 1;
+	ELSE
+		v_act_direct_sgn = -1;
+	END IF;
+	*/
+	--RAISE 'v_act_direct=%, v_cur_per=%, v_calc_interval=%',v_act_direct,v_cur_per,v_calc_interval;
+	RETURN QUERY 
+	SELECT 
+	
+	sub.cement_silos_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		SELECT
+		
+		b.cement_silos_id
+		,b.quant				
+		FROM rg_cement AS b
+		WHERE (v_act_direct AND b.date_time = (v_cur_per-v_calc_interval)) OR (NOT v_act_direct AND b.date_time = v_cur_per)
+		
+		AND (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (b.cement_silos_id=ANY(in_cement_silos_id_ar)))
+		
+		AND (
+		b.quant<>0
+		)
+		
+		UNION ALL
+		
+		(SELECT
+		
+		act.cement_silos_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant*v_act_direct_sgn
+			ELSE -act.quant*v_act_direct_sgn
+		END AS quant
+										
+		FROM ra_cement AS act
+		WHERE (v_act_direct AND (act.date_time>=v_cur_per AND act.date_time<in_date_time) )
+		
+		AND (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (act.cement_silos_id=ANY(in_cement_silos_id_ar)))
+		
+		AND (
+		
+		act.quant<>0
+		)
+		ORDER BY act.date_time,act.id)
+
+
+	) AS sub
+	WHERE (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (sub.cement_silos_id=ANY(in_cement_silos_id_ar)))
+	
+	GROUP BY
+		
+		sub.cement_silos_id
+	HAVING
+		
+		SUM(sub.quant)<>0
+						
+	ORDER BY
+		
+		sub.cement_silos_id;
+END;			
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_cement_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 13:28:05 ******************
+-- Function: public.rg_cement_balance(timestamp without time zone, integer[])
+
+-- DROP FUNCTION public.rg_cement_balance(timestamp without time zone, integer[]);
+
+CREATE OR REPLACE FUNCTION public.rg_cement_balance(
+    IN in_date_time timestamp without time zone,
+    IN in_cement_silos_id_ar integer[])
+  RETURNS TABLE(cement_silos_id integer, quant numeric) AS
+$BODY$
+DECLARE
+	v_cur_per timestamp;
+	v_act_direct boolean;
+	v_act_direct_sgn int;
+	v_calc_interval interval;
+BEGIN
+	v_cur_per = rg_period('cement'::reg_types, in_date_time);
+	v_calc_interval = rg_calc_interval('cement'::reg_types);
+	v_act_direct = TRUE;--( (rg_calc_period_end('cement'::reg_types,v_cur_per)-in_date_time)>(in_date_time - v_cur_per) );
+	v_act_direct_sgn = 1;
+	/*
+	IF v_act_direct THEN
+		v_act_direct_sgn = 1;
+	ELSE
+		v_act_direct_sgn = -1;
+	END IF;
+	*/
+	--RAISE 'v_act_direct=%, v_cur_per=%, v_calc_interval=%',v_act_direct,v_cur_per,v_calc_interval;
+	RETURN QUERY 
+	SELECT 
+	
+	sub.cement_silos_id
+	,SUM(sub.quant) AS quant				
+	FROM(
+		SELECT
+		
+		b.cement_silos_id
+		,b.quant				
+		FROM rg_cement AS b
+		WHERE (v_act_direct AND b.date_time = (v_cur_per-v_calc_interval)) OR (NOT v_act_direct AND b.date_time = v_cur_per)
+		
+		AND (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (b.cement_silos_id=ANY(in_cement_silos_id_ar)))
+		
+		AND (
+		b.quant<>0
+		)
+		
+		UNION ALL
+		
+		(SELECT
+		
+		act.cement_silos_id
+		,CASE act.deb
+			WHEN TRUE THEN act.quant*v_act_direct_sgn
+			ELSE -act.quant*v_act_direct_sgn
+		END AS quant
+										
+		FROM ra_cement AS act
+		WHERE (v_act_direct AND (act.date_time>=v_cur_per AND act.date_time<in_date_time) )
+		
+		AND (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (act.cement_silos_id=ANY(in_cement_silos_id_ar)))
+		
+		AND (
+		
+		act.quant<>0
+		)
+		--ORDER BY act.date_time,act.id
+		)
+
+
+	) AS sub
+	WHERE (ARRAY_LENGTH(in_cement_silos_id_ar,1) IS NULL OR (sub.cement_silos_id=ANY(in_cement_silos_id_ar)))
+	
+	GROUP BY
+		
+		sub.cement_silos_id
+	HAVING
+		
+		SUM(sub.quant)<>0
+						
+	ORDER BY
+		
+		sub.cement_silos_id;
+END;			
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.rg_cement_balance(timestamp without time zone, integer[])
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 13:45:25 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list CASCADE;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		t.production_site_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req,
+		
+		--Ошибка в марке
+		(t.concrete_type_id IS NOT NULL AND t.concrete_type_id<>o.concrete_type_id) AS err_concrete_type,
+		
+		ra_mat.quant AS material_quant_shipped,
+		(
+			(CASE WHEN ra_mat.quant IS NULL OR ra_mat.quant=0 THEN TRUE
+				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=mat.max_required_quant_tolerance_percent
+			END)
+			OR
+			(CASE WHEN t.material_quant_req IS NULL OR t.material_quant_req=0 THEN TRUE
+				ELSE abs(t.material_quant/t.material_quant_req*100-100)>=mat.max_required_quant_tolerance_percent
+			END
+			)
+		) AS material_quant_tolerance_exceeded,
+		
+		concrete_types_ref(ct_o) AS order_concrete_types_ref
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id=vh_sch_st.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	LEFT JOIN concrete_types AS ct_o ON ct_o.id=o.concrete_type_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	ORDER BY pr.name,t.date_time DESC,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 21/04/2020 14:27:19 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		IF NEW.raw_material_id IS NOT NULL THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;
+		END IF;	
+				
+		IF NEW.raw_material_id IS NOT NULL AND v_is_cement  THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.raw_material_id IS NOT NULL
+			AND v_is_cement
+			 AND NEW.cement_silo_id IS NOT NULL THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= FALSE;
+			reg_cement.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= NEW.material_quant;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 14:33:42 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+		
+		IF (SELECT is_cement FROM raw_materials WHERE id=NEW.material_id) THEN
+			--ЦЕМЕНТ
+			RAISE EXCEPTION 'Остатки по цементу обнуляются в разрезе силосов!';
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)			
+					- NEW.required_balance_quant;
+			--RAISE EXCEPTION 'BALANCE=%',add_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 14:37:35 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		IF NEW.raw_material_id IS NOT NULL THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;
+		END IF;	
+				
+		IF NEW.raw_material_id IS NOT NULL AND NOT v_is_cement  THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.raw_material_id IS NOT NULL
+			AND v_is_cement
+			 AND NEW.cement_silo_id IS NOT NULL THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= FALSE;
+			reg_cement.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= NEW.material_quant;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 17:43:13 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		IF NEW.raw_material_id IS NOT NULL THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;
+		END IF;	
+				
+		IF NEW.raw_material_id IS NOT NULL AND NOT v_is_cement  THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.raw_material_id IS NOT NULL
+			AND v_is_cement
+			 AND NEW.cement_silo_id IS NOT NULL THEN
+			 
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+			 
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= FALSE;
+			reg_cement.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= NEW.material_quant;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 21/04/2020 17:52:59 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		IF NEW.raw_material_id IS NOT NULL THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;
+		END IF;	
+				
+		IF NEW.raw_material_id IS NOT NULL AND NOT v_is_cement  THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		ELSIF NEW.raw_material_id IS NOT NULL
+			AND v_is_cement
+			 AND NEW.cement_silo_id IS NOT NULL THEN
+			 
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+			 
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 08:23:06 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list CASCADE;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		t.production_site_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req,
+		
+		--Ошибка в марке
+		(t.concrete_type_id IS NOT NULL AND t.concrete_type_id<>o.concrete_type_id) AS err_concrete_type,
+		
+		ra_mat.quant AS material_quant_shipped,
+		(
+			(CASE WHEN ra_mat.quant IS NULL OR ra_mat.quant=0 THEN TRUE
+				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=mat.max_required_quant_tolerance_percent
+			END)
+			OR
+			(CASE WHEN t.material_quant_req IS NULL OR t.material_quant_req=0 THEN TRUE
+				ELSE abs(t.material_quant/t.material_quant_req*100-100)>=mat.max_required_quant_tolerance_percent
+			END
+			)
+		) AS material_quant_tolerance_exceeded,
+		
+		concrete_types_ref(ct_o) AS order_concrete_types_ref,
+		
+		t.production_id
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id=vh_sch_st.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	LEFT JOIN concrete_types AS ct_o ON ct_o.id=o.concrete_type_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	ORDER BY pr.name,t.date_time DESC,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 22/04/2020 08:23:43 ******************
+-- VIEW: material_fact_consumptions_rolled_list
+
+--DROP VIEW material_fact_consumptions_rolled_list;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
+	SELECT
+		date_time,
+		upload_date_time,
+		(upload_users_ref::text)::jsonb AS upload_users_ref,
+		(production_sites_ref::text)::jsonb AS production_sites_ref,
+		production_site_id,
+		(concrete_types_ref::text)::jsonb AS concrete_types_ref,
+		(order_concrete_types_ref::text)::jsonb AS order_concrete_types_ref,
+		concrete_type_production_descr,
+		(vehicles_ref::text)::jsonb AS vehicles_ref,
+		vehicle_production_descr,
+		(orders_ref::text)::jsonb AS orders_ref,
+		shipments_inf,
+		concrete_quant,
+		jsonb_agg(
+			jsonb_build_object(
+				'production_descr',raw_material_production_descr,
+				'ref',raw_materials_ref,
+				'quant',material_quant,
+				'quant_req',material_quant_req,
+				'quant_shipped',material_quant_shipped,
+				'quant_tolerance_exceeded',material_quant_tolerance_exceeded
+			)
+		) AS materials,
+		err_concrete_type,
+		production_id
+		
+	FROM material_fact_consumptions_list
+	GROUP BY date_time,
+		concrete_quant,
+		upload_date_time,
+		upload_users_ref::text,
+		production_sites_ref::text,
+		production_site_id,
+		concrete_types_ref::text,
+		order_concrete_types_ref::text,
+		concrete_type_production_descr,
+		vehicles_ref::text,
+		vehicle_production_descr,
+		orders_ref::text,
+		shipments_inf,
+		err_concrete_type,
+		production_id
+	ORDER BY date_time DESC
+
+	;
+	
+ALTER VIEW material_fact_consumptions_rolled_list OWNER TO beton;
+
+
+-- ******************* update 22/04/2020 14:47:21 ******************
+-- Function: public.doc_material_procurements_process()
+
+-- DROP FUNCTION public.doc_material_procurements_process();
+
+CREATE OR REPLACE FUNCTION public.doc_material_procurements_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_act ra_materials%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER') AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN					
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		--register actions ra_materials
+		reg_act.date_time		= NEW.date_time;
+		reg_act.deb			= true;
+		reg_act.doc_type  		= 'material_procurement'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.material_id		= NEW.material_id;
+		reg_act.quant			= NEW.quant_net;
+		PERFORM ra_materials_add_act(reg_act);	
+		
+		--По материалам делаем всегда движения, а если есть учет по силосам и есть силос - то и по силосам
+		--register actions ra_material_facts
+		reg_material_facts.date_time		= NEW.date_time;
+		reg_material_facts.deb			= true;
+		reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
+		reg_material_facts.doc_id  		= NEW.id;
+		reg_material_facts.material_id		= NEW.material_id;
+		reg_material_facts.quant		= NEW.quant_net;
+		PERFORM ra_material_facts_add_act(reg_material_facts);	
+		
+		IF coalesce( (SELECT is_cement FROM raw_materials WHERE id = NEW.material_id),FALSE)
+		AND NEW.cement_silos_id IS NOT NULL THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= true;
+			reg_cement.doc_type  		= 'material_procurement'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.quant_net;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+				
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_procurement'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+						
+		RETURN NEW;
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='DELETE') THEN
+		RETURN OLD;
+	ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		--detail tables
+		
+		--register actions										
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
+		
+		--log
+		PERFORM doc_log_delete('material_procurement'::doc_types,OLD.id);
+		
+		RETURN OLD;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.doc_material_procurements_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 14:53:40 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		IF NEW.raw_material_id IS NOT NULL THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;
+		END IF;	
+		
+		--Все материалы проходят по регистру учета материалов
+		IF NEW.raw_material_id IS NOT NULL  THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+		
+		--А те, что учитываются по силосам (с отметкой в справочнике), еще и по регистру силосов
+		IF NEW.raw_material_id IS NOT NULL
+		AND v_is_cement
+		AND NEW.cement_silo_id IS NOT NULL THEN
+			 
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+			 
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 14:57:06 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		IF NEW.raw_material_id IS NOT NULL THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;
+		END IF;	
+		
+		--Все материалы проходят по регистру учета материалов
+		IF NEW.raw_material_id IS NOT NULL  THEN
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+		
+		--А те, что учитываются по силосам (с отметкой в справочнике), еще и по регистру силосов
+		IF NEW.raw_material_id IS NOT NULL
+		AND v_is_cement
+		AND NEW.cement_silo_id IS NOT NULL THEN
+			 
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= FALSE;
+			reg_cement.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+			 
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 14:57:46 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		--Все материалы проходят по регистру учета материалов
+		IF NEW.raw_material_id IS NOT NULL  THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;		
+			
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+		
+		--А те, что учитываются по силосам (с отметкой в справочнике), еще и по регистру силосов
+		IF NEW.raw_material_id IS NOT NULL
+		AND v_is_cement
+		AND NEW.cement_silo_id IS NOT NULL THEN
+			 
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= FALSE;
+			reg_cement.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+			 
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 14:58:03 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		--Все материалы проходят по регистру учета материалов
+		IF NEW.raw_material_id IS NOT NULL  THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;		
+			
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+		
+		--А те, что учитываются по силосам (с отметкой в справочнике), еще и по регистру силосов
+		IF NEW.raw_material_id IS NOT NULL
+		AND v_is_cement
+		AND NEW.cement_silo_id IS NOT NULL THEN
+			 
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= FALSE;
+			reg_cement.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silos_id;
+			reg_cement.quant		= NEW.material_quant;
+			PERFORM ra_cement_add_act(reg_cement);	
+			 
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 14:59:18 ******************
+-- Function: public.material_fact_consumptions_process()
+
+-- DROP FUNCTION public.material_fact_consumptions_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_is_cement bool;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;	
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
+		IF NEW.vehicle_schedule_state_id IS NULL THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+		
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+
+		--Все материалы проходят по регистру учета материалов
+		IF NEW.raw_material_id IS NOT NULL  THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;		
+			
+			--register actions ra_material_facts
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.raw_material_id;
+			reg_material_facts.quant		= NEW.material_quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+		
+		--А те, что учитываются по силосам (с отметкой в справочнике), еще и по регистру силосов
+		IF NEW.raw_material_id IS NOT NULL
+		AND v_is_cement
+		AND NEW.cement_silo_id IS NOT NULL THEN
+			 
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= FALSE;
+			reg_cement.doc_type  		= 'material_fact_consumption'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= NEW.material_quant;
+			PERFORM ra_cement_add_act(reg_cement);	
+			 
+		END IF;
+			
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF (
+		(coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0) OR NEW.date_time<>OLD.date_time)
+		AND NEW.vehicle_schedule_state_id IS NULL
+		) THEN
+			SELECT material_fact_consumptions_find_schedule(NEW.date_time,NEW.vehicle_id) INTO NEW.vehicle_schedule_state_id;
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		IF OLD.cement_silo_id IS NOT NULL THEN
+			PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption'::doc_types,OLD.id);
+		
+			IF OLD.cement_silo_id IS NOT NULL THEN
+				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
+			END IF;
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumptions_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 15:01:23 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+		
+		IF (SELECT is_cement FROM raw_materials WHERE id=NEW.material_id) THEN
+			--ЦЕМЕНТ
+			RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+		ELSE
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)			
+					- NEW.required_balance_quant;
+			--RAISE EXCEPTION 'BALANCE=%',add_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 15:10:43 ******************
+-- Function: public.material_fact_consumption_corrections_process()
+
+-- DROP FUNCTION public.material_fact_consumption_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_consumption_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_consumption_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+
+		IF NEW.quant <> 0 THEN
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= NEW.date_time;
+			reg_material_facts.deb			= FALSE;
+			reg_material_facts.doc_type  		= 'material_fact_consumption_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.quant		= NEW.quant;
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		IF (SELECT is_cement FROM raw_materials WHERE id=NEW.material_id)
+		AND NEW.cement_silo_id IS NOT NULL THEN
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= FALSE;
+			reg_cement.doc_type  		= 'material_fact_consumption_correction'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= NEW.quant;
+			PERFORM ra_cement_add_act(reg_cement);	
+		END IF;
+
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('material_fact_consumption_correction'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_consumption_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_consumption_corrections_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 15:11:41 ******************
+-- Trigger: material_fact_consumption_corrections_trigger_before on public.material_fact_consumption_corrections
+
+-- DROP TRIGGER material_fact_consumption_corrections_trigger_before ON public.material_fact_consumption_corrections;
+
+/*
+CREATE TRIGGER material_fact_consumption_corrections_trigger_before
+  BEFORE UPDATE OR DELETE
+  ON public.material_fact_consumption_corrections
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.material_fact_consumption_corrections_process();
+*/
+
+-- DROP TRIGGER material_fact_consumption_corrections_trigger_after ON public.material_fact_consumption_corrections;
+
+CREATE TRIGGER material_fact_consumption_corrections_trigger_after
+  AFTER INSERT OR UPDATE
+  ON public.material_fact_consumption_corrections
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.material_fact_consumption_corrections_process();
+
+
+
+-- ******************* update 22/04/2020 15:11:50 ******************
+-- Trigger: material_fact_consumption_corrections_trigger_before on public.material_fact_consumption_corrections
+
+-- DROP TRIGGER material_fact_consumption_corrections_trigger_before ON public.material_fact_consumption_corrections;
+
+
+CREATE TRIGGER material_fact_consumption_corrections_trigger_before
+  BEFORE UPDATE OR DELETE
+  ON public.material_fact_consumption_corrections
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.material_fact_consumption_corrections_process();
+
+/*
+-- DROP TRIGGER material_fact_consumption_corrections_trigger_after ON public.material_fact_consumption_corrections;
+
+CREATE TRIGGER material_fact_consumption_corrections_trigger_after
+  AFTER INSERT OR UPDATE
+  ON public.material_fact_consumption_corrections
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.material_fact_consumption_corrections_process();
+*/
+
+
+-- ******************* update 22/04/2020 15:18:49 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(ARRAY[NEW.cement_silo_id]) AS rg;		
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= CASE WHEN v_quant>0 THEN FALSE ELSE TRUE END;
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);	
+			
+			--Остатки материалов, материал отпределить по последнему приходу в силос
+			SELECT material_id
+			INTO v_material_id
+			FROM doc_material_procurements
+			WHERE cement_silos_id = NEW.cement_silo_id
+			ORDER BY date_time DESC
+			LIMIT 1;
+			
+			IF coalesce(v_material_id,0)>0 THEN
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= FALSE;
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;			
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 15:28:33 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance('{}')
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+		get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+		now()::timestamp,
+		now()::timestamp,
+		NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 15:54:23 ******************
+-- VIEW: cement_silo_balance_resets_list
+
+--DROP VIEW cement_silo_balance_resets_list;
+
+CREATE OR REPLACE VIEW cement_silo_balance_resets_list AS
+	SELECT
+		t.id
+		,t.date_time
+		,t.user_id
+		,users_ref(u) AS users_ref
+		,t.cement_silo_id
+		,cement_silos_ref(sil) AS cement_silos_ref
+		,t.comment_text
+		,ra.quant
+		,t.quant_required
+		
+	FROM cement_silo_balance_resets AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	LEFT JOIN cement_silos sil ON sil.id=t.cement_silo_id
+	LEFT JOIN ra_cement AS ra ON ra.doc_id = t.id AND ra.doc_type='cement_silo_balance_reset'::doc_types
+	ORDER BY t.date_time DESC
+	;
+	
+ALTER VIEW cement_silo_balance_resets_list OWNER TO beton;
+
+
+-- ******************* update 22/04/2020 16:05:02 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(ARRAY[v_material_id]) AS rg;		
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:08:26 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN
+		RAISE EXCEPTION 'v_material_id=%',v_material_id;
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(ARRAY[v_material_id]) AS rg;		
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:09:01 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN		
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(ARRAY[v_material_id]) AS rg;		
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			RAISE EXCEPTION 'v_quant=%',v_quant;
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:09:37 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN		
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(ARRAY[v_material_id]) AS rg;		
+			RAISE EXCEPTION 'v_quant=%',v_quant;
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:12:59 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(NEW.date_time,ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN		
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(NEW.date_time,ARRAY[v_material_id]) AS rg;		
+			RAISE EXCEPTION 'v_quant=%',v_quant;
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:13:05 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(NEW.date_time,ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN		
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(NEW.date_time,ARRAY[v_material_id]) AS rg;		
+			--RAISE EXCEPTION 'v_quant=%',v_quant;
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:15:47 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(NEW.date_time,ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN		
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(NEW.date_time,ARRAY[v_material_id]) AS rg;		
+			RAISE EXCEPTION 'v_quant=%',v_quant;
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:16:06 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(NEW.date_time,ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN		
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(NEW.date_time,ARRAY[v_material_id]) AS rg;		
+			
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			RAISE EXCEPTION 'v_quant=%',v_quant;
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:16:38 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(NEW.date_time,ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN		
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(NEW.date_time,ARRAY[v_material_id]) AS rg;		
+			
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			--RAISE EXCEPTION 'v_quant=%',v_quant;
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= v_quant;
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:18:16 ******************
+-- Function: public.cement_silo_balance_resets_process()
+
+-- DROP FUNCTION public.cement_silo_balance_resets_process();
+
+CREATE OR REPLACE FUNCTION public.cement_silo_balance_resets_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_cement ra_cement%ROWTYPE;
+	reg_material_facts ra_material_facts%ROWTYPE;
+	v_quant numeric(19,4);
+	v_material_id int;
+BEGIN
+	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+	
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(NEW.date_time,ARRAY[NEW.cement_silo_id]) AS rg;		
+		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		IF v_quant<>0 THEN
+			--register actions ra_cement
+			reg_cement.date_time		= NEW.date_time;
+			reg_cement.deb			= (v_quant>0);
+			reg_cement.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+			reg_cement.doc_id  		= NEW.id;
+			reg_cement.cement_silos_id	= NEW.cement_silo_id;
+			reg_cement.quant		= abs(v_quant);
+			PERFORM ra_cement_add_act(reg_cement);				
+		END IF;
+		
+		--Остатки материалов, материал отпределить по последнему приходу в силос
+		SELECT material_id
+		INTO v_material_id
+		FROM doc_material_procurements
+		WHERE cement_silos_id = NEW.cement_silo_id
+		ORDER BY date_time DESC
+		LIMIT 1;
+		
+		IF coalesce(v_material_id,0)>0 THEN		
+			--здесь определяем свое количество по регистру материалов
+			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(NEW.date_time,ARRAY[v_material_id]) AS rg;		
+			
+			v_quant = NEW.quant_required - coalesce(v_quant,0);
+			--RAISE EXCEPTION 'v_quant=%',v_quant;
+			IF v_quant<>0 THEN			
+				reg_material_facts.date_time		= NEW.date_time;
+				reg_material_facts.deb			= (v_quant>0);
+				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.quant		= abs(v_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;			
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.date_time<>OLD.date_time THEN
+			PERFORM doc_log_update('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
+		END IF;
+
+		PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('cement_silo_balance_reset'::doc_types,OLD.id);
+
+			PERFORM ra_cement_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+			PERFORM ra_material_facts_remove_acts('cement_silo_balance_reset'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.cement_silo_balance_resets_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 22/04/2020 16:23:17 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance('{}')
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+		get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+		now()::timestamp,
+		now()::timestamp,
+		NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;

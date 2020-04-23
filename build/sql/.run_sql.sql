@@ -1,98 +1,127 @@
--- VIEW: production_material_list
+-- Function: public.mat_totals(date)
 
-DROP VIEW production_material_list;
+-- DROP FUNCTION public.mat_totals(date);
 
-CREATE OR REPLACE VIEW production_material_list AS
-/*	
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
 	SELECT
-		t.production_site_id,
-		t.production_id,
-		production_sites_ref(ps) AS production_sites_ref,
-		materials_ref(mat) AS materials_ref,
-		cement_silos_ref(cem) AS cement_silos_ref,
-		t.material_quant+coalesce(t_cor.quant,0) AS quant_fact,
-		t.material_quant_req AS quant_fact_req,
-		ra_mat.quant AS quant_consuption,
-		coalesce(t_cor.quant,0) AS quant_corrected,
+		m.id AS material_id,
+		m.name::text AS material_descr,
 		
-		t_cor.elkon_id AS elkon_correction_id,
-		users_ref(cor_u) AS correction_users_ref,
-		t_cor.date_time_set correction_date_time_set,
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
 		
-		--подбор - (Факт + исправление)
-		ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0)) as quant_dif,
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
 		
-		CASE WHEN ra_mat.quant = 0 THEN FALSE
-		ELSE
-			((ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0))) * 100 / ra_mat.quant >= mat.max_fact_quant_tolerance_percent)
-		END AS dif_violation,
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
 		
-		t.id AS material_fact_consumption_id
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
 		
+		--остатки на завтра на утро
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
 		
-	FROM material_fact_consumptions AS t
-	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
-	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
-	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
-	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
-	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
-	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
-			AND t_cor.material_id=t.raw_material_id
-	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
-	ORDER BY t.production_site_id,
-		t.production_id,
-		mat.ord
-*/	
-	
-	SELECT
-		t.production_site_id,
-		production_sites_ref(ps) AS production_sites_ref,
-		t.production_id,
-		t.raw_material_id AS material_id,
-		materials_ref(mat) AS materials_ref,
-		cement_silos_ref(cem) AS cement_silos_ref,
-		t.cement_silo_id,
-		sum(t.material_quant) AS material_quant,
-		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
-		sum(t.material_quant_req) AS quant_fact_req,
-		ra_mat.quant AS quant_consuption,
-		coalesce(t_cor.quant,0) AS quant_corrected,
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
 
-		t_cor.elkon_id AS elkon_correction_id,
-		users_ref(cor_u) AS correction_users_ref,
-		t_cor.date_time_set correction_date_time_set,
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
 
-		--подбор - (Факт + исправление)
-		ra_mat.quant - (sum(t.material_quant) + coalesce(t_cor.quant,0)) as quant_dif
 	
-		,CASE WHEN sum(ra_mat.quant) = 0 THEN FALSE
-		ELSE
-			coalesce(
-			( (ra_mat.quant - (sum(t.material_quant) + coalesce(t_cor.quant,0))) * 100 / ra_mat.quant >= mat.max_fact_quant_tolerance_percent)
-			,FALSE)
-		END AS dif_violation
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance('{}')
+	) AS bal_fact ON bal_fact.material_id=m.id
 	
-
-	FROM material_fact_consumptions t
-	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
-	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
-	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
-	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
-	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
-	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
-			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
-	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
-
-	GROUP BY
-		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
-		mat.ord,ra_mat.quant,t.raw_material_id,t.cement_silo_id,
-		ps.*,mat.*,cem.*,
-		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant
-	ORDER BY t.production_site_id,
-		t.production_id,
-		mat.ord
-			
-	;
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
 	
-ALTER VIEW production_material_list OWNER TO beton;
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+		get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+		now()::timestamp,
+		now()::timestamp,
+		NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
 

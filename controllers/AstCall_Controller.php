@@ -335,7 +335,7 @@ class AstCall_Controller extends ControllerSQL{
 	}	
 	
 	private function active_call_query($extraCond='',$commonExt=FALSE){		
-		return "SELECT t.* FROM ast_calls_current t LIMIT 1";
+		//return "SELECT t.* FROM ast_calls_current t LIMIT 1";
 	
 		return sprintf("SELECT t.* FROM ast_calls_current t
 		WHERE t.ext='%s'

@@ -64,7 +64,20 @@ function CementSiloBalanceResetList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.comment_text = new FieldText("comment_text",filed_options);
+		
 	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	filed_options.alias = 'Требуемое количество';
+	filed_options.autoInc = false;	
+	
+	options.fields.quant_required = new FieldFloat("quant_required",filed_options);
+	options.fields.quant_required.getValidator().setMaxLength('19');
+	
+			
+				
+			
 			
 			
 			
@@ -97,6 +110,7 @@ function CementSiloBalanceResetList_Model(options){
 	
 	options.fields.quant = new FieldText("quant",filed_options);
 	
+			
 		CementSiloBalanceResetList_Model.superclass.constructor.call(this,id,options);
 }
 extend(CementSiloBalanceResetList_Model,ModelXML);

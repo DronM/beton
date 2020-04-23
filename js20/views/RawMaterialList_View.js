@@ -121,6 +121,14 @@ function RawMaterialList_View(id,options){
 									})
 								]
 							})
+							,new GridCellHead(id+":grid:head:is_cement",{
+								"value":"Учет в силосе",
+								"columns":[
+									new GridColumnBool({
+										"field":model.getField("is_cement")
+									})
+								]
+							})
 						
 						]
 					})

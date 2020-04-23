@@ -32,34 +32,50 @@ function OperatorList_View(id,options){
 										var gr = self.getElement("grid")
 										gr.setModelToCurrentRow(tr);
 										var f = gr.getModel().getFields();
-										var t_params = {};
-										/*
-										t_params.productionId = "123";
-										t_params.productionDtStart = DateHelper.format(DateHelper.time(),"H:i");
-										t_params.productionDtEnd = DateHelper.format(DateHelper.time(),"H:i");
-										t_params.productionUser = "Миша";
-										t_params.productionConcreteType = "M350";
-										*/
-										var t = window.getApp().getTemplate("ElkonProdInf");
-										t_params.bsCol = window.getBsCol();
-										t_params.widthType = window.getWidthType();
-										Mustache.parse(t);
-										
-										t_params.productionId = f.production_id.getValue();
-										t_params.productionDtStart = DateHelper.format(f.production_dt_start.getValue(),"H:i");
-										t_params.productionDtEnd = DateHelper.format(f.production_dt_end.getValue(),"H:i");
-										t_params.productionUser = f.production_user.getValue();
-										t_params.productionConcreteType = f.production_concrete_types_ref.getValue().getDescr();
-										
-										
-										col.tooltip.popup(
-											Mustache.render(t,t_params)
-											,{"width":200,
-											"title":"Производство Elkon",
-											"className":"",
-											"event":ev
+										if(!f.production_id.getValue()){
+											var td = ev.target;
+											if(ev.target.nodeName!="TD"){
+												td = DOMHelper.getParentByTagName(ev.target,"TD");
 											}
-										);
+											var title;
+											if(f.shipped.getValue()){
+												title = "Номер производства Elkon не определен.";
+											}
+											else{
+												title = "Данные Elkon не выгружены";
+											}
+											td.title = title;
+										}
+										else{
+											var t_params = {};
+											/*
+											t_params.productionId = "123";
+											t_params.productionDtStart = DateHelper.format(DateHelper.time(),"H:i");
+											t_params.productionDtEnd = DateHelper.format(DateHelper.time(),"H:i");
+											t_params.productionUser = "Миша";
+											t_params.productionConcreteType = "M350";
+											*/
+											var t = window.getApp().getTemplate("ElkonProdInf");
+											t_params.bsCol = window.getBsCol();
+											t_params.widthType = window.getWidthType();
+											Mustache.parse(t);
+										
+											t_params.productionId = f.production_id.getValue();
+											t_params.productionDtStart = DateHelper.format(f.production_dt_start.getValue(),"H:i");
+											t_params.productionDtEnd = DateHelper.format(f.production_dt_end.getValue(),"H:i");
+											t_params.productionUser = f.production_user.getValue();
+											t_params.productionConcreteType = f.production_concrete_types_ref.getValue().getDescr();
+										
+										
+											col.tooltip.popup(
+												Mustache.render(t,t_params)
+												,{"width":200,
+												"title":"Производство Elkon",
+												"className":"",
+												"event":ev
+												}
+											);
+										}
 									}
 								}
 						});
@@ -343,6 +359,9 @@ function OperatorList_View(id,options){
 		"editWinClass":null,
 		"commands":null,
 		"popUpMenu":null,
+		"cmdInsert":false,
+		"cmdEdit":false,
+		"cmdDelete":false,
 		"onEventSetRowOptions":function(opts){
 			opts.className = opts.className||"";
 			var m = this.getModel();
@@ -353,9 +372,19 @@ function OperatorList_View(id,options){
 		"onEventSetCellOptions":function(opts){
 			opts.className = opts.className||"";
 			var col = opts.gridColumn.getId();
-			if (!this.getModel().getFieldValue("shipped") && (col=="concrete_types_ref"||col=="quant") ){
+			var m = this.getModel();
+			if (!m.getFieldValue("shipped") && (col=="concrete_types_ref"||col=="quant") ){
 				opts.className+= (opts.className.length? " ":"")+"operatorNotShipped";
-			}			
+			}
+			else if(
+				col=="production_id"
+				&&(
+					m.getFieldValue("tolerance_exceeded")
+					||(m.getFieldValue("shipped") && !m.getFieldValue("production_id")) 
+				)
+			){
+				opts.className+= (opts.className.length? " ":"")+"factQuantViolation";
+			}
 		},
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
@@ -407,7 +436,12 @@ function OperatorList_View(id,options){
 		
 		self.m_gridOnGetData.call(self.getElement("grid"),resp);
 		
-		var new_data = this.m_model.getData().toString();
+		//Расчет Хэша не простой  т.к. результаты производтва приходят позже и меняют данные, а пикать не надо!
+		var new_data = "";//this.m_model.getData().toString();
+		this.m_model.reset();
+		while(this.m_model.getNextRow()){
+			new_data+= this.m_model.getFieldValue("date_time")+this.m_model.getFieldValue("ship_date_time");
+		}		
 		var new_data_h = CommonHelper.md5(new_data);
 		if(!this.m_oldDataHash || this.m_oldDataHash!=new_data_h){
 			if(this.m_oldDataHash!=undefined){

@@ -68,6 +68,12 @@ extend(CementSiloBalanceReset_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Требуемое количество";
+	var field = new FieldFloat("quant_required",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -107,6 +113,12 @@ extend(CementSiloBalanceReset_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldText("comment_text",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Требуемое количество";
+	var field = new FieldFloat("quant_required",options);
 	
 	pm.addField(field);
 	
@@ -153,6 +165,11 @@ extend(CementSiloBalanceReset_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldText("comment_text",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Требуемое количество";
+	pm.addField(new FieldFloat("quant_required",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("date_time");
+	
 }
 
 			CementSiloBalanceReset_Controller.prototype.addGetObject = function(){

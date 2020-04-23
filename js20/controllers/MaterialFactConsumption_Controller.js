@@ -348,6 +348,9 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("order_concrete_types_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("production_id",f_opts));
 }
 
 			MaterialFactConsumption_Controller.prototype.add_get_rolled_list = function(){

@@ -117,6 +117,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Цемент,учет в силосе";
+	var field = new FieldBool("is_cement",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -195,6 +201,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Цемент,учет в силосе";
+	var field = new FieldBool("is_cement",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -256,6 +268,9 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldFloat("max_fact_quant_tolerance_percent",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Цемент,учет в силосе";
+	pm.addField(new FieldBool("is_cement",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("ord");
 	
 }

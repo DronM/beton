@@ -88,7 +88,7 @@ function CementSiloBalanceResetList_View(id,options){
 								})
 							],
 							"sortable":true,
-							"sort":"asc"							
+							"sort":"desc"							
 						})
 						,new GridCellHead(id+":grid:head:cement_silos_ref",{
 							"value":"Силос",
@@ -117,13 +117,29 @@ function CementSiloBalanceResetList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:quant_required",{
+							"value":"Кол.требуемое",
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("quant_required"),
+									"precision":"4",
+									"ctrlOptions":{
+										"length":"19",
+										"precision":"4"
+									}
+								})
+							]
+						})
+						
 						,new GridCellHead(id+":grid:head:quant",{
-							"value":"Количество",
+							"value":"Кол.уменьшения",
 							"columns":[
 								new GridColumnFloat({
 									"field":model.getField("quant"),
+									"precision":"4",
 									"ctrlOptions":{
-										"enabled":false
+										"enabled":false,
+										"precision":"4"
 									}
 								})
 							]

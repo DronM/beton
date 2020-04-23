@@ -64,6 +64,15 @@ class MatTotals_Model extends {
 		$this->addField($f_quant_balance);
 		//********************
 		
+		//*** Field quant_fact_balance ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="quant_fact_balance";
+						
+		$f_quant_fact_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_fact_balance",$f_opts);
+		$this->addField($f_quant_fact_balance);
+		//********************
+		
 		//*** Field quant_morn_cur_balance ***
 		$f_opts = array();
 		$f_opts['length']=15;
@@ -71,6 +80,15 @@ class MatTotals_Model extends {
 						
 		$f_quant_morn_cur_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_morn_cur_balance",$f_opts);
 		$this->addField($f_quant_morn_cur_balance);
+		//********************
+		
+		//*** Field quant_morn_fact_cur_balance ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="quant_morn_fact_cur_balance";
+						
+		$f_quant_morn_fact_cur_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_morn_fact_cur_balance",$f_opts);
+		$this->addField($f_quant_morn_fact_cur_balance);
 		//********************
 		
 		//*** Field quant_morn_next_balance ***

@@ -41,6 +41,11 @@ class CementSiloBalanceReset_Controller extends ControllerSQL{
 		$param = new FieldExtText('comment_text'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtFloat('quant_required'
+				,array(
+				'alias'=>'Требуемое количество'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -73,6 +78,12 @@ class CementSiloBalanceReset_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		$param = new FieldExtText('comment_text'
 				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtFloat('quant_required'
+				,array(
+			
+				'alias'=>'Требуемое количество'
 			));
 			$pm->addParam($param);
 		

@@ -12,6 +12,7 @@ CREATE OR REPLACE VIEW cement_silo_balance_resets_list AS
 		,cement_silos_ref(sil) AS cement_silos_ref
 		,t.comment_text
 		,ra.quant
+		,t.quant_required
 		
 	FROM cement_silo_balance_resets AS t
 	LEFT JOIN users u ON u.id=t.user_id

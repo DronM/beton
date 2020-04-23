@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-04-20 10:15:57</lastBuild></version>
+		<lastBuild>2020-04-23 06:45:03</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -70,6 +70,7 @@
 		<version dateOpen="2019-12-02 06:12:25" dateClose="2019-12-02 06:12:27">1.00164</version>
 		<version dateOpen="2019-12-04 11:12:07" dateClose="2020-04-20 06:04:57">1.00165</version>
 		<version dateOpen="2020-04-20 10:04:15" dateClose="2020-04-20 10:04:16">1.00166</version>
+		<version dateOpen="2020-04-20 10:04:26" dateClose="2020-04-23 06:04:45">1.00167</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -662,6 +663,7 @@
 			<field id="min_end_quant" dataType="Float" length="19" precision="3"/>
 			<field id="max_required_quant_tolerance_percent" dataType="Float" length="19" precision="2"/>
 			<field id="max_fact_quant_tolerance_percent" dataType="Float" length="19" precision="2"/>
+			<field id="is_cement" dataType="Bool" alias="Цемент,учет в силосе" defaultValue="FALSE"/>
 			<index id="raw_materials_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -741,6 +743,9 @@
 			<field id="mat10_rate" dataType="Float" length="19" precision="4"/>
 		</model>
 		<model id="RawMaterialConsRateDateList" parent="ModelSQLBeton" dataTable="raw_material_cons_rates_dates_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="dt" sortDirect="DESC"/>
+			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="dt" dataType="Date" sysCol="TRUE"/>
 			<field id="period" dataType="Text" alias="Период"/>
@@ -1323,6 +1328,7 @@
 			<field id="production_dt_start" dataType="DateTime" alias="Начало производства elkon"/>
 			<field id="production_dt_end" dataType="DateTime" alias="Окончание производства elkon"/>
 			<field id="production_user" dataType="String" alias="Пользователь elkon"/>
+			<field id="tolerance_exceeded" dataType="Bool"/>
 		</model>
 		<model id="ProductionMaterialList" parent="ModelSQLBeton" dataTable="production_material_list" virtual="TRUE" server="FALSE">
 			<field id="production_site_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE"/>
@@ -1417,6 +1423,7 @@
 			<field id="ship_norm_min" dataType="Int"/>
 			<field id="ship_fact_min" dataType="Int"/>
 			<field id="ship_bal_min" dataType="Int"/>
+			<field id="tolerance_exceeded" dataType="Bool"/>
 		</model>
 		<model id="VehicleSchedule" parent="ModelSQLBeton" dataTable="vehicle_schedules" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
@@ -2383,7 +2390,9 @@
 			<field id="quant_ordered" dataType="Float" length="15" precision="2"/>
 			<field id="quant_procured" dataType="Float" length="15" precision="2"/>
 			<field id="quant_balance" dataType="Float" length="15" precision="2"/>
+			<field id="quant_fact_balance" dataType="Float" length="15" precision="2"/>
 			<field id="quant_morn_cur_balance" dataType="Float" length="15" precision="2"/>
+			<field id="quant_morn_fact_cur_balance" dataType="Float" length="15" precision="2"/>
 			<field id="quant_morn_next_balance" dataType="Float" length="15" precision="2"/>
 			<field id="balance_corrected_data" dataType="JSON"/>
 		</model>
@@ -2722,6 +2731,7 @@
 			<field id="material_quant_tolerance_exceeded" dataType="Bool"/>
 			<field id="err_concrete_type" dataType="Bool"/>
 			<field id="order_concrete_types_ref" dataType="JSON"/>
+			<field id="production_id" dataType="Int"/>
 		</model>
 		<model id="MaterialFactConsumptionRolledList" parent="ModelSQLBeton" dataTable="material_fact_consumptions_rolled_list" virtual="TRUE">
 			<field id="date_time" dataType="DateTimeTZ" primaryKey="TRUE"/>
@@ -2740,6 +2750,7 @@
 			<field id="materials" dataType="JSONB"/>
 			<field id="err_concrete_type" dataType="Bool"/>
 			<field id="order_concrete_types_ref" dataType="JSON"/>
+			<field id="production_id" dataType="Int"/>
 		</model>
 		<model id="MaterialFactConsumptionCorretion" parent="ModelSQLBeton" dataTable="material_fact_consumption_corrections" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
@@ -2841,6 +2852,7 @@
 			<field id="user_id" dataType="Int" refTable="users" refField="id" dbRequired="TRUE"/>
 			<field id="cement_silo_id" dataType="Int" refTable="cement_silos" refField="id" required="TRUE"/>
 			<field id="comment_text" dataType="Text"/>
+			<field id="quant_required" dataType="Float" length="19" precision="4" defaultValue="0" alias="Требуемое количество"/>
 			<index id="cement_silo_balance_resets_date_time_idx" unique="FALSE">
 				<field id="date_time"/>
 			</index>
@@ -2855,6 +2867,9 @@
 			</registerAtcs>
 		</model>
 		<model id="CementSiloBalanceResetList" parent="ModelSQLBeton" dataTable="cement_silo_balance_resets_list" virtual="TRUE" baseModelId="CementSiloBalanceReset">
+			<defaultOrder>
+				<field id="date_time" sortDirect="DESC"/>
+			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="date_time" dataType="DateTime" alias="Дата записи"/>
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
@@ -2863,6 +2878,7 @@
 			<field id="cement_silos_ref" dataType="JSON" alias="Силос"/>
 			<field id="comment_text" dataType="Text" alias="Комментарий"/>
 			<field id="quant" dataType="Text" alias="Количество"/>
+			<field id="quant_required" dataType="Float" alias="Требуемое количество"/>
 		</model>
 		<model id="RGCement" parent="ModelSQLBeton" dataTable="rg_cement" virtual="FALSE" modelType="RG" period="1 month">
 			<defaultOrder>
@@ -3900,7 +3916,7 @@
 			<publicMethod id="delete" modelId="ProductionSite"/>
 			<publicMethod id="get_list" modelId="ProductionSite"/>
 			<publicMethod id="get_object" modelId="ProductionSite"/>
-			<publicMethod id="get_list_for_edit" modelId="ProductionSiteForEditList" cond_fields="TRUE"/>
+			<publicMethod id="get_list_for_edit" modelId="ProductionSiteForEditList" condFields="TRUE"/>
 		</controller>
 		<controller id="ShipQuantForCostGrade" parentId="ControllerSQL" state="TRUE">
 			<publicMethod id="insert" modelId="ShipQuantForCostGrade"/>

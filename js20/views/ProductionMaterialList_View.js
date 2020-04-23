@@ -28,6 +28,7 @@ function ProductionMaterialList_View(id,options){
 		"readPublicMethod":contr.getPublicMethod("get_production_material_list"),
 		"editInline":true,
 		"editWinClass":null,
+		"contClassName":options.detailFilters? window.getBsCol(6):null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdInsert":false,
 			"cmdEdit":false,
@@ -40,40 +41,45 @@ function ProductionMaterialList_View(id,options){
 		"popUpMenu":popup_menu,
 		"onEventSetCellOptions":function(opts){
 			if(opts.gridColumn.getId()=="quant_fact"){
-				opts.className = "quant_editable";
+				if(opts.fields.quant_fact.getValue()==0){
+					opts.className = "quant_editable";
+				}
 				var v = opts.fields.quant_corrected.getValue();
-				if(v){					
+				if(v){
+					opts.className = opts.className || "";				
 					var elkon_cor = opts.fields.elkon_correction_id.getValue();
 					opts.attrs = opts.attrs || {};
 					if(elkon_cor&&elkon_cor!="0"){
 						opts.attrs.title = "Исправления Elkon №"+elkon_cor+" от "+DateHelper.format(opts.fields.correction_date_time_set.getValue(),"d/m/y H:i")+
 							", "+opts.fields.correction_users_ref.getValue().getDescr();
-						opts.className+= " factQuantCorrectedElkon";
+						opts.className+= ((opts.className=="")? "":" ")+"factQuantCorrectedElkon";
 					}
 					else{
-						opts.className+= " factQuantCorrected";	
+						opts.className+= ((opts.className=="")? "":" ")+"factQuantCorrected";	
 						opts.attrs.title = "Ручное исправление:"+" от "+DateHelper.format(opts.fields.correction_date_time_set.getValue(),"d/m/y H:i")+
 							", "+opts.fields.correction_users_ref.getValue().getDescr();
 						
 					}
 				}
-				opts.events = opts.event || {};
-				opts.events.dblclick = (function(thisForm){
-					return function(e){
-						if(thisForm.m_editMode)return;
-						var grid = thisForm.getElement("grid");
-						var row = DOMHelper.getParentByTagName(e.target,"TR");
-						if(row){							
-							grid.setModelToCurrentRow(row);
-							thisForm.onEditCons(grid.getModel().getFields());
+				if(opts.fields.quant_fact.getValue()==0){
+					opts.events = opts.event || {};
+					opts.events.dblclick = (function(thisForm){
+						return function(e){
+							if(thisForm.m_editMode)return;
+							var grid = thisForm.getElement("grid");
+							var row = DOMHelper.getParentByTagName(e.target,"TR");
+							if(row){							
+								grid.setModelToCurrentRow(row);
+								thisForm.onEditCons(grid.getModel().getFields());
+							}
+							if (e.preventDefault){
+								e.preventDefault();
+							}
+							e.stopPropagation();
+							return false;						
 						}
-						if (e.preventDefault){
-							e.preventDefault();
-						}
-						e.stopPropagation();
-						return false;						
-					}
-				})(self);
+					})(self);
+				}
 			}
 			else if(opts.gridColumn.getId()=="quant_dif"){
 				if (opts.fields.dif_violation.getValue()){
@@ -130,7 +136,7 @@ function ProductionMaterialList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:materials_ref",{
 							"value":"Материал",
-							"colAttrs":{"width":"20px"},
+							"className":options.detailFilters? window.getBsCol(2):"",
 							"columns":[
 								new GridColumn({
 									"field":model.getField("materials_ref"),
@@ -139,7 +145,7 @@ function ProductionMaterialList_View(id,options){
 										var res = !mat.isNull()? mat.getDescr():"";
 										var sil = fields.cement_silos_ref.getValue();
 										if(!sil.isNull()){
-											res+= ", "+sil.getDescr();
+											res+= " (силос:"+sil.getDescr()+")";
 										}
 										return res;
 									}
@@ -148,20 +154,24 @@ function ProductionMaterialList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:quant_consuption",{
 							"value":"Кол-во подбор",
+							"className":options.detailFilters? window.getBsCol(1):"",
 							"colAttrs":{"align":"right","width":"10px"},
 							"columns":[
 								new GridColumnFloat({
-									"field":model.getField("quant_consuption")
+									"field":model.getField("quant_consuption"),
+									"precision":"4"
 								})
 							]
 						})
 						,new GridCellHead(id+":grid:head:quant_fact",{
 							"value":"Кол-во факт",
+							"className":options.detailFilters? window.getBsCol(1):"",
 							"colAttrs":{"align":"right","width":"10px"},
 							"title":"Двойной клик для ручного исправления",
 							"columns":[
 								new GridColumnFloat({
-									"field":model.getField("quant_fact")
+									"field":model.getField("quant_fact"),
+									"precision":"4"
 								})
 							]
 						})
@@ -178,6 +188,7 @@ function ProductionMaterialList_View(id,options){
 						*/
 						,new GridCellHead(id+":grid:head:quant_dif",{
 							"value":"Отклонение",
+							"className":options.detailFilters? window.getBsCol(1):"",
 							"colAttrs":{"align":"right","width":"10px"},
 							"columns":[
 								new GridColumnFloat({

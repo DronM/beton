@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
  
 class RawMaterialConsRateDateList_Model extends ModelSQLBeton{
 	
@@ -58,7 +59,12 @@ class RawMaterialConsRateDateList_Model extends ModelSQLBeton{
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
-	$this->setLimitConstant('doc_per_page_count');
+	
+		$order = new ModelOrderSQL();		
+		$this->setDefaultModelOrder($order);		
+		$direct = 'DESC';
+		$order->addField($f_dt,$direct);
+$this->setLimitConstant('doc_per_page_count');
 	}
 
 }

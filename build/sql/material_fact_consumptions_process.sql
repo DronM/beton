@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
   RETURNS trigger AS
 $BODY$
 DECLARE
-	v_cement_material_id int;
+	v_is_cement bool;
 	reg_material_facts ra_material_facts%ROWTYPE;
 	reg_cement ra_cement%ROWTYPE;	
 BEGIN
@@ -19,9 +19,10 @@ BEGIN
 
 	ELSEIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
 
-		v_cement_material_id = 	(const_cement_material_val()->'keys'->>'id')::int;
-				
-		IF NEW.raw_material_id IS NOT NULL AND NEW.raw_material_id<>v_cement_material_id  THEN
+		--Все материалы проходят по регистру учета материалов
+		IF NEW.raw_material_id IS NOT NULL  THEN
+			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;		
+			
 			--register actions ra_material_facts
 			reg_material_facts.date_time		= NEW.date_time;
 			reg_material_facts.deb			= FALSE;
@@ -30,11 +31,13 @@ BEGIN
 			reg_material_facts.material_id		= NEW.raw_material_id;
 			reg_material_facts.quant		= NEW.material_quant;
 			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
 		
-		ELSIF NEW.raw_material_id IS NOT NULL
-			AND NEW.raw_material_id=v_cement_material_id
-			 AND NEW.cement_silo_id IS NOT NULL THEN
-			--register actions ra_cement
+		--А те, что учитываются по силосам (с отметкой в справочнике), еще и по регистру силосов
+		IF NEW.raw_material_id IS NOT NULL
+		AND v_is_cement
+		AND NEW.cement_silo_id IS NOT NULL THEN
+			 
 			reg_cement.date_time		= NEW.date_time;
 			reg_cement.deb			= FALSE;
 			reg_cement.doc_type  		= 'material_fact_consumption'::doc_types;
@@ -42,6 +45,7 @@ BEGIN
 			reg_cement.cement_silos_id	= NEW.cement_silo_id;
 			reg_cement.quant		= NEW.material_quant;
 			PERFORM ra_cement_add_act(reg_cement);	
+			 
 		END IF;
 			
 		RETURN NEW;

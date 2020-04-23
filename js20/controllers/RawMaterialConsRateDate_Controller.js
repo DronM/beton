@@ -127,6 +127,8 @@ extend(RawMaterialConsRateDate_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Комментарий";
 	pm.addField(new FieldText("name",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("dt");
+	
 }
 
 			RawMaterialConsRateDate_Controller.prototype.addGetObject = function(){

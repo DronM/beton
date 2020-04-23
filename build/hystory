@@ -337,6 +337,13 @@ update vehicle_schedule_states set destination_id=1225 where shipment_id=97949 a
 1) Ошибка при открытии звонка ViewObjectAjx.addDetailDataSet()
 dsParams.control.getInsertPublicMethod()
 
+
+1.067
+1) MaterialMakeOrderGrid фактический остаток
+2) OperatorList_View параметры бляма
+3) Свернутая таблица
+4) Остатки материалов
+
 -- Откорректировать модули проведения документов: корректировка остатка материала,фактический расход, все как поступление материалов
 -- В чем хранить остатки : тонны или кг???
 ---3)!!!Форматирование даты в Сафари и Edge

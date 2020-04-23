@@ -27,7 +27,9 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 				'quant_tolerance_exceeded',material_quant_tolerance_exceeded
 			)
 		) AS materials,
-		err_concrete_type
+		err_concrete_type,
+		production_id
+		
 	FROM material_fact_consumptions_list
 	GROUP BY date_time,
 		concrete_quant,
@@ -42,7 +44,8 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 		vehicle_production_descr,
 		orders_ref::text,
 		shipments_inf,
-		err_concrete_type
+		err_concrete_type,
+		production_id
 	ORDER BY date_time DESC
 
 	;

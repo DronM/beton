@@ -132,6 +132,16 @@ function RawMaterial_Model(options){
 	options.fields.max_fact_quant_tolerance_percent = new FieldFloat("max_fact_quant_tolerance_percent",filed_options);
 	options.fields.max_fact_quant_tolerance_percent.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	filed_options.alias = 'Цемент,учет в силосе';
+	filed_options.autoInc = false;	
+	
+	options.fields.is_cement = new FieldBool("is_cement",filed_options);
+	
 			
 			
 			

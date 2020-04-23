@@ -9,7 +9,9 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class CementSiloBalanceResetList_Model extends ModelSQLBeton{
@@ -64,6 +66,18 @@ class CementSiloBalanceResetList_Model extends ModelSQLBeton{
 		$this->addField($f_comment_text);
 		//********************
 		
+		//*** Field quant_required ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Требуемое количество';
+		$f_opts['length']=19;
+		$f_opts['defaultValue']='0';
+		$f_opts['id']="quant_required";
+						
+		$f_quant_required=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_required",$f_opts);
+		$this->addField($f_quant_required);
+		//********************
+		
 		//*** Field users_ref ***
 		$f_opts = array();
 		
@@ -93,7 +107,12 @@ class CementSiloBalanceResetList_Model extends ModelSQLBeton{
 		$f_quant=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant",$f_opts);
 		$this->addField($f_quant);
 		//********************
-	$this->setLimitConstant('doc_per_page_count');
+	
+		$order = new ModelOrderSQL();		
+		$this->setDefaultModelOrder($order);		
+		$direct = 'DESC';
+		$order->addField($f_date_time,$direct);
+$this->setLimitConstant('doc_per_page_count');
 	}
 
 }

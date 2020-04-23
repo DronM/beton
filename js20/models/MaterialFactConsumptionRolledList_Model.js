@@ -167,6 +167,15 @@ function MaterialFactConsumptionRolledList_Model(options){
 	
 	options.fields.order_concrete_types_ref = new FieldJSON("order_concrete_types_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_id = new FieldInt("production_id",filed_options);
+	
 		MaterialFactConsumptionRolledList_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialFactConsumptionRolledList_Model,ModelXML);
