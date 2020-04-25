@@ -30,7 +30,10 @@ AppBeton.prototype.DEF_phoneEditMask = "8-(999)-999-99-99";
 AppBeton.prototype.m_colorClass;
 
 /* protected*/
-
+/*App.prototype.m_serverTemplateIds = [
+	"ProductionMaterialList"
+];
+*/
 AppBeton.prototype.makeItemCurrent = function(elem){
 	if (elem){
 		var l = DOMHelper.getElementsByAttr("active", document.body, "class", true,"LI");

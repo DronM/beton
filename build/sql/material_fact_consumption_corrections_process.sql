@@ -16,7 +16,7 @@ BEGIN
 	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
 		IF (TG_OP='INSERT') THEN						
 			--log
-			PERFORM doc_log_insert('material_fact_consumption_correction'::doc_types,NEW.id,NEW.date_time);
+			PERFORM doc_log_insert('material_fact_consumption_correction'::doc_types,NEW.id,NEW.date_time::timestamp without time zone);
 		END IF;
 
 
@@ -47,7 +47,7 @@ BEGIN
 		
 	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
 		IF NEW.date_time<>OLD.date_time THEN
-			PERFORM doc_log_update('material_fact_consumption_correction'::doc_types,NEW.id,NEW.date_time);
+			PERFORM doc_log_update('material_fact_consumption_correction'::doc_types,NEW.id,NEW.date_time::timestamp without time zone);
 		END IF;
 
 		PERFORM ra_material_facts_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);

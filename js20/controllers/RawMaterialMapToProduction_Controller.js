@@ -153,6 +153,12 @@ extend(RawMaterialMapToProduction_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("order_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("raw_material_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("raw_material_ord",f_opts));
 }
 
 			RawMaterialMapToProduction_Controller.prototype.addGetObject = function(){

@@ -344,29 +344,31 @@ dsParams.control.getInsertPublicMethod()
 3) Свернутая таблица
 4) Остатки материалов
 
--- Откорректировать модули проведения документов: корректировка остатка материала,фактический расход, все как поступление материалов
--- В чем хранить остатки : тонны или кг???
----3)!!!Форматирование даты в Сафари и Edge
 
+update material_fact_consumptions SET concrete_quant=concrete_quant*1000 WHERE concrete_quant<1
+update material_fact_consumptions set concrete_type_production_descr= 'М-300',concrete_type_id=3 WHERE concrete_type_production_descr='?300'
+update material_fact_consumptions set concrete_type_production_descr= 'М-350',concrete_type_id=4 WHERE concrete_type_production_descr='?350'
+--update material_fact_consumptions set concrete_type_production_descr= 'М-250',concrete_type_id=5 WHERE concrete_type_production_descr='?250'
+--update material_fact_consumptions set concrete_type_production_descr= 'М500',concrete_type_id=51 WHERE concrete_type_production_descr='?500'
+
+
+Копия Крона на слейве, автоприменение
+--На слейве не работают методы соединения с MSSQL!
+--sudo apt-get install php5-sybase
+Нет такого пакета для php7
+extension=/usr/lib/php/20190902/pdo_sqlsrv.so
+Разобраться!!!
+http://www.katren.org/ttt.php
+
+---3)!!!Форматирование даты в Сафари и Edge
 ---5) Проверить функцию "сменить пароль", если нажал - сразу выкинуть этого пользователя
 ---6) Установить макс.длительность сессии
-
-
-
-Проверить shipment_list вроде как насосы от последнего владельца!!!
-
-E,Убрать поле vehicle у cement_silos_for_order_list !!!
 
 !!!!!!
 !!!Показывает время (пустые строки) на след день до 7:00!!!
 
 
 Перенос накладных в бухгалтерию
-
-
-???Контрагенты повторы Client_Controller->get_duplicates_list НЕ ДЕЛАТЬ!
-
-
 Передвигаемое окно звонка и не модальное
 
 

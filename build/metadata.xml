@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-04-23 06:45:03</lastBuild></version>
+		<lastBuild>2020-04-25 10:01:56</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -71,6 +71,7 @@
 		<version dateOpen="2019-12-04 11:12:07" dateClose="2020-04-20 06:04:57">1.00165</version>
 		<version dateOpen="2020-04-20 10:04:15" dateClose="2020-04-20 10:04:16">1.00166</version>
 		<version dateOpen="2020-04-20 10:04:26" dateClose="2020-04-23 06:04:45">1.00167</version>
+		<version dateOpen="2020-04-23 10:04:13" dateClose="2020-04-25 10:04:02">1.00168</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1305,7 +1306,7 @@
 			<field id="users_ref" dataType="JSON" alias="Пользователь"/>
 			<field id="quant" dataType="Float" alias="Количество"/>
 		</model>
-		<model id="OperatorList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE" server="FALSE">
+		<model id="OperatorList" parent="ModelSQLBeton" dataTable="shipment_for_orders_list" virtual="TRUE" server="FALSE" calcHash="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
 			<field id="date_time" dataType="DateTime" alias="Назначен"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Отгружен"/>
@@ -1323,11 +1324,14 @@
 			<field id="ship_fact_min" dataType="Int" alias="Норма факт."/>
 			<field id="ship_bal_min" dataType="Int" alias="Остаток"/>
 			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
-			<field id="production_id" dataType="Int" alias="Номер производства elkon"/>
-			<field id="production_concrete_types_ref" dataType="JSON" alias="Марка elkon"/>
-			<field id="production_dt_start" dataType="DateTime" alias="Начало производства elkon"/>
-			<field id="production_dt_end" dataType="DateTime" alias="Окончание производства elkon"/>
-			<field id="production_user" dataType="String" alias="Пользователь elkon"/>
+			<field id="production_list" dataType="JSON" alias="Список производств elkon"/>
+			<!--
+			<field id="production_id" dataType="Int" alias="Номер производства elkon" />
+			<field id="production_concrete_types_ref" dataType="JSON" alias="Марка elkon" />
+			<field id="production_dt_start" dataType="DateTime" alias="Начало производства elkon" />
+			<field id="production_dt_end" dataType="DateTime" alias="Окончание производства elkon" />
+			<field id="production_user" dataType="String" alias="Пользователь elkon" />
+			-->
 			<field id="tolerance_exceeded" dataType="Bool"/>
 		</model>
 		<model id="ProductionMaterialList" parent="ModelSQLBeton" dataTable="production_material_list" virtual="TRUE" server="FALSE">
@@ -2673,6 +2677,8 @@
 			<field id="raw_materials_ref" dataType="JSON"/>
 			<field id="production_descr" dataType="String" length="100" required="TRUE"/>
 			<field id="order_id" dataType="Int"/>
+			<field id="raw_material_id" dataType="Int"/>
+			<field id="raw_material_ord" dataType="Int"/>
 		</model>
 		<model id="MaterialFactConsumption" parent="ModelSQLBeton" dataTable="material_fact_consumptions" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
@@ -2734,7 +2740,7 @@
 			<field id="production_id" dataType="Int"/>
 		</model>
 		<model id="MaterialFactConsumptionRolledList" parent="ModelSQLBeton" dataTable="material_fact_consumptions_rolled_list" virtual="TRUE">
-			<field id="date_time" dataType="DateTimeTZ" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTime" primaryKey="TRUE"/>
 			<field id="production_site_id" dataType="Int" primaryKey="TRUE"/>
 			<field id="upload_date_time" dataType="DateTimeTZ"/>
 			<field id="upload_users_ref" dataType="JSON"/>
@@ -2751,6 +2757,7 @@
 			<field id="err_concrete_type" dataType="Bool"/>
 			<field id="order_concrete_types_ref" dataType="JSON"/>
 			<field id="production_id" dataType="Int"/>
+			<field id="material_tolerance_violated" dataType="Bool"/>
 		</model>
 		<model id="MaterialFactConsumptionCorretion" parent="ModelSQLBeton" dataTable="material_fact_consumption_corrections" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
@@ -3000,6 +3007,7 @@
 			<field id="vehicle_schedule_state_id" dataType="Int" refTable="vehicle_schedule_states" refField="id"/>
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
 			<field id="production_concrete_type_descr" dataType="Text"/>
+			<field id="material_tolerance_violated" dataType="Bool" defaultValue="FALSE"/>
 			<index id="productions_production_id_idx" unique="TRUE">
 				<field id="production_site_id"/>
 				<field id="production_id"/>
@@ -3031,6 +3039,7 @@
 			<field id="vehicle_id" dataType="Int"/>
 			<field id="concrete_type_id" dataType="Int"/>
 			<field id="order_id" dataType="Int"/>
+			<field id="material_tolerance_violated" dataType="Bool"/>
 		</model>
 	</models>
 	<constants>
@@ -4425,6 +4434,7 @@
 		<jsTemplate id="CementSiloForOrderList_View" file="tmpl/CementSiloForOrderList_View.html"/>
 		<jsTemplate id="ElkonProdInf" file="tmpl/ElkonProdInf.html"/>
 		<jsTemplate id="MaterialFactBalanceCorretionInf" file="tmpl/MaterialFactBalanceCorretionInf.html"/>
+		<!--<jsTemplate id="ProductionMaterialList_View" file="tmpl/ProductionMaterialList_View.html" />-->
 	</jsTemplates>
 	<jsScripts>
 		<!-- Core JS files -->

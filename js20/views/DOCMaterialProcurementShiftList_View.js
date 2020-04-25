@@ -15,6 +15,7 @@ function DOCMaterialProcurementShiftList_View(id,options){
 	options = options || {};	
 	options.addElement = function(){
 		this.addElement(new DOCMaterialProcurementShiftGrid(id+":grid",{
+			"contClassName":options.detailFilters? window.getBsCol(11):null,
 			"model":options.models.DOCMaterialProcurementShiftList_Model
 			,"modelMat":options.models.RawMaterial_Model
 			,"variantStorage":options.variantStorage

@@ -55,7 +55,11 @@ CREATE OR REPLACE VIEW production_material_list AS
 		sum(t.material_quant) AS material_quant,
 		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
 		sum(t.material_quant_req) AS quant_fact_req,
-		ra_mat.quant AS quant_consuption,
+		
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE ra_mat.quant/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
 		coalesce(t_cor.quant,0) AS quant_corrected,
 
 		t_cor.elkon_id AS elkon_correction_id,
@@ -63,12 +67,23 @@ CREATE OR REPLACE VIEW production_material_list AS
 		t_cor.date_time_set correction_date_time_set,
 
 		--подбор - (Факт + исправление)
-		ra_mat.quant - (sum(t.material_quant) + coalesce(t_cor.quant,0)) as quant_dif
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE ra_mat.quant/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		- (sum(t.material_quant) + coalesce(t_cor.quant,0)) AS quant_dif
 	
 		,CASE WHEN sum(ra_mat.quant) = 0 THEN FALSE
 		ELSE
 			coalesce(
-			( (ra_mat.quant - (sum(t.material_quant) + coalesce(t_cor.quant,0))) * 100 / ra_mat.quant >= mat.max_fact_quant_tolerance_percent)
+			( (
+				CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+				ELSE ra_mat.quant/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				END				
+				 - (sum(t.material_quant) + coalesce(t_cor.quant,0))) * 100 /
+				 	(CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+					ELSE ra_mat.quant/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					END)
+				 	>= mat.max_fact_quant_tolerance_percent)
 			,FALSE)
 		END AS dif_violation
 	
@@ -78,6 +93,7 @@ CREATE OR REPLACE VIEW production_material_list AS
 	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
 	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
 	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id = vsch.shipment_id
 	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
 	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
 			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
@@ -87,7 +103,7 @@ CREATE OR REPLACE VIEW production_material_list AS
 		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
 		mat.ord,ra_mat.quant,t.raw_material_id,t.cement_silo_id,
 		ps.*,mat.*,cem.*,
-		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
 	ORDER BY t.production_site_id,
 		t.production_id,
 		mat.ord

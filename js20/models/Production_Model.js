@@ -156,6 +156,16 @@ function Production_Model(options){
 	
 	options.fields.production_concrete_type_descr = new FieldText("production_concrete_type_descr",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.material_tolerance_violated = new FieldBool("material_tolerance_violated",filed_options);
+	
 			
 			
 			

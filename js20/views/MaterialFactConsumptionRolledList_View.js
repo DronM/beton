@@ -101,7 +101,11 @@ function MaterialFactConsumptionRolledList_View(id,options){
 					opts.title="Соответствие не определено!";
 					opts.className+=(opts.className.length? " ":"")+"prouction_upload_no_match";
 				}
-			}				
+			}
+			if(col=="production_id" && this.getModel().getFieldValue("material_tolerance_violated")){
+				opts.className = opts.className||"";
+				opts.className+= (opts.className.length? " ":"")+"factQuantViolation";
+			}
 		},
 		
 		"head":new GridHead(id+":grid:head",{
@@ -183,30 +187,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 								
 							]
 						}													
-					}																											
-					
-					/*
-					"detailViewClass":MaterialFactConsumptionList_View,
-					"detailViewOptions":{
-						"detailFilters":{
-							"MaterialFactConsumptionList_Model":[
-								{
-								"masterFieldId":"date_time",
-								"field":"date_time",
-								"sign":"e",
-								"val":"0"
-								},
-								{
-								"masterFieldId":"production_site_id",
-								"field":"production_site_id",
-								"sign":"e",
-								"val":"0"
-								}	
-								
-							]
-						}													
-					}									
-					*/
+					}
 				})
 			],
 			"sortable":true,
@@ -343,8 +324,9 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 				new GridColumn({
 					"field":model.getField("concrete_quant"),
 					"ctrlClass":EditFloat,
+					"precision":2,
 					"ctrlOptions":{
-						"precision":4
+						"precision":2
 					}																		
 				})
 			]
@@ -483,6 +465,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 					"columns":[
 						new GridColumnFloat({
 							"field":f_q
+							,"precision":"4"
 							,"ctrlOptions":{
 								"precision":"4"
 							}
@@ -498,6 +481,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 					"columns":[
 						new GridColumnFloat({
 							"field":f_q_r
+							,"precision":"4"
 							,"ctrlOptions":{
 								"precision":"4"
 							}							
@@ -513,6 +497,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 					"columns":[
 						new GridColumnFloat({
 							"field":f_q_sh
+							,"precision":"4"
 							,"ctrlOptions":{
 								"precision":"4"
 							}							

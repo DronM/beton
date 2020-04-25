@@ -179,47 +179,12 @@ function OperatorList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Номер производства elkon';
+	filed_options.alias = 'Список производств elkon';
 	filed_options.autoInc = false;	
 	
-	options.fields.production_id = new FieldInt("production_id",filed_options);
+	options.fields.production_list = new FieldJSON("production_list",filed_options);
 	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Марка elkon';
-	filed_options.autoInc = false;	
-	
-	options.fields.production_concrete_types_ref = new FieldJSON("production_concrete_types_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Начало производства elkon';
-	filed_options.autoInc = false;	
-	
-	options.fields.production_dt_start = new FieldDateTime("production_dt_start",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Окончание производства elkon';
-	filed_options.autoInc = false;	
-	
-	options.fields.production_dt_end = new FieldDateTime("production_dt_end",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Пользователь elkon';
-	filed_options.autoInc = false;	
-	
-	options.fields.production_user = new FieldString("production_user",filed_options);
-	
+			
 				
 	
 	var filed_options = {};
@@ -229,7 +194,9 @@ function OperatorList_Model(options){
 	
 	options.fields.tolerance_exceeded = new FieldBool("tolerance_exceeded",filed_options);
 	
-		OperatorList_Model.superclass.constructor.call(this,id,options);
+		
+	options.calcHash = true;
+	OperatorList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OperatorList_Model,ModelXML);
 

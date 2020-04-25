@@ -20,70 +20,53 @@ function OperatorList_View(id,options){
 			"colAttrs":{"align":"center"},
 			"columns":[
 				new GridColumn({
-					"field":model.getField("production_id"),
-					"formatFunction":function(fields,gridCell){
-						var col = gridCell.getGridColumn();
-						col.tooltip = new ToolTip({
-								"node":gridCell.getNode(),
-								"wait":500,
-								"onHover":function(ev){
-									var tr = DOMHelper.getParentByTagName(ev.target,"TR");
-									if(tr){
-										var gr = self.getElement("grid")
-										gr.setModelToCurrentRow(tr);
-										var f = gr.getModel().getFields();
-										if(!f.production_id.getValue()){
-											var td = ev.target;
-											if(ev.target.nodeName!="TD"){
-												td = DOMHelper.getParentByTagName(ev.target,"TD");
-											}
-											var title;
-											if(f.shipped.getValue()){
-												title = "Номер производства Elkon не определен.";
-											}
-											else{
-												title = "Данные Elkon не выгружены";
-											}
-											td.title = title;
-										}
-										else{
-											var t_params = {};
-											/*
-											t_params.productionId = "123";
-											t_params.productionDtStart = DateHelper.format(DateHelper.time(),"H:i");
-											t_params.productionDtEnd = DateHelper.format(DateHelper.time(),"H:i");
-											t_params.productionUser = "Миша";
-											t_params.productionConcreteType = "M350";
-											*/
-											var t = window.getApp().getTemplate("ElkonProdInf");
-											t_params.bsCol = window.getBsCol();
-											t_params.widthType = window.getWidthType();
-											Mustache.parse(t);
+					"field":model.getField("production_list")
+					,"formatFunction":function(fields,gridCell){
+						var list = fields.production_list.getValue();
+						if(list){
+							var col = gridCell.getGridColumn();
+							col.productions = col.productions || [];
+							var cell_n = gridCell.getNode();
+							for(var i=0;i<list.length;i++){
+								var t_tag_cont = document.createElement("DIV");
+								t_tag_cont.setAttribute("class",list[i].material_tolerance_violated? "badge-danger":"operatorProdDetail");
+								
+								col.productions[list[i].production_id] = {
+									"pic":document.createElement("SPAN")
+									,"txt":document.createElement("SPAN")
+								};
+								col.productions[list[i].production_id].pic.setAttribute("class","glyphicon glyphicon-triangle-right pull-left detailToggle");
+								col.productions[list[i].production_id].txt.textContent = list[i].production_id;
+								
+								t_tag_cont.appendChild(col.productions[list[i].production_id].pic);
+								t_tag_cont.appendChild(col.productions[list[i].production_id].txt);
+								cell_n.appendChild(t_tag_cont);								
+								
+								EventHelper.add(col.productions[list[i].production_id].pic, "click",(function(prodData){
+									return function(e){
+										EventHelper.stopPropagation(e);
 										
-											t_params.productionId = f.production_id.getValue();
-											t_params.productionDtStart = DateHelper.format(f.production_dt_start.getValue(),"H:i");
-											t_params.productionDtEnd = DateHelper.format(f.production_dt_end.getValue(),"H:i");
-											t_params.productionUser = f.production_user.getValue();
-											t_params.productionConcreteType = f.production_concrete_types_ref.getValue().getDescr();
-										
-										
-											col.tooltip.popup(
-												Mustache.render(t,t_params)
-												,{"width":200,
-												"title":"Производство Elkon",
-												"className":"",
-												"event":ev
-												}
-											);
-										}
+										self.showProdDetails(prodData,e.target);
 									}
-								}
-						});
-						
-						var res = fields.production_id.getValue();
-						return res? res:"";
-					},
-					"master":true,
+								})(list[i])
+								);
+								
+								col.productions[list[i].production_id].tooltip = new ToolTip({
+										"node":t_tag_cont,
+										"wait":500,
+										"onHover":(function(prodData,toolTip){
+											return function(ev){
+												self.showProdTooltip(this,prodData,ev);
+												
+											}										
+										}
+										)(list[i],col.productions[list[i].production_id].tooltip)
+									});
+							}
+						}
+						return "";
+					}
+					/*,"master":true,
 					"detailViewClass":ProductionMaterialList_View,
 					"detailViewOptions":{
 						"detailFilters":{
@@ -104,7 +87,7 @@ function OperatorList_View(id,options){
 							]
 						}													
 					}																											
-					
+					*/
 				})
 			]
 		})
@@ -185,9 +168,9 @@ function OperatorList_View(id,options){
 			"value":"Марка",
 			"colAttrs":{"align":"right"},
 			"columns":[
-				new GridColumn({
-					"field":model.getField("concrete_types_ref"),
-					"formatFunction":function(fields,gridCell){
+				new GridColumnRef({
+					"field":model.getField("concrete_types_ref")
+					/*,"formatFunction":function(fields,gridCell){
 						var res = "";
 						var ct = fields.concrete_types_ref.getValue();	
 						var p_ct = fields.production_concrete_types_ref.getValue();
@@ -209,6 +192,7 @@ function OperatorList_View(id,options){
 						}
 						return res;
 					}
+					*/
 				})
 			]
 		})
@@ -244,7 +228,7 @@ function OperatorList_View(id,options){
 	];
 	var foot_elements = [
 		new GridCell(id+":grid:foot:sp1",{
-			"colSpan":"6"
+			"colSpan":"7"
 		})												
 		,new GridCellFoot(id+":features_grid:foot:tot_quant",{
 			"attrs":{"align":"right"},
@@ -468,4 +452,99 @@ OperatorList_View.prototype.setShipped = function(btnCont){
 			grid.onRefresh();
 		}
 	})
+}
+
+OperatorList_View.prototype.showProdDetails = function(prodData,node){
+	this.m_details = this.m_details || [];
+	if(!this.m_details[prodData.production_id]){
+		var detail_view_id = CommonHelper.uniqid();
+		
+		var tr = DOMHelper.getParentByTagName(node,"TR");
+		
+		this.m_detailRow = this.m_detailRow || [];
+		this.m_detailRow[prodData.production_id] = document.createElement(tr.tagName);
+		this.m_detailRow[prodData.production_id].className = "grid_details";
+		this.m_detailRow[prodData.production_id].setAttribute("for_keys",tr.getAttribute("keys"));
+		this.m_detailRow[prodData.production_id].setAttribute("detail_view_id",detail_view_id);
+		
+		//new 
+		var v_opts = {};
+		v_opts.attrs = v_opts.attrs || {};
+		v_opts.attrs.style = "display: none;";
+		v_opts.attrs.colspan = tr.cells.length;
+		v_opts.tagName = "TD";
+		
+		//setting keys
+		var grid = this.getElement("grid");
+		this.m_gridRefreshInterval = grid.getRefreshInterval();
+		grid.setRefreshInterval(0);
+		
+		v_opts.detailFilters = {
+			"ProductionMaterialList_Model":[
+				{
+				"masterFieldId":"production_site_id",
+				"field":"production_site_id",
+				"sign":"e",
+				"val":prodData.production_site_id
+				}	
+				,{
+				"masterFieldId":"production_id",
+				"field":"production_id",
+				"sign":"e",
+				"val":prodData.production_id
+				}	
+				
+			]		
+		};
+		
+		var app = window.getApp();
+		if(!app.m_detailViews)app.m_detailViews = {};
+		app.m_detailViews[detail_view_id] = new ProductionMaterialList_View(detail_view_id,v_opts);
+		
+		if(tr.nextSibling){
+			tr.parentNode.insertBefore(this.m_detailRow[prodData.production_id], tr.nextSibling);	
+		}
+		else{
+			tr.parentNode.appendChild(this.m_detailRow[prodData.production_id]);	
+		}
+		app.m_detailViews[detail_view_id].toDOM(this.m_detailRow[prodData.production_id]);
+		$(app.m_detailViews[detail_view_id].getNode()).slideToggle(300);
+	}
+	else{
+		var tr = DOMHelper.getParentByTagName(node,"TR");
+		var detail_view_id = tr.nextSibling.getAttribute("detail_view_id");
+		if(detail_view_id){
+			window.getApp().m_detailViews[detail_view_id].delDOM();
+		}
+		this.getElement("grid").setRefreshInterval(this.m_gridRefreshInterval);				
+		DOMHelper.delNode(this.m_detailRow[prodData.production_id]);			
+	}
+	
+	this.m_details[prodData.production_id] = !this.m_details[prodData.production_id];
+	$(node).toggleClass("rotate-90");	
+}
+
+OperatorList_View.prototype.showProdTooltip = function(toolTip,prodData,ev){
+	var t_params = {
+		"productionId":prodData.production_id
+		,"productionDtStart":DateHelper.format(DateHelper.strtotime(prodData.production_dt_start),"H:i")
+		,"productionDtEnd":DateHelper.format(DateHelper.strtotime(prodData.production_dt_end),"H:i")
+		,"productionUser":prodData.production_user
+		,"productionConcreteType":prodData.production_concrete_type_descr
+	};
+
+	var t = window.getApp().getTemplate("ElkonProdInf");
+	t_params.bsCol = window.getBsCol();
+	t_params.widthType = window.getWidthType();
+	Mustache.parse(t);
+
+	toolTip.popup(
+		Mustache.render(t,t_params)
+		,{"width":200,
+		"title":"Производство Elkon",
+		"className":"",
+		"event":ev
+		}
+	);
+
 }

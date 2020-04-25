@@ -769,3 +769,8 @@ td.factQuantViolation{
 .productionMaterialList td.quant_editable:hover{
 	background-color:yellow !important;
 }
+
+.operatorProdDetail{
+	margin:10px 10px;
+}
+

@@ -21,6 +21,8 @@ CREATE OR REPLACE VIEW productions_list AS
 		vs.vehicle_id,
 		vehicle_schedules_ref(vs,v,dr) AS vehicle_schedules_ref
 		
+		,t.material_tolerance_violated
+		
 	FROM productions AS t
 	LEFT JOIN production_sites AS ps ON ps.id = t.production_site_id
 	LEFT JOIN shipments AS sh ON sh.id = t.shipment_id

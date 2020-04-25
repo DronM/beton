@@ -62,6 +62,22 @@ class RawMaterialMapToProductionList_Model extends ModelSQLBeton{
 		$f_order_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_id",$f_opts);
 		$this->addField($f_order_id);
 		//********************
+		
+		//*** Field raw_material_id ***
+		$f_opts = array();
+		$f_opts['id']="raw_material_id";
+						
+		$f_raw_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"raw_material_id",$f_opts);
+		$this->addField($f_raw_material_id);
+		//********************
+		
+		//*** Field raw_material_ord ***
+		$f_opts = array();
+		$f_opts['id']="raw_material_ord";
+						
+		$f_raw_material_ord=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"raw_material_ord",$f_opts);
+		$this->addField($f_raw_material_ord);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

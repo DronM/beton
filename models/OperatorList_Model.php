@@ -8,7 +8,6 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
@@ -194,54 +193,14 @@ class OperatorList_Model extends ModelSQLBeton{
 		$this->addField($f_production_site_id);
 		//********************
 		
-		//*** Field production_id ***
+		//*** Field production_list ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Номер производства elkon';
-		$f_opts['id']="production_id";
+		$f_opts['alias']='Список производств elkon';
+		$f_opts['id']="production_list";
 						
-		$f_production_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_id",$f_opts);
-		$this->addField($f_production_id);
-		//********************
-		
-		//*** Field production_concrete_types_ref ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Марка elkon';
-		$f_opts['id']="production_concrete_types_ref";
-						
-		$f_production_concrete_types_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_concrete_types_ref",$f_opts);
-		$this->addField($f_production_concrete_types_ref);
-		//********************
-		
-		//*** Field production_dt_start ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Начало производства elkon';
-		$f_opts['id']="production_dt_start";
-						
-		$f_production_dt_start=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_dt_start",$f_opts);
-		$this->addField($f_production_dt_start);
-		//********************
-		
-		//*** Field production_dt_end ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Окончание производства elkon';
-		$f_opts['id']="production_dt_end";
-						
-		$f_production_dt_end=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_dt_end",$f_opts);
-		$this->addField($f_production_dt_end);
-		//********************
-		
-		//*** Field production_user ***
-		$f_opts = array();
-		
-		$f_opts['alias']='Пользователь elkon';
-		$f_opts['id']="production_user";
-						
-		$f_production_user=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_user",$f_opts);
-		$this->addField($f_production_user);
+		$f_production_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_list",$f_opts);
+		$this->addField($f_production_list);
 		//********************
 		
 		//*** Field tolerance_exceeded ***
@@ -252,6 +211,7 @@ class OperatorList_Model extends ModelSQLBeton{
 		$this->addField($f_tolerance_exceeded);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
+		$this->setCalcHash(TRUE);
 	}
 
 }

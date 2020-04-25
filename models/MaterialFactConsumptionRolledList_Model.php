@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
@@ -29,7 +30,7 @@ class MaterialFactConsumptionRolledList_Model extends ModelSQLBeton{
 		$f_opts['primaryKey'] = TRUE;
 		$f_opts['id']="date_time";
 						
-		$f_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
+		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
 		$this->addField($f_date_time);
 		//********************
 		
@@ -161,6 +162,14 @@ class MaterialFactConsumptionRolledList_Model extends ModelSQLBeton{
 						
 		$f_production_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_id",$f_opts);
 		$this->addField($f_production_id);
+		//********************
+		
+		//*** Field material_tolerance_violated ***
+		$f_opts = array();
+		$f_opts['id']="material_tolerance_violated";
+						
+		$f_material_tolerance_violated=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_tolerance_violated",$f_opts);
+		$this->addField($f_material_tolerance_violated);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

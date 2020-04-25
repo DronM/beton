@@ -797,7 +797,7 @@ class Shipment_Controller extends ControllerSQL{
 			$extra_join = "LEFT JOIN (SELECT t.shipment_id,t.date_time FROM vehicle_schedule_states t WHERE t.state='assigned' GROUP BY t.shipment_id,t.date_time) vs2 ON vs2.shipment_id = sh.id";
 		}
 		
-		$this->addNewModel(sprintf(
+		$q = sprintf(
 		"WITH
 		%s
 		ships AS (
@@ -816,16 +816,7 @@ class Shipment_Controller extends ControllerSQL{
 			sh.production_site_id,
 			production_sites_ref(ps) AS production_sites_ref,
 			users_ref(op_u) AS operators_ref,
-			prd.production_id,
-			concrete_types_ref(prd_ct) AS production_concrete_types_ref,
-			prd.production_dt_start,
-			prd.production_dt_end,
-			prd.production_user,
-			CASE
-				WHEN prd.production_id IS NOT NULL THEN
-					mat_list.tolerance_exceeded
-				ELSE FALSE
-			END tolerance_exceeded
+			(SELECT json_agg(row_to_json(productions)) FROM productions WHERE productions.shipment_id=sh.id) AS production_list
 			%s
 		FROM shipments AS sh
 		LEFT JOIN orders o ON o.id = sh.order_id
@@ -837,17 +828,6 @@ class Shipment_Controller extends ControllerSQL{
 		LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
 		LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
 		LEFT JOIN users AS op_u ON op_u.id=sh.operator_user_id
-		LEFT JOIN productions AS prd ON prd.shipment_id=sh.id
-		LEFT JOIN concrete_types prd_ct ON prd_ct.id = prd.concrete_type_id
-		LEFT JOIN (
-			SELECT
-				production_site_id,production_id,
-				bool_or(dif_violation) AS tolerance_exceeded
-			FROM production_material_list
-			GROUP BY production_site_id,production_id
-		) AS mat_list ON
-			mat_list.production_site_id = sh.production_site_id
-			AND mat_list.production_id = prd.production_id
 		%s
 		WHERE (sh.shipped = FALSE OR (sh.ship_date_time BETWEEN %s AND %s))".$operator_cond."
 		)
@@ -869,9 +849,11 @@ class Shipment_Controller extends ControllerSQL{
 		$extra_join,
 		$date_from_db,
 		$date_to_db
-		),
-		"OperatorList_Model"
 		);
+		$m = new ModelSQL($this->getDbLink(),array('id'=>"OperatorList_Model"));
+		$m->setCalcHash(TRUE);
+		$m->query($q,TRUE);
+		$this->addModel($m);
 		
 		//totals
 		$this->addNewModel(sprintf(
@@ -897,7 +879,7 @@ class Shipment_Controller extends ControllerSQL{
 		else{
 			$prod_site_q = 'SELECT ps.name FROM production_sites ps';
 		}
-		$this->addNewModel($prod_site_q,'OperatorProductionSite_Model');		
+		$this->addNewModel($prod_site_q,'OperatorProductionSite_Model');				
 	}
 	
 	public static function setShipped($dbLinkMaster,$dbLink,$idForDb,$operatorUserId,$smsResOk,$smsResStr,$interactiveMode){

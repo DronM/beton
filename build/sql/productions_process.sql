@@ -31,6 +31,19 @@ BEGIN
 			);		
 		END IF;
 		
+		IF TG_OP='UPDATE'
+			AND (
+				OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL
+			)
+		THEN
+			SELECT
+				bool_or(mat_list.dif_violation)
+			INTO NEW.material_tolerance_violated
+			FROM production_material_list AS mat_list
+			WHERE mat_list.production_site_id = NEW.production_site_id AND mat_list.production_id = NEW.production_id			
+			;
+		END IF;
+		
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN

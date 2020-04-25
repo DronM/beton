@@ -32,6 +32,8 @@ class Production_Controller extends ControllerSQL{
 	const LOG_LEVEL_DEBUG = 9;
 	const LOG_LEVEL_NOTE = 3;
 	const LOG_LEVEL_ERROR = 0;
+	
+	const ER_NO_MSSQL_DRIVER = 'No MSSQL driver installed!';
 
 	private $mssqlConnections;
 
@@ -89,6 +91,9 @@ class Production_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		$param = new FieldExtText('production_concrete_type_descr'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtBool('material_tolerance_violated'
 				,array());
 		$pm->addParam($param);
 		
@@ -168,6 +173,10 @@ class Production_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtText('production_concrete_type_descr'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('material_tolerance_violated'
 				,array(
 			));
 			$pm->addParam($param);
@@ -267,6 +276,10 @@ UPDATE public.production_sites
 		return function_exists('mssql_select_db');
 	}
 
+	private static function use_sqlsrv_connect(){
+		return function_exists('sqlsrv_connect');
+	}
+
 	private function log_action($prodSiteId,$mes,$mesLevel,$servLevel){
 		if($servLevel >= $mesLevel){
 
@@ -285,11 +298,12 @@ UPDATE public.production_sites
 
 	/**
 	 * Возвращает производства более $productionId
-	 * каждая строка- это новое производство
+	 * каждая строка- это новое начатое производство
+	 * Uretim.Statu=1 - отмененное
 	 */
 	private function elkon_get_next_productions($prodSiteId,$elkonCon,$productionId){
 		$q  = sprintf(
-			'SELECT
+			"SELECT
 				Uretim.Id AS id,
 				Uretim.BasTarih AS dt_start,
 				Recete.ReceteAdi AS concrete_type_descr,
@@ -297,17 +311,15 @@ UPDATE public.production_sites
 				Uretim.Olusturan AS user_descr
 			FROM Uretim
 			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
-			WHERE Uretim.Id>%d
-			ORDER BY Uretim.Id',
+			WHERE Uretim.Id>%d AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih<>'' AND (Uretim.Statu=0 OR Uretim.Statu=2)
+			ORDER BY Uretim.Id",
 			$productionId
 		);
 		
 		$productions = [];
-		if(self::use_mssql_connect()){
-			$con_id = self::get_con_id($prodSiteId);
-			
-			$this->log_action($prodSiteId,'Получение из elkon следующего производства больше '.$productionId,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);
-			
+		$con_id = self::get_con_id($prodSiteId);			
+		$this->log_action($prodSiteId,'Получение из elkon следующего производства больше '.$productionId,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);		
+		if(self::use_mssql_connect()){			
 			try{
 				$res = mssql_query($q, $this->mssqlConnections[$con_id]);
 				while($row = mssql_fetch_assoc($res)){
@@ -317,6 +329,26 @@ UPDATE public.production_sites
 			finally{
 				mssql_free_result($res);
 			}
+		}
+		else if(self::use_sqlsrv_connect()){
+			try{
+				$res = sqlsrv_query($this->mssqlConnections[$con_id], $q);
+				if( $res === FALSE ) {
+					throw new Exception(print_r(sqlsrv_errors()));	
+				}
+				while($row = sqlsrv_fetch_array($res,SQLSRV_FETCH_ASSOC)){
+					array_push($productions,$row);
+				}
+			}
+			finally{
+				if($res!==FALSE){
+					sqlsrv_free_stmt($res);
+				}
+			}
+		
+		}
+		else{
+			throw new Exception(self::ER_NO_MSSQL_DRIVER);
 		}
 		
 		return $productions;
@@ -333,6 +365,8 @@ UPDATE public.production_sites
 	 * при ручном импорте сделаем как в файле без
 	 *	Mat1.MalzemeAdi AS mat1_descr
 	 *	LEFT JOIN Malzeme AS Mat1 ON Mat1.Id=UretimSonuc.Agrega1MalzemeId
+	 *
+	 *	Uretim.Statu=1 - Это отмененные производства, их не учитываем!
 	 */
 	private function elkon_get_materials_on_closed_production($prodSiteId,$elkonCon,$productionId){
 		$q  = sprintf(
@@ -457,11 +491,11 @@ UPDATE public.production_sites
 			$productionId,
 			$productionId
 		);
-		if(self::use_mssql_connect()){
-			$con_id = self::get_con_id($prodSiteId);
-			
-			$this->log_action($prodSiteId,'Получение из elkon списанных материалов по закрытому производству '.$productionId,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);
-			
+		
+		$con_id = self::get_con_id($prodSiteId);			
+		$this->log_action($prodSiteId,'Получение из elkon списанных материалов по закрытому производству '.$productionId,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);
+		
+		if(self::use_mssql_connect()){			
 			try{
 				$res = mssql_query($q, $this->mssqlConnections[$con_id]);
 				$row = mssql_fetch_assoc($res);
@@ -469,6 +503,23 @@ UPDATE public.production_sites
 			finally{
 				mssql_free_result($res);
 			}
+		}
+		else if(self::use_sqlsrv_connect()){
+			try{
+				$res = sqlsrv_query($this->mssqlConnections[$con_id], $q);
+				if($res === FALSE ) {
+					throw new Exception(print_r(sqlsrv_errors()));	
+				}
+				$row = sqlsrv_fetch_array($res,SQLSRV_FETCH_ASSOC);
+			}
+			finally{
+				if($res!==FALSE){
+					sqlsrv_free_stmt($res);
+				}
+			}
+		}
+		else{
+			throw new Exception(self::ER_NO_MSSQL_DRIVER);
 		}
 		
 		return $row;
@@ -483,13 +534,13 @@ UPDATE public.production_sites
 	 */	
 	private function connect_to_elkon_server($prodSiteId,$elkonCon){
 		//substr(phpversion(),0,1)
-		$con_id = self::get_con_id($prodSiteId);
-		if(self::use_mssql_connect()){
+		$con_id = self::get_con_id($prodSiteId);		
 		
+		if(self::use_mssql_connect()){		
 			$server_name = sprintf('%s:%d',$elkonCon->host,$elkonCon->port);
 			
 			if((is_null($this->mssqlConnections) || !isset($this->mssqlConnections[$con_id]))){
-				$this->log_action($prodSiteId,'Соединение с сервером '.$server_name,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);
+				$this->log_action($prodSiteId,'Соединение mssql_connect с сервером '.$server_name,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);
 			
 				$this->mssqlConnections[$con_id] = @mssql_connect($server_name, $elkonCon->userName, $elkonCon->userPassword);
 				if($this->mssqlConnections[$con_id]===FALSE){
@@ -501,7 +552,26 @@ UPDATE public.production_sites
 				$this->log_action($prodSiteId,'Используется открытое соединение с сервером '.$server_name,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);
 			}
 		}
-	
+		else if(self::use_sqlsrv_connect()){
+			$server_name = sprintf('%s, %d',$elkonCon->host,$elkonCon->port);
+			
+			if((is_null($this->mssqlConnections) || !isset($this->mssqlConnections[$con_id]))){
+				$this->log_action($prodSiteId,'Соединение sqlsrv_connect с сервером '.$server_name,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);
+				$con_info = array(
+					'Database'=>$elkonCon->databaseName
+					,'UID'=>$elkonCon->userName
+					,'PWD'=>$elkonCon->userPassword
+					//,'CharacterSet' => 'UTF-8'
+				);
+				$this->mssqlConnections[$con_id] = @sqlsrv_connect($server_name, $con_info);
+			}
+			else{
+				$this->log_action($prodSiteId,'Используется открытое соединение с сервером '.$server_name,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);
+			}			
+		}
+		else{
+			throw new Exception(self::ER_NO_MSSQL_DRIVER);
+		}	
 	}
 
 	public function check_data($pm){
@@ -534,6 +604,14 @@ UPDATE public.production_sites
 			$elkon_con = json_decode($serv['elkon_connection']);
 		
 			$this->log_action($serv['id'],'Проверка данных завод: '.$serv['name'],self::LOG_LEVEL_NOTE,$elkon_con->logLevel);
+		
+			try{
+				$this->connect_to_elkon_server($serv['id'],$elkon_con);
+			}
+			catch(Exception $e){
+				$this->log_action($serv['id'],'Ошибка: '.$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
+				continue;
+			}
 		
 			try{
 				$this->connect_to_elkon_server($serv['id'],$elkon_con);
@@ -765,7 +843,7 @@ UPDATE public.production_sites
 										$veh_descr_db,
 										$vehicle_id,
 										$vehicle_schedule_state_id,
-										floatval($material_data['concrete_quant'])/1000,
+										floatval($material_data['concrete_quant']),
 										floatval($material_data[$m_id_pref.'_quant'])/1000,
 										floatval($material_data[$m_id_pref.'_quant_req'])/1000,
 										$silo_id,

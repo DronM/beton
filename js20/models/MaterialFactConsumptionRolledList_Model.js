@@ -29,7 +29,7 @@ function MaterialFactConsumptionRolledList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.date_time = new FieldDateTimeTZ("date_time",filed_options);
+	options.fields.date_time = new FieldDateTime("date_time",filed_options);
 	
 				
 	
@@ -175,6 +175,15 @@ function MaterialFactConsumptionRolledList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.production_id = new FieldInt("production_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.material_tolerance_violated = new FieldBool("material_tolerance_violated",filed_options);
 	
 		MaterialFactConsumptionRolledList_Model.superclass.constructor.call(this,id,options);
 }

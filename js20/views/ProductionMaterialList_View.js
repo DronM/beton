@@ -3,6 +3,23 @@
  */
 function ProductionMaterialList_View(id,options){	
 
+	var production_id;
+	if(options.detailFilters){	
+		for(var i=0;i<options.detailFilters.ProductionMaterialList_Model.length;i++){
+			if(options.detailFilters.ProductionMaterialList_Model[i].masterFieldId=="production_id"){
+				production_id = options.detailFilters.ProductionMaterialList_Model[i].val;
+				break;
+			}
+		}
+	}
+	this.HEAD_TITLE = "Списание материалов в производство"+( production_id? " №"+production_id:"" );
+	/*
+	options.template = window.getApp().getTemplate("ProductionMaterialList");
+	options.templateOptions = {
+		this.HEAD_TITLE:"Списание материалов в производство"+( production_id? " №"+production_id:"" )
+	};
+	*/
+	
 	ProductionMaterialList_View.superclass.constructor.call(this,id,options);
 
 	var model = (options.models&&options.models.ProductionMaterialList_Model)? options.models.ProductionMaterialList_Model : new ProductionMaterialList_Model();
@@ -192,7 +209,8 @@ function ProductionMaterialList_View(id,options){
 							"colAttrs":{"align":"right","width":"10px"},
 							"columns":[
 								new GridColumnFloat({
-									"field":model.getField("quant_dif")
+									"field":model.getField("quant_dif"),
+									"precision":"4"
 								})
 							]
 						})

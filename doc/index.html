@@ -6940,7 +6940,7 @@
 <div class="content_item">
 <p>Поля:</p>
 <h2>date_time</h2>
-<div>Type:DateTimeTZ</div>
+<div>Type:DateTime</div>
 <div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -7037,6 +7037,12 @@
 <div>Precision:</div>
 <h2>production_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_tolerance_violated</h2>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -7269,32 +7275,8 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>production_id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>production_concrete_types_ref</h2>
+<h2>production_list</h2>
 <div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>production_dt_start</h2>
-<div>Type:DateTime</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>production_dt_end</h2>
-<div>Type:DateTime</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>production_user</h2>
-<div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -8661,6 +8643,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>material_tolerance_violated</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ProductionList_Model" class="content_box">
@@ -8771,6 +8759,12 @@
 <div>Precision:</div>
 <h2>order_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_tolerance_violated</h2>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -10240,6 +10234,18 @@
 <div>Length:100</div>
 <div>Precision:</div>
 <h2>order_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_material_ord</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>

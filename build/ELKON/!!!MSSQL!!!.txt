@@ -33,3 +33,12 @@ go
 Реестр
 HKey_LOCAL_MACHINE\Software\MICROSOFTSQLServer\MSSQL.1\MSSQLServer\LoginMode было 1, сделал 2
 и MSSQL.2 тоже самое!
+
+Для работы php5, подключение через mssql_connect
+ФАЙЛ /etc/freetds/freetds.conf
+Добавить строки в секцию global
+        tds version = 7.0
+        client charset = UTF8
+
+php7 sqlsrv_connect Подключение описано в настройке сервера install
+
