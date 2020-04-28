@@ -29,7 +29,8 @@ function ShipmentForOrderList_View(id,options){
 			"cmdAllCommands":false,
 			"cmdDelete":false,
 			"addCustomCommandsAfter":function(commands){
-				commands.push(new ShipmentGridCmdPrintInvoice(id+":grid:cmd:printInvoice"));
+				commands.push(new ShipmentGridCmdPrintInvoice(id+":grid:cmd:printInvoice"));				
+				commands.push(new ShipmentGridCmdChangeOrder(id+":grid:cmd:Change"));
 				commands.push(new ShipmentGridCmdDelete(id+":grid:cmd:delete"));
 			}
 		}),

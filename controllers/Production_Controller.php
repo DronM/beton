@@ -237,6 +237,24 @@ class Production_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('check_production');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('production_site_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('production_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_production_material_list');
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -297,11 +315,13 @@ UPDATE public.production_sites
 	}
 
 	/**
-	 * Возвращает производства более $productionId
+	 * Возвращает производства более или равное $productionId
 	 * каждая строка- это новое начатое производство
 	 * Uretim.Statu=1 - отмененное
+	 * $sign = меньше / или равно
+	 * т.е получает или слкдующее или равное по Ид
 	 */
-	private function elkon_get_next_productions($prodSiteId,$elkonCon,$productionId){
+	private function elkon_get_productions($prodSiteId,$elkonCon,$productionId,$sign){
 		$q  = sprintf(
 			"SELECT
 				Uretim.Id AS id,
@@ -311,14 +331,20 @@ UPDATE public.production_sites
 				Uretim.Olusturan AS user_descr
 			FROM Uretim
 			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
-			WHERE Uretim.Id>%d AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih<>'' AND (Uretim.Statu=0 OR Uretim.Statu=2)
+			WHERE Uretim.Id %s %d AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih<>'' AND (Uretim.Statu=0 OR Uretim.Statu=2)
 			ORDER BY Uretim.Id",
+			$sign,
 			$productionId
 		);
 		
 		$productions = [];
 		$con_id = self::get_con_id($prodSiteId);			
-		$this->log_action($prodSiteId,'Получение из elkon следующего производства больше '.$productionId,self::LOG_LEVEL_DEBUG,$elkonCon->logLevel);		
+		$this->log_action(
+			$prodSiteId,
+			(($sign=='=')? 'Получение из elkon производства по идентификатору '.$productionId:'Получение из elkon следующего производства больше '.$productionId),
+			self::LOG_LEVEL_DEBUG,
+			$elkonCon->logLevel
+		);		
 		if(self::use_mssql_connect()){			
 			try{
 				$res = mssql_query($q, $this->mssqlConnections[$con_id]);
@@ -354,7 +380,14 @@ UPDATE public.production_sites
 		return $productions;
 		
 	}
-	
+
+	private function elkon_get_next_productions($prodSiteId,$elkonCon,$productionId){
+		return $this->elkon_get_productions($prodSiteId,$elkonCon,$productionId,">");
+	}
+	private function elkon_get_production_by_id($prodSiteId,$elkonCon,$productionId){
+		return $this->elkon_get_productions($prodSiteId,$elkonCon,$productionId,"=");
+	}
+
 	/**
 	 * если производство с данным ID  закрыто - возвращает таблицу списанных материалов
 	 * Всего с материалами 12 полей и 4 с цементом = 16 Это соответствует константе MT_FIELD_CNT
@@ -574,6 +607,135 @@ UPDATE public.production_sites
 		}	
 	}
 
+	private function insert_elkon_productions($productionSiteId,&$productionsData,$elkonLogLevel,$updateLastProduction){
+		$q_head = "INSERT INTO productions (
+			production_id,
+			production_dt_start,
+			production_user,
+			production_vehicle_descr,
+			production_site_id,
+			concrete_type_id,
+			production_concrete_type_descr				
+		) VALUES ";												
+		$q_body = '';				
+		
+		$max_production_id = 0;
+		foreach($productionsData as $production_data){
+		
+			$id_db = 0;
+			FieldSQLInt::formatForDb($production_data['id'],$id_db);
+
+			$dt_start = strtotime($production_data['dt_start']);
+			if($dt_start===FALSE || $dt_start===-1){
+				//throw new Exception('Ошибка преобразования даты начала производства:"'.$production_data['dt_start'].'", Производство элкон:'.$production_data['id']);
+				$this->log_action($productionSiteId,'Ошибка преобразования даты начала производства:"'.$production_data['dt_start'].'"',self::LOG_LEVEL_ERROR,$elkonLogLevel);
+				continue;
+			}
+			$dt_start_db = '';
+			FieldSQLDateTime::formatForDb($dt_start,$dt_start_db);
+
+			$user_db = '';
+			FieldSQLString::formatForDb($this->getDbLink(),$production_data['user_descr'],$user_db);
+
+			$vehicle_descr_db = '';
+			FieldSQLString::formatForDb($this->getDbLink(),$production_data['vehicle_descr'],$vehicle_descr_db);
+
+			$concrete_type_descr_db = '';
+			FieldSQLString::formatForDb($this->getDbLink(),$production_data['concrete_type_descr'],$concrete_type_descr_db);
+		
+			//******* Марка бетона идентификатор **********
+			$concrete_type_id = 'NULL';
+			if(!isset($concrete_types[$production_data['concrete_type_descr']])){
+				$ar = $this->getDbLink()->query_first(sprintf("SELECT material_fact_consumptions_add_concrete_type(%s) AS concrete_type_id",$concrete_type_descr_db));
+				$concrete_type_id = is_null($ar['concrete_type_id'])? 'NULL':$ar['concrete_type_id'];
+				$concrete_types[$production_data['concrete_type_descr']] = $concrete_type_id;
+			}
+			else{
+				$concrete_type_id = $concrete_types[$production_data['concrete_type_descr']];
+			}
+		
+			$q_body.= ($q_body=='')? '':',';
+			$q_body.=sprintf(
+				"(%d,
+				%s,
+				%s,
+				%s,
+				%d,
+				%s,%s)",
+				$id_db,
+				$dt_start_db,
+				$user_db,
+				$vehicle_descr_db,
+				$productionSiteId,
+				$concrete_type_id,
+				$concrete_type_descr_db
+			);
+			
+			if($max_production_id < $id_db){
+				$max_production_id = $id_db;
+			}
+		}
+		if(strlen($q_body)){
+			try{
+				$this->log_action($productionSiteId,'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body,self::LOG_LEVEL_DEBUG,$elkonLogLevel);	
+				
+				$this->getDbLinkMaster()->query('BEGIN');						
+				$this->getDbLinkMaster()->query($q_head.' '.$q_body);
+
+				if($updateLastProduction){			
+					$this->getDbLinkMaster()->query(sprintf(
+						'UPDATE production_sites
+						SET last_elkon_production_id=%d
+						WHERE id=%d',
+						$max_production_id,
+						$productionSiteId
+					));
+				}
+				$this->getDbLinkMaster()->query('COMMIT');
+			}
+			catch(Exception $e){
+				$this->getDbLinkMaster()->query('ROLLBACK');
+				
+				throw $e;
+			}
+		}
+	
+	
+	}
+	
+	public function check_production($pm){
+		//Получение производства по иду
+		$production_site_id = $this->getExtDbVal($pm,'production_site_id');
+		$elkon_con = NULL;
+		$q_id = $this->getDbLink()->query("SELECT * FROM production_sites_last_production_list");
+		while($serv = $this->getDbLink()->fetch_array($q_id)){
+			if($production_site_id == $serv['id']){
+				$elkon_con = json_decode($serv['elkon_connection']);
+				try{
+					$this->connect_to_elkon_server($serv['id'],$elkon_con);
+				}
+				catch(Exception $e){
+					$this->log_action($serv['id'],'Ошибка: '.$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
+				}
+				
+				break;
+			}
+		}
+		if(!$elkon_con){
+			throw new Exception('Не найдено соединение для завода с Ид='.$production_site_id);
+		}
+		
+		try{
+			$productions_data = $this->elkon_get_production_by_id($production_site_id, $elkon_con,$this->getExtDbVal($pm,'production_id'));
+			$this->insert_elkon_productions($production_site_id,$productions_data,$elkon_con->logLevel,FALSE);
+		}
+		catch(Exception $e){
+			$this->log_action($production_site_id,'Ошибка: '.$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
+			
+			throw $e;
+		}			
+	}
+	
 	public function check_data($pm){
 		
 		$res = TRUE;//false if error
@@ -727,7 +889,8 @@ UPDATE public.production_sites
 									$mat_id = 'NULL';
 									if(!isset($materials[$mat_descr])){
 										$ar = $this->getDbLink()->query_first(sprintf(
-											"SELECT material_fact_consumptions_add_material(%s,%s) AS material_id",
+											"SELECT material_fact_consumptions_add_material(%d,%s,%s) AS material_id",
+											$serv['id'],
 											$mat_descr_db,
 											$production_dt_end_db
 										));
@@ -982,6 +1145,10 @@ UPDATE public.production_sites
 					continue;
 				}
 				
+				//Получение новых производств
+				$productions_data = $this->elkon_get_next_productions($serv['id'],$elkon_con,$max_production_id);
+				$this->insert_elkon_productions($serv['id'],$productions_data,$elkon_con->logLevel,TRUE);
+				/*
 				$q_head = "INSERT INTO productions (
 					production_id,
 					production_dt_start,
@@ -990,9 +1157,9 @@ UPDATE public.production_sites
 					production_site_id,
 					concrete_type_id,
 					production_concrete_type_descr				
-				) VALUES ";				
-				$q_body = '';
-				$productions_data = $this->elkon_get_next_productions($serv['id'],$elkon_con,$max_production_id);
+				) VALUES ";												
+				$q_body = '';				
+				
 				$max_production_id = 0;
 				foreach($productions_data as $production_data){
 				
@@ -1072,6 +1239,7 @@ UPDATE public.production_sites
 						throw $e;
 					}
 				}
+				*/
 				
 			}
 			catch(Exception $e){

@@ -68,6 +68,12 @@ extend(RawMaterialMapToProduction_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldInt("production_site_id",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -107,6 +113,12 @@ extend(RawMaterialMapToProduction_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldInt("order_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("production_site_id",options);
 	
 	pm.addField(field);
 	
@@ -159,6 +171,12 @@ extend(RawMaterialMapToProduction_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("raw_material_ord",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("production_sites_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("production_site_id",f_opts));
 }
 
 			RawMaterialMapToProduction_Controller.prototype.addGetObject = function(){

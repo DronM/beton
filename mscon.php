@@ -35,9 +35,16 @@ if (!$USE_SQLSRV){
 
 
 $q = "SELECT
-	Uretim.*
-FROM Uretim
-WHERE Uretim.Id=91675";
+				Uretim.Id AS id,
+				Uretim.BasTarih AS dt_start,
+				Recete.ReceteAdi AS concrete_type_descr,
+				Uretim.AracPlaka AS vehicle_descr,
+				Uretim.Olusturan AS user_descr
+			FROM Uretim
+			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
+			WHERE Uretim.Id = 91817 AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih<>'' AND (Uretim.Statu=0 OR Uretim.Statu=2)
+			ORDER BY Uretim.Id";
+//WHERE Uretim.Id=91918";
 
 //$q = "SELECT TOP 1 * FROM UretimSonuc";
 //$q = "SELECT * FROM SYSOBJECTS WHERE xtype = 'U'";

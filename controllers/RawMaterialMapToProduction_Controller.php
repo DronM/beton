@@ -41,6 +41,9 @@ class RawMaterialMapToProduction_Controller extends ControllerSQL{
 		$param = new FieldExtInt('order_id'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtInt('production_site_id'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -72,6 +75,10 @@ class RawMaterialMapToProduction_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtInt('order_id'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('production_site_id'
 				,array(
 			));
 			$pm->addParam($param);

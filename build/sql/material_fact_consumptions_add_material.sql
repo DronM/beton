@@ -1,13 +1,16 @@
---DROP FUNCTION material_fact_consumptions_add_material(text,timestamp)
-CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(text,timestamp)
+--DROP FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone)
 RETURNS int as $$
 DECLARE
 	v_raw_material_id int;
 BEGIN
 	v_raw_material_id = NULL;
+	
+	--Берется соответствие с большей датой или по конкретному заводу или по пустому
 	SELECT raw_material_id INTO v_raw_material_id
 	FROM raw_material_map_to_production
-	WHERE production_descr = $1 AND date_time<=$2
+	WHERE	(production_site_id=in_production_site_id OR production_site_id IS NULL)
+		AND production_descr = in_material_descr AND date_time<=in_date_time
 	ORDER BY date_time DESC
 	LIMIT 1;
 	
@@ -25,4 +28,4 @@ BEGIN
 END;
 $$ language plpgsql;
 
-ALTER FUNCTION material_fact_consumptions_add_material(text,timestamp) OWNER TO ;
+ALTER FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone) OWNER TO ;

@@ -38,11 +38,11 @@ BEGIN
 		ORDER BY date_time DESC
 		LIMIT 1;
 		
-		IF coalesce(v_material_id,0)>0 THEN		
+		IF coalesce(v_material_id,0)>0 AND v_quant<>0 THEN		
 			--здесь определяем свое количество по регистру материалов
-			SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(NEW.date_time,ARRAY[v_material_id]) AS rg;		
+			--SELECT rg.quant INTO v_quant FROM rg_material_facts_balance(NEW.date_time,ARRAY[v_material_id]) AS rg;					
+			--v_quant = NEW.quant_required - coalesce(v_quant,0);
 			
-			v_quant = NEW.quant_required - coalesce(v_quant,0);
 			--RAISE EXCEPTION 'v_quant=%',v_quant;
 			IF v_quant<>0 THEN			
 				reg_material_facts.date_time		= NEW.date_time;

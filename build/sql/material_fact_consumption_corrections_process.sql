@@ -43,6 +43,16 @@ BEGIN
 		END IF;
 
 		
+		IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND OLD.quant<>NEW.quant)) THEN
+			UPDATE productions
+			SET
+				material_tolerance_violated = productions_get_mat_tolerance_violated(
+						NEW.production_site_id,
+						NEW.production_id
+				)
+			WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id;
+		END IF;
+		
 		RETURN NEW;
 		
 	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN

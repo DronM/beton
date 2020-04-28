@@ -31,12 +31,12 @@ CREATE OR REPLACE VIEW material_fact_consumptions_list AS
 		
 		ra_mat.quant AS material_quant_shipped,
 		(
-			(CASE WHEN ra_mat.quant IS NULL OR ra_mat.quant=0 THEN TRUE
-				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=mat.max_required_quant_tolerance_percent
+			(CASE WHEN ra_mat.quant IS NULL OR ra_mat.quant=0 THEN FALSE
+				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
 			END)
 			OR
 			(CASE WHEN t.material_quant_req IS NULL OR t.material_quant_req=0 THEN TRUE
-				ELSE abs(t.material_quant/t.material_quant_req*100-100)>=mat.max_required_quant_tolerance_percent
+				ELSE abs(t.material_quant/t.material_quant_req*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
 			END
 			)
 		) AS material_quant_tolerance_exceeded,

@@ -30,6 +30,7 @@ function Production_Controller(options){
 	this.addGetList();
 	this.addGetObject();
 	this.add_check_data();
+	this.add_check_production();
 	this.add_get_production_material_list();
 		
 }
@@ -334,6 +335,30 @@ extend(Production_Controller,ControllerObjServer);
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('check_data',opts);
 	
+	this.addPublicMethod(pm);
+}
+
+			Production_Controller.prototype.add_check_production = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('check_production',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("production_site_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("production_id",options));
+	
+			
 	this.addPublicMethod(pm);
 }
 

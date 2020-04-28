@@ -36,12 +36,10 @@ BEGIN
 				OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL
 			)
 		THEN
-			SELECT
-				bool_or(mat_list.dif_violation)
-			INTO NEW.material_tolerance_violated
-			FROM production_material_list AS mat_list
-			WHERE mat_list.production_site_id = NEW.production_site_id AND mat_list.production_id = NEW.production_id			
-			;
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
 		END IF;
 		
 		RETURN NEW;

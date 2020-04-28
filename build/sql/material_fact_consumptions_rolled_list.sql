@@ -28,7 +28,8 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 			)
 		) AS materials,
 		err_concrete_type,
-		production_id
+		production_id,
+		bool_or(material_quant_tolerance_exceeded) AS material_tolerance_violated
 		
 	FROM material_fact_consumptions_list
 	GROUP BY date_time,

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-04-25 10:01:56</lastBuild></version>
+		<lastBuild>2020-04-28 06:42:00</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -72,6 +72,7 @@
 		<version dateOpen="2020-04-20 10:04:15" dateClose="2020-04-20 10:04:16">1.00166</version>
 		<version dateOpen="2020-04-20 10:04:26" dateClose="2020-04-23 06:04:45">1.00167</version>
 		<version dateOpen="2020-04-23 10:04:13" dateClose="2020-04-25 10:04:02">1.00168</version>
+		<version dateOpen="2020-04-27 12:04:09" dateClose="2020-04-28 06:04:42">1.00169</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2666,7 +2667,9 @@
 			<field id="raw_material_id" dataType="Int" refTable="raw_materials" refField="id"/>
 			<field id="production_descr" dataType="String" length="100" required="TRUE"/>
 			<field id="order_id" dataType="Int"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
 			<index id="raw_material_map_to_production_production_descr_idx" unique="TRUE">
+				<field id="production_site_id"/>
 				<field id="production_descr"/>
 				<field id="date_time"/>
 			</index>
@@ -2679,6 +2682,8 @@
 			<field id="order_id" dataType="Int"/>
 			<field id="raw_material_id" dataType="Int"/>
 			<field id="raw_material_ord" dataType="Int"/>
+			<field id="production_sites_ref" dataType="JSON"/>
+			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
 		</model>
 		<model id="MaterialFactConsumption" parent="ModelSQLBeton" dataTable="material_fact_consumptions" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
@@ -4146,6 +4151,10 @@
 			<publicMethod id="get_list" modelId="ProductionList"/>
 			<publicMethod id="get_object" modelId="ProductionList"/>
 			<publicMethod id="check_data"/>
+			<publicMethod id="check_production">
+				<field id="production_site_id" dataType="Int" required="TRUE"/>
+				<field id="production_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
 			<publicMethod id="get_production_material_list" modelId="ProductionMaterialList" condFields="TRUE"/>
 		</controller>
 		<controller id="MaterialFactBalanceCorretion" parentId="ControllerSQL" state="TRUE">
@@ -4854,6 +4863,7 @@
 		<jsScript file="views/QuarryList_View.js"/>
 		<jsScript file="views/LangList_View.js"/>
 		<jsScript file="views/OrderList_View.js"/>
+		<jsScript file="views/OrderForSelectList_View.js"/>
 		<jsScript file="views/ShipmentList_View.js"/>
 		<jsScript file="views/ShipmentForVehOwnerList_View.js"/>
 		<jsScript file="views/ShipmentForClientVehOwnerList_View.js"/>
@@ -5024,6 +5034,7 @@
 		<jsScript file="custom_controls/VehicleScheduleGridCmdShowPosition.js"/>
 		<jsScript file="custom_controls/PrintInvoiceBtn.js"/>
 		<jsScript file="custom_controls/ShipmentGridCmdPrintInvoice.js"/>
+		<jsScript file="custom_controls/ShipmentGridCmdChangeOrder.js"/>
 		<jsScript file="custom_controls/ShipmentGridCmdDelete.js"/>
 		<jsScript file="custom_controls/RawMaterialConsRateCalcBtn.js"/>
 		<jsScript file="custom_controls/RawMaterialConsRateDateGridCmd.js"/>

@@ -1204,6 +1204,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/QuarryList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LangList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderForSelectList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForVehOwnerList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForClientVehOwnerList_View.js'));
@@ -1374,6 +1375,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleGridCmdShowPosition.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PrintInvoiceBtn.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentGridCmdPrintInvoice.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentGridCmdChangeOrder.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentGridCmdDelete.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateCalcBtn.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateDateGridCmd.js'));

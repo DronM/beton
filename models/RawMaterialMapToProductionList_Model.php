@@ -78,6 +78,23 @@ class RawMaterialMapToProductionList_Model extends ModelSQLBeton{
 		$f_raw_material_ord=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"raw_material_ord",$f_opts);
 		$this->addField($f_raw_material_ord);
 		//********************
+		
+		//*** Field production_sites_ref ***
+		$f_opts = array();
+		$f_opts['id']="production_sites_ref";
+						
+		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
+		$this->addField($f_production_sites_ref);
+		//********************
+		
+		//*** Field production_site_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="production_site_id";
+						
+		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
+		$this->addField($f_production_site_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

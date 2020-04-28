@@ -71,6 +71,15 @@ function RawMaterialMapToProduction_Model(options){
 	
 	options.fields.order_id = new FieldInt("order_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
+	
 			
 		RawMaterialMapToProduction_Model.superclass.constructor.call(this,id,options);
 }

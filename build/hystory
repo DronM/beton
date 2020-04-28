@@ -338,19 +338,21 @@ update vehicle_schedule_states set destination_id=1225 where shipment_id=97949 a
 dsParams.control.getInsertPublicMethod()
 
 
-1.067
+1.069 27/04/20 
 1) MaterialMakeOrderGrid фактический остаток
 2) OperatorList_View параметры бляма
 3) Свернутая таблица
 4) Остатки материалов
+Промежуточный слив
 
 
-update material_fact_consumptions SET concrete_quant=concrete_quant*1000 WHERE concrete_quant<1
-update material_fact_consumptions set concrete_type_production_descr= 'М-300',concrete_type_id=3 WHERE concrete_type_production_descr='?300'
-update material_fact_consumptions set concrete_type_production_descr= 'М-350',concrete_type_id=4 WHERE concrete_type_production_descr='?350'
---update material_fact_consumptions set concrete_type_production_descr= 'М-250',concrete_type_id=5 WHERE concrete_type_production_descr='?250'
---update material_fact_consumptions set concrete_type_production_descr= 'М500',concrete_type_id=51 WHERE concrete_type_production_descr='?500'
-
+SELECT 
+(
+(select quant from rg_material_facts_balance('2020-04-27 06:00','{5}'))
++(select sum(quant) from ra_material_facts WHERE deb AND date_time>'2020-04-27 06:00:00' AND material_id=5)
+-(select sum(quant) from ra_material_facts WHERE NOT deb AND date_time>'2020-04-27 06:00:00' AND material_id=5)
+) AS calc
+,(select quant from rg_material_facts_balance('{5}')) AS fact
 
 Копия Крона на слейве, автоприменение
 --На слейве не работают методы соединения с MSSQL!

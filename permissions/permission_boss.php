@@ -1060,6 +1060,8 @@ $permissions = array();
 				
 					$permissions['Production_Controller_check_data']=TRUE;
 				
+					$permissions['Production_Controller_check_production']=TRUE;
+				
 					$permissions['Production_Controller_get_production_material_list']=TRUE;
 				
 					$permissions['MaterialFactBalanceCorretion_Controller_insert']=TRUE;

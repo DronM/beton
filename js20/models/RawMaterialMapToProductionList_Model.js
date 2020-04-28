@@ -87,6 +87,24 @@ function RawMaterialMapToProductionList_Model(options){
 	
 	options.fields.raw_material_ord = new FieldInt("raw_material_ord",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
+	
 		RawMaterialMapToProductionList_Model.superclass.constructor.call(this,id,options);
 }
 extend(RawMaterialMapToProductionList_Model,ModelXML);
