@@ -50,6 +50,7 @@ function Shipment_Controller(options){
 	this.add_owner_set_pump_agreed();
 	this.add_owner_set_pump_agreed_all();
 	this.add_get_shipped_vihicles_list();
+	this.addComplete();
 		
 }
 extend(Shipment_Controller,ControllerObjServer);
@@ -848,6 +849,16 @@ extend(Shipment_Controller,ControllerObjServer);
 	var pm = new PublicMethodServer('get_shipped_vihicles_list',opts);
 	
 	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.addComplete = function(){
+	Shipment_Controller.superclass.addComplete.call(this);
+	
+	var f_opts = {};
+	
+	var pm = this.getComplete();
+	pm.addField(new FieldInt("id",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("id");	
 }
 
 		

@@ -171,6 +171,22 @@ class MaterialFactConsumptionRolledList_Model extends ModelSQLBeton{
 		$f_material_tolerance_violated=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_tolerance_violated",$f_opts);
 		$this->addField($f_material_tolerance_violated);
 		//********************
+		
+		//*** Field shipments_ref ***
+		$f_opts = array();
+		$f_opts['id']="shipments_ref";
+						
+		$f_shipments_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipments_ref",$f_opts);
+		$this->addField($f_shipments_ref);
+		//********************
+		
+		//*** Field production_key ***
+		$f_opts = array();
+		$f_opts['id']="production_key";
+						
+		$f_production_key=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_key",$f_opts);
+		$this->addField($f_production_key);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

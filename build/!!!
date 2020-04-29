@@ -1,56 +1,48 @@
+SELECT quant from rg_material_facts_balance('2020-04-28 06:00','{5}')
+UNION ALL
 SELECT
-	s.*
-FROM
-(
-select clients.name,
-	(SELECT t.caller_id_num FROM ast_calls t WHERE t.client_id=clients.id AND t.call_type='in' order by start_time DESC limit 1) AS tel,
-	clients.create_date
- from clients
-where clients.create_date>='2019-04-01' AND substring(name,1,6)='Клиент'
-ORDER BY clients.create_date
-) As s
-WHERE s.tel IS NOT NULL AND substring(s.tel,1,1)='9'
+--(SELECT quant from rg_cement_balance('2020-04-28 06:00','{2}'))
++(SELECT quant from rg_cement_balance('2020-04-28 06:00','{3}'))
++(SELECT quant from rg_cement_balance('2020-04-28 06:00','{4}'))
++(SELECT quant from rg_cement_balance('2020-04-28 06:00','{5}'))
 
-
-
-
-
-DELETE FROM vehicle_owner_clients;
-INSERT INTO vehicle_owner_clients
-(vehicle_owner_id,client_id)
-(
-SELECT
-	t.id AS vehicle_owner_id,
-	t.client_id
-FROM vehicle_owners AS t
-WHERE t.client_id IS NOT NULL
-)
-
-
-DELETE FROM vehicle_owner_concrete_prices;
-INSERT INTO vehicle_owner_concrete_prices
-(vehicle_owner_id,concrete_costs_for_owner_h_id,date)
-(
-SELECT
-	t.id AS vehicle_owner_id,
-	t.concrete_costs_for_owner_h_id,
-	now()::date
-FROM vehicle_owners AS t
-WHERE t.concrete_costs_for_owner_h_id IS NOT NULL
-)
+--SELECT quant from rg_cement_balance('2020-04-28 06:00','{5}')
+--select * from ra_material_facts where doc_id=62 and doc_type='cement_silo_balance_reset'
+--update ra_cement set quant=0 where doc_id=62 and doc_type='cement_silo_balance_reset'
 
 
 
 /*
-UPDATE vehicle_owner_concrete_prices
-SET client_id=s.client_id
-FROM(
-SELECT v.client_id,v.id AS vehicle_owner_id
-FROM vehicle_owner_concrete_prices AS p
-LEFT JOIN vehicle_owners v ON v.id=p.vehicle_owner_id
-) AS s
-WHERE s.vehicle_owner_id=vehicle_owner_concrete_prices.vehicle_owner_id
+SELECT
+	dt_from,
+	get_shift_end(dt_from) AS dt_to
+FROM generate_series('2020-04-28 06:00:00'::timestamp without time zone,'2020-04-30 05:59:59'::timestamp without time zone,'1 day'::interval) AS dt_from
+LEFT JOIN 
 */
---SELECT * FROM vehicle_owner_concrete_prices
---ALTER TABLE vehicle_owner_concrete_prices DROP CONSTRAINT vehicle_owner_concrete_prices_pkey;
-ALTER TABLE vehicle_owner_concrete_prices ADD PRIMARY KEY (vehicle_owner_id,client_id,date);
+SELECT
+	sil.id AS silo_id,
+	coalesce(bal_start.quant,0) AS quant_start,	
+	coalesce(ra_prih.quant,0) AS quant_prih,
+	coalesce(ra_rash.quant,0) AS quant_rash,
+	coalesce(bal_end.quant,0) AS quant_end,
+	coalesce(bal_start.quant,0)+coalesce(ra_prih.quant,0)-coalesce(ra_rash.quant,0) AS quant_end_calc
+FROM cement_silos AS sil
+LEFT JOIN (SELECT * FROM rg_cement_balance('2020-04-28 06:00:00','{}')) AS bal_start ON bal_start.cement_silos_id=sil.id
+LEFT JOIN (SELECT * FROM rg_cement_balance('2020-05-01 06:00:00','{}')) AS bal_end ON bal_end.cement_silos_id=sil.id
+LEFT JOIN (
+	SELECT
+		cement_silos_id,
+		sum(quant) AS quant
+	FROM ra_cement
+	WHERE date_time BETWEEN '2020-04-28 06:00:00' AND '2020-04-30 05:59:59' AND deb
+	GROUP BY cement_silos_id
+) AS ra_prih ON ra_prih.cement_silos_id = sil.id 
+LEFT JOIN (
+	SELECT
+		cement_silos_id,
+		sum(quant) AS quant
+	FROM ra_cement
+	WHERE date_time BETWEEN '2020-04-28 06:00:00' AND '2020-04-30 05:59:59' AND NOT deb
+	GROUP BY cement_silos_id
+) AS ra_rash ON ra_rash.cement_silos_id = sil.id 
+

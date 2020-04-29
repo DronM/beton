@@ -29,7 +29,9 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 		) AS materials,
 		err_concrete_type,
 		production_id,
-		bool_or(material_quant_tolerance_exceeded) AS material_tolerance_violated
+		bool_or(material_quant_tolerance_exceeded) AS material_tolerance_violated,
+		(shipments_ref::text)::jsonb AS shipments_ref,
+		production_key
 		
 	FROM material_fact_consumptions_list
 	GROUP BY date_time,
@@ -46,7 +48,9 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 		orders_ref::text,
 		shipments_inf,
 		err_concrete_type,
-		production_id
+		production_id,
+		shipments_ref::text,
+		production_key
 	ORDER BY date_time DESC
 
 	;

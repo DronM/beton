@@ -7,27 +7,30 @@ function ShipmentList_View(id,options){
 	
 	var self = this;
 	
-	this.addElement(new EditString(id+":barcode",{
-		"labelCaption":"Штрих код бланка:",
-		"maxLength":13,
-		"autofocus":true,
-		"events":{
-			"keypress":function(e){
-				e = EventHelper.fixKeyEvent(e);
-				if (e.keyCode==13){
-					self.findDoc(e.target.value);
-				}								
-			}
-			,"input":function(e){
-				e = EventHelper.fixKeyEvent(e);
-				if (e.keyCode==13){
-					self.findDoc(e.target.value);
-				}								
-			}				
-		}
-	}));
+	var model_exists = (options.models&&options.models.ShipmentList_Model);
 	
-	var model = options.models.ShipmentList_Model;
+	if(!options.forSelect){
+		this.addElement(new EditString(id+":barcode",{
+			"labelCaption":"Штрих код бланка:",
+			"maxLength":13,
+			"autofocus":true,
+			"events":{
+				"keypress":function(e){
+					e = EventHelper.fixKeyEvent(e);
+					if (e.keyCode==13){
+						self.findDoc(e.target.value);
+					}								
+				}
+				,"input":function(e){
+					e = EventHelper.fixKeyEvent(e);
+					if (e.keyCode==13){
+						self.findDoc(e.target.value);
+					}								
+				}				
+			}
+		}));
+	}	
+	var model = model_exists? options.models.ShipmentList_Model:new ShipmentList_Model();
 	var contr = new Shipment_Controller();
 
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
@@ -136,13 +139,27 @@ function ShipmentList_View(id,options){
 		"editWinClass":ShipmentDialog_Form,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdInsert":false,
-			"cmdEdit":true,
+			"cmdEdit":!options.forSelect,
 			"cmdDelete":false,
 			"cmdFilter":true,
 			"filters":filters,
 			"variantStorage":options.variantStorage
 			//"cmdExport":!is_v_owner
 		}),
+		"filters":options.forSelect? [
+			{
+			"field":"ship_date_time"
+			,"sign":"ge"
+			,"val":DateHelper.format(DateHelper.getStartOfShift(options.date_time),"Y-m-d H:i:s")
+			}			
+			,{
+			"field":"ship_date_time"
+			,"sign":"le"
+			,"val":DateHelper.format(DateHelper.getEndOfShift(options.date_time),"Y-m-d H:i:s")
+			}			
+			
+		]:null,
+		"onSelect":options.onSelect,
 		"onEventSetCellOptions":function(opts){
 			if(opts.gridColumn.getId()=="cost"){
 				opts.className = opts.className||"";
@@ -303,7 +320,7 @@ function ShipmentList_View(id,options){
 							"sortable":true
 						})
 						
-						,new GridCellHead(id+":grid:head:vehicle_owners_ref",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:vehicle_owners_ref",{
 							"value":"Владелец ТС",
 							"columns":[
 								new GridColumnRef({
@@ -312,7 +329,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:cost",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:cost",{
 							"value":"Доставка",
 							"colAttrs":{"align":"right"},
 							"columns":[
@@ -323,7 +340,7 @@ function ShipmentList_View(id,options){
 							]
 						})
 											
-						,new GridCellHead(id+":grid:head:demurrage",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:demurrage",{
 							"value":"Время простоя",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -333,7 +350,7 @@ function ShipmentList_View(id,options){
 							]
 						})
 						
-						,new GridCellHead(id+":grid:head:demurrage_cost",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:demurrage_cost",{
 							"value":"За простой",
 							"colAttrs":{"align":"right"},
 							"columns":[
@@ -342,7 +359,7 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:pump_cost",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:pump_cost",{
 							"value":"Стоим.насос",
 							"colAttrs":{"align":"right"},
 							"columns":[
@@ -351,7 +368,7 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:pump_for_client_cost",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:pump_for_client_cost",{
 							"value":"Стоим.насос для кл-та",
 							"colAttrs":{"align":"right"},
 							"columns":[
@@ -361,7 +378,7 @@ function ShipmentList_View(id,options){
 							]
 						})
 						
-						,new GridCellHead(id+":grid:head:pump_vehicles_ref",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:pump_vehicles_ref",{
 							"value":"Насос",
 							"columns":[
 								new GridColumnRef({
@@ -375,7 +392,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})						
-						,new GridCellHead(id+":grid:head:pump_vehicle_owners_ref",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:pump_vehicle_owners_ref",{
 							"value":"Насос,влад.",
 							"columns":[
 								new GridColumnRef({
@@ -389,7 +406,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})						
-						,new GridCellHead(id+":grid:head:acc_comment",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:acc_comment",{
 							"value":"Бух.ком.(насос)",
 							"columns":[
 								new GridColumn({
@@ -397,7 +414,7 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})							
-						,new GridCellHead(id+":grid:head:acc_comment_shipment",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:acc_comment_shipment",{
 							"value":"Бух.ком.(миксер)",
 							"columns":[
 								new GridColumn({
@@ -406,7 +423,7 @@ function ShipmentList_View(id,options){
 							]
 						})							
 						
-						,new GridCellHead(id+":grid:head:client_mark",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:client_mark",{
 							"value":"Баллы",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -415,7 +432,7 @@ function ShipmentList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:blanks_exist",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:blanks_exist",{
 							"value":"Бланки",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -425,7 +442,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:users_ref",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:users_ref",{
 							"value":"Автор",
 							"columns":[
 								new GridColumnRef({
@@ -439,7 +456,7 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:owner_pump_agreed_date_time",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:owner_pump_agreed_date_time",{
 							"value":"Согл.насос",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -449,7 +466,7 @@ function ShipmentList_View(id,options){
 								})
 								]
 						})
-						,new GridCellHead(id+":grid:head:owner_agreed_date_time",{
+						,options.forSelect? null:new GridCellHead(id+":grid:head:owner_agreed_date_time",{
 						"value":"Согл.миксер",
 						"colAttrs":{"align":"center"},
 						"columns":[
@@ -463,7 +480,7 @@ function ShipmentList_View(id,options){
 				})
 			]
 		}),
-		"foot":new GridFoot(id+"grid:foot",{
+		"foot":options.forSelect? null:new GridFoot(id+"grid:foot",{
 			"autoCalc":true,			
 			"elements":[
 				new GridRow(id+":grid:foot:row0",{
@@ -514,7 +531,7 @@ function ShipmentList_View(id,options){
 		}),
 		"pagination":new pagClass(id+"_page",
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
-		"autoRefresh":false,
+		"autoRefresh":!model_exists,
 		"refreshInterval":0,//constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true

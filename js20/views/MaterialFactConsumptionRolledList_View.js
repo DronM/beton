@@ -29,7 +29,7 @@ function MaterialFactConsumptionRolledList_View(id,options){
 	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"field":new FieldDateTime("date_time")
 	});
-	
+	var self = this;
 	var filters = {
 		"period":{
 			"binding":new CommandBinding({
@@ -73,6 +73,7 @@ function MaterialFactConsumptionRolledList_View(id,options){
 	}	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
+	var grid_struc = this.getGridStruc(options.models.MaterialFactConsumptionMaterialList_Model? options.models.MaterialFactConsumptionMaterialList_Model:null,model);
 	var grid = new GridAjx(id+":grid",{
 		"keyIds":["production_site_id","production_id"],
 		"model":model,
@@ -106,10 +107,19 @@ function MaterialFactConsumptionRolledList_View(id,options){
 				opts.className = opts.className||"";
 				opts.className+= (opts.className.length? " ":"")+"factQuantViolation";
 			}
+			else if(col=="shipments_ref"&& this.getModel().getFieldValue("shipments_ref").isNull()){
+				opts.events = opts.events || {
+					"dblclick":(function(productionKey,dateTime){
+						return function(e){
+							self.selectShipment(productionKey,dateTime);
+						}
+					})(this.getModel().getFieldValue("production_key"),this.getModel().getFieldValue("date_time"))
+				}
+			}
 		},
 		
 		"head":new GridHead(id+":grid:head",{
-				"elements":this.getGridHead(options.models.MaterialFactConsumptionMaterialList_Model? options.models.MaterialFactConsumptionMaterialList_Model:null,model)
+				"elements":grid_struc.head
 		}),
 		"pagination":new pagClass(id+"_page",
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
@@ -121,16 +131,16 @@ function MaterialFactConsumptionRolledList_View(id,options){
 	});	
 
 	this.m_orig_onGetData = grid.onGetData
-	var self = this;
 	grid.onGetData = function(resp){
 		if(resp){
 			var h = this.getHead();
 			this.m_model = resp.getModel("MaterialFactConsumptionRolledList_Model");
 			h.delDOM();
-			h.m_elements = self.getGridHead(
+			var grid_struc = self.getGridStruc(
 				resp.getModel("MaterialFactConsumptionMaterialList_Model"),
 				this.m_model
-			);
+			);			
+			h.m_elements = grid_struc.head; 
 			h.toDOM(this.m_node);			
 		}
 		self.m_orig_onGetData.call(this);
@@ -151,7 +161,7 @@ extend(MaterialFactConsumptionRolledList_View,ViewAjxList);
 
 /* public methods */
 
-MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headModel,model){
+MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headModel,model){
 	var id = this.getId();
 	
 	var row0_elem = [
@@ -306,14 +316,15 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			"value":"Отгрузка",
 			"attrs":{"rowspan":"3"},
 			"columns":[
-				new GridColumn({
-					"field":model.getField("shipments_inf"),
-					"ctrlClass":EditString,
+				new GridColumnRef({
+					"field":model.getField("shipments_ref"),
+					"ctrlClass":ShipmentEdit,
 					"ctrlOptions":{
 						"labelCaption":"",
 						"enabled":false
-					}
-				})
+					},
+					"form":ShipmentDialog_Form
+				})				
 			]
 		})
 		,new GridCellHead(id+":grid:head:row0:concrete_quant",{
@@ -532,11 +543,77 @@ MaterialFactConsumptionRolledList_View.prototype.getGridHead = function(headMode
 			model.recUpdate();
 		}
 		model.reset();
-	}	
-	return [
-		new GridRow(id+":grid:head:row0",{"elements":row0_elem}),
-		new GridRow(id+":grid:head:row1",{"elements":row1_elem}),
-		new GridRow(id+":grid:head:row2",{"elements":row2_elem})
-	];
+	}
+	return {
+		"head":[
+			new GridRow(id+":grid:head:row0",{"elements":row0_elem}),
+			new GridRow(id+":grid:head:row1",{"elements":row1_elem}),
+			new GridRow(id+":grid:head:row2",{"elements":row2_elem})
+		]
+	};
 
 }
+
+MaterialFactConsumptionRolledList_View.prototype.selectShipment = function(productionKey,dateTime){
+	var self = this;
+	this.m_view = new ShipmentList_View("ShipmentList:cont",{
+		"forSelect":true,
+		"date_time":dateTime,
+		"onSelect":(function(productionKey){
+			return function(row){
+				self.closeSelect(productionKey,row.id.getValue());
+			}
+		})(productionKey)
+	});
+	this.m_form = new WindowFormModalBS("ShipmentList",{
+		"content":this.m_view,
+		"dialogWidth":"80%",
+		"cmdCancel":true,
+		"cmdOk":false,
+		"contentHead":"Выберите отгрузку",
+		"onClickCancel":function(){
+			self.closeSelect();
+		}
+	});
+	
+	this.m_form.open();
+	
+}
+
+MaterialFactConsumptionRolledList_View.prototype.closeSelect = function(productionKey,shipmentId){
+	if(this.m_view){
+		this.m_view.delDOM()	
+		delete this.m_view;
+	}
+	if(this.m_form){
+		this.m_form.delDOM();	
+		delete this.m_form;
+	}	
+	
+	if(productionKey&&shipmentId){
+		var pm = (new Production_Controller()).getPublicMethod("update");
+		var self = this;
+		pm.setFieldValue("old_id",productionKey);
+		pm.setFieldValue("shipment_id",shipmentId);
+		window.setGlobalWait(true);
+		pm.run({
+			"ok":function(){
+				if(self.m_grid){
+					window.showTempNote("К производству привязана отгрузка",null,5000);
+					/*
+					NO FILTER!!!
+					self.getElement("grid").onRefresh(function(){
+						window.setGlobalWait(false);
+						window.showTempNote("К производству привязана отгрузка",null,5000);
+					});
+					*/
+				}				
+			}
+			,"fail":function(resp,errCode,errStr){				
+				window.setGlobalWait(false);
+				throw Error(errStr);
+			}
+		});
+	}
+}
+

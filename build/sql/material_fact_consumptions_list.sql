@@ -43,7 +43,10 @@ CREATE OR REPLACE VIEW material_fact_consumptions_list AS
 		
 		concrete_types_ref(ct_o) AS order_concrete_types_ref,
 		
-		t.production_id
+		t.production_id,
+		
+		shipments_ref(sh) AS shipments_ref,
+		prod.id AS production_key
 		
 	FROM material_fact_consumptions AS t
 	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
@@ -51,8 +54,9 @@ CREATE OR REPLACE VIEW material_fact_consumptions_list AS
 	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
 	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
 	LEFT JOIN users AS u ON u.id=t.upload_user_id
-	LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
-	LEFT JOIN shipments AS sh ON sh.id=vh_sch_st.shipment_id
+	--LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id=prod.shipment_id
 	LEFT JOIN orders AS o ON o.id=sh.order_id
 	LEFT JOIN concrete_types AS ct_o ON ct_o.id=o.concrete_type_id
 	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id

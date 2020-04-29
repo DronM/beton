@@ -185,6 +185,24 @@ function MaterialFactConsumptionRolledList_Model(options){
 	
 	options.fields.material_tolerance_violated = new FieldBool("material_tolerance_violated",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.shipments_ref = new FieldJSON("shipments_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_key = new FieldInt("production_key",filed_options);
+	
 		MaterialFactConsumptionRolledList_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialFactConsumptionRolledList_Model,ModelXML);

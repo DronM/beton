@@ -172,6 +172,8 @@ $permissions = array();
 				
 					$permissions['RawMaterial_Controller_mat_totals']=TRUE;
 				
+					$permissions['RawMaterial_Controller_get_material_actions_list']=TRUE;
+				
 					$permissions['RawMaterialConsRateDate_Controller_insert']=TRUE;
 				
 					$permissions['RawMaterialConsRateDate_Controller_update']=TRUE;
@@ -287,6 +289,8 @@ $permissions = array();
 					$permissions['Shipment_Controller_owner_set_pump_agreed_all']=TRUE;
 				
 					$permissions['Shipment_Controller_get_shipped_vihicles_list']=TRUE;
+				
+					$permissions['Shipment_Controller_complete']=TRUE;
 				
 					$permissions['Login_Controller_get_list']=TRUE;
 				

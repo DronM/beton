@@ -224,6 +224,24 @@ function MaterialFactConsumptionList_Model(options){
 	
 	options.fields.production_id = new FieldInt("production_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.shipments_ref = new FieldJSON("shipments_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_key = new FieldInt("production_key",filed_options);
+	
 		MaterialFactConsumptionList_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialFactConsumptionList_Model,ModelXML);

@@ -80,7 +80,7 @@ ShipmentGridCmdChangeOrder.prototype.changeOrderCont = function(shipmentId){
 	});
 	this.m_form = new WindowFormModalBS("OrderList",{
 		"content":this.m_view,
-		"dialogWidth":"80%",
+		"dialogWidth":"100%",
 		"cmdCancel":true,
 		"cmdOk":false,
 		"contentHead":"Выберите новую заявку",
@@ -96,7 +96,7 @@ ShipmentGridCmdChangeOrder.prototype.changeOrderCont = function(shipmentId){
 ShipmentGridCmdChangeOrder.prototype.closeSelect = function(shipmentId,newOrderId){
 	if(this.m_view){
 		this.m_view.delDOM()	
-		delete self.m_view;
+		delete this.m_view;
 	}
 	if(this.m_form){
 		this.m_form.delDOM();	
@@ -104,9 +104,6 @@ ShipmentGridCmdChangeOrder.prototype.closeSelect = function(shipmentId,newOrderI
 	}	
 	
 	if(shipmentId&&newOrderId){
-		window.showTempNote("Отгрузка переставлена на другую заявку",null,5000);
-		//console.log("newOrderId="+newOrderId+" shipmentId="+shipmentId)
-		
 		var pm = (new Shipment_Controller()).getPublicMethod("update");
 		var self = this;
 		pm.setFieldValue("old_id",shipmentId);

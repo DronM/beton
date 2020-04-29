@@ -36,10 +36,12 @@ BEGIN
 				OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL
 			)
 		THEN
+			
 			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
 				NEW.production_site_id,
 				NEW.production_id
 			);
+			
 		END IF;
 		
 		RETURN NEW;

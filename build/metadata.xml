@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-04-28 06:42:00</lastBuild></version>
+		<lastBuild>2020-04-29 14:27:17</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -73,6 +73,7 @@
 		<version dateOpen="2020-04-20 10:04:26" dateClose="2020-04-23 06:04:45">1.00167</version>
 		<version dateOpen="2020-04-23 10:04:13" dateClose="2020-04-25 10:04:02">1.00168</version>
 		<version dateOpen="2020-04-27 12:04:09" dateClose="2020-04-28 06:04:42">1.00169</version>
+		<version dateOpen="2020-04-28 06:04:46" dateClose="2020-04-29 14:04:27">1.00170</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2401,6 +2402,14 @@
 			<field id="quant_morn_next_balance" dataType="Float" length="15" precision="2"/>
 			<field id="balance_corrected_data" dataType="JSON"/>
 		</model>
+		<model id="MaterialActionList" server="FALSE" virtual="TRUE" dataTable="material_actions">
+			<field id="is_cement" dataType="Bool" sysCol="TRUE"/>
+			<field id="material_name" dataType="String" alias="Материал"/>
+			<field id="quant_start" dataType="Float" alias="Начальный остаток"/>
+			<field id="quant_deb" dataType="Float" alias="Приход"/>
+			<field id="quant_kred" dataType="Float" alias="Расход"/>
+			<field id="quant_end" dataType="Float" alias="Конечный остаток"/>
+		</model>
 		<model id="VehicleScheduleMakeOrderList" virtual="TRUE" server="FALSE">
 			<field id="id" dataType="Int"/>
 			<field id="vehicles_count" dataType="Int"/>
@@ -2743,6 +2752,8 @@
 			<field id="err_concrete_type" dataType="Bool"/>
 			<field id="order_concrete_types_ref" dataType="JSON"/>
 			<field id="production_id" dataType="Int"/>
+			<field id="shipments_ref" dataType="JSON"/>
+			<field id="production_key" dataType="Int"/>
 		</model>
 		<model id="MaterialFactConsumptionRolledList" parent="ModelSQLBeton" dataTable="material_fact_consumptions_rolled_list" virtual="TRUE">
 			<field id="date_time" dataType="DateTime" primaryKey="TRUE"/>
@@ -2763,6 +2774,8 @@
 			<field id="order_concrete_types_ref" dataType="JSON"/>
 			<field id="production_id" dataType="Int"/>
 			<field id="material_tolerance_violated" dataType="Bool"/>
+			<field id="shipments_ref" dataType="JSON"/>
+			<field id="production_key" dataType="Int"/>
 		</model>
 		<model id="MaterialFactConsumptionCorretion" parent="ModelSQLBeton" dataTable="material_fact_consumption_corrections" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
@@ -3286,6 +3299,10 @@
 			<publicMethod id="correct_list" condFields="TRUE"/>
 			<publicMethod id="total_list" condFields="TRUE"/>
 			<publicMethod id="mat_totals" modelId="MatTotals" condFields="TRUE"/>
+			<publicMethod id="get_material_actions_list" condFields="TRUE">
+				<field id="templ" dataType="String"/>
+				<field id="inline" dataType="Int"/>
+			</publicMethod>
 		</controller>
 		<controller id="RawMaterialConsRateDate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="RawMaterialConsRateDate"/>
@@ -3441,6 +3458,7 @@
 			</publicMethod>
 			<publicMethod id="owner_set_pump_agreed_all"/>
 			<publicMethod id="get_shipped_vihicles_list" modelId="ShippedVehicleList"/>
+			<publicMethod id="complete" modelId="OrderList" patternFieldId="id"/>
 		</controller>
 		<controller id="Login" parentId="ControllerSQL" state="TRUE" noState="TRUE">
 			<publicMethod id="get_list" modelId="LoginList"/>
@@ -4313,6 +4331,7 @@
 		<view id="50011" t="LabEntryItemOnRatePeriodReport" section="Отчеты" descr="Показатели по периодам"/>
 		<view id="50012" t="LabEntryAvgReport" section="Отчеты" descr="Средние показатели по датам"/>
 		<view id="50013" t="VehicleOwnerTotReport" section="Отчеты" descr="Итоги для владельца ТС"/>
+		<view id="50014" t="RepMaterialAction" section="Отчеты" descr="Отчет по движению материалов"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -4408,6 +4427,7 @@
 		<serverTemplate id="ProductionList"/>
 		<serverTemplate id="ProductionMaterialList"/>
 		<serverTemplate id="ELKONLogList"/>
+		<serverTemplate id="RepMaterialAction"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -4964,6 +4984,7 @@
 		<jsScript file="views/ELKONLogList_View.js"/>
 		<jsScript file="views/CementSiloBalanceResetList_View.js"/>
 		<jsScript file="views/RepMaterialFactConsumption_View.js"/>
+		<jsScript file="views/RepMaterialAction_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
 		<jsScript file="forms/MainMenuConstructor_Form.js"/>
@@ -4990,6 +5011,7 @@
 		<jsScript file="forms/QuarryList_Form.js"/>
 		<jsScript file="forms/VehicleOwnerList_Form.js"/>
 		<jsScript file="forms/OrderList_Form.js"/>
+		<jsScript file="forms/ShipmentList_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="custom_controls/App.enums.js"/>
@@ -5056,6 +5078,7 @@
 		<jsScript file="custom_controls/EmployeeWorkTimeScheduleGrid.js"/>
 		<jsScript file="custom_controls/QuarryEdit.js"/>
 		<jsScript file="custom_controls/OrderEdit.js"/>
+		<jsScript file="custom_controls/ShipmentEdit.js"/>
 		<jsScript file="custom_controls/ConcreteCostForOwnerHeadEdit.js"/>
 		<jsScript file="custom_controls/ShipmentForVehOwnerCmdSetAgreed.js"/>
 		<jsScript file="custom_controls/ShipmentPumpForVehOwnerCmdSetAgreed.js"/>
@@ -5365,6 +5388,7 @@
 		<jsScript file="controllers/CementSiloBalanceReset_Controller.js"/>
 		<jsScript file="models/CementSiloBalanceReset_Model.js"/>
 		<jsScript file="models/CementSiloBalanceResetList_Model.js"/>
+		<jsScript file="models/MaterialActionList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

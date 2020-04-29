@@ -170,7 +170,7 @@ function ProductionMaterialList_View(id,options){
 							]
 						})
 						,new GridCellHead(id+":grid:head:quant_consuption",{
-							"value":"Кол-во подбор",
+							"value":"Кол-во подбор (Бетон)",
 							"className":options.detailFilters? window.getBsCol(1):"",
 							"colAttrs":{"align":"right","width":"10px"},
 							"columns":[

@@ -72,18 +72,15 @@ CREATE OR REPLACE VIEW production_material_list AS
 		END 
 		- (sum(t.material_quant) + coalesce(t_cor.quant,0)) AS quant_dif
 	
-		,CASE WHEN sum(ra_mat.quant) = 0 THEN FALSE
+		,CASE WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
 		ELSE
 			coalesce(
 			( (
-				CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
-				ELSE ra_mat.quant/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
-				END				
-				 - (sum(t.material_quant) + coalesce(t_cor.quant,0))) * 100 /
-				 	(CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
-					ELSE ra_mat.quant/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
-					END)
-				 	>= mat.max_fact_quant_tolerance_percent)
+				coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+			) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 	>= mat.max_fact_quant_tolerance_percent
+			)
 			,FALSE)
 		END AS dif_violation
 	

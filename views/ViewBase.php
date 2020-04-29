@@ -1305,6 +1305,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ELKONLogList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloBalanceResetList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialFactConsumption_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialAction_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1331,6 +1332,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/QuarryList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/VehicleOwnerList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/OrderList_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ShipmentList_Form.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));
@@ -1397,6 +1399,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EmployeeWorkTimeScheduleGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/QuarryEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OrderEdit.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ConcreteCostForOwnerHeadEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentForVehOwnerCmdSetAgreed.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ShipmentPumpForVehOwnerCmdSetAgreed.js'));
@@ -1706,6 +1709,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/CementSiloBalanceReset_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/CementSiloBalanceReset_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/CementSiloBalanceResetList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialActionList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

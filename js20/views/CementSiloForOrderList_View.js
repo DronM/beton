@@ -141,9 +141,9 @@ CementSiloForOrderList_View.prototype.fillSilos = function(){
 			}
 			//console.log("Silo "+this.m_silos[silo_id].id+" Capac:"+this.m_silos[silo_id].load_capacity+" balance="+this.m_silos[silo_id].balance+" percent="+percent)
 			
+			silo_n.title = "Остаток:"+((this.m_silos[silo_id].balance && !isNaN(this.m_silos[silo_id].balance))? this.m_silos[silo_id].balance:0);//+", двойной клик для обнуления."
 			if(this.m_silos[silo_id].load_percent!=percent){
-				silo_n.setAttribute("silo_id",this.m_silos[silo_id].id);
-				silo_n.title = "Остаток:"+((this.m_silos[silo_id].balance && !isNaN(this.m_silos[silo_id].balance))? this.m_silos[silo_id].balance:0)+", двойной клик для обнуления.";
+				silo_n.setAttribute("silo_id",this.m_silos[silo_id].id);				
 				this.m_silos[silo_id].load_percent = percent;
 				//console.log("Redraw silo №"+silo_id)
 				this.drawSilo(silo_n,silo_cont_n,0,0,percent);

@@ -255,6 +255,7 @@
 <li><a href="#ShipmentTimeNorm_Model">ShipmentTimeNorm_Model</a></li>
 <li><a href="#ConcretePrice_Model">ConcretePrice_Model</a></li>
 <li><a href="#MatTotals_Model">MatTotals_Model</a></li>
+<li><a href="#MaterialActionList_Model">MaterialActionList_Model</a></li>
 <li><a href="#VehicleScheduleMakeOrderList_Model">VehicleScheduleMakeOrderList_Model</a></li>
 <li><a href="#VehFeaturesOnDateList_Model">VehFeaturesOnDateList_Model</a></li>
 <li><a href="#OrderDescr_Model">OrderDescr_Model</a></li>
@@ -1904,7 +1905,24 @@
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
 <h2>mat_totals</h2>
-<a href="#MatTotals_Model">Model: MatTotals_Model</a>
+<a href="#MatTotals_Model">Model: MatTotals_Model</a><h2>get_material_actions_list</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>templ</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+<h3>inline</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 </div>
 </div>
 <div id="RawMaterialConsRate_Controller" class="content_box">
@@ -2203,7 +2221,8 @@
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
 <h2>get_shipped_vihicles_list</h2>
-<a href="#ShippedVehicleList_Model">Model: ShippedVehicleList_Model</a>
+<a href="#ShippedVehicleList_Model">Model: ShippedVehicleList_Model</a><h2>complete</h2>
+<a href="#OrderList_Model">Model: OrderList_Model</a>
 </div>
 </div>
 <div id="ShipmentCancelation_Controller" class="content_box">
@@ -6430,6 +6449,48 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="MaterialActionList_Model" class="content_box">
+<h1>MaterialActionList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>is_cement</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_start</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_deb</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_kred</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_end</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="MaterialFactBalanceCorretion_Model" class="content_box">
 <h1>MaterialFactBalanceCorretion_Model</h1>
 <div class="content_item">
@@ -6951,6 +7012,18 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>shipments_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_key</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="MaterialFactConsumptionRolledList_Model" class="content_box">
@@ -7061,6 +7134,18 @@
 <div>Precision:</div>
 <h2>material_tolerance_violated</h2>
 <div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shipments_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_key</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

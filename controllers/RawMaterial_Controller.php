@@ -25,6 +25,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ConditionParamsSQL.php');
 
 require_once('common/MyDate.php');
 require_once(ABSOLUTE_PATH.'functions/Beton.php');
@@ -400,6 +401,32 @@ class RawMaterial_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtString('ord_directs'));
 		$pm->addParam(new FieldExtString('field_sep'));
 
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_material_actions_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('templ',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('inline',$opts));
+	
+			
 		$this->addPublicMethod($pm);
 
 		
@@ -869,6 +896,38 @@ class RawMaterial_Controller extends ControllerSQL{
 		$link = $this->getDbLink();
 		
 		$this->addModel(self::getTotalsModel($link,$where->getFieldValueForDb('date','=',0)));
+	}
+	
+	public function get_material_actions_list($pm){
+		$cond = new ConditionParamsSQL($pm,$this->getDbLink());
+		$dt_from = $cond->getDbVal('date_time','ge',DT_DATETIME);
+		if (!isset($dt_from)){
+			throw new Exception('Не задана дата начала!');
+		}		
+		$dt_to = $cond->getDbVal('date_time','le',DT_DATETIME);
+		if (!isset($dt_to)){
+			throw new Exception('Не задана дата окончания!');
+		}		
+	
+		$this->addNewModel(
+			sprintf("SELECT * FROM material_actions(%s,%s)",
+				$dt_from,
+				$dt_to
+			),
+			"MaterialActionList_Model"
+		);
+		
+		$this->addNewModel(
+			sprintf(
+			"SELECT
+				format_period_rus(%s::date,%s::date,NULL) AS period_descr
+			",
+			$dt_from,
+			$dt_to
+			),
+		'Head_Model'
+		);		
+		
 	}
 }
 ?>

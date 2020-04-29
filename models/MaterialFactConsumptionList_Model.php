@@ -203,6 +203,22 @@ class MaterialFactConsumptionList_Model extends ModelSQLBeton{
 		$f_production_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_id",$f_opts);
 		$this->addField($f_production_id);
 		//********************
+		
+		//*** Field shipments_ref ***
+		$f_opts = array();
+		$f_opts['id']="shipments_ref";
+						
+		$f_shipments_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipments_ref",$f_opts);
+		$this->addField($f_shipments_ref);
+		//********************
+		
+		//*** Field production_key ***
+		$f_opts = array();
+		$f_opts['id']="production_key";
+						
+		$f_production_key=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_key",$f_opts);
+		$this->addField($f_production_key);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 
