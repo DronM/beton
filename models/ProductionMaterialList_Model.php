@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ProductionMaterialList_Model extends ModelSQLBeton{
@@ -205,7 +206,7 @@ class ProductionMaterialList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Превышение';
 		$f_opts['id']="dif_violation";
 						
-		$f_dif_violation=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dif_violation",$f_opts);
+		$f_dif_violation=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dif_violation",$f_opts);
 		$this->addField($f_dif_violation);
 		//********************
 		

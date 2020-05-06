@@ -31,7 +31,11 @@ function ProductionSiteForEditList_View(id,options){
 		"readPublicMethod":contr.getPublicMethod("get_list_for_edit"),
 		"editInline":true,
 		"editWinClass":null,
-		"commands":new GridCmdContainerAjx(id+":grid:cmd"),		
+		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"addCustomCommandsAfter":function(commands){
+				commands.push(new ProductionSiteCmdLoadProduction(id+":grid:cmd:LoadProduction"));				
+			}
+		}),		
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[

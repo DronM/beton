@@ -66,7 +66,20 @@ function RawMaterialMapToProductionList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:order_id",{
+						
+						,new GridCellHead(id+":grid:head:production_sites_ref",{
+							"value":"Завод (если не указан, то для всех заводов)",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("production_sites_ref"),
+									"ctrlClass":ProductionSiteEdit,
+									"ctrlOptions":{
+									}																		
+								})
+							]
+						})
+						
+						/*,new GridCellHead(id+":grid:head:order_id",{
 							"value":"Порядок сортировки",
 							"title":"При 0 - не отображать материал в общей таблице",
 							"columns":[
@@ -76,7 +89,7 @@ function RawMaterialMapToProductionList_View(id,options){
 								})
 							]
 						})
-						
+						*/
 					]
 				})
 			]

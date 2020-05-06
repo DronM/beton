@@ -80,6 +80,22 @@ function VehicleList_View(id,options){
 							],
 							"sortable":true
 						})						
+						,is_v_owner? null:new GridCellHead(id+":grid:head:tracker_id",{
+							"value":"Трэкер",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("tracker_id")
+								})
+							]
+						})						
+						,is_v_owner? null:new GridCellHead(id+":grid:head:sim_number",{
+							"value":"Тел.номер сим карты",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("sim_number")
+								})
+							]
+						})						
 						
 					]
 				})

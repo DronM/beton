@@ -20,8 +20,16 @@ $$
 	WHERE
 		sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
 		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+	ORDER BY sh.date_time	
 	LIMIT 1;
 $$
   LANGUAGE sql VOLATILE
   COST 100;
 ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO ;
+

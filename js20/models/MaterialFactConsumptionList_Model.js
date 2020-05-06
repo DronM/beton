@@ -38,7 +38,7 @@ function MaterialFactConsumptionList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.date_time = new FieldDateTimeTZ("date_time",filed_options);
+	options.fields.date_time = new FieldDateTime("date_time",filed_options);
 	
 				
 	
@@ -102,6 +102,15 @@ function MaterialFactConsumptionList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.concrete_types_ref = new FieldJSON("concrete_types_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.concrete_type_id = new FieldInt("concrete_type_id",filed_options);
 	
 				
 	

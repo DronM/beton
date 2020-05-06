@@ -290,7 +290,7 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("id",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldDateTimeTZ("date_time",f_opts));
+	pm.addField(new FieldDateTime("date_time",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldDateTimeTZ("upload_date_time",f_opts));
@@ -312,6 +312,9 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("concrete_types_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("concrete_type_id",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldString("concrete_type_production_descr",f_opts));

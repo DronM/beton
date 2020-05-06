@@ -191,7 +191,7 @@ function ProductionMaterialList_Model(options){
 	filed_options.alias = 'Превышение';
 	filed_options.autoInc = false;	
 	
-	options.fields.dif_violation = new FieldFloat("dif_violation",filed_options);
+	options.fields.dif_violation = new FieldBool("dif_violation",filed_options);
 	
 				
 	

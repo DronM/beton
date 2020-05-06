@@ -31,9 +31,12 @@ BEGIN
 			);		
 		END IF;
 		
-		IF TG_OP='UPDATE'
+		IF TG_OP='UPDATE'		
 			AND (
-				OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
+				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
 			)
 		THEN
 			
@@ -43,10 +46,29 @@ BEGIN
 			);
 			
 		END IF;
-		
+
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+
+		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+
+		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
+		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				shipment_id = NEW.shipment_id,
+				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
 		
 		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
 		--IF OLD.production_dt_end IS NULL

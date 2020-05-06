@@ -193,6 +193,15 @@ function ProductionList_Model(options){
 	
 	options.fields.material_tolerance_violated = new FieldBool("material_tolerance_violated",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.concrete_quant = new FieldFloat("concrete_quant",filed_options);
+	
 		ProductionList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionList_Model,ModelXML);

@@ -131,6 +131,12 @@ extend(Production_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldFloat("concrete_quant",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -233,6 +239,12 @@ extend(Production_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldFloat("concrete_quant",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -318,6 +330,9 @@ extend(Production_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldBool("material_tolerance_violated",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("concrete_quant",f_opts));
 }
 
 			Production_Controller.prototype.addGetObject = function(){

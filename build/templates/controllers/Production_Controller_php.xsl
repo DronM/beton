@@ -377,7 +377,7 @@ UPDATE public.production_sites
 		}	
 	}
 
-	private function insert_elkon_productions($productionSiteId,&amp;$productionsData,$elkonLogLevel,$updateLastProduction){
+	private function insert_elkon_productions($productionSiteId,&amp;$productionsData,$elkonLogLevel,$updateLastProduction){		
 		$q_head = "INSERT INTO productions (
 			production_id,
 			production_dt_start,
@@ -387,7 +387,10 @@ UPDATE public.production_sites
 			concrete_type_id,
 			production_concrete_type_descr				
 		) VALUES ";												
-		$q_body = '';				
+		$q_body = '';
+		
+		$q_del_head = "DELETE FROM productions WHERE ";				
+		$q_del_body = '';
 		
 		$max_production_id = 0;
 		foreach($productionsData as $production_data){
@@ -441,6 +444,12 @@ UPDATE public.production_sites
 				$concrete_type_descr_db
 			);
 			
+			$q_del_body.= (($q_del_body=='')? '':' OR '). sprintf(
+				"(production_site_id=%d AND production_id=%d)",
+				$productionSiteId,
+				$id_db
+			);
+			
 			if($max_production_id &lt; $id_db){
 				$max_production_id = $id_db;
 			}
@@ -450,7 +459,8 @@ UPDATE public.production_sites
 				$this->log_action($productionSiteId,'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body,self::LOG_LEVEL_DEBUG,$elkonLogLevel);	
 				
 				$this->getDbLinkMaster()->query('BEGIN');						
-				$this->getDbLinkMaster()->query($q_head.' '.$q_body);
+				$this->getDbLinkMaster()->query($q_del_head.' '.$q_del_body);
+				$this->getDbLinkMaster()->query($q_head.' '.$q_body);				
 
 				if($updateLastProduction){			
 					$this->getDbLinkMaster()->query(sprintf(
@@ -485,7 +495,7 @@ UPDATE public.production_sites
 					$this->connect_to_elkon_server($serv['id'],$elkon_con);
 				}
 				catch(Exception $e){
-					$this->log_action($serv['id'],'Ошибка: '.$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
+					$this->log_action($serv['id'],$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
 				}
 				
 				break;
@@ -500,7 +510,7 @@ UPDATE public.production_sites
 			$this->insert_elkon_productions($production_site_id,$productions_data,$elkon_con->logLevel,FALSE);
 		}
 		catch(Exception $e){
-			$this->log_action($production_site_id,'Ошибка: '.$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
+			$this->log_action($production_site_id,$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
 			
 			throw $e;
 		}			
@@ -541,7 +551,7 @@ UPDATE public.production_sites
 				$this->connect_to_elkon_server($serv['id'],$elkon_con);
 			}
 			catch(Exception $e){
-				$this->log_action($serv['id'],'Ошибка: '.$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
+				$this->log_action($serv['id'],$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
 				continue;
 			}
 		
@@ -608,7 +618,9 @@ UPDATE public.production_sites
 							$veh_sched_on_production_id = NULL;
 							$vehicle_schedule_state_id = NULL;
 							$concrete_type_id = NULL;
-						
+							
+							$concrete_quant = 0;
+							
 							//По каждому материалу
 							for($m_ind=1;$m_ind&lt;=$MT_FIELD_CNT;$m_ind++){
 								$m_id_pref = 'mat'.$m_ind;
@@ -783,6 +795,10 @@ UPDATE public.production_sites
 										$production_id
 										);
 										
+										if($concrete_quant==0){
+											$concrete_quant = floatval($material_data['concrete_quant']);
+										}
+										
 										//correction
 										$q_cor = floatval($material_data[$m_id_pref.'_quant_corrected']);
 										if($q_cor &amp;&amp; $mat_id!='NULL'){
@@ -867,9 +883,11 @@ UPDATE public.production_sites
 										"UPDATE productions
 										SET
 											production_dt_end = %s,
-											dt_end_set = now()
+											dt_end_set = now(),
+											concrete_quant=%f
 										WHERE production_id=%d AND production_site_id=%d",
 										$production_dt_end_db,
+										$concrete_quant,
 										$production_id,
 										$serv['id']
 									));
@@ -1013,7 +1031,7 @@ UPDATE public.production_sites
 				
 			}
 			catch(Exception $e){
-				$this->log_action($serv['id'],'Ошибка: '.$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
+				$this->log_action($serv['id'],$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
 				
 				throw $e;
 			}

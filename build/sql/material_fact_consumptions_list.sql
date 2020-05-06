@@ -30,23 +30,26 @@ CREATE OR REPLACE VIEW material_fact_consumptions_list AS
 		(t.concrete_type_id IS NOT NULL AND t.concrete_type_id<>o.concrete_type_id) AS err_concrete_type,
 		
 		ra_mat.quant AS material_quant_shipped,
+		
+		/*
 		(
-			(CASE WHEN ra_mat.quant IS NULL OR ra_mat.quant=0 THEN FALSE
+			CASE
+				WHEN mat.id IS NULL THEN FALSE
+				WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
 				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
-			END)
-			OR
-			(CASE WHEN t.material_quant_req IS NULL OR t.material_quant_req=0 THEN TRUE
-				ELSE abs(t.material_quant/t.material_quant_req*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
 			END
-			)
 		) AS material_quant_tolerance_exceeded,
+		*/
+		prod.material_tolerance_violated AS material_quant_tolerance_exceeded,
 		
 		concrete_types_ref(ct_o) AS order_concrete_types_ref,
 		
 		t.production_id,
 		
 		shipments_ref(sh) AS shipments_ref,
-		prod.id AS production_key
+		prod.id AS production_key,
+		
+		t.concrete_type_id
 		
 	FROM material_fact_consumptions AS t
 	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id

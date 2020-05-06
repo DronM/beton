@@ -107,7 +107,8 @@ function MaterialFactConsumptionRolledList_View(id,options){
 				opts.className = opts.className||"";
 				opts.className+= (opts.className.length? " ":"")+"factQuantViolation";
 			}
-			else if(col=="shipments_ref"&& this.getModel().getFieldValue("shipments_ref").isNull()){
+			else if(col=="shipments_ref"){
+				//&& this.getModel().getFieldValue("shipments_ref").isNull()
 				opts.events = opts.events || {
 					"dblclick":(function(productionKey,dateTime){
 						return function(e){
@@ -121,6 +122,10 @@ function MaterialFactConsumptionRolledList_View(id,options){
 		"head":new GridHead(id+":grid:head",{
 				"elements":grid_struc.head
 		}),
+		"foot":new GridFoot(id+":grid:foot",{
+			"autoCalc":true,			
+			"elements":grid_struc.foot
+		}),		
 		"pagination":new pagClass(id+"_page",
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
 		
@@ -141,7 +146,13 @@ function MaterialFactConsumptionRolledList_View(id,options){
 				this.m_model
 			);			
 			h.m_elements = grid_struc.head; 
-			h.toDOM(this.m_node);			
+			h.toDOM(this.m_node);
+			
+			var f = this.getFoot();			
+			f.delDOM();
+			f.m_elements = grid_struc.foot; 
+			f.toDOM(this.m_node);
+			
 		}
 		self.m_orig_onGetData.call(this);
 	}
@@ -344,6 +355,19 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 		})
 	];
 	
+	var foot0_elem	= [
+		new GridCell(id+":grid:foot:sp2",{
+			"colSpan":"7"
+		})
+		,new GridCellFoot(id+":grid:foot:concrete_quant",{
+			"attrs":{"align":"right"},
+			"calcOper":"sum",
+			"calcFieldId":"concrete_quant",
+			"gridColumn":new GridColumn({"id":"tot_concrete_quant"})
+		})						
+														
+	];
+	
 	var row1_elem = [];
 	var row2_elem = [];
 	
@@ -394,7 +418,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 								"colAttrs":{"align":"center"},
 								"attrs":attrs1_tmp
 							})
-						);
+						);												
 						row1_id++;					
 					}
 				}
@@ -516,7 +540,32 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 					]
 				})		
 			);
+			//*********************
 			
+			foot0_elem.push(
+				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_id,{
+					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
+					"calcOper":"sum",
+					"calcFieldId":col_q_id,
+					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_id,"precision":"4"})
+				})									
+			);
+			foot0_elem.push(
+				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_r_id,{
+					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
+					"calcOper":"sum",
+					"calcFieldId":col_q_r_id,
+					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_r_id,"precision":"4"})
+				})									
+			);
+			foot0_elem.push(
+				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_sh_id,{
+					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
+					"calcOper":"sum",
+					"calcFieldId":col_q_sh_id,
+					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_sh_id,"precision":"4"})
+				})									
+			);
 			
 		}
 		
@@ -544,11 +593,18 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 		}
 		model.reset();
 	}
+		
+	
 	return {
 		"head":[
 			new GridRow(id+":grid:head:row0",{"elements":row0_elem}),
 			new GridRow(id+":grid:head:row1",{"elements":row1_elem}),
 			new GridRow(id+":grid:head:row2",{"elements":row2_elem})
+		]
+		,"foot":[
+			new GridRow(id+":grid:foot:row0",{
+				"elements":foot0_elem
+			})		
 		]
 	};
 

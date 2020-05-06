@@ -12,37 +12,31 @@ SELECT
 
 
 
-/*
-SELECT
-	dt_from,
-	get_shift_end(dt_from) AS dt_to
-FROM generate_series('2020-04-28 06:00:00'::timestamp without time zone,'2020-04-30 05:59:59'::timestamp without time zone,'1 day'::interval) AS dt_from
-LEFT JOIN 
-*/
-SELECT
-	sil.id AS silo_id,
-	coalesce(bal_start.quant,0) AS quant_start,	
-	coalesce(ra_prih.quant,0) AS quant_prih,
-	coalesce(ra_rash.quant,0) AS quant_rash,
-	coalesce(bal_end.quant,0) AS quant_end,
-	coalesce(bal_start.quant,0)+coalesce(ra_prih.quant,0)-coalesce(ra_rash.quant,0) AS quant_end_calc
-FROM cement_silos AS sil
-LEFT JOIN (SELECT * FROM rg_cement_balance('2020-04-28 06:00:00','{}')) AS bal_start ON bal_start.cement_silos_id=sil.id
-LEFT JOIN (SELECT * FROM rg_cement_balance('2020-05-01 06:00:00','{}')) AS bal_end ON bal_end.cement_silos_id=sil.id
-LEFT JOIN (
-	SELECT
-		cement_silos_id,
-		sum(quant) AS quant
-	FROM ra_cement
-	WHERE date_time BETWEEN '2020-04-28 06:00:00' AND '2020-04-30 05:59:59' AND deb
-	GROUP BY cement_silos_id
-) AS ra_prih ON ra_prih.cement_silos_id = sil.id 
-LEFT JOIN (
-	SELECT
-		cement_silos_id,
-		sum(quant) AS quant
-	FROM ra_cement
-	WHERE date_time BETWEEN '2020-04-28 06:00:00' AND '2020-04-30 05:59:59' AND NOT deb
-	GROUP BY cement_silos_id
-) AS ra_rash ON ra_rash.cement_silos_id = sil.id 
+UPDATE productions
+SET material_tolerance_violated = productions_get_mat_tolerance_violated(
+				2,
+				3209
+			)
+WHERE 	production_site_id = 2 AND production_id = 3209		
 
+
+
+UPDATE productions
+SET concrete_quant = sel.concrete_quant
+FROM
+(SELECT
+	pr.production_id,
+	pr.production_site_id,
+	cons.concrete_quant
+FROM productions AS pr
+LEFT JOIN (
+	SELECT
+		production_site_id,
+		production_id,
+		max(concrete_quant) AS concrete_quant
+	FROM material_fact_consumptions
+	GROUP BY production_site_id,production_id
+) AS cons ON cons.production_site_id=pr.production_site_id AND cons.production_id=pr.production_id
+WHERE pr.concrete_quant=0
+) AS sel
+WHERE productions.production_site_id=sel.production_site_id AND productions.production_id=sel.production_id

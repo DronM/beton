@@ -67,7 +67,14 @@ EditPeriodDateShift.prototype.setCtrlDateTime = function(ctrl,dt){
 	dt.setMinutes(0);
 	dt.setSeconds(0);
 	//
-	dt.setTime(dt.getTime() + DateHelper.timeToMS(ctrl.getTimeValueStr()) + ((ctrl.getAttr("name")=="to")? 24*60*60*1000:0) );
+	var tm = 0;
+	if (
+	(this.getControlPeriodSelect().getValue()=="shift"||this.getControlPeriodSelect().getValue()=="prev_shift")
+	&&ctrl.getAttr("name")=="to"){
+		tm = 24*60*60*1000;
+	}
+	//dt.setTime(dt.getTime() + DateHelper.timeToMS(ctrl.getTimeValueStr()) + ((ctrl.getAttr("name")=="to")? 24*60*60*1000:0) );
+	dt.setTime(dt.getTime() + DateHelper.timeToMS(ctrl.getTimeValueStr()) + tm);
 	ctrl.setValue(dt);
 }
 

@@ -204,13 +204,14 @@ function ProductionMaterialList_View(id,options){
 						})
 						*/
 						,new GridCellHead(id+":grid:head:quant_dif",{
-							"value":"Отклонение",
+							"value":"Отклонение (факт-подбор)",
 							"className":options.detailFilters? window.getBsCol(1):"",
 							"colAttrs":{"align":"right","width":"10px"},
 							"columns":[
 								new GridColumnFloat({
 									"field":model.getField("quant_dif"),
-									"precision":"4"
+									"precision":"4",
+									"sign":true
 								})
 							]
 						})

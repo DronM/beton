@@ -110,6 +110,17 @@ BEGIN
 	IF TG_OP='UPDATE' THEN
 		IF (NEW.shipped AND OLD.shipped=false) THEN
 			NEW.ship_date_time = current_timestamp;
+			
+			--Если есть привязанное производство - пересчитать
+			--возможно изменение отклонений при списании материалов по подбору
+			UPDATE productions
+			SET
+				material_tolerance_violated = productions_get_mat_tolerance_violated(
+					production_site_id,
+					production_id
+				)				
+			WHERE shipment_id=NEW.id;
+			
 		ELSEIF (OLD.shipped AND NEW.shipped=false) THEN
 			NEW.ship_date_time = null;
 		END IF;

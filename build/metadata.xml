@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-04-29 14:27:17</lastBuild></version>
+		<lastBuild>2020-05-06 15:32:56</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -74,6 +74,8 @@
 		<version dateOpen="2020-04-23 10:04:13" dateClose="2020-04-25 10:04:02">1.00168</version>
 		<version dateOpen="2020-04-27 12:04:09" dateClose="2020-04-28 06:04:42">1.00169</version>
 		<version dateOpen="2020-04-28 06:04:46" dateClose="2020-04-29 14:04:27">1.00170</version>
+		<version dateOpen="2020-04-30 09:04:02" dateClose="2020-05-06 10:05:10">1.00171</version>
+		<version dateOpen="2020-05-06 10:05:50" dateClose="2020-05-06 15:05:33">1.00172</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1355,7 +1357,7 @@
 			<field id="correction_date_time_set" dataType="DateTime" alias="Когда исправил"/>
 			<field id="quant_dif" dataType="Float" alias="Разница"/>
 			<field id="material_quant" dataType="Float" sysCol="TRUE"/>
-			<field id="dif_violation" dataType="Float" alias="Превышение"/>
+			<field id="dif_violation" dataType="Bool" alias="Превышение"/>
 			<field id="material_fact_consumption_id" dataType="Int" alias="Идентификатор строки фактического расхода" sysCol="TRUE"/>
 		</model>
 		<model id="AssignedVehicleList" parent="ModelSQLBeton" dataTable="assigned_vehicles_list" virtual="TRUE" server="FALSE">
@@ -2731,7 +2733,7 @@
 		</model>
 		<model id="MaterialFactConsumptionList" parent="ModelSQLBeton" dataTable="material_fact_consumptions_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
-			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="date_time" dataType="DateTime"/>
 			<field id="upload_date_time" dataType="DateTimeTZ"/>
 			<field id="upload_users_ref" dataType="JSON"/>
 			<field id="production_site_id" dataType="Int"/>
@@ -2739,6 +2741,7 @@
 			<field id="orders_ref" dataType="JSON"/>
 			<field id="shipments_inf" dataType="String"/>
 			<field id="concrete_types_ref" dataType="JSON"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
 			<field id="concrete_type_production_descr" dataType="String"/>
 			<field id="raw_materials_ref" dataType="JSON"/>
 			<field id="raw_material_production_descr" dataType="String"/>
@@ -2764,6 +2767,7 @@
 			<field id="orders_ref" dataType="JSON"/>
 			<field id="shipments_inf" dataType="String"/>
 			<field id="concrete_types_ref" dataType="JSON"/>
+			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
 			<field id="concrete_type_production_descr" dataType="String"/>
 			<field id="raw_material_production_descr" dataType="String"/>
 			<field id="vehicles_ref" dataType="JSON"/>
@@ -3026,6 +3030,7 @@
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
 			<field id="production_concrete_type_descr" dataType="Text"/>
 			<field id="material_tolerance_violated" dataType="Bool" defaultValue="FALSE"/>
+			<field id="concrete_quant" dataType="Float" precision="4" length="19" defaultValue="0"/>
 			<index id="productions_production_id_idx" unique="TRUE">
 				<field id="production_site_id"/>
 				<field id="production_id"/>
@@ -3058,6 +3063,7 @@
 			<field id="concrete_type_id" dataType="Int"/>
 			<field id="order_id" dataType="Int"/>
 			<field id="material_tolerance_violated" dataType="Bool"/>
+			<field id="concrete_quant" dataType="Float"/>
 		</model>
 	</models>
 	<constants>
@@ -5090,6 +5096,7 @@
 		<jsScript file="custom_controls/OwnerListGrid.js"/>
 		<jsScript file="custom_controls/PumpVehiclePriceListGrid.js"/>
 		<jsScript file="custom_controls/CementSiloEdit.js"/>
+		<jsScript file="custom_controls/ProductionSiteCmdLoadProduction.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->

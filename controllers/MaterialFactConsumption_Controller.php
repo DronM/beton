@@ -25,6 +25,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 require_once('common/ExcelReader/Excel/reader.php');
 
+require_once(FRAME_WORK_PATH.'basic_classes/VariantStorageBeton.php');
+
 class MaterialFactConsumption_Controller extends ControllerSQL{
 
 	const ER_UPLOAD = 'Ошибка загрузки файла данных';
@@ -274,10 +276,20 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 		
 		$list_model_name = $this->getListModelId();
 		$list_model = new $list_model_name($this->getDbLink());
-		$where = $this->conditionFromParams($pm,$list_model);
-		
+
 		$cond = '';
-		$oblig_cond = 'NOT coalesce(t_map.order_id,0)=0';
+		if (defined('PARAM_TEMPLATE') && isset($_REQUEST[PARAM_TEMPLATE])){
+			$stvar = VariantStorageBeton::restore($_REQUEST[PARAM_TEMPLATE], $this->getDbLink());
+			VariantStorageBeton::applyFilters($stvar,$list_model,$where,$_REQUEST[PARAM_TEMPLATE]);
+		}
+		else{
+			$where = $this->conditionFromParams($pm,$list_model);
+		}
+		if($where){
+			$where->setTableName('t');
+		}
+		
+		$oblig_cond = '';//NOT coalesce(t_map.order_id,0)=0
 		if($where){
 			$where_fields = $where->getFieldIterator();
 			while($where_fields->valid()){
@@ -306,9 +318,12 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 				
 				$where_fields->next();
 			}
-			$cond.= 'AND '.$oblig_cond;
+			if(strlen($oblig_cond)){
+				$cond.= ' AND '.$oblig_cond;
+			}
+			
 		}
-		else{
+		else if(strlen($oblig_cond)){
 			$cond = $oblig_cond;
 		}
 		$cond = 'WHERE '.$cond;
@@ -316,17 +331,18 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 		$mat_model = new ModelSQL($link,array('id'=>'MaterialFactConsumptionMaterialList_Model'));
 		$mat_model->addField(new FieldSQLString($link,null,null,"raw_material_production_descr"));
 		$mat_model->query(sprintf(
-			"SELECT DISTINCT ON (t.raw_material_production_descr,t_map.raw_material_ord)
-				t.raw_material_production_descr,
-				(t_map.raw_materials_ref::text)::jsonb,
+			"SELECT DISTINCT ON (mat.ord,t.raw_material_production_descr,t.production_site_id)
+				t.raw_material_production_descr||' ('||pr_st.name||')' AS raw_material_production_descr,
+				materials_ref(mat) AS raw_materials_ref,
 				sum(t.concrete_quant) AS concrete_quant,
 				sum(t.material_quant) AS material_quant,
 				sum(t.material_quant_req) AS material_quant_req				
 			FROM material_fact_consumptions AS t
-			LEFT JOIN raw_material_map_to_production_list AS t_map ON t_map.production_descr=t.raw_material_production_descr
+			LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+			LEFT JOIN production_sites AS pr_st ON pr_st.id=t.production_site_id
 			%s
-			GROUP BY t.raw_material_production_descr,t_map.raw_materials_ref::text,t_map.raw_material_ord
-			ORDER BY t_map.raw_material_ord",
+			GROUP BY t.raw_material_production_descr,t.production_site_id,pr_st.name,mat.ord,mat.*
+			ORDER BY mat.ord",
 			$cond
 		),
 		TRUE);

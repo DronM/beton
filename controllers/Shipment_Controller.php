@@ -893,23 +893,11 @@ class Shipment_Controller extends ControllerSQL{
 		$this->addNewModel($prod_site_q,'OperatorProductionSite_Model');				
 	}
 	
-	public static function setShipped($dbLinkMaster,$dbLink,$idForDb,$operatorUserId,$smsResOk,$smsResStr,$interactiveMode){
-		$dbLinkMaster->query(
-			sprintf(
-			"UPDATE shipments SET
-				shipped=TRUE,
-				operator_user_id=%d
-			WHERE id=%d",
-			$_SESSION["user_id"],
-			$idForDb
-			)
-		);
-		
-		Graph_Controller::clearCacheOnShipId($dbLink,$idForDb);		
-			
+	public static function sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode){
 		//SMS service
 		if (SMS_ACTIVE) {
-			$ar = $dbLink->query_first(sprintf(
+			//Может не быть изменений order_id на слейве после update!!!
+			$ar = $dbLinkMaster->query_first(sprintf(
 			"SELECT
 				orders.id AS order_id,
 				orders.phone_cel,
@@ -982,6 +970,24 @@ class Shipment_Controller extends ControllerSQL{
 				}
 			}
 		}	
+	
+	}
+	
+	public static function setShipped($dbLinkMaster,$dbLink,$idForDb,$operatorUserId,$smsResOk,$smsResStr,$interactiveMode){
+		$dbLinkMaster->query(
+			sprintf(
+			"UPDATE shipments SET
+				shipped=TRUE,
+				operator_user_id=%d
+			WHERE id=%d",
+			$_SESSION["user_id"],
+			$idForDb
+			)
+		);
+		
+		Graph_Controller::clearCacheOnShipId($dbLink,$idForDb);		
+		
+		self::sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode);	
 	}
 	
 	public function set_shipped($pm){
@@ -1597,5 +1603,24 @@ class Shipment_Controller extends ControllerSQL{
 		$this->modelGetList(new ShippedVehicleList_Model($this->getDbLink()),$pm);
 	}
 	
+	public function update($pm){
+		parent::update($pm);
+		
+		if($pm->getParamValue("order_id")){
+			//сменили заявку
+			$sms_res_ok = 0;
+			$sms_res_str = '';
+			self::sendShipSMS(
+				$this->getDbLinkMaster(),
+				$this->getDbLink(),
+				$this->getExtDbVal($pm,"old_id"),
+				$sms_res_ok,
+				$sms_res_str,
+				TRUE
+			);
+			
+		}
+		
+	}
 }
 ?>

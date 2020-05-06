@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
@@ -174,6 +175,14 @@ class ProductionList_Model extends ModelSQLBeton{
 						
 		$f_material_tolerance_violated=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_tolerance_violated",$f_opts);
 		$this->addField($f_material_tolerance_violated);
+		//********************
+		
+		//*** Field concrete_quant ***
+		$f_opts = array();
+		$f_opts['id']="concrete_quant";
+						
+		$f_concrete_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_quant",$f_opts);
+		$this->addField($f_concrete_quant);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

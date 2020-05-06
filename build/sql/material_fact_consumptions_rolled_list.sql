@@ -1,6 +1,6 @@
 -- VIEW: material_fact_consumptions_rolled_list
 
---DROP VIEW material_fact_consumptions_rolled_list;
+DROP VIEW material_fact_consumptions_rolled_list;
 
 CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 	SELECT
@@ -10,6 +10,7 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 		(production_sites_ref::text)::jsonb AS production_sites_ref,
 		production_site_id,
 		(concrete_types_ref::text)::jsonb AS concrete_types_ref,
+		concrete_type_id,
 		(order_concrete_types_ref::text)::jsonb AS order_concrete_types_ref,
 		concrete_type_production_descr,
 		(vehicles_ref::text)::jsonb AS vehicles_ref,
@@ -41,6 +42,7 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 		production_sites_ref::text,
 		production_site_id,
 		concrete_types_ref::text,
+		concrete_type_id,
 		order_concrete_types_ref::text,
 		concrete_type_production_descr,
 		vehicles_ref::text,

@@ -33807,3 +33807,2228 @@ $$
   COST 100;
 ALTER FUNCTION format_period_rus(in_date_from date, in_date_to date, in_date_format text) OWNER TO beton;
 
+
+-- ******************* update 30/04/2020 10:05:02 ******************
+-- VIEW: production_material_list
+
+DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+/*	
+	SELECT
+		t.production_site_id,
+		t.production_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.material_quant+coalesce(t_cor.quant,0) AS quant_fact,
+		t.material_quant_req AS quant_fact_req,
+		ra_mat.quant AS quant_consuption,
+		coalesce(t_cor.quant,0) AS quant_corrected,
+		
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+		
+		--подбор - (Факт + исправление)
+		ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0)) as quant_dif,
+		
+		CASE WHEN ra_mat.quant = 0 THEN FALSE
+		ELSE
+			((ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0))) * 100 / ra_mat.quant >= mat.max_fact_quant_tolerance_percent)
+		END AS dif_violation,
+		
+		t.id AS material_fact_consumption_id
+		
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+*/	
+	
+	SELECT
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--подбор - (Факт + исправление)
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE ra_mat.quant/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		- (sum(t.material_quant) + coalesce(t_cor.quant,0)) AS quant_dif
+	
+		,CASE WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+		ELSE
+			coalesce(
+			( (
+				coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+			) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 	>= mat.max_fact_quant_tolerance_percent
+			)
+			,FALSE)
+		END AS dif_violation
+	
+
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id = vsch.shipment_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+
+	GROUP BY
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 30/04/2020 10:05:40 ******************
+-- VIEW: production_material_list
+
+DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+/*	
+	SELECT
+		t.production_site_id,
+		t.production_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.material_quant+coalesce(t_cor.quant,0) AS quant_fact,
+		t.material_quant_req AS quant_fact_req,
+		ra_mat.quant AS quant_consuption,
+		coalesce(t_cor.quant,0) AS quant_corrected,
+		
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+		
+		--подбор - (Факт + исправление)
+		ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0)) as quant_dif,
+		
+		CASE WHEN ra_mat.quant = 0 THEN FALSE
+		ELSE
+			((ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0))) * 100 / ra_mat.quant >= mat.max_fact_quant_tolerance_percent)
+		END AS dif_violation,
+		
+		t.id AS material_fact_consumption_id
+		
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+*/	
+	
+	SELECT
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--подбор - (Факт + исправление)
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		- (sum(t.material_quant) + coalesce(t_cor.quant,0)) AS quant_dif
+	
+		,CASE WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+		ELSE
+			coalesce(
+			( (
+				coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+			) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 	>= mat.max_fact_quant_tolerance_percent
+			)
+			,FALSE)
+		END AS dif_violation
+	
+
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id = vsch.shipment_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+
+	GROUP BY
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 30/04/2020 10:10:05 ******************
+-- VIEW: production_material_list
+
+DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+/*	
+	SELECT
+		t.production_site_id,
+		t.production_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.material_quant+coalesce(t_cor.quant,0) AS quant_fact,
+		t.material_quant_req AS quant_fact_req,
+		ra_mat.quant AS quant_consuption,
+		coalesce(t_cor.quant,0) AS quant_corrected,
+		
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+		
+		--подбор - (Факт + исправление)
+		ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0)) as quant_dif,
+		
+		CASE WHEN ra_mat.quant = 0 THEN FALSE
+		ELSE
+			((ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0))) * 100 / ra_mat.quant >= mat.max_fact_quant_tolerance_percent)
+		END AS dif_violation,
+		
+		t.id AS material_fact_consumption_id
+		
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+*/	
+	
+	SELECT
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--подбор - (Факт + исправление)
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		- (sum(t.material_quant) + coalesce(t_cor.quant,0)) AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+			coalesce(
+			( (
+				coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+			) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 	>= mat.max_fact_quant_tolerance_percent
+			)
+			,FALSE)
+		END AS dif_violation
+	
+
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN shipments AS sh ON sh.id = vsch.shipment_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+
+	GROUP BY
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 30/04/2020 10:10:22 ******************
+﻿-- Function: productions_get_mat_tolerance_violated(in_production_site_id int, in_production_id int)
+
+-- DROP FUNCTION productions_get_mat_tolerance_violated(in_production_site_id int, in_production_id int);
+
+CREATE OR REPLACE FUNCTION productions_get_mat_tolerance_violated(in_production_site_id int, in_production_id int)
+  RETURNS bool AS
+$$
+	--SELECT FALSE;
+	
+	SELECT
+		bool_or(mat_list.dif_violation)
+	FROM production_material_list AS mat_list
+	WHERE mat_list.production_site_id = in_production_site_id AND mat_list.production_id = in_production_id			
+	;
+	
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION productions_get_mat_tolerance_violated(in_production_site_id int, in_production_id int) OWNER TO beton;
+
+
+-- ******************* update 30/04/2020 15:39:25 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR NEW.shipment_id<>OLD.shipment_id
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		IF TG_OP='UPDATE' AND NEW.shipment_id<>OLD.shipment_id
+		THEN
+			UPDATE material_fact_consumptions
+			SET shipment_id = NEW.shipment_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 30/04/2020 17:32:43 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list CASCADE;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		t.production_site_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req,
+		
+		--Ошибка в марке
+		(t.concrete_type_id IS NOT NULL AND t.concrete_type_id<>o.concrete_type_id) AS err_concrete_type,
+		
+		ra_mat.quant AS material_quant_shipped,
+		(
+			(CASE WHEN ra_mat.quant IS NULL OR ra_mat.quant=0 THEN FALSE
+				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
+			END)
+			OR
+			(CASE WHEN t.material_quant_req IS NULL OR t.material_quant_req=0 THEN TRUE
+				ELSE abs(t.material_quant/t.material_quant_req*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
+			END
+			)
+		) AS material_quant_tolerance_exceeded,
+		
+		concrete_types_ref(ct_o) AS order_concrete_types_ref,
+		
+		t.production_id,
+		
+		shipments_ref(sh) AS shipments_ref,
+		prod.id AS production_key,
+		
+		t.concrete_type_id
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	--LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id=prod.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	LEFT JOIN concrete_types AS ct_o ON ct_o.id=o.concrete_type_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	ORDER BY pr.name,t.date_time DESC,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 02/05/2020 11:03:49 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	LEFT JOIN productions pr ON pr.shipment_id=sh.id
+	WHERE
+		sh.production_site_id=in_production_site_id
+		AND sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND pr.id IS NULL
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+-- ******************* update 02/05/2020 11:08:40 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	LEFT JOIN productions pr ON pr.shipment_id=sh.id
+	WHERE
+		sh.production_site_id=in_production_site_id
+		AND sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		--AND pr.id IS NULL
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+-- ******************* update 02/05/2020 11:10:40 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	LEFT JOIN productions pr ON pr.shipment_id=sh.id
+	WHERE
+		sh.production_site_id=in_production_site_id
+		AND sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND pr.id IS NULL
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+-- ******************* update 02/05/2020 11:11:18 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_site_id,
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR NEW.shipment_id<>OLD.shipment_id
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		IF TG_OP='UPDATE' AND NEW.shipment_id<>OLD.shipment_id
+		THEN
+			UPDATE material_fact_consumptions
+			SET shipment_id = NEW.shipment_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 02/05/2020 17:35:59 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR NEW.shipment_id<>OLD.shipment_id
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		IF TG_OP='UPDATE' AND NEW.shipment_id<>OLD.shipment_id
+		THEN
+			UPDATE material_fact_consumptions
+			SET shipment_id = NEW.shipment_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 03/05/2020 09:30:49 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+ DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp);
+/*
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	LEFT JOIN productions pr ON pr.shipment_id=sh.id
+	WHERE
+		sh.production_site_id=in_production_site_id
+		AND sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND pr.id IS NULL
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int,in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+*/
+
+
+-- ******************* update 06/05/2020 06:50:31 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR NEW.shipment_id<>OLD.shipment_id
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		IF TG_OP='UPDATE' AND
+			(NEW.shipment_id<>OLD.shipment_id
+			OR NEW.concrete_type_id<>OLD.concrete_type_id
+			)
+		THEN
+			UPDATE material_fact_consumptions
+			SET shipment_id = NEW.shipment_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 06:51:56 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR NEW.shipment_id<>OLD.shipment_id
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		IF TG_OP='UPDATE' AND
+			(coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+			OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN
+			UPDATE material_fact_consumptions
+			SET shipment_id = NEW.shipment_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 06:57:47 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR NEW.shipment_id<>OLD.shipment_id
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		IF TG_OP='UPDATE' AND
+			(coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+			OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				shipment_id = NEW.shipment_id,
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 07:02:55 ******************
+﻿-- Function: concrete_type_map_to_production_recalc(in_concrete_type_id int, in_production_descr text)
+
+-- DROP FUNCTION concrete_type_map_to_production_recalc(int in_concrete_type_id int, in_production_descr text);
+
+CREATE OR REPLACE FUNCTION concrete_type_map_to_production_recalc(in_concrete_type_id int, in_production_descr text)
+  RETURNS void AS
+$$
+	UPDATE productions
+	SET concrete_type_id=in_concrete_type_id
+	WHERE production_concrete_type_descr=in_production_descr;
+$$
+  LANGUAGE sql VOLATILE CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION concrete_type_map_to_production_recalc(in_material_id int, in_production_descr text) OWNER TO beton;
+
+
+-- ******************* update 06/05/2020 07:05:31 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR NEW.shipment_id<>OLD.shipment_id
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		IF TG_OP='UPDATE' AND
+			(coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+			OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				shipment_id = NEW.shipment_id,
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 07:05:50 ******************
+-- Function: public.concrete_type_map_to_production_process()
+
+-- DROP FUNCTION public.concrete_type_map_to_production_process();
+
+CREATE OR REPLACE FUNCTION public.concrete_type_map_to_production_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF TG_OP='DELETE' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			OLD.concrete_type_id,
+			OLD.production_descr
+		);
+		RETURN OLD;
+		
+	ELSEIF TG_OP='INSERT' THEN
+		PERFORM concrete_type_map_to_production_recalc(
+			NEW.concrete_type_id,
+			NEW.production_descr
+		);
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' AND (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0) OR NEW.production_descr<>OLD.production_descr) THEN
+		
+		UPDATE productions
+		SET
+			production_concrete_type_descr = NEW.production_descr,
+			concrete_type_id = NEW.concrete_type_id
+		WHERE production_concrete_type_descr=OLD.production_descr;
+		
+		RETURN NEW;
+	ELSEIF TG_OP='UPDATE' THEN
+		RETURN NEW;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.concrete_type_map_to_production_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 07:10:49 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		IF TG_OP='UPDATE' AND coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 07:13:16 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+
+		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 07:39:13 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+	ORDER BY sh.date_time	
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 09:02:19 ******************
+-- Function: public.shipment_process()
+
+-- DROP FUNCTION public.shipment_process();
+
+CREATE OR REPLACE FUNCTION public.shipment_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE quant_rest numeric;
+	v_vehicle_load_capacity vehicles.load_capacity%TYPE DEFAULT 0;
+	v_vehicle_state vehicle_states;
+	v_vehicle_plate vehicles.plate%TYPE;
+	v_vehicle_feature vehicles.feature%TYPE;
+	v_ord_date_time timestamp;
+	v_destination_id int;
+	--v_shift_open boolean;
+BEGIN
+	/*
+	IF (TG_OP='UPDATE' AND NEW.shipped AND OLD.shipped) THEN
+		--closed shipment, but trying to change smth
+		RAISE EXCEPTION 'Для возможности изменения отмените отгрузку!';
+	END IF;
+	*/
+
+	IF (TG_WHEN='BEFORE' AND TG_OP='UPDATE' AND OLD.shipped=true) THEN
+		--register actions
+		PERFORM ra_materials_remove_acts('shipment'::doc_types,NEW.id);
+		PERFORM ra_material_consumption_remove_acts('shipment'::doc_types,NEW.id);
+	END IF;
+	
+	IF (TG_WHEN='BEFORE' AND TG_OP='UPDATE'
+	AND (OLD.vehicle_schedule_id<>NEW.vehicle_schedule_id OR OLD.id<>NEW.id)
+	)
+	THEN
+		--
+		DELETE FROM vehicle_schedule_states t WHERE t.shipment_id = OLD.id AND t.schedule_id = OLD.vehicle_schedule_id;	
+	END IF;
+	
+	-- vehicle data
+	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
+		SELECT v.load_capacity,v.plate,v.feature INTO v_vehicle_load_capacity, v_vehicle_plate,v_vehicle_feature
+		FROM vehicle_schedules AS vs
+		LEFT JOIN vehicles As v ON v.id=vs.vehicle_id
+		WHERE vs.id=NEW.vehicle_schedule_id;	
+
+		IF (v_vehicle_feature IS NULL)
+		OR (
+			(v_vehicle_feature<>const_own_vehicles_feature_val())
+			AND (v_vehicle_feature<>const_backup_vehicles_feature_val()) 
+		) THEN
+			--check destination. const_self_ship_dest_id_val only allowed!!!
+			SELECT orders.destination_id INTO v_destination_id FROM orders WHERE orders.id=NEW.order_id;
+			IF v_destination_id <> const_self_ship_dest_id_val() THEN
+				RAISE EXCEPTION 'Данному автомобилю запрещено вывозить на этот объект!';
+			END IF;
+		END IF;
+	END IF;
+
+	--check vehicle state && open shift
+	IF (TG_OP='INSERT') THEN
+		/*
+		SELECT true INTO v_shift_open FROM shifts WHERE shifts.date = NEW.date_time::date;
+		IF NOT FOUND THEN
+			RAISE EXCEPTION 'Смена "%" не открыта!',get_shift_descr(NEW.date_time);
+		END IF;
+		*/
+		
+		SELECT vehicle_schedule_states.state INTO v_vehicle_state
+		FROM vehicle_schedule_states
+		WHERE schedule_id=NEW.vehicle_schedule_id
+		ORDER BY date_time DESC NULLS LAST
+		LIMIT 1;
+		
+		/*IF v_vehicle_state != 'free'::vehicle_states THEN
+			RAISE EXCEPTION 'Автомобиль "%" в статусе "%", должен быть 
+				"%"',v_vehicle_plate,get_vehicle_states_descr(v_vehicle_state),get_vehicle_states_descr('free'::vehicle_states);
+		END IF;
+		*/
+	END IF;
+
+	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
+		-- ********** check balance ****************************************
+		SELECT o.quant-SUM(COALESCE(s.quant,0)),o.date_time INTO quant_rest,v_ord_date_time FROM orders AS o
+		LEFT JOIN shipments AS s ON s.order_id=o.id	
+		WHERE o.id = NEW.order_id
+		GROUP BY o.quant,o.date_time;
+
+		--order shift date MUST overlap shipment shift date!		
+		IF get_shift_start(NEW.date_time)<>get_shift_start(v_ord_date_time) THEN
+			RAISE EXCEPTION 'Заявка из другой смены!';
+		END IF;
+		
+
+		IF (TG_OP='UPDATE') THEN
+			quant_rest:= quant_rest + OLD.quant;
+		END IF;
+		
+		IF (quant_rest<NEW.quant::numeric) THEN
+			RAISE EXCEPTION 'Остаток по данной заявке: %, запрошено: %',quant_descr(quant_rest::numeric),quant_descr(NEW.quant::numeric);
+		END IF;
+		-- ********** check balance ****************************************
+
+		
+		-- *********  check load capacity *************************************		
+		IF v_vehicle_load_capacity < NEW.quant THEN
+			RAISE EXCEPTION 'Грузоподъемность автомобиля: "%", запрошено: %',quant_descr(v_vehicle_load_capacity::numeric),quant_descr(NEW.quant::numeric);
+		END IF;
+		-- *********  check load capacity *************************************
+	END IF;
+
+	IF TG_OP='UPDATE' THEN
+		IF (NEW.shipped AND OLD.shipped=false) THEN
+			NEW.ship_date_time = current_timestamp;
+			
+			--Если есть привязанное производство - пересчитать
+			UPDATE productions
+			SET
+				material_tolerance_violated = productions_get_mat_tolerance_violated(
+					production_site_id,
+					production_id
+				)				
+			WHERE shipment_id=NEW.id;
+			
+		ELSEIF (OLD.shipped AND NEW.shipped=false) THEN
+			NEW.ship_date_time = null;
+		END IF;
+		
+		IF (NEW.order_id <> OLD.order_id) THEN
+			/* смена заявки
+			 * 1) Удалить vehicle_schedule_states сданным id отгрузки и статусом at_dest, как будто и не доехал еще
+			 * 2) Исправить все оставшиеся vehicle_schedule_states where shipment_id = NEW.id на новый destionation_id из orders
+			 */
+			DELETE FROM vehicle_schedule_states WHERE shipment_id = NEW.id AND state= 'at_dest'::vehicle_states;
+			UPDATE vehicle_schedule_states
+			SET
+				destination_id = (SELECT orders.destination_id FROM orders WHERE orders.id=NEW.order_id)
+			WHERE shipment_id = NEW.id;
+		END IF;
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.shipment_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 13:40:49 ******************
+-- VIEW: production_material_list
+
+DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+/*	
+	SELECT
+		t.production_site_id,
+		t.production_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.material_quant+coalesce(t_cor.quant,0) AS quant_fact,
+		t.material_quant_req AS quant_fact_req,
+		ra_mat.quant AS quant_consuption,
+		coalesce(t_cor.quant,0) AS quant_corrected,
+		
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+		
+		--подбор - (Факт + исправление)
+		ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0)) as quant_dif,
+		
+		CASE WHEN ra_mat.quant = 0 THEN FALSE
+		ELSE
+			((ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0))) * 100 / ra_mat.quant >= mat.max_fact_quant_tolerance_percent)
+		END AS dif_violation,
+		
+		t.id AS material_fact_consumption_id
+		
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+*/	
+	
+	SELECT
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--подбор - (Факт + исправление)
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		- (sum(t.material_quant) + coalesce(t_cor.quant,0)) AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+			coalesce(
+				abs((coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				- (sum(t.material_quant) + coalesce(t_cor.quant,0)))*100
+				)>= mat.max_fact_quant_tolerance_percent
+			,FALSE)
+		END AS dif_violation
+	
+/*
+			( (
+				coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+			) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+				 	>= mat.max_fact_quant_tolerance_percent
+			)
+
+*/
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	--LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+
+	GROUP BY
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 13:53:33 ******************
+-- VIEW: production_material_list
+
+DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+/*	
+	SELECT
+		t.production_site_id,
+		t.production_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.material_quant+coalesce(t_cor.quant,0) AS quant_fact,
+		t.material_quant_req AS quant_fact_req,
+		ra_mat.quant AS quant_consuption,
+		coalesce(t_cor.quant,0) AS quant_corrected,
+		
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+		
+		--подбор - (Факт + исправление)
+		ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0)) as quant_dif,
+		
+		CASE WHEN ra_mat.quant = 0 THEN FALSE
+		ELSE
+			((ra_mat.quant - (t.material_quant + coalesce(t_cor.quant,0))) * 100 / ra_mat.quant >= mat.max_fact_quant_tolerance_percent)
+		END AS dif_violation,
+		
+		t.id AS material_fact_consumption_id
+		
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=vsch.shipment_id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+*/	
+	
+	SELECT
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--подбор - (Факт + исправление)
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		- (sum(t.material_quant) + coalesce(t_cor.quant,0)) AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( (
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+/*
+
+*/
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	--LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+
+	GROUP BY
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 14:01:02 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list CASCADE;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		t.production_site_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req,
+		
+		--Ошибка в марке
+		(t.concrete_type_id IS NOT NULL AND t.concrete_type_id<>o.concrete_type_id) AS err_concrete_type,
+		
+		ra_mat.quant AS material_quant_shipped,
+		(
+			CASE
+				WHEN mat.id IS NULL THEN FALSE
+				WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+				/*
+				ELSE
+					coalesce(
+					( (
+						coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+						 - (sum(t.material_quant) )
+					) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+						 	>= mat.max_fact_quant_tolerance_percent
+					)
+				,FALSE)
+				*/
+				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
+			END
+		) AS material_quant_tolerance_exceeded,
+		
+		concrete_types_ref(ct_o) AS order_concrete_types_ref,
+		
+		t.production_id,
+		
+		shipments_ref(sh) AS shipments_ref,
+		prod.id AS production_key,
+		
+		t.concrete_type_id
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	--LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id=prod.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	LEFT JOIN concrete_types AS ct_o ON ct_o.id=o.concrete_type_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	ORDER BY pr.name,t.date_time DESC,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 06/05/2020 14:03:24 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list CASCADE;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		t.production_site_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		t.concrete_quant,
+		t.material_quant,
+		t.material_quant_req,
+		
+		--Ошибка в марке
+		(t.concrete_type_id IS NOT NULL AND t.concrete_type_id<>o.concrete_type_id) AS err_concrete_type,
+		
+		ra_mat.quant AS material_quant_shipped,
+		
+		/*
+		(
+			CASE
+				WHEN mat.id IS NULL THEN FALSE
+				WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
+			END
+		) AS material_quant_tolerance_exceeded,
+		*/
+		prod.material_tolerance_violated AS material_quant_tolerance_exceeded,
+		
+		concrete_types_ref(ct_o) AS order_concrete_types_ref,
+		
+		t.production_id,
+		
+		shipments_ref(sh) AS shipments_ref,
+		prod.id AS production_key,
+		
+		t.concrete_type_id
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	--LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id=prod.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	LEFT JOIN concrete_types AS ct_o ON ct_o.id=o.concrete_type_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	ORDER BY pr.name,t.date_time DESC,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 06/05/2020 14:18:11 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_vehicle_descr,
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
+				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN
+			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+			
+		END IF;
+
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+
+		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+
+		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
+		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				shipment_id = NEW.shipment_id,
+				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 14:18:56 ******************
+-- Function: public.vehicle_schedule_states_process()
+
+-- DROP FUNCTION public.vehicle_schedule_states_process();
+
+CREATE OR REPLACE FUNCTION public.vehicle_schedule_states_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_veh_at_work_count int;
+	v_old_state vehicle_states;
+	v_controled_states vehicle_states[];
+	veh_count int;
+	v_vehicle_feature vehicles.feature%TYPE;
+	v_do_control_max_count boolean;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF (NEW.state='free'::vehicle_states)
+		AND (now()::date=NEW.date_time::date AND  now()::time<(constant_first_shift_start_time()+constant_day_shift_length()::interval)) THEN
+			--ON DAY SHIFT ONLY!!!!
+
+			--check if it is ITS shift
+			SELECT true INTO v_do_control_max_count FROM vehicle_schedule_states AS st
+			WHERE st.date_time::date=NEW.date_time::date
+				AND st.schedule_id=NEW.schedule_id
+				AND st.state='shift'::vehicle_states;
+
+			--check vehicle counts
+			IF NOT FOUND THEN			
+				v_controled_states = ARRAY['free'::vehicle_states,'assigned'::vehicle_states,'busy'::vehicle_states,'at_dest'::vehicle_states,'left_for_base'::vehicle_states];
+
+				--current (old) state
+				SELECT coalesce(vehicle_schedule_states.state,'out'::vehicle_states) INTO v_old_state
+				FROM vehicle_schedule_states
+				WHERE vehicle_schedule_states.schedule_id = NEW.schedule_id
+				ORDER BY vehicle_schedule_states.date_time DESC LIMIT 1;
+
+				IF NOT FOUND THEN
+					v_old_state = 'out'::vehicle_states;
+				END IF;
+
+				v_do_control_max_count = (NOT v_old_state = ANY(v_controled_states));
+
+				IF v_do_control_max_count THEN
+					--need feature
+					SELECT v.feature INTO v_vehicle_feature
+					FROM vehicle_schedules AS vs
+					LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
+					WHERE vs.id=NEW.schedule_id;
+				
+					v_do_control_max_count = ( (v_vehicle_feature IS NOT NULL) 
+					AND (v_vehicle_feature=constant_own_vehicles_feature() OR v_vehicle_feature=constant_backup_vehicles_feature()) );
+				END IF;
+			
+				IF v_do_control_max_count THEN
+					SELECT * INTO v_veh_at_work_count FROM get_working_vehicles_count_main(NEW.date_time::date);
+
+					veh_count = constant_max_vehicle_at_work();
+					IF v_veh_at_work_count>=veh_count THEN
+						RAISE EXCEPTION 'Максимально допустимое количество машин на линии: %. Нет возможности добавить еще.',veh_count;
+					END IF;
+				END IF;
+			END IF;
+		END IF;
+				
+		RETURN NEW;
+			
+	ELSIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+	
+		UPDATE productions
+		SET
+			vehicle_schedule_state_id=NULL,
+			shipment_id=NULL
+		WHERE shipment_id = OLD.shipment_id;
+		
+		RETURN OLD;
+	END IF;
+	
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.vehicle_schedule_states_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 06/05/2020 14:19:30 ******************
+-- Trigger: vehicle_schedule_states_before_insert on public.vehicle_schedule_states
+
+ DROP TRIGGER vehicle_schedule_states_before_insert ON public.vehicle_schedule_states;
+
+CREATE TRIGGER vehicle_schedule_states_before_trigger
+  BEFORE INSERT OR DELETE
+  ON public.vehicle_schedule_states
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.vehicle_schedule_states_process();
+
+
+
+
+-- ******************* update 06/05/2020 15:07:22 ******************
+-- VIEW: production_material_list
+
+DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	
+	SELECT
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор
+		(sum(t.material_quant) + coalesce(t_cor.quant,0)) - 
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( (
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	--LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+
+	GROUP BY
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+

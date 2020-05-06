@@ -346,6 +346,9 @@ dsParams.control.getInsertPublicMethod()
 Промежуточный слив
 
 
+1.070
+1) Shipment_Controller->update перекрытие метода для отправки СМС при смене заявки
+
 SELECT 
 (
 (select quant from rg_material_facts_balance('2020-04-27 06:00','{5}'))

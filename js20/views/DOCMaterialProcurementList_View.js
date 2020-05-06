@@ -19,6 +19,7 @@ function DOCMaterialProcurementList_View(id,options){
 		"controller":contr,
 		"editInline":false,
 		"editWinClass":null,
+		"contClassName":options.detailFilters? window.getBsCol(11):null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdInsert":false,
 			"cmdInsert":false,
@@ -113,7 +114,8 @@ function DOCMaterialProcurementList_View(id,options){
 							"colAttrs":{"align":"right"},
 							"columns":[
 								new GridColumnFloat({
-									"field":model.getField("quant_net")
+									"field":model.getField("quant_net"),
+									"precision":"4"
 								})
 							]
 						})

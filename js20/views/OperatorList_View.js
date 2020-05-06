@@ -29,13 +29,17 @@ function OperatorList_View(id,options){
 							var cell_n = gridCell.getNode();
 							for(var i=0;i<list.length;i++){
 								var t_tag_cont = document.createElement("DIV");
-								t_tag_cont.setAttribute("class",list[i].material_tolerance_violated? "badge-danger":"operatorProdDetail");
+								//t_tag_cont.setAttribute("class",list[i].material_tolerance_violated? "badge badge-danger":"operatorProdDetail");
 								
 								col.productions[list[i].production_id] = {
 									"pic":document.createElement("SPAN")
 									,"txt":document.createElement("SPAN")
 								};
 								col.productions[list[i].production_id].pic.setAttribute("class","glyphicon glyphicon-triangle-right pull-left detailToggle");
+								if(list[i].material_tolerance_violated){
+									col.productions[list[i].production_id].txt.setAttribute("class","badge badge-danger");
+									col.productions[list[i].production_id].txt.setAttribute("style","font-size:100%;");
+								}
 								col.productions[list[i].production_id].txt.textContent = list[i].production_id;
 								
 								t_tag_cont.appendChild(col.productions[list[i].production_id].pic);
