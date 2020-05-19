@@ -22,7 +22,14 @@ BEGIN
 				NEW.vehicle_schedule_state_id,
 				NEW.shipment_id
 			FROM material_fact_consumptions_find_vehicle(
-				NEW.production_vehicle_descr,
+				coalesce(
+					(SELECT v.plate::text
+					FROM production_vehicle_corrections AS p
+					LEFT JOIN vehicles AS v ON v.id=p.vehicle_id
+					WHERE p.production_site_id=NEW.production_site_id AND p.production_id=NEW.production_id
+					)
+					,NEW.production_vehicle_descr
+				),
 				NEW.production_dt_start::timestamp
 			) AS (
 				vehicle_id int,
@@ -31,6 +38,14 @@ BEGIN
 			);		
 		END IF;
 		
+		IF NEW.production_dt_end IS NOT NULL THEN
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+		END IF;
+				
+		/*
 		IF TG_OP='UPDATE'		
 			AND (
 				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
@@ -38,15 +53,32 @@ BEGIN
 				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
 				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
 			)
-		THEN
-			
+		THEN			
 			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
 				NEW.production_site_id,
 				NEW.production_id
-			);
-			
+			);			
 		END IF;
-
+		*/
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
+		
+		IF coalesce(
+			(SELECT TRUE
+			FROM production_sites
+			WHERE id = NEW.production_site_id
+			AND NEW.production_id =ANY(missing_elkon_production_ids))
+			,FALSE
+		) THEN
+			UPDATE production_sites
+			SET
+				missing_elkon_production_ids = array_diff(missing_elkon_production_ids,ARRAY[missing_elkon_production_ids])
+			WHERE id = NEW.production_site_id
+			;
+		END IF;
+		
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
@@ -64,7 +96,6 @@ BEGIN
 		THEN
 			UPDATE material_fact_consumptions
 			SET
-				shipment_id = NEW.shipment_id,
 				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id
 			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
 		END IF;

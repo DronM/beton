@@ -117,6 +117,16 @@ function MaterialFactConsumptionRolledList_View(id,options){
 					})(this.getModel().getFieldValue("production_key"),this.getModel().getFieldValue("date_time"))
 				}
 			}
+			else if(col=="vehicles_ref"){
+				opts.events = opts.events || {
+					"dblclick":(function(productionSiteId,productionId){
+						return function(e){
+							self.selectVehicle(productionSiteId,productionId);
+						}
+					})(this.getModel().getFieldValue("production_site_id"),this.getModel().getFieldValue("production_id"))
+				}
+			}
+			
 		},
 		
 		"head":new GridHead(id+":grid:head",{
@@ -617,7 +627,7 @@ MaterialFactConsumptionRolledList_View.prototype.selectShipment = function(produ
 		"date_time":dateTime,
 		"onSelect":(function(productionKey){
 			return function(row){
-				self.closeSelect(productionKey,row.id.getValue());
+				self.closeShipmentSelect(productionKey,row.id.getValue());
 			}
 		})(productionKey)
 	});
@@ -628,7 +638,7 @@ MaterialFactConsumptionRolledList_View.prototype.selectShipment = function(produ
 		"cmdOk":false,
 		"contentHead":"Выберите отгрузку",
 		"onClickCancel":function(){
-			self.closeSelect();
+			self.closeShipmentSelect();
 		}
 	});
 	
@@ -636,7 +646,41 @@ MaterialFactConsumptionRolledList_View.prototype.selectShipment = function(produ
 	
 }
 
-MaterialFactConsumptionRolledList_View.prototype.closeSelect = function(productionKey,shipmentId){
+MaterialFactConsumptionRolledList_View.prototype.selectVehicle = function(productionSiteId,productionId){
+	var self = this;
+	this.m_view = new View("Vehicle:cont",{
+		"elements":[
+			new VehicleEdit("Vehicle:cont:vehicles_ref",{
+				"labelCaption":"ТС:",
+				"focus":true
+			})
+		]
+	});
+	this.m_form = new WindowFormModalBS("Vehicle",{
+		"content":this.m_view,
+		"dialogWidth":"30%",
+		"cmdCancel":true,
+		"cmdOk":true,
+		"contentHead":"Выберите ТС",
+		"onClickCancel":function(){
+			self.closeVehicleSelect();
+		},
+		"onClickOk":(function(productionSiteId,productionId){
+			return function(){	
+				var v = self.m_view.getElement("vehicles_ref").getValue();
+				if(!v||v.isNull()){
+					throw Error("Не выбрано ТС!");
+				}
+				self.closeVehicleSelect(productionSiteId,productionId,v.getKey());
+			}
+		})(productionSiteId,productionId)
+	});
+	
+	this.m_form.open();
+	
+}
+
+MaterialFactConsumptionRolledList_View.prototype.closeSelect = function(){
 	if(this.m_view){
 		this.m_view.delDOM()	
 		delete this.m_view;
@@ -645,7 +689,36 @@ MaterialFactConsumptionRolledList_View.prototype.closeSelect = function(producti
 		this.m_form.delDOM();	
 		delete this.m_form;
 	}	
-	
+}
+
+MaterialFactConsumptionRolledList_View.prototype.closeVehicleSelect = function(productionSiteId,productionId,vehicleId){
+	this.closeSelect();
+	if(productionSiteId&&productionId&&vehicleId){
+		var pm = (new ProductionVehicleCorrection_Controller()).getPublicMethod("insert");
+		var self = this;
+		pm.setFieldValue("production_site_id",productionSiteId);
+		pm.setFieldValue("production_id",productionId);
+		pm.setFieldValue("vehicle_id",vehicleId);
+		window.setGlobalWait(true);
+		pm.run({
+			"ok":function(){
+				if(self.getElement("grid")){
+					self.getElement("grid").onRefresh(function(){
+						window.setGlobalWait(false);
+						window.showTempNote("К производству привязано новое ТС",null,5000);
+					});
+				}				
+			}
+			,"fail":function(resp,errCode,errStr){				
+				window.setGlobalWait(false);
+				throw Error(errStr);
+			}
+		});
+	}
+}
+
+MaterialFactConsumptionRolledList_View.prototype.closeShipmentSelect = function(productionKey,shipmentId){
+	this.closeSelect();
 	if(productionKey&&shipmentId){
 		var pm = (new Production_Controller()).getPublicMethod("update");
 		var self = this;
@@ -654,15 +727,12 @@ MaterialFactConsumptionRolledList_View.prototype.closeSelect = function(producti
 		window.setGlobalWait(true);
 		pm.run({
 			"ok":function(){
-				if(self.m_grid){
-					window.showTempNote("К производству привязана отгрузка",null,5000);
-					/*
-					NO FILTER!!!
+				
+				if(self.getElement("grid")){
 					self.getElement("grid").onRefresh(function(){
 						window.setGlobalWait(false);
 						window.showTempNote("К производству привязана отгрузка",null,5000);
-					});
-					*/
+					});					
 				}				
 			}
 			,"fail":function(resp,errCode,errStr){				

@@ -22,15 +22,22 @@
 <xsl:template match="model[@id='MaterialActionList_Model']">
 	<xsl:variable name="model_id" select="@id"/>
 	
-	<table id="{$model_id}" class="tabel table-bordered table-striped">
+	<table id="{$model_id}" class="table table-bordered table-responsive table-striped" style="width:60%;">
 		<thead>
 			<tr align="center">
-				<td>Материал</td>
-				<td>Начальный остаток</td>
-				<td>Приход</td>
-				<td>Расход</td>
-				<td>Конечный остаток</td>
+				<td rowspan="2">Материал</td>
+				<td rowspan="2">Начальный остаток</td>
+				<td rowspan="2">Приход</td>
+				<td colspan="3">Расход</td>
+				<td rowspan="2">Корректировка</td>
+				<td rowspan="2">Конечный остаток</td>
 			</tr>
+			<tr align="center">
+				<td>Завод 1</td>
+				<td>Завод 2</td>
+				<td>Итого</td>
+			</tr>
+			
 		</thead>
 	
 		<tbody>
@@ -55,7 +62,23 @@
 		</td>				
 		<td align="right">
 			<xsl:call-template name="format_quant">
+				<xsl:with-param name="val" select="pr1_quant_kred"/>
+			</xsl:call-template>																									
+		</td>				
+		<td align="right">
+			<xsl:call-template name="format_quant">
+				<xsl:with-param name="val" select="pr2_quant_kred"/>
+			</xsl:call-template>																									
+		</td>				
+		
+		<td align="right">
+			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="quant_kred"/>
+			</xsl:call-template>																									
+		</td>				
+		<td align="right">
+			<xsl:call-template name="format_quant">
+				<xsl:with-param name="val" select="quant_correction"/>
 			</xsl:call-template>																									
 		</td>				
 		<td align="right">

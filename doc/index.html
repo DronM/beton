@@ -58,6 +58,7 @@
 <li><a href="#OwnerList_Controller">OwnerList_Controller</a></li>
 <li><a href="#Production_Controller">Production_Controller</a></li>
 <li><a href="#ProductionSite_Controller">ProductionSite_Controller</a></li>
+<li><a href="#ProductionVehicleCorrection_Controller">ProductionVehicleCorrection_Controller</a></li>
 <li><a href="#PumpPrice_Controller">PumpPrice_Controller</a></li>
 <li><a href="#PumpPriceValue_Controller">PumpPriceValue_Controller</a></li>
 <li><a href="#PumpVehicle_Controller">PumpVehicle_Controller</a></li>
@@ -315,6 +316,8 @@
 <li><a href="#ELKONLogList_Model">ELKONLogList_Model</a></li>
 <li><a href="#Production_Model">Production_Model</a></li>
 <li><a href="#ProductionList_Model">ProductionList_Model</a></li>
+<li><a href="#ProductionVehicleCorrection_Model">ProductionVehicleCorrection_Model</a></li>
+<li><a href="#ProductionVehicleCorrectionList_Model">ProductionVehicleCorrectionList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1676,6 +1679,19 @@
 <a href="#ProductionSite_Model">Model: ProductionSite_Model</a><h2>get_object</h2>
 <a href="#ProductionSite_Model">Model: ProductionSite_Model</a><h2>get_list_for_edit</h2>
 <a href="#ProductionSiteForEditList_Model">Model: ProductionSiteForEditList_Model</a>
+</div>
+</div>
+<div id="ProductionVehicleCorrection_Controller" class="content_box">
+<h1>ProductionVehicleCorrection_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ProductionVehicleCorrection_Model">Model: ProductionVehicleCorrection_Model</a><h2>update</h2>
+<a href="#ProductionVehicleCorrection_Model">Model: ProductionVehicleCorrection_Model</a><h2>delete</h2>
+<a href="#ProductionVehicleCorrection_Model">Model: ProductionVehicleCorrection_Model</a><h2>get_list</h2>
+<a href="#ProductionVehicleCorrectionList_Model">Model: ProductionVehicleCorrectionList_Model</a><h2>get_object</h2>
+<a href="#ProductionVehicleCorrectionList_Model">Model: ProductionVehicleCorrectionList_Model</a>
 </div>
 </div>
 <div id="PumpPrice_Controller" class="content_box">
@@ -6483,6 +6499,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>quant_correction</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>quant_end</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
@@ -9058,6 +9080,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>missing_elkon_production_ids</h2>
+<div>Type:Array</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ProductionSiteForEditList_Model" class="content_box">
@@ -9111,6 +9139,96 @@
 <div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:100</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ProductionVehicleCorrection_Model" class="content_box">
+<h1>ProductionVehicleCorrection_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ProductionVehicleCorrectionList_Model" class="content_box">
+<h1>ProductionVehicleCorrectionList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
 <div>Precision:</div>
 </div>
 </div>

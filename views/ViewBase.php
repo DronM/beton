@@ -1301,6 +1301,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloForOrderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ProductionList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ProductionVehicleCorrectionList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ProductionMaterialList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ELKONLogList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloBalanceResetList_View.js'));
@@ -1711,6 +1712,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/CementSiloBalanceReset_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/CementSiloBalanceResetList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialActionList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ProductionVehicleCorrection_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ProductionVehicleCorrection_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ProductionVehicleCorrectionList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

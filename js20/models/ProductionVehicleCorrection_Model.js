@@ -16,24 +16,12 @@
  * @param {Object} options
  */
 
-function ProductionSite_Model(options){
-	var id = 'ProductionSite_Model';
+function ProductionVehicleCorrection_Model(options){
+	var id = 'ProductionVehicleCorrection_Model';
 	options = options || {};
 	
 	options.fields = {};
 	
-			
-				
-			
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = true;	
-	
-	filed_options.autoInc = true;	
-	
-	options.fields.id = new FieldInt("id",filed_options);
-	
 				
 	
 	var filed_options = {};
@@ -41,8 +29,18 @@ function ProductionSite_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.name = new FieldString("name",filed_options);
-	options.fields.name.getValidator().setMaxLength('100');
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
+	options.fields.production_site_id.getValidator().setRequired(true);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.production_id = new FieldInt("production_id",filed_options);
+	options.fields.production_id.getValidator().setRequired(true);
 	
 				
 	
@@ -51,25 +49,18 @@ function ProductionSite_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.elkon_connection = new FieldJSONB("elkon_connection",filed_options);
+	options.fields.vehicle_id = new FieldInt("vehicle_id",filed_options);
+	options.fields.vehicle_id.getValidator().setRequired(true);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Активен';
-	filed_options.autoInc = false;	
-	
-	options.fields.active = new FieldBool("active",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.last_elkon_production_id = new FieldInt("last_elkon_production_id",filed_options);
+	options.fields.date_time = new FieldDateTimeTZ("date_time",filed_options);
 	
 				
 	
@@ -78,9 +69,9 @@ function ProductionSite_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.missing_elkon_production_ids = new FieldArray("missing_elkon_production_ids",filed_options);
+	options.fields.user_id = new FieldInt("user_id",filed_options);
 	
-		ProductionSite_Model.superclass.constructor.call(this,id,options);
+		ProductionVehicleCorrection_Model.superclass.constructor.call(this,id,options);
 }
-extend(ProductionSite_Model,ModelXML);
+extend(ProductionVehicleCorrection_Model,ModelXML);
 

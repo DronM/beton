@@ -69,6 +69,16 @@ class MaterialActionList_Model extends {
 		$this->addField($f_quant_kred);
 		//********************
 		
+		//*** Field quant_correction ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Корректировка';
+		$f_opts['id']="quant_correction";
+						
+		$f_quant_correction=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_correction",$f_opts);
+		$this->addField($f_quant_correction);
+		//********************
+		
 		//*** Field quant_end ***
 		$f_opts = array();
 		

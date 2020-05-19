@@ -743,13 +743,14 @@ td.elkonDifConcreteType{
 	background-color:red !important;	
 }
 td.factQuantCorrected{
-	border:3px solid black;	
-	background-color:red !important;	
+	font-weight:bolder !important;	
+	border:3px solid black !important;
+	background-color:#ffcccc !important;	
 }
 td.factQuantCorrectedElkon{
-	font-weight:bolder;
-	border:3px solid black;	
-	background-color:red !important;	
+	font-weight:bolder !important;	
+	border:3px solid black !important;	
+	background-color:#ffcccc !important;	
 }
 td.factQuantViolation{
 	font-weight:bolder;
@@ -764,10 +765,12 @@ td.factQuantViolation{
 }
 #OrderMakeList\:mat_totals_grid td.quant_editable:hover{
 	background-color:yellow !important;
+	cursor:pointer;
 }
 
 .productionMaterialList td.quant_editable:hover{
 	background-color:yellow !important;
+	cursor:pointer;
 }
 
 .operatorProdDetail{

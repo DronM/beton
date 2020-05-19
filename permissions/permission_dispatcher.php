@@ -1078,6 +1078,16 @@ $permissions = array();
 				
 					$permissions['MaterialFactBalanceCorretion_Controller_get_object']=TRUE;
 				
+					$permissions['ProductionVehicleCorrection_Controller_insert']=TRUE;
+				
+					$permissions['ProductionVehicleCorrection_Controller_update']=TRUE;
+				
+					$permissions['ProductionVehicleCorrection_Controller_delete']=TRUE;
+				
+					$permissions['ProductionVehicleCorrection_Controller_get_list']=TRUE;
+				
+					$permissions['ProductionVehicleCorrection_Controller_get_object']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

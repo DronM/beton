@@ -22,100 +22,89 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
  */
 
 
-class ProductionSite_Controller extends ControllerSQL{
-
+class ProductionVehicleCorrection_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);
 			
 
 		/* insert */
 		$pm = new PublicMethod('insert');
-		$param = new FieldExtString('name'
+		$param = new FieldExtInt('production_site_id'
+				,array('required'=>TRUE));
+		$pm->addParam($param);
+		$param = new FieldExtInt('production_id'
+				,array('required'=>TRUE));
+		$pm->addParam($param);
+		$param = new FieldExtInt('vehicle_id'
+				,array('required'=>TRUE));
+		$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('date_time'
 				,array());
 		$pm->addParam($param);
-		$param = new FieldExtJSONB('elkon_connection'
+		$param = new FieldExtInt('user_id'
 				,array());
 		$pm->addParam($param);
-		$param = new FieldExtBool('active'
-				,array(
-				'alias'=>'Активен'
-			));
-		$pm->addParam($param);
-		$param = new FieldExtInt('last_elkon_production_id'
-				,array());
-		$pm->addParam($param);
-		$param = new FieldExtArray('missing_elkon_production_ids'
-				,array());
-		$pm->addParam($param);
-		
-		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		
 		$this->addPublicMethod($pm);
-		$this->setInsertModelId('ProductionSite_Model');
+		$this->setInsertModelId('ProductionVehicleCorrection_Model');
 
 			
 		/* update */		
 		$pm = new PublicMethod('update');
 		
-		$pm->addParam(new FieldExtInt('old_id',array('required'=>TRUE)));
+		$pm->addParam(new FieldExtInt('old_production_site_id',array('required'=>TRUE)));
 		
-		$pm->addParam(new FieldExtString('old_name',array('required'=>TRUE)));
+		$pm->addParam(new FieldExtInt('old_production_id',array('required'=>TRUE)));
 		
 		$pm->addParam(new FieldExtInt('obj_mode'));
-		$param = new FieldExtInt('id'
+		$param = new FieldExtInt('production_site_id'
 				,array(
 			));
 			$pm->addParam($param);
-		$param = new FieldExtString('name'
+		$param = new FieldExtInt('production_id'
 				,array(
 			));
 			$pm->addParam($param);
-		$param = new FieldExtJSONB('elkon_connection'
+		$param = new FieldExtInt('vehicle_id'
 				,array(
 			));
 			$pm->addParam($param);
-		$param = new FieldExtBool('active'
-				,array(
-			
-				'alias'=>'Активен'
-			));
-			$pm->addParam($param);
-		$param = new FieldExtInt('last_elkon_production_id'
+		$param = new FieldExtDateTimeTZ('date_time'
 				,array(
 			));
 			$pm->addParam($param);
-		$param = new FieldExtArray('missing_elkon_production_ids'
+		$param = new FieldExtInt('user_id'
 				,array(
 			));
 			$pm->addParam($param);
 		
-			$param = new FieldExtInt('id',array(
+			$param = new FieldExtInt('production_site_id',array(
 			));
 			$pm->addParam($param);
 		
-			$param = new FieldExtString('name',array(
+			$param = new FieldExtInt('production_id',array(
 			));
 			$pm->addParam($param);
 		
 		
 			$this->addPublicMethod($pm);
-			$this->setUpdateModelId('ProductionSite_Model');
+			$this->setUpdateModelId('ProductionVehicleCorrection_Model');
 
 			
 		/* delete */
 		$pm = new PublicMethod('delete');
 		
-		$pm->addParam(new FieldExtInt('id'
+		$pm->addParam(new FieldExtInt('production_site_id'
 		));		
 		
-		$pm->addParam(new FieldExtString('name'
+		$pm->addParam(new FieldExtInt('production_id'
 		));		
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
 		$this->addPublicMethod($pm);					
-		$this->setDeleteModelId('ProductionSite_Model');
+		$this->setDeleteModelId('ProductionVehicleCorrection_Model');
 
 			
 		/* get_list */
@@ -133,48 +122,34 @@ class ProductionSite_Controller extends ControllerSQL{
 
 		$this->addPublicMethod($pm);
 		
-		$this->setListModelId('ProductionSite_Model');
+		$this->setListModelId('ProductionVehicleCorrectionList_Model');
 		
 			
 		/* get_object */
 		$pm = new PublicMethod('get_object');
 		$pm->addParam(new FieldExtString('mode'));
 		
-		$pm->addParam(new FieldExtInt('id'
+		$pm->addParam(new FieldExtInt('production_site_id'
 		));
 		
-		$pm->addParam(new FieldExtString('name'
+		$pm->addParam(new FieldExtInt('production_id'
 		));
 		
 		
 		$this->addPublicMethod($pm);
-		$this->setObjectModelId('ProductionSite_Model');		
-
-			
-		$pm = new PublicMethod('get_list_for_edit');
-		
-		$pm->addParam(new FieldExtInt('count'));
-		$pm->addParam(new FieldExtInt('from'));
-		$pm->addParam(new FieldExtString('cond_fields'));
-		$pm->addParam(new FieldExtString('cond_sgns'));
-		$pm->addParam(new FieldExtString('cond_vals'));
-		$pm->addParam(new FieldExtString('cond_ic'));
-		$pm->addParam(new FieldExtString('ord_fields'));
-		$pm->addParam(new FieldExtString('ord_directs'));
-		$pm->addParam(new FieldExtString('field_sep'));
-
-		$this->addPublicMethod($pm);
+		$this->setObjectModelId('ProductionVehicleCorrectionList_Model');		
 
 		
 	}	
 	
-	public function get_list_for_edit($pm){
-		$link = $this->getDbLink();		
-		$model = new ProductionSiteForEditList_Model($this->getDbLink());
-		$model->query("SELECT * FROM production_sites_for_edit_list",TRUE);
-		$this->addModel($model);
-		
+
+	public function insert($pm){
+		if($_SESSION['role_id']!='admin' || !$pm->getParamValue('user_id')){
+			$pm->setParamValue('user_id',$_SESSION['user_id']);
+		}
+		parent::insert($pm);
 	}
+
 
 }
 ?>

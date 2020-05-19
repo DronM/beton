@@ -12,6 +12,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLArray.php');
  
 class ProductionSite_Model extends ModelSQLBeton{
 	
@@ -66,6 +67,14 @@ class ProductionSite_Model extends ModelSQLBeton{
 						
 		$f_last_elkon_production_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_elkon_production_id",$f_opts);
 		$this->addField($f_last_elkon_production_id);
+		//********************
+		
+		//*** Field missing_elkon_production_ids ***
+		$f_opts = array();
+		$f_opts['id']="missing_elkon_production_ids";
+						
+		$f_missing_elkon_production_ids=new FieldSQLArray($this->getDbLink(),$this->getDbName(),$this->getTableName(),"missing_elkon_production_ids",$f_opts);
+		$this->addField($f_missing_elkon_production_ids);
 		//********************
 	
 		$order = new ModelOrderSQL();		

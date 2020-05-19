@@ -58,14 +58,15 @@ function ProductionMaterialList_View(id,options){
 		"popUpMenu":popup_menu,
 		"onEventSetCellOptions":function(opts){
 			if(opts.gridColumn.getId()=="quant_fact"){
-				if(opts.fields.quant_fact.getValue()==0){
+				var q_editable = true;//(opts.fields.quant_fact.getValue()==0);
+				if(q_editable){
 					opts.className = "quant_editable";
 				}
 				var v = opts.fields.quant_corrected.getValue();
+				opts.attrs = opts.attrs || {};
 				if(v){
 					opts.className = opts.className || "";				
-					var elkon_cor = opts.fields.elkon_correction_id.getValue();
-					opts.attrs = opts.attrs || {};
+					var elkon_cor = opts.fields.elkon_correction_id.getValue();					
 					if(elkon_cor&&elkon_cor!="0"){
 						opts.attrs.title = "Исправления Elkon №"+elkon_cor+" от "+DateHelper.format(opts.fields.correction_date_time_set.getValue(),"d/m/y H:i")+
 							", "+opts.fields.correction_users_ref.getValue().getDescr();
@@ -78,7 +79,10 @@ function ProductionMaterialList_View(id,options){
 						
 					}
 				}
-				if(opts.fields.quant_fact.getValue()==0){
+				else{
+					opts.attrs.title = "Двойной клик для корректировки";
+				}
+				if(q_editable){					
 					opts.events = opts.event || {};
 					opts.events.dblclick = (function(thisForm){
 						return function(e){
@@ -241,7 +245,7 @@ ProductionMaterialList_View.prototype.setCorrectionOnServer = function(newValues
 	pm.setFieldValue("production_id",fieldValues.production_id);
 	//alert("newValues.quant="+newValues.quant+" fieldValues.material_quant="+fieldValues.material_quant);
 	//return;
-	pm.setFieldValue("cor_quant",newValues.quant - fieldValues.material_quant);
+	pm.setFieldValue("cor_quant",newValues.quant);// - fieldValues.material_quant
 	pm.setFieldValue("comment_text",newValues.comment_text);
 	pm.run({
 		"ok":function(){
@@ -259,11 +263,11 @@ ProductionMaterialList_View.prototype.onEditCons = function(fields){
 	this.m_view = new EditJSON("CorrectQuant:cont",{
 		"elements":[
 			new EditFloat("CorrectQuant:cont:quant",{
-				"labelCaption":"Количество:",
+				"labelCaption":"Количество добавить:",
 				"length":19,
 				"precision":4,
 				"focus":true,
-				"value":fields.quant_fact.getValue(),
+				"value":0,//fields.quant_fact.getValue(),
 				"focus":true
 			})
 			,new EditText("CorrectQuant:cont:comment_text",{

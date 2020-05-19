@@ -620,7 +620,7 @@ UPDATE public.production_sites
 							$concrete_type_id = NULL;
 							
 							$concrete_quant = 0;
-							
+							$corrections_added = [];
 							//По каждому материалу
 							for($m_ind=1;$m_ind&lt;=$MT_FIELD_CNT;$m_ind++){
 								$m_id_pref = 'mat'.$m_ind;
@@ -801,7 +801,8 @@ UPDATE public.production_sites
 										
 										//correction
 										$q_cor = floatval($material_data[$m_id_pref.'_quant_corrected']);
-										if($q_cor &amp;&amp; $mat_id!='NULL'){
+										if($q_cor &amp;&amp; $mat_id!='NULL'
+										&amp;&amp; !isset($corrections_added[$material_data['correction_id']])){
 											/*
 											production_site_id,
 											date_time,
@@ -832,6 +833,7 @@ UPDATE public.production_sites
 												$material_data['correction_id'],
 												$q_cor/1000
 											);
+											$corrections_added[$material_data['correction_id']] = TRUE;
 										}
 										if($shipment_id != 'NULL'
 										&amp;&amp; !array_key_exists('id_'.$production_id,$productions_for_close)
@@ -936,99 +938,17 @@ UPDATE public.production_sites
 				//Получение новых производств
 				$productions_data = $this->elkon_get_next_productions($serv['id'],$elkon_con,$max_production_id);
 				$this->insert_elkon_productions($serv['id'],$productions_data,$elkon_con->logLevel,TRUE);
-				/*
-				$q_head = "INSERT INTO productions (
-					production_id,
-					production_dt_start,
-					production_user,
-					production_vehicle_descr,
-					production_site_id,
-					concrete_type_id,
-					production_concrete_type_descr				
-				) VALUES ";												
-				$q_body = '';				
 				
-				$max_production_id = 0;
-				foreach($productions_data as $production_data){
-				
-					$id_db = 0;
-					FieldSQLInt::formatForDb($production_data['id'],$id_db);
-
-					$dt_start = strtotime($production_data['dt_start']);
-					if($dt_start===FALSE || $dt_start===-1){
-						//throw new Exception('Ошибка преобразования даты начала производства:"'.$production_data['dt_start'].'", Производство элкон:'.$production_data['id']);
-						$this->log_action($serv['id'],'Ошибка преобразования даты начала производства:"'.$production_data['dt_start'].'"',self::LOG_LEVEL_ERROR,$elkon_con->logLevel);
-						continue;
-					}
-					$dt_start_db = '';
-					FieldSQLDateTime::formatForDb($dt_start,$dt_start_db);
-
-					$user_db = '';
-					FieldSQLString::formatForDb($this->getDbLink(),$production_data['user_descr'],$user_db);
-
-					$vehicle_descr_db = '';
-					FieldSQLString::formatForDb($this->getDbLink(),$production_data['vehicle_descr'],$vehicle_descr_db);
-
-					$concrete_type_descr_db = '';
-					FieldSQLString::formatForDb($this->getDbLink(),$production_data['concrete_type_descr'],$concrete_type_descr_db);
-				
-					//******* Марка бетона идентификатор **********
-					$concrete_type_id = 'NULL';
-					if(!isset($concrete_types[$production_data['concrete_type_descr']])){
-						$ar = $this->getDbLink()->query_first(sprintf("SELECT material_fact_consumptions_add_concrete_type(%s) AS concrete_type_id",$concrete_type_descr_db));
-						$concrete_type_id = is_null($ar['concrete_type_id'])? 'NULL':$ar['concrete_type_id'];
-						$concrete_types[$production_data['concrete_type_descr']] = $concrete_type_id;
-					}
-					else{
-						$concrete_type_id = $concrete_types[$production_data['concrete_type_descr']];
-					}
-				
-					$q_body.= ($q_body=='')? '':',';
-					$q_body.=sprintf(
-						"(%d,
-						%s,
-						%s,
-						%s,
-						%d,
-						%s,%s)",
-						$id_db,
-						$dt_start_db,
-						$user_db,
-						$vehicle_descr_db,
-						$serv['id'],
-						$concrete_type_id,
-						$concrete_type_descr_db
-					);
-					
-					if($max_production_id &lt; $id_db){
-						$max_production_id = $id_db;
+				//Дырки в производствах
+				if(isset($serv['missing_elkon_production_ids']) &amp;&amp; strlen($serv['missing_elkon_production_ids'])){
+					$missing_elkon_production_ids_s = substr($serv['missing_elkon_production_ids'],1,strlen($serv['missing_elkon_production_ids'])-2);
+					$missing_elkon_production_ids = explode(',',$missing_elkon_production_ids_s);
+					foreach($missing_elkon_production_ids as $missing_elkon_production_id){
+						$productions_data = $this->elkon_get_production_by_id($serv['id'], $elkon_con,$missing_elkon_production_id);
+						$this->insert_elkon_productions($serv['id'],$productions_data,$elkon_con->logLevel,FALSE);
+						
 					}
 				}
-				if(strlen($q_body)){
-					try{
-						$this->log_action($serv['id'],'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body,self::LOG_LEVEL_DEBUG,$elkon_con->logLevel);	
-						
-						$this->getDbLinkMaster()->query('BEGIN');						
-						$this->getDbLinkMaster()->query($q_head.' '.$q_body);
-					
-						$this->getDbLinkMaster()->query(sprintf(
-							'UPDATE production_sites
-							SET last_elkon_production_id=%d
-							WHERE id=%d',
-							$max_production_id,
-							$serv['id']
-						));
-						$this->getDbLinkMaster()->query('COMMIT');
-						
-					}
-					catch(Exception $e){
-						$this->getDbLinkMaster()->query('ROLLBACK');
-						
-						throw $e;
-					}
-				}
-				*/
-				
 			}
 			catch(Exception $e){
 				$this->log_action($serv['id'],$e->getMessage(),self::LOG_LEVEL_ERROR,$elkon_con->logLevel);

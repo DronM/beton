@@ -32,7 +32,9 @@ CREATE OR REPLACE VIEW production_sites_last_production_list AS
 			*/
 		FROM productions
 		WHERE production_site_id=p_s.id AND production_dt_end IS NULL
-		) AS production_ids
+		) AS production_ids,
+		
+		p_s.missing_elkon_production_ids
 		
 	FROM production_sites AS p_s
 	

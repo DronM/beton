@@ -346,7 +346,7 @@ dsParams.control.getInsertPublicMethod()
 Промежуточный слив
 
 
-1.070
+1.070 19/05/20
 1) Shipment_Controller->update перекрытие метода для отправки СМС при смене заявки
 
 SELECT 

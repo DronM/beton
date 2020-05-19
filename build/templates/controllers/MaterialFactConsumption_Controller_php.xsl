@@ -92,7 +92,9 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		else if(strlen($oblig_cond)){
 			$cond = $oblig_cond;
 		}
-		$cond = 'WHERE '.$cond;
+		if(strlen($cond)){
+			$cond = 'WHERE '.$cond;
+		}
 		
 		$mat_model = new ModelSQL($link,array('id'=>'MaterialFactConsumptionMaterialList_Model'));
 		$mat_model->addField(new FieldSQLString($link,null,null,"raw_material_production_descr"));

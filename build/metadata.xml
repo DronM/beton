@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-05-06 15:32:56</lastBuild></version>
+		<lastBuild>2020-05-19 06:43:53</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -76,6 +76,7 @@
 		<version dateOpen="2020-04-28 06:04:46" dateClose="2020-04-29 14:04:27">1.00170</version>
 		<version dateOpen="2020-04-30 09:04:02" dateClose="2020-05-06 10:05:10">1.00171</version>
 		<version dateOpen="2020-05-06 10:05:50" dateClose="2020-05-06 15:05:33">1.00172</version>
+		<version dateOpen="2020-05-06 16:05:42" dateClose="2020-05-19 06:05:44">1.00173</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1029,6 +1030,7 @@
 			<field id="elkon_connection" dataType="JSONB"/>
 			<field id="active" dataType="Bool" alias="Активен"/>
 			<field id="last_elkon_production_id" dataType="Int"/>
+			<field id="missing_elkon_production_ids" dataType="Array" arrayType="Int"/>
 		</model>
 		<model id="ProductionSiteList" parent="ModelSQLBeton" dataTable="production_sites_list" virtual="FALSE">
 			<defaultOrder>
@@ -2410,6 +2412,7 @@
 			<field id="quant_start" dataType="Float" alias="Начальный остаток"/>
 			<field id="quant_deb" dataType="Float" alias="Приход"/>
 			<field id="quant_kred" dataType="Float" alias="Расход"/>
+			<field id="quant_correction" dataType="Float" alias="Корректировка"/>
 			<field id="quant_end" dataType="Float" alias="Конечный остаток"/>
 		</model>
 		<model id="VehicleScheduleMakeOrderList" virtual="TRUE" server="FALSE">
@@ -3064,6 +3067,23 @@
 			<field id="order_id" dataType="Int"/>
 			<field id="material_tolerance_violated" dataType="Bool"/>
 			<field id="concrete_quant" dataType="Float"/>
+		</model>
+		<model id="ProductionVehicleCorrection" parent="ModelSQLBeton" dataTable="production_vehicle_corrections" virtual="FALSE">
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id" required="TRUE" primaryKey="TRUE"/>
+			<field id="production_id" dataType="Int" required="TRUE" primaryKey="TRUE"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" required="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ" dbRequired="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" dbRequired="TRUE"/>
+		</model>
+		<model id="ProductionVehicleCorrectionList" parent="ModelSQLBeton" dataTable="production_vehicle_corrections_list" virtual="TRUE">
+			<field id="production_site_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
+			<field id="production_id" dataType="Int" primaryKey="TRUE" alias="Номер производства"/>
+			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
+			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата установки"/>
+			<field id="user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="users_ref" dataType="JSON" alias="Пользователь"/>
 		</model>
 	</models>
 	<constants>
@@ -4188,6 +4208,13 @@
 			<publicMethod id="get_list" modelId="MaterialFactBalanceCorretionList"/>
 			<publicMethod id="get_object" modelId="MaterialFactBalanceCorretionList"/>
 		</controller>
+		<controller id="ProductionVehicleCorrection" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="insert" modelId="ProductionVehicleCorrection"/>
+			<publicMethod id="update" modelId="ProductionVehicleCorrection"/>
+			<publicMethod id="delete" modelId="ProductionVehicleCorrection"/>
+			<publicMethod id="get_list" modelId="ProductionVehicleCorrectionList"/>
+			<publicMethod id="get_object" modelId="ProductionVehicleCorrectionList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -4304,6 +4331,7 @@
 		<view id="20017" c="CementSiloBalanceReset_Controller" t="CementSiloBalanceResetList" f="get_list" section="Документы" descr="Обнуление остатков силосов"/>
 		<view id="20018" c="MaterialFactBalanceCorretion_Controller" t="MaterialFactBalanceCorretionList" f="get_list" section="Документы" descr="Корректировки фактических остатков материалов"/>
 		<view id="20019" c="MaterialFactConsumptionCorretion_Controller" t="MaterialFactConsumptionCorretionList" f="get_list" section="Документы" descr="Корректировки фактического расхода материалов"/>
+		<view id="20020" c="ProductionVehicleCorrection_Controller" t="ProductionVehicleCorrectionList" f="get_list" section="Документы" descr="Корректировка автообилей ELKON"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -4431,6 +4459,7 @@
 		<serverTemplate id="LabEntryDetailList"/>
 		<serverTemplate id="CementSiloList"/>
 		<serverTemplate id="ProductionList"/>
+		<serverTemplate id="ProductionVehicleCorrectionList"/>
 		<serverTemplate id="ProductionMaterialList"/>
 		<serverTemplate id="ELKONLogList"/>
 		<serverTemplate id="RepMaterialAction"/>
@@ -4986,6 +5015,7 @@
 		<jsScript file="views/CementSiloList_View.js"/>
 		<jsScript file="views/CementSiloForOrderList_View.js"/>
 		<jsScript file="views/ProductionList_View.js"/>
+		<jsScript file="views/ProductionVehicleCorrectionList_View.js"/>
 		<jsScript file="views/ProductionMaterialList_View.js"/>
 		<jsScript file="views/ELKONLogList_View.js"/>
 		<jsScript file="views/CementSiloBalanceResetList_View.js"/>
@@ -5396,6 +5426,9 @@
 		<jsScript file="models/CementSiloBalanceReset_Model.js"/>
 		<jsScript file="models/CementSiloBalanceResetList_Model.js"/>
 		<jsScript file="models/MaterialActionList_Model.js"/>
+		<jsScript file="models/ProductionVehicleCorrection_Model.js"/>
+		<jsScript file="controllers/ProductionVehicleCorrection_Controller.js"/>
+		<jsScript file="models/ProductionVehicleCorrectionList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

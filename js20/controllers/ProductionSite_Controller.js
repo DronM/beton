@@ -69,6 +69,12 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldArray("missing_elkon_production_ids",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -111,6 +117,12 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldInt("last_elkon_production_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldArray("missing_elkon_production_ids",options);
 	
 	pm.addField(field);
 	
@@ -160,6 +172,9 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("last_elkon_production_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldArray("missing_elkon_production_ids",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }

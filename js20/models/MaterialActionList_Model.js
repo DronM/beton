@@ -71,6 +71,15 @@ function MaterialActionList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Корректировка';
+	filed_options.autoInc = false;	
+	
+	options.fields.quant_correction = new FieldFloat("quant_correction",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Конечный остаток';
 	filed_options.autoInc = false;	
 	

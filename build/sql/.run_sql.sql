@@ -1,74 +1,179 @@
--- VIEW: production_material_list
+﻿-- Function: material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
 
-DROP VIEW production_material_list;
+ DROP FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone);
 
-CREATE OR REPLACE VIEW production_material_list AS
-	
+CREATE OR REPLACE FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+  RETURNS TABLE(
+  	is_cement bool,
+  	material_name text,
+  	quant_start numeric(19,4),
+  	quant_deb numeric(19,4),
+  	quant_kred numeric(19,4),
+  	pr1_quant_kred numeric(19,4),
+  	pr2_quant_kred numeric(19,4),
+  	quant_correction numeric(19,4),
+  	quant_end numeric(19,4)
+  
+  ) AS
+$$
+	--По цементу
+	(
 	SELECT
-		t.production_site_id,
-		production_sites_ref(ps) AS production_sites_ref,
-		t.production_id,
-		t.raw_material_id AS material_id,
-		materials_ref(mat) AS materials_ref,
-		cement_silos_ref(cem) AS cement_silos_ref,
-		t.cement_silo_id,
-		sum(t.material_quant) AS material_quant,
-		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
-		sum(t.material_quant_req) AS quant_fact_req,
-		
-		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
-		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
-		END AS quant_consuption,
-		
-		coalesce(t_cor.quant,0) AS quant_corrected,
-
-		t_cor.elkon_id AS elkon_correction_id,
-		users_ref(cor_u) AS correction_users_ref,
-		t_cor.date_time_set correction_date_time_set,
-
-		--(Факт + исправление) - подбор
-		(sum(t.material_quant) + coalesce(t_cor.quant,0)) - 
-		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
-		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
-		END 
-		AS quant_dif
+		TRUE AS is_cement,
+		sil.name::text AS material_name,
+		coalesce(bal_start.quant,0) AS quant_start,	
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	FROM cement_silos AS sil
 	
-		,CASE
-			WHEN mat.id IS NULL THEN FALSE
-			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
-			ELSE
-				coalesce(
-				( (
-					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
-					 - (sum(t.material_quant) + coalesce(t_cor.quant,0))
-				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
-					 	>= mat.max_fact_quant_tolerance_percent
-				)
-			,FALSE)
-		END AS dif_violation
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_cement_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.cement_silos_id=sil.id
 	
-	FROM material_fact_consumptions t
-	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
-	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
-	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
-	--LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
-	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
-	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
-	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
-	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
-			AND t_cor.material_id=t.raw_material_id --AND t_cor.cement_silo_id=t.cement_silo_id
-	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
-
-	GROUP BY
-		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
-		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
-		ps.*,mat.*,cem.*,
-		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
-	ORDER BY t.production_site_id,
-		t.production_id,
-		mat.ord
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
 			
-	;
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_deb ON ra_deb.cement_silos_id = sil.id 
 	
-ALTER VIEW production_material_list OWNER TO beton;
-
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=1 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=2 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_kred ON ra_kred.cement_silos_id = sil.id 
+	ORDER BY sil.name
+	)
+	
+	UNION ALL
+	
+	--По материалам
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' OR ra.doc_type='material_fact_consumption_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' OR ra.doc_type='material_fact_consumption_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' OR ra.doc_type='material_fact_consumption_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN doc_type='material_fact_balance_correction' OR ra.doc_type='material_fact_consumption_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_consumption' AND cons.production_site_id=1 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_consumption' AND cons.production_site_id=2 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id 
+	WHERE concrete_part AND NOT is_cement
+	ORDER BY ord
+	)
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone) OWNER TO beton;
