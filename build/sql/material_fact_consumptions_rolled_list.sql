@@ -1,6 +1,6 @@
 -- VIEW: material_fact_consumptions_rolled_list
 
-DROP VIEW material_fact_consumptions_rolled_list;
+--DROP VIEW material_fact_consumptions_rolled_list;
 
 CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 	SELECT
@@ -22,9 +22,9 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 			jsonb_build_object(
 				'production_descr',raw_material_production_descr,
 				'ref',raw_materials_ref,
-				'quant',material_quant,
+				'quant',material_quant+material_quant_cor,
 				'quant_req',material_quant_req,
-				'quant_shipped',material_quant_shipped,
+				'quant_shipped',material_quant_shipped,				
 				'quant_tolerance_exceeded',material_quant_tolerance_exceeded
 			)
 		) AS materials,

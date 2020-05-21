@@ -84,6 +84,7 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 							"sortable":true,
 							"sort":"desc"
 						})
+						/*
 						,new GridCellHead(id+":grid:head:date_time_set",{
 							"value":"Дата установки",
 							"columns":[
@@ -99,6 +100,7 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 							],
 							"sortable":true
 						})
+						*/
 						,new GridCellHead(id+":grid:head:users_ref",{
 							"value":"Пользователь",
 							"columns":[
@@ -178,7 +180,9 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 							"value":"Количество",
 							"columns":[
 								new GridColumnFloat({
-									"field":model.getField("quant")									
+									"field":model.getField("quant"),
+									"precision":"4"
+									
 								})
 							]
 						})

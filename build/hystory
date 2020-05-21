@@ -349,6 +349,12 @@ dsParams.control.getInsertPublicMethod()
 1.070 19/05/20
 1) Shipment_Controller->update перекрытие метода для отправки СМС при смене заявки
 
+1.071
+1) Итоговая таблица (свернуто), тепреь с учетом корректировки. Итоги правильные.
+2) Загрузка материалов из elkon теперь с учетом дат.
+
+
+
 SELECT 
 (
 (select quant from rg_material_facts_balance('2020-04-27 06:00','{5}'))

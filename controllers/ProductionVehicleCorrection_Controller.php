@@ -147,6 +147,14 @@ class ProductionVehicleCorrection_Controller extends ControllerSQL{
 		if($_SESSION['role_id']!='admin' || !$pm->getParamValue('user_id')){
 			$pm->setParamValue('user_id',$_SESSION['user_id']);
 		}
+
+		$this->getDbLinkMaster()->query(sprintf(
+			"DELETE FROM production_vehicle_corrections
+			WHERE production_site_id=%d AND production_id=%d"
+			,$this->getExtDbVal($pm,'production_site_id')
+			,$this->getExtDbVal($pm,'production_id')
+			)
+		);
 		parent::insert($pm);
 	}
 

@@ -698,8 +698,8 @@ a.tel_in_list{
 }
 
 .production_upload_no_match{
-	background-color:red !important;
-	border:2px solid red;
+	background-color:#ffcccc !important;
+	border:3px solid black !important;
 }
 
 .LabEntry30Days_grid tr{
@@ -714,7 +714,7 @@ a.tel_in_list{
 
 .quant_consump_editable:hover{
 	border:3px solid black;	
-	background-color:red !important;
+	background-color:#ffcccc !important;
 }
 
 .cementSiloPic{
@@ -740,7 +740,7 @@ a.tel_in_list{
 
 td.elkonDifConcreteType{
 	border:3px solid black;	
-	background-color:red !important;	
+	background-color:#ffcccc !important;	
 }
 td.factQuantCorrected{
 	font-weight:bolder !important;	
@@ -753,10 +753,9 @@ td.factQuantCorrectedElkon{
 	background-color:#ffcccc !important;	
 }
 td.factQuantViolation{
-	font-weight:bolder;
-	border:3px solid black;	
-	background-color:red !important;	
-
+	font-weight:bolder !important;	
+	border:3px solid black !important;	
+	background-color:#ffcccc !important;	
 }
 
 #OrderMakeList\:mat_totals_grid td.quant_editable{

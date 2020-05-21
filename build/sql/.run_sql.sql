@@ -119,13 +119,13 @@ $$
 			ra.material_id,
 			sum(
 				CASE
-					WHEN ra.doc_type='material_fact_balance_correction' OR ra.doc_type='material_fact_consumption_correction' THEN 0
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
 					ELSE ra.quant
 				END
 			) AS quant,
 			sum(
 				CASE
-					WHEN ra.doc_type='material_fact_balance_correction' OR ra.doc_type='material_fact_consumption_correction' THEN ra.quant
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
 					ELSE 0
 				END
 			) AS quant_correction
@@ -141,31 +141,39 @@ $$
 			ra.material_id,
 			sum(
 				CASE
-					WHEN ra.doc_type='material_fact_balance_correction' OR ra.doc_type='material_fact_consumption_correction' THEN 0
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
 					ELSE ra.quant
 				END
 			) AS quant,
 			sum(
 				CASE
-					WHEN doc_type='material_fact_balance_correction' OR ra.doc_type='material_fact_consumption_correction' THEN ra.quant
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
 					ELSE 0
 				END
 			) AS quant_correction,
 			sum(
 				CASE
-					WHEN ra.doc_type='material_fact_consumption' AND cons.production_site_id=1 THEN ra.quant
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
 					ELSE 0
 				END
 			) AS pr1_quant,
 			sum(
 				CASE
-					WHEN ra.doc_type='material_fact_consumption' AND cons.production_site_id=2 THEN ra.quant
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
 					ELSE 0
 				END
 			) AS pr2_quant
 			
 		FROM ra_material_facts AS ra
 		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
 		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
 		GROUP BY ra.material_id
 	) AS ra_kred ON ra_kred.material_id = m.id 

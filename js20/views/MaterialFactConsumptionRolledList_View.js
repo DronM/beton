@@ -100,12 +100,13 @@ function MaterialFactConsumptionRolledList_View(id,options){
 				var m = this.getModel();
 				if(m.getField(col).isNull()){
 					opts.title="Соответствие не определено!";
-					opts.className+=(opts.className.length? " ":"")+"prouction_upload_no_match";
+					opts.className+=(opts.className.length? " ":"")+"production_upload_no_match";
 				}
 			}
 			if(col=="production_id" && this.getModel().getFieldValue("material_tolerance_violated")){
 				opts.className = opts.className||"";
 				opts.className+= (opts.className.length? " ":"")+"factQuantViolation";
+				opts.title="Отклонение вышло за допустимые пределы";
 			}
 			else if(col=="shipments_ref"){
 				//&& this.getModel().getFieldValue("shipments_ref").isNull()
@@ -365,18 +366,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 		})
 	];
 	
-	var foot0_elem	= [
-		new GridCell(id+":grid:foot:sp2",{
-			"colSpan":"7"
-		})
-		,new GridCellFoot(id+":grid:foot:concrete_quant",{
-			"attrs":{"align":"right"},
-			"calcOper":"sum",
-			"calcFieldId":"concrete_quant",
-			"gridColumn":new GridColumn({"id":"tot_concrete_quant"})
-		})						
-														
-	];
+	var foot0_elem;
 	
 	var row1_elem = [];
 	var row2_elem = [];
@@ -465,7 +455,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 				prev_mat_descr = cur_mat_id? mat_ref.getDescr():headModel.getFieldValue("raw_material_production_descr");
 				col_span_ar = [];//init
 			}
-			col_span_ar.push(headModel.getFieldValue("raw_material_production_descr"));
+			col_span_ar.push(headModel.getFieldValue("raw_material_production_descr")+" ("+headModel.getFieldValue("production_name")+")");
 		}
 		add_rows();
 		
@@ -474,6 +464,25 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 		var m_ind = 0;
 		var mat_col_ids = {};
 		while(headModel.getNextRow()){
+			if(m_ind==0){
+				console.log("q="+headModel.getFieldValue("concrete_quant"))
+				foot0_elem = [
+					new GridCell(id+":grid:foot:sp2",{
+						"colSpan":"7"
+					})
+					,new GridCellFoot(id+":grid:foot:concrete_quant",{
+						"attrs":{"align":"right"},
+						//"calcOper":"sum",
+						//"calcFieldId":"concrete_quant",
+						"value":headModel.getFieldValue("concrete_quant"),
+						"gridColumn":new GridColumnFloat({
+							"id":"tot_concrete_quant",
+							"precision":"2"							
+						})
+					})						
+														
+				];
+			}
 			m_descr = headModel.getFieldValue("raw_material_production_descr");
 			
 			var col_q_id = "m_"+m_ind+"_q";
@@ -555,15 +564,17 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 			foot0_elem.push(
 				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_id,{
 					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
-					"calcOper":"sum",
-					"calcFieldId":col_q_id,
+					//"calcOper":"sum",
+					//"calcFieldId":col_q_id,
+					"value":headModel.getFieldValue("material_quant"),
 					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_id,"precision":"4"})
 				})									
 			);
 			foot0_elem.push(
 				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_r_id,{
 					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
-					"calcOper":"sum",
+					//"calcOper":"sum",
+					"value":headModel.getFieldValue("material_quant_req"),
 					"calcFieldId":col_q_r_id,
 					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_r_id,"precision":"4"})
 				})									
@@ -571,7 +582,8 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 			foot0_elem.push(
 				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_sh_id,{
 					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
-					"calcOper":"sum",
+					//"calcOper":"sum",
+					"value":headModel.getFieldValue("material_quant_shipped"),
 					"calcFieldId":col_q_sh_id,
 					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_sh_id,"precision":"4"})
 				})									

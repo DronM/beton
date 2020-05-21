@@ -329,6 +329,8 @@ UPDATE public.production_sites
 	 * т.е получает или слкдующее или равное по Ид
 	 */
 	private function elkon_get_productions($prodSiteId,$elkonCon,$productionId,$sign){
+		//Контроль статуса только при автозагрузке!!!
+		//Если грузить конкретное прозводство руками - берем все!!!
 		$q  = sprintf(
 			"SELECT
 				Uretim.Id AS id,
@@ -338,8 +340,9 @@ UPDATE public.production_sites
 				Uretim.Olusturan AS user_descr
 			FROM Uretim
 			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
-			WHERE Uretim.Id %s %d AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih<>'' AND (Uretim.Statu=0 OR Uretim.Statu=2)
-			ORDER BY Uretim.Id",
+			WHERE Uretim.Id %s %d AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih<>''".
+				( ($sign=='=')? "":" AND (Uretim.Statu=0 OR Uretim.Statu=2)" ).
+			"ORDER BY Uretim.Id",
 			$sign,
 			$productionId
 		);
@@ -771,7 +774,7 @@ UPDATE public.production_sites
 		 */
 		$silo_ids = [];
 		$concrete_types = [];
-		$materials = [];
+		$materials = [];//По заводу!!!
 		$concrete_type_descrs = [];
 		$material_descrs = [];
 		$veh_descrs = [];
@@ -902,11 +905,14 @@ UPDATE public.production_sites
 									$mat_descr_db = NULL;		
 									if(!isset($material_descrs[$mat_descr])){
 										FieldSQLString::formatForDb($this->getDbLink(),$mat_descr,$mat_descr_db);
+										$material_descrs[$mat_descr] = $mat_descr_db;
 									}
-								
+									else{
+										$mat_descr_db = $material_descrs[$mat_descr];
+									}
 									//******* Материал идентификатор **********
 									$mat_id = 'NULL';
-									if(!isset($materials[$mat_descr])){
+									if(!isset($materials[$mat_descr.'_'.$serv['id']])){
 										$ar = $this->getDbLink()->query_first(sprintf(
 											"SELECT material_fact_consumptions_add_material(%d,%s,%s) AS material_id",
 											$serv['id'],
@@ -914,10 +920,10 @@ UPDATE public.production_sites
 											$production_dt_end_db
 										));
 										$mat_id = is_null($ar['material_id'])? 'NULL':$ar['material_id'];
-										$materials[$mat_descr] = $mat_id;
+										$materials[$mat_descr.'_'.$serv['id']] = $mat_id;
 									}
 									else{
-										$mat_id = $materials[$mat_descr];
+										$mat_id = $materials[$mat_descr.'_'.$serv['id']];
 									}
 								
 									//******* ТС представление **********

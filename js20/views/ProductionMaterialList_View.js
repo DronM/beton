@@ -105,6 +105,7 @@ function ProductionMaterialList_View(id,options){
 			else if(opts.gridColumn.getId()=="quant_dif"){
 				if (opts.fields.dif_violation.getValue()){
 					opts.className = "factQuantViolation";
+					opts.title="Отклонение вышло за допустимые пределы";
 				}
 			}
 		},

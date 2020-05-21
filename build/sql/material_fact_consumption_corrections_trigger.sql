@@ -4,7 +4,7 @@
 
 
 CREATE TRIGGER material_fact_consumption_corrections_trigger_before
-  BEFORE UPDATE OR DELETE
+  BEFORE INSERT OR UPDATE OR DELETE
   ON public.material_fact_consumption_corrections
   FOR EACH ROW
   EXECUTE PROCEDURE public.material_fact_consumption_corrections_process();

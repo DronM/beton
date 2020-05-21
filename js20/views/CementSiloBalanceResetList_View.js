@@ -79,7 +79,8 @@ function CementSiloBalanceResetList_View(id,options){
 							"columns":[
 								new GridColumnDateTime({
 									"field":model.getField("date_time"),
-									"dateFormat":"d/m/y H:i",									
+									//"dateFormat":"d/m/y H:i",
+									//"editMask":"99/99/9999 99:99",
 									"searchOptions":{
 										"field":new FieldDate("date_time"),
 										"searchType":"on_beg",

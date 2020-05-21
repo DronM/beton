@@ -93,10 +93,12 @@ BEGIN
 
 		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
 		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
+		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
 		THEN
 			UPDATE material_fact_consumptions
 			SET
-				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id
+				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id,
+				vehicle_id = NEW.vehicle_id
 			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
 		END IF;
 		
@@ -109,7 +111,7 @@ BEGIN
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
-		DELETE FROM material_fact_consumptions WHERE production_id = OLD.production_id;
+		DELETE FROM material_fact_consumptions WHERE production_site_id = OLD.production_site_id AND production_id = OLD.production_id;
 		
 		RETURN OLD;
 				

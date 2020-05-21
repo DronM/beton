@@ -14,23 +14,41 @@ DECLARE
 BEGIN
 	
 	IF TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		
 		SELECT *
 		INTO
 			v_vehicle_id,
 			v_vehicle_schedule_state_id,
 			v_shipment_id
 		FROM material_fact_consumptions_find_vehicle(
-			(SELECT v.plate::text FROM vehicles WHERE id=NEW.vehicle_id)
+			(SELECT v.plate::text FROM vehicles v WHERE v.id=NEW.vehicle_id)
 			,(SELECT production_dt_start::timestamp FROM productions WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id)
 		) AS (
 			vehicle_id int,
 			vehicle_schedule_state_id int,
 			shipment_id int
-		);		
-		
+		);
+/*				
+RAISE EXCEPTION '%, %, %',
+			(SELECT v.plate::text FROM vehicles v WHERE v.id=NEW.vehicle_id)
+			,(SELECT production_dt_start::timestamp FROM productions WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id)
+			,material_fact_consumptions_find_vehicle(
+			'1810'
+			,'2020-05-18 20:02:32'::timestamp
+		)
+		;
+*/		
 		UPDATE productions
 		SET
-			shipment_id = v_shipment_id
+			shipment_id = v_shipment_id,
+			vehicle_schedule_state_id = v_vehicle_schedule_state_id,
+			vehicle_id = v_vehicle_id
+		WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id
+		;
+
+		UPDATE productions
+		SET
+			material_tolerance_violated = productions_get_mat_tolerance_violated(NEW.production_site_id,NEW.production_id)
 		WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id
 		;
 		
@@ -38,13 +56,13 @@ BEGIN
 	
 	ELSEIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
 		SELECT
-			production_dt_start::timestamp,
+			production_dt_start,
 			production_vehicle_descr
 		INTO
-			v_production_dt_start::timestamp,
+			v_production_dt_start,
 			v_production_vehicle_descr
 		FROM productions
-		WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id;
+		WHERE production_site_id=OLD.production_site_id AND production_id=OLD.production_id;
 		
 		SELECT *
 		INTO
@@ -63,8 +81,10 @@ BEGIN
 		
 		UPDATE productions
 		SET
-			shipment_id = v_shipment_id
-		WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id
+			shipment_id = v_shipment_id,
+			vehicle_schedule_state_id = v_vehicle_schedule_state_id,
+			vehicle_id=v_vehicle_id
+		WHERE production_site_id=OLD.production_site_id AND production_id=OLD.production_id
 		;
 		
 		

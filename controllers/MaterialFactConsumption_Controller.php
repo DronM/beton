@@ -329,19 +329,31 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 		if(strlen($cond)){
 			$cond = 'WHERE '.$cond;
 		}
-		
+		//||' ('||pr_st.name||')'
 		$mat_model = new ModelSQL($link,array('id'=>'MaterialFactConsumptionMaterialList_Model'));
 		$mat_model->addField(new FieldSQLString($link,null,null,"raw_material_production_descr"));
 		$mat_model->query(sprintf(
 			"SELECT DISTINCT ON (mat.ord,t.raw_material_production_descr,t.production_site_id)
-				t.raw_material_production_descr||' ('||pr_st.name||')' AS raw_material_production_descr,
+				t.raw_material_production_descr AS raw_material_production_descr,
 				materials_ref(mat) AS raw_materials_ref,
+				pr_st.name As production_name,
 				sum(t.concrete_quant) AS concrete_quant,
-				sum(t.material_quant) AS material_quant,
-				sum(t.material_quant_req) AS material_quant_req				
+				sum(t.material_quant+coalesce(t_cor.quant,0)) AS material_quant,
+				sum(t.material_quant_req) AS material_quant_req,
+				sum(
+					CASE
+						WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+						ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					END				
+				) AS material_quant_shipped
 			FROM material_fact_consumptions AS t
 			LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
 			LEFT JOIN production_sites AS pr_st ON pr_st.id=t.production_site_id
+			LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+			LEFT JOIN shipments AS sh ON sh.id=prod.shipment_id
+			LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+			LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+						AND t_cor.material_id=t.raw_material_id			
 			%s
 			GROUP BY t.raw_material_production_descr,t.production_site_id,pr_st.name,mat.ord,mat.*
 			ORDER BY mat.ord",
