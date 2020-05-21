@@ -366,8 +366,6 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 		})
 	];
 	
-	var foot0_elem;
-	
 	var row1_elem = [];
 	var row2_elem = [];
 	
@@ -456,6 +454,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 				col_span_ar = [];//init
 			}
 			col_span_ar.push(headModel.getFieldValue("raw_material_production_descr")+" ("+headModel.getFieldValue("production_name")+")");
+			
 		}
 		add_rows();
 		
@@ -465,30 +464,26 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 		var mat_col_ids = {};
 		while(headModel.getNextRow()){
 			if(m_ind==0){
-				console.log("q="+headModel.getFieldValue("concrete_quant"))
-				foot0_elem = [
+				var foot0_elem = [
 					new GridCell(id+":grid:foot:sp2",{
 						"colSpan":"7"
 					})
 					,new GridCellFoot(id+":grid:foot:concrete_quant",{
 						"attrs":{"align":"right"},
-						//"calcOper":"sum",
-						//"calcFieldId":"concrete_quant",
-						"value":headModel.getFieldValue("concrete_quant"),
+						"value":parseFloat(headModel.getFieldValue("concrete_quant")),
 						"gridColumn":new GridColumnFloat({
 							"id":"tot_concrete_quant",
 							"precision":"2"							
 						})
-					})						
-														
-				];
+					})																		
+				];		
 			}
 			m_descr = headModel.getFieldValue("raw_material_production_descr");
 			
 			var col_q_id = "m_"+m_ind+"_q";
 			var col_q_r_id = "m_"+m_ind+"_q_r";
 			var col_q_sh_id = "m_"+m_ind+"_q_sh";
-			mat_col_ids[m_descr] = m_ind;
+			mat_col_ids[m_descr+"_"+headModel.getFieldValue("production_site_id")] = m_ind;
 			m_ind++;
 			
 			var f_q = new FieldFloat(col_q_id,{"precision":4,"length":19});
@@ -564,50 +559,49 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 			foot0_elem.push(
 				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_id,{
 					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
-					//"calcOper":"sum",
-					//"calcFieldId":col_q_id,
-					"value":headModel.getFieldValue("material_quant"),
+					"value":parseFloat(headModel.getFieldValue("material_quant")),
 					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_id,"precision":"4"})
 				})									
 			);
 			foot0_elem.push(
 				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_r_id,{
 					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
-					//"calcOper":"sum",
-					"value":headModel.getFieldValue("material_quant_req"),
-					"calcFieldId":col_q_r_id,
+					"value":parseFloat(headModel.getFieldValue("material_quant_req")),
 					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_r_id,"precision":"4"})
 				})									
 			);
+			//headModel.getFieldValue("material_quant")
 			foot0_elem.push(
 				new GridCellFoot(id+":grid:foot:row0:m_"+col_q_sh_id,{
 					"attrs":{"align":"right","class":((m_ind%2)? "mat_odd":"mat_even")},
-					//"calcOper":"sum",
-					"value":headModel.getFieldValue("material_quant_shipped"),
-					"calcFieldId":col_q_sh_id,
+					"value":parseFloat(headModel.getFieldValue("material_quant_shipped")),
 					"gridColumn":new GridColumnFloat({"id":"tot_m_"+col_q_sh_id,"precision":"4"})
 				})									
-			);
-			
+			);			
 		}
 		
-		var materials;
+		var materials,site_ref,site_id;
 		var m_descr;
+		debugger
 		while(model.getNextRow()){				
 			materials = model.getFieldValue("materials");
+			site_ref = model.getFieldValue("production_sites_ref");
+			site_id = (site_ref&&!site_ref.isNull())? site_ref.getKey():"0";
 			headModel.reset();
 			while(headModel.getNextRow()){
-				m_descr = headModel.getFieldValue("raw_material_production_descr");					
-				for(var j=0;j<materials.length;j++){
-					if(materials[j].production_descr==m_descr){					
-						var col_q_id = "m_"+mat_col_ids[m_descr]+"_q";
-						var col_q_r_id = "m_"+mat_col_ids[m_descr]+"_q_r";
-						var col_q_sh_id = "m_"+mat_col_ids[m_descr]+"_q_sh";
+				if(site_id==headModel.getFieldValue("production_site_id")){
+					m_descr = headModel.getFieldValue("raw_material_production_descr");					
+					for(var j=0;j<materials.length;j++){
+						if(materials[j].production_descr==m_descr){					
+							var col_q_id = "m_"+mat_col_ids[m_descr+"_"+site_id]+"_q";
+							var col_q_r_id = "m_"+mat_col_ids[m_descr+"_"+site_id]+"_q_r";
+							var col_q_sh_id = "m_"+mat_col_ids[m_descr+"_"+site_id]+"_q_sh";
 					
-						model.setFieldValue(col_q_id,materials[j].quant);
-						model.setFieldValue(col_q_r_id,materials[j].quant_req);
-						model.setFieldValue(col_q_sh_id,materials[j].quant_shipped);
-						break;
+							model.setFieldValue(col_q_id,materials[j].quant);
+							model.setFieldValue(col_q_r_id,materials[j].quant_req);
+							model.setFieldValue(col_q_sh_id,materials[j].quant_shipped);
+							break;
+						}
 					}
 				}
 			}
@@ -615,8 +609,6 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 		}
 		model.reset();
 	}
-		
-	
 	return {
 		"head":[
 			new GridRow(id+":grid:head:row0",{"elements":row0_elem}),

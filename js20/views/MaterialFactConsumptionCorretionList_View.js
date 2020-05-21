@@ -73,7 +73,10 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 							"columns":[
 								new GridColumnDateTime({
 									"field":model.getField("date_time"),
-									"dateFormat":"d/m/y H:i",									
+									//"dateFormat":"d/m/y H:i",
+									/*"ctrlOptions":{
+										"enabled":false
+									},*/
 									"searchOptions":{
 										"field":new FieldDate("date_time"),
 										"searchType":"on_beg",

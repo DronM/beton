@@ -333,11 +333,23 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 		$mat_model = new ModelSQL($link,array('id'=>'MaterialFactConsumptionMaterialList_Model'));
 		$mat_model->addField(new FieldSQLString($link,null,null,"raw_material_production_descr"));
 		$mat_model->query(sprintf(
-			"SELECT DISTINCT ON (mat.ord,t.raw_material_production_descr,t.production_site_id)
+			"WITH 
+			prod_tot AS (
+				SELECT sum(concrete_quant) AS v
+				FROM productions
+				WHERE id IN (
+					SELECT prod.id
+					FROM material_fact_consumptions AS t
+					LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+					%s
+				)
+			)
+			SELECT DISTINCT ON (mat.ord,t.production_site_id,t.raw_material_production_descr)
 				t.raw_material_production_descr AS raw_material_production_descr,
 				materials_ref(mat) AS raw_materials_ref,
-				pr_st.name As production_name,
-				sum(t.concrete_quant) AS concrete_quant,
+				pr_st.name AS production_name,
+				t.production_site_id,
+				(SELECT v FROM prod_tot) AS concrete_quant,
 				sum(t.material_quant+coalesce(t_cor.quant,0)) AS material_quant,
 				sum(t.material_quant_req) AS material_quant_req,
 				sum(
@@ -355,8 +367,9 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 			LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
 						AND t_cor.material_id=t.raw_material_id			
 			%s
-			GROUP BY t.raw_material_production_descr,t.production_site_id,pr_st.name,mat.ord,mat.*
-			ORDER BY mat.ord",
+			GROUP BY t.raw_material_production_descr,t.production_site_id,mat.ord,mat.*,pr_st.name
+			ORDER BY mat.ord,t.production_site_id",
+			$cond,
 			$cond
 		),
 		TRUE);
