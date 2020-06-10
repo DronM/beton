@@ -13,8 +13,9 @@ function ShipmentForOrderList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
-	var role = window.getApp().getServVar("role_id");
-		
+	var role = window.getApp().getServVar("role_id");	
+	var is_client = (role=="client");
+	
 	var pagClass = window.getApp().getPaginationClass();
 	var grid = new GridAjx(id+":grid",{
 		"className":"table-bordered table-responsive table-make_order",
@@ -23,7 +24,7 @@ function ShipmentForOrderList_View(id,options){
 		"readPublicMethod":contr.getPublicMethod("get_list_for_order"),
 		"editInline":true,
 		"editWinClass":null,
-		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+		"commands":is_client? null:new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdSearch":false,
 			"cmdFilter":false,
 			"cmdAllCommands":false,
@@ -61,7 +62,7 @@ function ShipmentForOrderList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:production_sites_ref",{
+						,is_client? null:new GridCellHead(id+":grid:head:production_sites_ref",{
 							"value":"Завод",
 							"className":window.getBsCol(2),
 							"columns":[
@@ -110,7 +111,7 @@ function ShipmentForOrderList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:vs_state",{
+						,is_client? null:new GridCellHead(id+":grid:head:vs_state",{
 							"value":"Статус",
 							"className":window.getBsCol(2),
 							"columns":[
@@ -167,7 +168,7 @@ function ShipmentForOrderList_View(id,options){
 					"elements":[
 						new GridCell(id+":grid:foot:sp",{
 							"value":"Итого",
-							"colSpan":"6"
+							"colSpan":is_client? "4":"6"
 						})												
 						,new GridCellFoot(id+":features_grid:foot:tot_quant",{
 							"attrs":{"align":"right"},
@@ -185,20 +186,23 @@ function ShipmentForOrderList_View(id,options){
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true
-	});	
-	var self = this;
-	this.m_origGridEdit = grid.edit
-	grid.edit = function(cmd,editOptions){
-		self.m_makeGridListView.enableRefreshing(false);
-		self.m_origGridEdit.call(self.getElement("grid"),cmd,editOptions);
-	}
+	});
 	
-	this.m_origGridCloseEditView = grid.closeEditView;
-	grid.closeEditView = function(res){
-		self.m_makeGridListView.enableRefreshing(true);
-		self.m_origGridCloseEditView.call(self.getElement("grid"),res);
-	}
+	if(!is_client){
+		var self = this;
+		this.m_origGridEdit = grid.edit
+		grid.edit = function(cmd,editOptions){
+			self.m_makeGridListView.enableRefreshing(false);
+			self.m_origGridEdit.call(self.getElement("grid"),cmd,editOptions);
+		}
 	
+		this.m_origGridCloseEditView = grid.closeEditView;
+		grid.closeEditView = function(res){
+			self.m_makeGridListView.enableRefreshing(true);
+			self.m_origGridCloseEditView.call(self.getElement("grid"),res);
+		}
+	}
+		
 	this.addElement(grid);
 }
 extend(ShipmentForOrderList_View,ViewAjx);

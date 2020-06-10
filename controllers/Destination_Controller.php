@@ -198,6 +198,11 @@ class Destination_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('get_for_client_list');
+		
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_coords_on_name');
 		
 				
@@ -307,6 +312,18 @@ class Destination_Controller extends ControllerSQL{
 			),
 			'DestinationList_Model');
 		}
+	}
+	
+	public function get_for_client_list($pm){
+		$this->addNewModel(sprintf(
+		"SELECT * FROM destination_list_view
+		WHERE id IN (SELECT DISTINCT o.destination_id FROM orders o WHERE o.client_id=%d %s)
+		ORDER BY name"
+		,$_SESSION['global_client_id']
+		,is_null($_SESSION['global_client_from_date'])? '':sprintf(" AND o.date_time>='%s'",date('Y-m-d',$_SESSION['global_client_from_date']))
+		),
+		'DestinationList_Model');
+	
 	}
 }
 ?>

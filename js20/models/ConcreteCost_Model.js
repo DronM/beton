@@ -38,8 +38,8 @@ function ConcreteCost_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.date = new FieldDate("date",filed_options);
-	options.fields.date.getValidator().setRequired(true);
+	options.fields.concrete_costs_h_id = new FieldInt("concrete_costs_h_id",filed_options);
+	options.fields.concrete_costs_h_id.getValidator().setRequired(true);
 	
 				
 	

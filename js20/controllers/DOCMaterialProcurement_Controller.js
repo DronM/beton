@@ -127,6 +127,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldText("store",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -223,6 +229,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldText("store",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -299,6 +311,9 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldString("quant_net",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldString("store",f_opts));
 }
 
 			DOCMaterialProcurement_Controller.prototype.addGetObject = function(){

@@ -74,6 +74,8 @@ $permissions = array();
 		
 			$permissions['Driver_Controller_get_list']=TRUE;
 		
+			$permissions['Driver_Controller_complete']=TRUE;
+		
 			$permissions['ProductionSite_Controller_get_list']=TRUE;
 		
 			$permissions['OrderPump_Controller_get_list']=TRUE;

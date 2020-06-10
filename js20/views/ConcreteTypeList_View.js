@@ -45,7 +45,14 @@ function ConcreteTypeList_View(id,options){
 							"columns":[
 								new GridColumnFloat({"field":model.getField("mpa_ratio")})
 							]
+						})
+						,new GridCellHead(id+":grid:head:material_cons_rates",{
+							"value":"Есть подборы",
+							"columns":[
+								new GridColumnBool({"field":model.getField("material_cons_rates")})
+							]
 						})								
+														
 						,new GridCellHead(id+":grid:head:price",{
 							"value":"Цена",
 							"columns":[

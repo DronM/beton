@@ -149,6 +149,14 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		$f_quant_net=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_net",$f_opts);
 		$this->addField($f_quant_net);
 		//********************
+		
+		//*** Field store ***
+		$f_opts = array();
+		$f_opts['id']="store";
+						
+		$f_store=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"store",$f_opts);
+		$this->addField($f_store);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

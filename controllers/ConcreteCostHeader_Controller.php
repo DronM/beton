@@ -32,9 +32,17 @@ class ConcreteCostHeader_Controller extends ControllerSQL{
 		$param = new FieldExtDate('date'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtArray('clients_ar'
+				,array());
+		$pm->addParam($param);
+		$param = new FieldExtJSONB('clients_list'
+				,array());
+		$pm->addParam($param);
 		$param = new FieldExtText('comment_text'
 				,array());
 		$pm->addParam($param);
+		
+		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		
 		$this->addPublicMethod($pm);
@@ -44,15 +52,33 @@ class ConcreteCostHeader_Controller extends ControllerSQL{
 		/* update */		
 		$pm = new PublicMethod('update');
 		
+		$pm->addParam(new FieldExtInt('old_id',array('required'=>TRUE)));
+		
 		$pm->addParam(new FieldExtDate('old_date',array('required'=>TRUE)));
 		
 		$pm->addParam(new FieldExtInt('obj_mode'));
+		$param = new FieldExtInt('id'
+				,array(
+			));
+			$pm->addParam($param);
 		$param = new FieldExtDate('date'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtArray('clients_ar'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtJSONB('clients_list'
 				,array(
 			));
 			$pm->addParam($param);
 		$param = new FieldExtText('comment_text'
 				,array(
+			));
+			$pm->addParam($param);
+		
+			$param = new FieldExtInt('id',array(
 			));
 			$pm->addParam($param);
 		
@@ -67,6 +93,9 @@ class ConcreteCostHeader_Controller extends ControllerSQL{
 			
 		/* delete */
 		$pm = new PublicMethod('delete');
+		
+		$pm->addParam(new FieldExtInt('id'
+		));		
 		
 		$pm->addParam(new FieldExtDate('date'
 		));		
@@ -99,6 +128,9 @@ class ConcreteCostHeader_Controller extends ControllerSQL{
 		$pm = new PublicMethod('get_object');
 		$pm->addParam(new FieldExtString('mode'));
 		
+		$pm->addParam(new FieldExtInt('id'
+		));
+		
 		$pm->addParam(new FieldExtDate('date'
 		));
 		
@@ -106,8 +138,30 @@ class ConcreteCostHeader_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 		$this->setObjectModelId('ConcreteCostHeader_Model');		
 
+			
+		$pm = new PublicMethod('get_client_price_list');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('client_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}	
 	
+
+	public function get_client_price_list($pm){
+		$client_id = $pm->getParamValue('client_id')? $this->getExtDbVal($pm,'client_id'):0;
+		$this->addNewModel(
+			sprintf(
+				"SELECT * FROM client_price_list(%d)",$client_id
+			),'ConcretePrice_Model'
+		);
+	}
+
+
 }
 ?>

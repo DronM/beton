@@ -4,6 +4,7 @@
 function ConcreteCostList_View(id,options){	
 
 	options = options || {};
+	
 	ConcreteCostList_View.superclass.constructor.call(this,id,options);
 
 	var model = (options.models&&options.models.ConcreteCostList_Model)? options.models.ConcreteCostList_Model : new ConcreteCostList_Model();
@@ -27,6 +28,7 @@ function ConcreteCostList_View(id,options){
 		"controller":contr,
 		"editInline":true,
 		"editWinClass":null,
+		"contClassName":options.detailFilters? window.getBsCol(3):null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdInsert":options.detailFilters? true:false,
 			"cmdEdit":options.detailFilters? true:false,

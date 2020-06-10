@@ -59,7 +59,7 @@ class User_Controller extends ControllerSQL{
 				,array('required'=>TRUE));
 		$pm->addParam($param);
 		
-				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner'
+				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
 		$param = new FieldExtString('email'
@@ -111,7 +111,7 @@ class User_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner'
+				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client'
 				,array(
 			));
 			$pm->addParam($param);
@@ -468,7 +468,52 @@ class User_Controller extends ControllerSQL{
 		$_SESSION['first_shift_end_time'] = $ar['first_shift_end_time'];
 		
 		//global filters				
-		if ($ar['role_id']=='vehicle_owner'){
+		if ($ar['role_id']=='client'){
+			$client_ar = $this->getDbLink()->query_first(sprintf("SELECT id,account_from_date FROM clients WHERE user_id=%d",$ar['id']));
+			$_SESSION['global_client_id'] = (count($client_ar)&&isset($client_ar['id']))? $client_ar['id']:null;
+			$_SESSION['global_client_from_date'] = (count($client_ar)&&isset($client_ar['account_from_date']))? strtotime($client_ar['account_from_date']):null;
+			
+			$model = new ShipmentForClientList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			//client_id
+			$field = clone $model->getFieldById('client_id');
+			$field->setValue($_SESSION['global_client_id']);
+			$filter->addField($field,'=');
+			//client_from_date
+			/*
+			$field2 = clone $model->getFieldById('ship_date');
+			$field2->setValue($_SESSION['global_client_from_date']);
+			$filter->addField($field2,'>=');
+			*/
+			GlobalFilter::set('ShipmentForClientList_Model',$filter);
+						
+			$model = new OrderForClientList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			$field = clone $model->getFieldById('client_id');
+			$field->setValue($_SESSION['global_client_id']);
+			$filter->addField($field,'=');
+			//client_from_date
+			/*
+			$field2 = clone $model->getFieldById('date_time');
+			$field2->setValue($_SESSION['global_client_from_date']);
+			$filter->addField($field2,'>=');
+			*/
+			GlobalFilter::set('OrderForClientList_Model',$filter);
+						
+			$model = new ShipmentForOrderList_Model($this->getDbLink());
+			$filter = new ModelWhereSQL();
+			//client_id
+			$field = clone $model->getFieldById('client_id');
+			$field->setValue($_SESSION['global_client_id']);
+			$filter->addField($field,'=');
+			//client_from_date
+			$field2 = clone $model->getFieldById('date_time');
+			$field2->setValue($_SESSION['global_client_from_date']);
+			$filter->addField($field2,'>=');
+			GlobalFilter::set('ShipmentForOrderList_Model',$filter);
+			
+		}		
+		else if ($ar['role_id']=='vehicle_owner'){
 			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d LIMIT 1",$ar['id']));
 			if(is_array($ar_veh_owner) && count($ar_veh_owner)){
 				$_SESSION['global_vehicle_owner_id'] = $ar_veh_owner['id'];

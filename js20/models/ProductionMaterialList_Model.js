@@ -202,6 +202,15 @@ function ProductionMaterialList_Model(options){
 	
 	options.fields.material_fact_consumption_id = new FieldInt("material_fact_consumption_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Комментарий';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_comment = new FieldJSON("production_comment",filed_options);
+	
 		ProductionMaterialList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionMaterialList_Model,ModelXML);

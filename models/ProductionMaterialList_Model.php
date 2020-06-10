@@ -220,6 +220,16 @@ class ProductionMaterialList_Model extends ModelSQLBeton{
 		$f_material_fact_consumption_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_fact_consumption_id",$f_opts);
 		$this->addField($f_material_fact_consumption_id);
 		//********************
+		
+		//*** Field production_comment ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Комментарий';
+		$f_opts['id']="production_comment";
+						
+		$f_production_comment=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_comment",$f_opts);
+		$this->addField($f_production_comment);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

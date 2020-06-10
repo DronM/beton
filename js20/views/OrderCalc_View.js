@@ -193,6 +193,7 @@ OrderCalc_View.prototype.setConcretePrice = function(price){
 }
 
 OrderCalc_View.prototype.onSelectConcrete = function(f){
+	//Проверить на существование специальной цены для клиента!!!
 	this.setConcretePrice(f.price.getValue());
 	this.recalcTotal();
 }

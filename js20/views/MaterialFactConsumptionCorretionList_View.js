@@ -63,7 +63,7 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 									"ctrlOptions":{
 										"labelCaption":""
 									},
-									"ctrlBindFiledId":"production_site_id"					
+									"ctrlBindFieldId":"production_site_id"					
 								})
 							],
 							"sortable":true
@@ -113,7 +113,7 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 									"ctrlOptions":{
 										"labelCaption":""
 									},
-									"ctrlBindFiledId":"user_id",
+									"ctrlBindFieldId":"user_id",
 									"searchOptions":{
 										"field":new FieldInt("user_id"),
 										"searchType":"on_match"
@@ -131,7 +131,7 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 									"ctrlOptions":{
 										"labelCaption":""
 									},
-									"ctrlBindFiledId":"material_id",
+									"ctrlBindFieldId":"material_id",
 									"searchOptions":{
 										"field":new FieldInt("material_id"),
 										"searchType":"on_match"
@@ -150,7 +150,7 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 									"ctrlOptions":{
 										"labelCaption":""
 									},
-									"ctrlBindFiledId":"cement_silos_id",
+									"ctrlBindFieldId":"cement_silo_id",
 									"searchOptions":{
 										"field":new FieldInt("cement_silo_id"),
 										"searchType":"on_match"

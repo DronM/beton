@@ -110,10 +110,19 @@ function ClientDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Аккаунт';
+	filed_options.autoInc = false;	
+	
+	options.fields.accounts_ref = new FieldJSON("accounts_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.inn = new FieldString("inn",filed_options);
+	options.fields.account_from_date = new FieldDate("account_from_date",filed_options);
 	
 		ClientDialog_Model.superclass.constructor.call(this,id,options);
 }

@@ -104,6 +104,17 @@ function ShipmentForOrderList_Model(options){
 	
 	options.fields.order_id = new FieldInt("order_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_id = new FieldInt("client_id",filed_options);
+	
+			
+			
 		ShipmentForOrderList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ShipmentForOrderList_Model,ModelXML);

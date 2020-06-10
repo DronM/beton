@@ -99,6 +99,11 @@ class Production_Controller extends ControllerSQL{
 		$param = new FieldExtFloat('concrete_quant'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtBool('manual_correction'
+				,array(
+				'alias'=>'Ручное исправление'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -185,6 +190,12 @@ class Production_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		$param = new FieldExtFloat('concrete_quant'
 				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('manual_correction'
+				,array(
+			
+				'alias'=>'Ручное исправление'
 			));
 			$pm->addParam($param);
 		
@@ -415,11 +426,20 @@ UPDATE public.production_sites
 		$q  = sprintf(
 			"WITH
 			manual_correction AS (
-				SELECT TOP 1
-					*
-				FROM ManuelKayit
-				WHERE ManuelKayit.M_Tarih < (SELECT Uretim.BasTarih FROM Uretim WHERE Uretim.Id=%d)
-				ORDER BY ManuelKayit.M_Tarih DESC
+				SELECT sub.*
+				FROM (
+					SELECT TOP 1
+						ManuelKayit.*,
+						(SELECT TOP 1 Uretim.id
+						FROM Uretim
+						WHERE Uretim.BasTarih > ManuelKayit.M_Tarih
+						ORDER BY Uretim.BasTarih ASC						
+						) AS for_prod_id						
+					FROM ManuelKayit
+					WHERE ManuelKayit.M_Tarih < (SELECT Uretim.BasTarih FROM Uretim WHERE Uretim.Id=%d)
+					ORDER BY ManuelKayit.M_Tarih DESC
+				) AS sub
+				WHERE sub.for_prod_id = %d
 			)
 			SELECT
 				UretimSonuc.BitisTarihi AS production_dt_end,
@@ -531,6 +551,7 @@ UPDATE public.production_sites
 			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
 			
 			WHERE Uretim.Id=%d AND UretimSonuc.BitisTarihi IS NOT NULL",
+			$productionId,
 			$productionId,
 			$productionId
 		);
@@ -860,7 +881,6 @@ UPDATE public.production_sites
 							$concrete_type_id = NULL;
 							
 							$concrete_quant = 0;
-							$corrections_added = [];
 							//По каждому материалу
 							for($m_ind=1;$m_ind<=$MT_FIELD_CNT;$m_ind++){
 								$m_id_pref = 'mat'.$m_ind;
@@ -1045,7 +1065,7 @@ UPDATE public.production_sites
 										//correction
 										$q_cor = floatval($material_data[$m_id_pref.'_quant_corrected']);
 										if($q_cor && $mat_id!='NULL'
-										&& !isset($corrections_added[$material_data['correction_id']])){
+										){
 											/*
 											production_site_id,
 											date_time,
@@ -1076,7 +1096,6 @@ UPDATE public.production_sites
 												$material_data['correction_id'],
 												$q_cor/1000
 											);
-											$corrections_added[$material_data['correction_id']] = TRUE;
 										}
 										if($shipment_id != 'NULL'
 										&& !array_key_exists('id_'.$production_id,$productions_for_close)
@@ -1111,16 +1130,14 @@ UPDATE public.production_sites
 									$this->getDbLinkMaster()->query($q_head.' '.$q_body);
 								
 									if(strlen($q_body_cor)){
-										$cor_exists = $this->getDbLinkMaster()->query_first(sprintf(
-											"SELECT TRUE AS cor_exists
-											FROM material_fact_consumption_corrections
+										//delete on ALL materials...
+										$this->getDbLinkMaster()->query(sprintf(
+											"DELETE FROM material_fact_consumption_corrections
 											WHERE production_site_id=%d AND elkon_id=%d",
 											$serv['id'],$material_data['correction_id']
 										));
 										//correction
-										if(!count($cor_exists)||!isset($cor_exists['cor_exists'])||$cor_exists['cor_exists']!='t'){
-											$this->getDbLinkMaster()->query($q_head_cor.' '.$q_body_cor);
-										}
+										$this->getDbLinkMaster()->query($q_head_cor.' '.$q_body_cor);
 									}
 								
 									//Закрытие производства

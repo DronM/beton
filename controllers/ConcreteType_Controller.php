@@ -54,6 +54,11 @@ class ConcreteType_Controller extends ControllerSQL{
 				'alias'=>'Цена'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtBool('material_cons_rates'
+				,array(
+				'alias'=>'Есть нормы расхода'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -102,6 +107,12 @@ class ConcreteType_Controller extends ControllerSQL{
 				,array(
 			
 				'alias'=>'Цена'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('material_cons_rates'
+				,array(
+			
+				'alias'=>'Есть нормы расхода'
 			));
 			$pm->addParam($param);
 		
@@ -173,6 +184,11 @@ class ConcreteType_Controller extends ControllerSQL{
 		
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('get_for_client_list');
+		
+		$this->addPublicMethod($pm);
+
 		
 	}	
 	
@@ -180,6 +196,18 @@ class ConcreteType_Controller extends ControllerSQL{
 		$this->addNewModel('SELECT * FROM concrete_types_for_lab_list',
 		'ConcreteType_Model');	
 	}
+	
+	public function get_for_client_list($pm){
+		$this->addNewModel(sprintf(
+		"SELECT * FROM concrete_types_list
+		WHERE id IN (SELECT DISTINCT o.concrete_type_id FROM orders o WHERE o.client_id=%d %s)
+		ORDER BY name"
+		,$_SESSION['global_client_id']
+		,is_null($_SESSION['global_client_from_date'])? '':sprintf(" AND o.date_time>='%s'",date('Y-m-d',$_SESSION['global_client_from_date']))
+		),
+		'ConcreteTypeList_Model');	
+	}
+	
 
 }
 ?>

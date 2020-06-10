@@ -8,19 +8,47 @@ $BODY$
 DECLARE
 	reg_material_facts ra_material_facts%ROWTYPE;
 	reg_cement ra_cement%ROWTYPE;
+	v_cnt int;
+	v_is_cement bool;
 BEGIN
 	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
 		
-		--Определить силос и дату по номеру производства
-		SELECT
-			date_time,
-			cement_silo_id
-		INTO
-			NEW.date_time,
-			NEW.cement_silo_id
-		FROM material_fact_consumptions
+		--Определить дату по номеру производства
+		SELECT count(*) INTO v_cnt FROM material_fact_consumptions
 		WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id AND raw_material_id=NEW.material_id;
+		
+		IF v_cnt = 2 THEN
+			--Если два производство - ВЕРИМ силосу, который прислали, но проверяем на заполненность
+			SELECT
+				cons.date_time,
+				mat.is_cement
+			INTO
+				NEW.date_time
+				v_is_cement
+			FROM material_fact_consumptions AS cons
+			LEFT JOIN raw_materials AS mat ON mat.id = cons.raw_material_id
+			WHERE cons.production_site_id = NEW.production_site_id AND cons.production_id = NEW.production_id
+				AND cons.raw_material_id=NEW.material_id
+				AND (NEW.cement_silo_id IS NULL OR cons.cement_silo_id=NEW.cement_silo_id);
+			
+			IF v_is_cement AND NEW.cement_silo_id IS NULL THEN
+				RAISE EXCEPTION 'Не указан силос по цементу!';
+			END IF;
 				
+		ELSIF v_cnt = 1 THEN
+			--Если одно производство - ВСЕГДА 1 силос, его и ставим
+			SELECT
+				date_time,
+				cement_silo_id
+			INTO
+				NEW.date_time,
+				NEW.cement_silo_id
+			FROM material_fact_consumptions
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id AND raw_material_id=NEW.material_id
+			;
+		
+		END IF;
+		
 		RETURN NEW;
 		
 	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
@@ -73,15 +101,41 @@ BEGIN
 		PERFORM ra_material_facts_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);
 		PERFORM ra_cement_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);
 		
-		--Определить силос и дату по номеру производства
-		SELECT
-			date_time,
-			cement_silo_id
-		INTO
-			NEW.date_time,
-			NEW.cement_silo_id
-		FROM material_fact_consumptions
+		--Определить дату по номеру производства
+		SELECT count(*) INTO v_cnt FROM material_fact_consumptions
 		WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id AND raw_material_id=NEW.material_id;
+		
+		IF v_cnt = 2 THEN
+			--Если два производство - ВЕРИМ силосу, который прислали, но проверяем на заполненность
+			SELECT
+				cons.date_time,
+				mat.is_cement
+			INTO
+				NEW.date_time
+				v_is_cement
+			FROM material_fact_consumptions AS cons
+			LEFT JOIN raw_materials AS mat ON mat.id = cons.raw_material_id
+			WHERE cons.production_site_id = NEW.production_site_id AND cons.production_id = NEW.production_id
+				AND cons.raw_material_id=NEW.material_id
+				AND (NEW.cement_silo_id IS NULL OR cons.cement_silo_id=NEW.cement_silo_id);
+			
+			IF v_is_cement AND NEW.cement_silo_id IS NULL THEN
+				RAISE EXCEPTION 'Не указан силос по цементу!';
+			END IF;
+				
+		ELSIF v_cnt = 1 THEN
+			--Если одно производство - ВСЕГДА 1 силос, его и ставим
+			SELECT
+				date_time,
+				cement_silo_id
+			INTO
+				NEW.date_time,
+				NEW.cement_silo_id
+			FROM material_fact_consumptions
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id AND raw_material_id=NEW.material_id
+			;
+		
+		END IF;
 		
 		RETURN NEW;
 		

@@ -177,6 +177,16 @@ function Production_Model(options){
 	options.fields.concrete_quant = new FieldFloat("concrete_quant",filed_options);
 	options.fields.concrete_quant.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	filed_options.alias = 'Ручное исправление';
+	filed_options.autoInc = false;	
+	
+	options.fields.manual_correction = new FieldBool("manual_correction",filed_options);
+	
 			
 			
 			

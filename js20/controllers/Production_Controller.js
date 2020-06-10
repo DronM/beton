@@ -137,6 +137,12 @@ extend(Production_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Ручное исправление";
+	var field = new FieldBool("manual_correction",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -242,6 +248,12 @@ extend(Production_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldFloat("concrete_quant",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ручное исправление";
+	var field = new FieldBool("manual_correction",options);
 	
 	pm.addField(field);
 	

@@ -310,6 +310,21 @@ class Shipment_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('get_list_for_client');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_list_for_client_veh_owner');
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -769,14 +784,7 @@ class Shipment_Controller extends ControllerSQL{
 		
 	}
 	
-	public function get_operator_list($pm){
-	
-		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
-		$date_from = Beton::shiftStart($dt);
-		$date_to = Beton::shiftEnd($date_from);
-		$date_from_db = "'".date('Y-m-d H:i:s',$date_from)."'";
-		$date_to_db = "'".date('Y-m-d H:i:s',$date_to)."'";
-	
+	private static function get_operator_query($date_from_db,$date_to_db,&$operator_cond_tot){
 		$operator_cond = '';
 		$operator_cond_tot = '';
 		$operator_with = '';
@@ -808,7 +816,7 @@ class Shipment_Controller extends ControllerSQL{
 			$extra_join = "LEFT JOIN (SELECT t.shipment_id,t.date_time FROM vehicle_schedule_states t WHERE t.state='assigned' GROUP BY t.shipment_id,t.date_time) vs2 ON vs2.shipment_id = sh.id";
 		}
 		
-		$q = sprintf(
+		return sprintf(
 		"WITH
 		%s
 		ships AS (
@@ -860,23 +868,31 @@ class Shipment_Controller extends ControllerSQL{
 		$extra_join,
 		$date_from_db,
 		$date_to_db
-		);
-		$m = new ModelSQL($this->getDbLink(),array('id'=>"OperatorList_Model"));
+		);	
+	}
+	
+	public function addOperatorModels(&$controller,$dateFromForDb,$dateToForDb){
+	
+		$operator_cond_tot = '';
+		$q = self::get_operator_query($dateFromForDb,$dateToForDb,$operator_cond_tot);
+		$m = new ModelSQL($controller->getDbLink(),array('id'=>"OperatorList_Model"));
 		$m->setCalcHash(TRUE);
 		$m->query($q,TRUE);
-		$this->addModel($m);
+		$controller->addModel($m);
 		
 		//totals
-		$this->addNewModel(sprintf(
-		"SELECT
-			coalesce((SELECT sum(sh.quant) FROM shipments AS sh WHERE sh.ship_date_time BETWEEN %s AND %s AND sh.shipped".$operator_cond_tot."),0) AS quant_shipped,
-			coalesce((SELECT sum(quant) FROM orders WHERE date_time BETWEEN %s AND %s),0) AS quant_ordered",
-		$date_from_db,
-		$date_to_db,
-		$date_from_db,
-		$date_to_db		
-		),
-		'OperatorTotals_Model');
+		$controller->addNewModel(
+			sprintf(
+				"SELECT
+					coalesce((SELECT sum(sh.quant) FROM shipments AS sh WHERE sh.ship_date_time BETWEEN %s AND %s AND sh.shipped".$operator_cond_tot."),0) AS quant_shipped,
+					coalesce((SELECT sum(quant) FROM orders WHERE date_time BETWEEN %s AND %s),0) AS quant_ordered",
+				$dateFromForDb,
+				$dateToForDb,
+				$dateFromForDb,
+				$dateToForDb		
+			),
+			'OperatorTotals_Model'
+		);
 		
 		//production site(s)
 		if($_SESSION['role_id']=='operator'){
@@ -890,9 +906,20 @@ class Shipment_Controller extends ControllerSQL{
 		else{
 			$prod_site_q = 'SELECT ps.name FROM production_sites ps';
 		}
-		$this->addNewModel($prod_site_q,'OperatorProductionSite_Model');				
+		$controller->addNewModel($prod_site_q,'OperatorProductionSite_Model');				
 	}
 	
+	public function get_operator_list($pm){
+	
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		$date_from_db = "'".date('Y-m-d H:i:s',$date_from)."'";
+		$date_to_db = "'".date('Y-m-d H:i:s',$date_to)."'";
+		
+		self::addOperatorModels($this,$date_from_db,$date_to_db);
+	}
+		
 	public static function sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode){
 		//SMS service
 		if (SMS_ACTIVE) {
@@ -901,7 +928,7 @@ class Shipment_Controller extends ControllerSQL{
 			"SELECT
 				orders.id AS order_id,
 				orders.phone_cel,
-				shipments.quant,
+				coalesce(shipments.quant) AS quant,
 				concrete_types.name AS concrete,
 				d.name AS d_name,
 				coalesce(d.phone_cel,'') AS d_phone,
@@ -909,13 +936,23 @@ class Shipment_Controller extends ControllerSQL{
 				(SELECT pattern FROM sms_patterns
 					WHERE sms_type='ship'::sms_types
 					AND lang_id= orders.lang_id
-				) AS text	
+				) AS text,
+				coalesce(tot_sh.quant,0) AS quant_shipped,
+				coalesce(orders.quant,0) AS quant_ordered,
+				coalesce(orders.quant,0) - coalesce(tot_sh.quant,0) AS quant_balance
 			FROM orders
 			LEFT JOIN shipments ON shipments.order_id=orders.id
 			LEFT JOIN concrete_types ON concrete_types.id=orders.concrete_type_id
 			LEFT JOIN vehicle_schedules AS vs ON vs.id=shipments.vehicle_schedule_id
 			LEFT JOIN drivers AS d ON d.id=vs.driver_id
-			LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id									
+			LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
+			LEFT JOIN (
+				SELECT
+					t.order_id,
+					sum(t.quant) AS quant
+				FROM shipments t
+				GROUP BY t.order_id
+			) AS tot_sh ON tot_sh.order_id=orders.id
 			WHERE shipments.id=%d",
 			$idForDb
 			));
@@ -925,6 +962,9 @@ class Shipment_Controller extends ControllerSQL{
 				$text = str_replace('[quant]',$ar['quant'],$text);
 				$text = str_replace('[concrete]',$ar['concrete'],$text);
 				$text = str_replace('[car]',$ar['v_plate'],$text);
+				$text = str_replace('[quant_shipped]',$ar['quant_shipped'],$text);
+				$text = str_replace('[quant_balance]',$ar['quant_balance'],$text);
+				$text = str_replace('[quant_ordered]',$ar['quant_ordered'],$text);
 				
 				$driver = $ar['d_name'];
 				$d_phone = $ar['d_phone'];
@@ -1622,5 +1662,10 @@ class Shipment_Controller extends ControllerSQL{
 		}
 		
 	}
+	
+	public function get_list_for_client($pm){	
+		$this->modelGetList(new ShipmentForClientList_Model($this->getDbLink()),$pm);
+	}
+	
 }
 ?>

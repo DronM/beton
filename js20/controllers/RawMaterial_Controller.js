@@ -43,6 +43,7 @@ function RawMaterial_Controller(options){
 	this.add_total_list();
 	this.add_mat_totals();
 	this.add_get_material_actions_list();
+	this.add_get_material_cons_tolerance_violation_list();
 		
 }
 extend(RawMaterial_Controller,ControllerObjServer);
@@ -521,6 +522,36 @@ extend(RawMaterial_Controller,ControllerObjServer);
 			RawMaterial_Controller.prototype.add_get_material_actions_list = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_material_actions_list',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("templ",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("inline",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			RawMaterial_Controller.prototype.add_get_material_cons_tolerance_violation_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_material_cons_tolerance_violation_list',opts);
 	
 	pm.addField(new FieldInt(this.PARAM_COUNT));
 	pm.addField(new FieldInt(this.PARAM_FROM));

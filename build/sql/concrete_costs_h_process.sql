@@ -6,7 +6,25 @@ CREATE OR REPLACE FUNCTION concrete_costs_h_process()
   RETURNS trigger AS
 $BODY$
 BEGIN
-	IF (TG_WHEN='AFTER' AND TG_OP='INSERT') THEN		
+	IF (TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN		
+		
+		IF TG_OP='INSERT' OR coalesce(NEW.clients_list::text,'')<>coalesce(OLD.clients_list::text,'') THEN
+			SELECT
+				array_agg( ((sub.obj->'fields'->>'client')::json->'keys'->>'id')::int )
+			INTO NEW.clients_ar
+			FROM (
+				SELECT jsonb_array_elements(NEW.clients_list->'rows') AS obj
+			) AS sub;		
+		
+		END IF;
+		
+		IF NEW.clients_ar IS NULL THEN
+			NEW.clients_ar = ARRAY[0];
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='INSERT') THEN		
 		INSERT INTO concrete_costs
 		(date,concrete_type_id,price)
 		(SELECT

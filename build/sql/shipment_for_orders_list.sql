@@ -17,6 +17,9 @@ CREATE OR REPLACE VIEW shipment_for_orders_list AS
 		
 		users_ref(op_u) AS operators_ref
 		
+		--for client role filter
+		,o.client_id
+		
 		/*
 		(SELECT t.state
 		FROM vehicle_schedule_states t

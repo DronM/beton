@@ -504,6 +504,21 @@ class Order_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);					
 		$this->setCompleteModelId('OrderList_Model');
 
+			
+		$pm = new PublicMethod('get_list_for_client');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+		$this->addPublicMethod($pm);
+
 		
 	}	
 	
@@ -936,6 +951,7 @@ class Order_Controller extends ControllerSQL{
 		$date_from = Beton::shiftStart($dt);
 		$date_to = Beton::shiftEnd($date_from);
 		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		$date_to_for_db = "'".date('Y-m-d',$date_to)."'";
 		
 		$db_link = $this->getDbLink();
 		
@@ -960,6 +976,9 @@ class Order_Controller extends ControllerSQL{
 		
 		//Vehicles		
 		$this->addModel(VehicleSchedule_Controller::getMakeListModel($db_link,$date_for_db));
+
+		//OperatorList	
+		Shipment_Controller::addOperatorModels($this,$date_for_db,$date_to_for_db);	
 		
 		//weather
 		//$this->addModel(Weather_Controller::getCurrentModel($db_link,$this->getDbLinkMaster()));
@@ -1069,6 +1088,10 @@ class Order_Controller extends ControllerSQL{
 			$this->getExtDbVal($pm,'id')
 		));	
 	}	
+	
+	public function get_list_for_client($pm){	
+		$this->modelGetList(new OrderForClientList_Model($this->getDbLink()),$pm);
+	}
 	
 }
 ?>

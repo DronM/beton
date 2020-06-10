@@ -6,7 +6,7 @@ $USE_SQLSRV = FALSE;
 
 //"192.168.1.12:59900"
 $serverName = "86.109.193.160";
-$serverPort = "59900";//59900 50203
+$serverPort = "50203";//59900 50203
 $userName = 'andreymikhalevich';
 $userPwd = 'wimaf2020ii42';
 //serverName\instanceName 59900 50203
@@ -34,12 +34,8 @@ if (!$USE_SQLSRV){
 }
 
 
-$q = "SELECT Uretim.Id AS id, Uretim.BasTarih AS dt_start, Recete.ReceteAdi AS concrete_type_descr,
-	Uretim.AracPlaka AS vehicle_descr, Uretim.Olusturan AS user_descr,Uretim.Statu FROM Uretim	
-	LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
-	WHERE Uretim.Id = 3505
-	AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih<>'' AND (Uretim.Statu=0 OR Uretim.Statu=2)
-	ORDER BY Uretim.Id";
+$q = "SELECT * ManuelKayit.* FROM ManuelKayit
+				WHERE ManuelKayit.Id=2487";
 //WHERE Uretim.Id=91918";
 
 //$q = "SELECT TOP 1 * FROM UretimSonuc";

@@ -8,6 +8,37 @@
 		
 		<div id="{{id}}:order_make_grid">
 		</div>	
+		
+		<div id="{{id}}:OperatorList_View">
+	
+			<div id="totContainer">
+				<span style="margin-right:20px;">
+					<label class="lbl" id="totOrdered_l" for="totOrdered">Заявлено:</label>
+					<input id="totOrdered" disabled="disabled" class="" type="text" size="4">
+					</input>
+					<span id="totOrdered_m" class="">м3</span>
+				</span>
+		
+				<span style="margin-right:20px;">
+					<label class="lbl" id="totShipped_l" for="totShipped">Отгружено:</label>
+					<input id="totShipped" disabled="disabled" class="" type="text" size="4">
+					</input>
+					<span id="totShipped_m" class="">м3</span>
+				</span>
+		
+				<span style="margin-right:20px;">
+					<label class="lbl" id="totBalance_l" for="totShipped">Остаток:</label>
+					<input id="totBalance" disabled="disabled" class="" type="text" size="4">
+					</input>
+					<span id="totBalance_m" class="">м3</span>		
+				</span>
+			</div>	
+	
+			<div id="{{id}}:OperatorList_View:grid">
+			</div>	
+		
+		</div>	
+		
 	</div>	
 	
 	<div class="{{bsCol}}3">

@@ -168,6 +168,17 @@ class Production_Model extends ModelSQLBeton{
 		$f_concrete_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_quant",$f_opts);
 		$this->addField($f_concrete_quant);
 		//********************
+		
+		//*** Field manual_correction ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ручное исправление';
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="manual_correction";
+						
+		$f_manual_correction=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"manual_correction",$f_opts);
+		$this->addField($f_manual_correction);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

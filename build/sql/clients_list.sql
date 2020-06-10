@@ -28,10 +28,13 @@ CREATE OR REPLACE VIEW public.clients_list AS
 		
 		cl.inn
 		
+		,users_ref(acc) AS accounts_ref
+		
 	FROM clients cl
 	LEFT JOIN client_types ct ON ct.id = cl.client_type_id
 	LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
 	LEFT JOIN users man ON man.id = cl.manager_id
+	LEFT JOIN users acc ON acc.id = cl.user_id
 	LEFT JOIN (
 		SELECT
 			orders.client_id,

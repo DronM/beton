@@ -166,6 +166,15 @@ function DOCMaterialProcurementList_Model(options){
 	
 	options.fields.quant_net = new FieldString("quant_net",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.store = new FieldString("store",filed_options);
+	
 		DOCMaterialProcurementList_Model.superclass.constructor.call(this,id,options);
 }
 extend(DOCMaterialProcurementList_Model,ModelXML);

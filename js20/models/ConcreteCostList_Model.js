@@ -38,7 +38,7 @@ function ConcreteCostList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.date = new FieldDate("date",filed_options);
+	options.fields.concrete_costs_h_id = new FieldInt("concrete_costs_h_id",filed_options);
 	
 				
 	

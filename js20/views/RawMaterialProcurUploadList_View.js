@@ -51,6 +51,15 @@ function RawMaterialProcurUploadList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:descr",{
+							"value":"Описание",
+							"colAttrs":{"align":"left"},
+							"columns":[
+								new GridColumn({
+									"field":model.getField("descr")
+								})
+							]
+						})
 						
 					]
 				})

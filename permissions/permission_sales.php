@@ -42,6 +42,8 @@ $permissions = array();
 				
 					$permissions['ConcreteType_Controller_get_list_for_lab']=TRUE;
 				
+					$permissions['ConcreteType_Controller_get_for_client_list']=TRUE;
+				
 					$permissions['Destination_Controller_insert']=TRUE;
 				
 					$permissions['Destination_Controller_update']=TRUE;
@@ -53,6 +55,8 @@ $permissions = array();
 					$permissions['Destination_Controller_get_object']=TRUE;
 				
 					$permissions['Destination_Controller_complete_dest']=TRUE;
+				
+					$permissions['Destination_Controller_get_for_client_list']=TRUE;
 				
 					$permissions['Destination_Controller_get_coords_on_name']=TRUE;
 				
@@ -122,6 +126,8 @@ $permissions = array();
 				
 					$permissions['Order_Controller_complete']=TRUE;
 				
+					$permissions['Order_Controller_get_list_for_client']=TRUE;
+				
 					$permissions['Driver_Controller_insert']=TRUE;
 				
 					$permissions['Driver_Controller_update']=TRUE;
@@ -173,6 +179,8 @@ $permissions = array();
 					$permissions['RawMaterial_Controller_mat_totals']=TRUE;
 				
 					$permissions['RawMaterial_Controller_get_material_actions_list']=TRUE;
+				
+					$permissions['RawMaterial_Controller_get_material_cons_tolerance_violation_list']=TRUE;
 				
 					$permissions['RawMaterialConsRateDate_Controller_insert']=TRUE;
 				
@@ -247,6 +255,8 @@ $permissions = array();
 					$permissions['Shipment_Controller_get_list']=TRUE;
 				
 					$permissions['Shipment_Controller_get_list_for_veh_owner']=TRUE;
+				
+					$permissions['Shipment_Controller_get_list_for_client']=TRUE;
 				
 					$permissions['Shipment_Controller_get_list_for_client_veh_owner']=TRUE;
 				
@@ -864,6 +874,8 @@ $permissions = array();
 				
 					$permissions['ConcreteCostHeader_Controller_get_object']=TRUE;
 				
+					$permissions['ConcreteCostHeader_Controller_get_client_price_list']=TRUE;
+				
 					$permissions['ConcreteCost_Controller_insert']=TRUE;
 				
 					$permissions['ConcreteCost_Controller_update']=TRUE;
@@ -1038,6 +1050,16 @@ $permissions = array();
 				
 					$permissions['OwnerList_Controller_get_object']=TRUE;
 				
+					$permissions['ClientLocalList_Controller_insert']=TRUE;
+				
+					$permissions['ClientLocalList_Controller_update']=TRUE;
+				
+					$permissions['ClientLocalList_Controller_delete']=TRUE;
+				
+					$permissions['ClientLocalList_Controller_get_list']=TRUE;
+				
+					$permissions['ClientLocalList_Controller_get_object']=TRUE;
+				
 					$permissions['PumpVehiclePriceList_Controller_insert']=TRUE;
 				
 					$permissions['PumpVehiclePriceList_Controller_update']=TRUE;
@@ -1087,6 +1109,16 @@ $permissions = array();
 					$permissions['ProductionVehicleCorrection_Controller_get_list']=TRUE;
 				
 					$permissions['ProductionVehicleCorrection_Controller_get_object']=TRUE;
+				
+					$permissions['ProductionComment_Controller_insert']=TRUE;
+				
+					$permissions['ProductionComment_Controller_update']=TRUE;
+				
+					$permissions['ProductionComment_Controller_delete']=TRUE;
+				
+					$permissions['ProductionComment_Controller_get_list']=TRUE;
+				
+					$permissions['ProductionComment_Controller_get_object']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

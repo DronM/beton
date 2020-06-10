@@ -20,7 +20,12 @@ function ConcreteTypeEdit(id,options){
 	options.modelDescrFields = [options.model.getField("name")];
 	
 	var contr = new ConcreteType_Controller();
-	options.readPublicMethod = contr.getPublicMethod("get_list");
+	if(window.getApp().getServVar("role_id")=="client"){
+		options.readPublicMethod = contr.getPublicMethod("get_for_client_list");
+	}
+	else{
+		options.readPublicMethod = contr.getPublicMethod("get_list");
+	}
 	
 	ConcreteTypeEdit.superclass.constructor.call(this,id,options);
 	

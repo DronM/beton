@@ -147,6 +147,16 @@ class ClientList_Model extends ModelSQLBeton{
 		$f_inn=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
 		$this->addField($f_inn);
 		//********************
+		
+		//*** Field accounts_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Аккаунт';
+		$f_opts['id']="accounts_ref";
+						
+		$f_accounts_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"accounts_ref",$f_opts);
+		$this->addField($f_accounts_ref);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

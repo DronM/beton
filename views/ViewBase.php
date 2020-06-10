@@ -60,6 +60,10 @@ require_once('models/MainMenu_Model_supervisor.php');
 if (file_exists('models/MainMenu_Model_vehicle_owner.php')){
 require_once('models/MainMenu_Model_vehicle_owner.php');
 }
+			
+if (file_exists('models/MainMenu_Model_client.php')){
+require_once('models/MainMenu_Model_client.php');
+}
 		
 class ViewBase extends ViewHTMLXSLT {	
 
@@ -1208,6 +1212,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForVehOwnerList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForClientVehOwnerList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForClientList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderForClientList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentTimeList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentDateList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallList_View.js'));
@@ -1307,6 +1313,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloBalanceResetList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialFactConsumption_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialAction_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialConsToleranceViolation_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1355,6 +1362,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/LangEditRef.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodShift.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodMonth.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodWeek.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodDateShift.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PlantLoadGraphControl.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ClientTypeEdit.js'));
@@ -1363,6 +1371,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ClientNameFullEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ConcreteTypeEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/DestinationEdit.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/DestinationForClientEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ClientEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PumpVehicleEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleEdit.js'));
@@ -1410,6 +1419,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleScheduleMakeOrderGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/MaterialMakeOrderGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/OwnerListGrid.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ClientLocalListGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PumpVehiclePriceListGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/CementSiloEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ProductionSiteCmdLoadProduction.js'));
@@ -1715,6 +1725,13 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ProductionVehicleCorrection_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ProductionVehicleCorrection_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ProductionVehicleCorrectionList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ProductionComment_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialConsToleranceViolationList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ProductionComment_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/ClientLocalList_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ClientLocalList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForClientList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/OrderForClientList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

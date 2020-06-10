@@ -22,6 +22,18 @@ function ConcreteCostHeader_Model(options){
 	
 	options.fields = {};
 	
+			
+				
+			
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = true;	
+	
+	options.fields.id = new FieldInt("id",filed_options);
+	
 				
 	
 	var filed_options = {};
@@ -30,6 +42,24 @@ function ConcreteCostHeader_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.date = new FieldDate("date",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.clients_ar = new FieldArray("clients_ar",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.clients_list = new FieldJSONB("clients_list",filed_options);
 	
 				
 	

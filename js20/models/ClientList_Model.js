@@ -139,6 +139,15 @@ function ClientList_Model(options){
 	
 	options.fields.inn = new FieldString("inn",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Аккаунт';
+	filed_options.autoInc = false;	
+	
+	options.fields.accounts_ref = new FieldJSON("accounts_ref",filed_options);
+	
 		ClientList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ClientList_Model,ModelXML);

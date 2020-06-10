@@ -27,6 +27,16 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+
+	public function get_client_price_list($pm){
+		$client_id = $pm->getParamValue('client_id')? $this->getExtDbVal($pm,'client_id'):0;
+		$this->addNewModel(
+			sprintf(
+				"SELECT * FROM client_price_list(%d)",$client_id
+			),'ConcretePrice_Model'
+		);
+	}
+
 </xsl:template>
 
 </xsl:stylesheet>

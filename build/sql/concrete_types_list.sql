@@ -10,6 +10,7 @@ CREATE OR REPLACE VIEW concrete_types_list AS
 		ctp.pres_norm,
 		ctp.mpa_ratio,
 		coalesce(coalesce(act_price.price,ctp.price),0) AS price
+		,ctp.material_cons_rates
 	FROM concrete_types AS ctp
 	LEFT JOIN (
 		SELECT

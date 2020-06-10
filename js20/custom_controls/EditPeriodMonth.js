@@ -21,11 +21,11 @@
 function EditPeriodMonth(id,options){
 	options = options || {};	
 	
-	options.template = window.getApp().getTemplate("EditPeriodMonth");
+	options.template = options.template || window.getApp().getTemplate("EditPeriodMonth");
 	
 	options.cmdPeriodSelect = false;
-	options.downTitle = "Предыдущий месяц";
-	options.upTitle = "Следующий месяц";
+	options.downTitle = options.downTitle || "Предыдущий месяц";
+	options.upTitle = options.upTitle || "Следующий месяц";
 	options.cmdControlTo = false;
 	options.cmdControlFrom = false;
 	
@@ -36,7 +36,7 @@ function EditPeriodMonth(id,options){
 	options.periodSelectOptions = {"periodShift":true};
 	
 	this.m_dateFrom = options.dateFrom;	
-	if(!this.m_dateFrom)this.m_dateFrom = DateHelper.monthStart();
+	if(!this.m_dateFrom)this.m_dateFrom = this.getDefaulDateFrom();
 	this.calcDateTo();
 	
 	this.m_filters = options.filters;	
@@ -51,6 +51,10 @@ EditPeriodMonth.prototype.m_dateFrom;
 EditPeriodMonth.prototype.m_dateTo;
 EditPeriodMonth.prototype.m_timeFrom;
 EditPeriodMonth.prototype.shiftLengthMS;
+
+EditPeriodMonth.prototype.getDefaulDateFrom = function(){
+	return DateHelper.monthStart();
+}
 
 EditPeriodMonth.prototype.addControls = function(){
 

@@ -141,7 +141,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$mat_model->query('SELECT id,name
 			FROM raw_materials
 			WHERE concrete_part=true
-			ORDER BY id',
+			ORDER BY ord',
 		TRUE);
 		$this->addModel($mat_model);		
 		

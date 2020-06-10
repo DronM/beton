@@ -468,6 +468,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$date_from = Beton::shiftStart($dt);
 		$date_to = Beton::shiftEnd($date_from);
 		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		$date_to_for_db = "'".date('Y-m-d',$date_to)."'";
 		
 		$db_link = $this->getDbLink();
 		
@@ -492,6 +493,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		//Vehicles		
 		$this->addModel(VehicleSchedule_Controller::getMakeListModel($db_link,$date_for_db));
+
+		//OperatorList	
+		Shipment_Controller::addOperatorModels($this,$date_for_db,$date_to_for_db);	
 		
 		//weather
 		//$this->addModel(Weather_Controller::getCurrentModel($db_link,$this->getDbLinkMaster()));
@@ -601,6 +605,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$this->getExtDbVal($pm,'id')
 		));	
 	}	
+	
+	public function get_list_for_client($pm){	
+		$this->modelGetList(new OrderForClientList_Model($this->getDbLink()),$pm);
+	}
 	
 }
 <![CDATA[?>]]>

@@ -2,9 +2,30 @@
  *	Andrey Mikhalevich, Katren ltd.
  */
 function OperatorList_View(id,options){	
-
+	
+	options.templateOptions = options.templateOptions || {};
+	options.templateOptions.showPeriod = (!options.fromLabList && CommonHelper.inArray(window.getApp().getServVar("role_id"),["operator","dispatcher"])==-1);
+	
 	OperatorList_View.superclass.constructor.call(this,id,options);
-
+	
+	//Для оператора - только текущая смена, для все остальных - можно шагазть по сменам	
+	if(options.templateOptions.showPeriod){
+		var cur = DateHelper.time();		
+		var per_select = new EditPeriodShift(id+":date_filter",{
+			"template":window.getApp().getTemplate( ((window.getWidthType()=="sm")? "EditPeriodShiftSM":"EditPeriodShift") ),
+			"dateFrom":(new Date(cur.getFullYear(),cur.getMonth(),cur.getDate())),
+			"onChange":function(dateTime){
+				var gr = self.getElement("grid");
+				gr.getReadPublicMethod().setFieldValue("date",dateTime);
+				window.setGlobalWait(true);
+				gr.onRefresh(function(){
+					window.setGlobalWait(false);
+				});
+			}
+		});
+		this.addElement(per_select);	
+	}
+		
 	var model = options.models.OperatorList_Model;
 	this.m_totModel = options.models.OperatorTotals_Model;
 	this.m_prodSiteModel = options.models.OperatorProductionSite_Model;
@@ -12,7 +33,7 @@ function OperatorList_View(id,options){
 	
 	var constants = {"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
-	
+		
 	var self = this;
 	var elements = [
 		new GridCellHead(id+":grid:head:production_id",{
@@ -246,7 +267,8 @@ function OperatorList_View(id,options){
 	];
 	
 	
-	if(window.getApp().getServVar("role_id")!="operator"){
+	var role = window.getApp().getServVar("role_id");
+	if(role!="operator"){
 		elements.push(
 			new GridCellHead(id+":grid:head:ship_norm_min",{
 				"value":"Норма отгр.",
@@ -314,28 +336,30 @@ function OperatorList_View(id,options){
 		
 	}
 
-	elements.push(
-		new GridCellHead(id+":grid:head:sys",{
-			"value":"...",
-			"columns":[
-				new GridColumn({
-					"id":"sys",
-					"cellElements":[
-						{"elementClass":ButtonCtrl,
-						"elementOptions":{
-								"title":"Отгрузить",
-								"glyph":"glyphicon-send",
-								"onClick":function(){
-									self.setShipped(this);
-								}						
+	if(role=="operator"||role=="owner"||role=="boss"){
+		elements.push(
+			new GridCellHead(id+":grid:head:sys",{
+				"value":"...",
+				"columns":[
+					new GridColumn({
+						"id":"sys",
+						"cellElements":[
+							{"elementClass":ButtonCtrl,
+							"elementOptions":{
+									"title":"Отгрузить",
+									"glyph":"glyphicon-send",
+									"onClick":function(){
+										self.setShipped(this);
+									}						
+								}
 							}
-						}
-						,{"elementClass":PrintInvoiceBtn}
-					]
-				})
-			]
-		})		
-	);
+							,{"elementClass":PrintInvoiceBtn}
+						]
+					})
+				]
+			})		
+		);
+	}
 	
 	var grid = new GridAjx(id+":grid",{
 		"className":"table-bordered table-responsive table-make_order",
@@ -391,9 +415,9 @@ function OperatorList_View(id,options){
 		}),		
 		"pagination":null,		
 		"autoRefresh":false,
-		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
+		"refreshInterval":options.fromLabList? null:constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
-		"focus":true,
+		"focus":!options.fromLabList,
 		"navigate":false,
 		"navigateClick":false
 	});	

@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
  
 class ConcreteType_Model extends ModelSQLBeton{
@@ -86,6 +87,17 @@ class ConcreteType_Model extends ModelSQLBeton{
 						
 		$f_price=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price",$f_opts);
 		$this->addField($f_price);
+		//********************
+		
+		//*** Field material_cons_rates ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Есть нормы расхода';
+		$f_opts['defaultValue']='TRUE';
+		$f_opts['id']="material_cons_rates";
+						
+		$f_material_cons_rates=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_cons_rates",$f_opts);
+		$this->addField($f_material_cons_rates);
 		//********************
 	
 		$order = new ModelOrderSQL();		

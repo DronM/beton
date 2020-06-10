@@ -429,6 +429,32 @@ class RawMaterial_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('get_material_cons_tolerance_violation_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('templ',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('inline',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}
 	public function get_list_for_concrete($pm){		
@@ -474,8 +500,18 @@ class RawMaterial_Controller extends ControllerSQL{
 		
 		$xml = new SimpleXMLElement($docs_str);
 		try{
+			$cement_silos_ids = [];
+			$material_ids = [];
+			$supplier_ids = [];
+			$carrier_ids = [];
+			
 			$doc_cnt=0;
 			foreach ($xml->doc as $doc) {
+			
+				if(!isset($doc->material)){
+					continue;
+				}
+				
 				$doc_cnt++;
 				//supplier
 				$sup_params = new ParamsSQL($pm,$link);				
@@ -483,92 +519,140 @@ class RawMaterial_Controller extends ControllerSQL{
 				$sup_params->add('supplier_name',DT_STRING,$doc->supplier_name);
 				$sup_params->add('supplier_name_full',DT_STRING,$doc->supplier_name_full);				
 				
-				$supplier_ar = $link->query_first(
-				sprintf(
-				"SELECT id FROM suppliers
-				WHERE ext_ref_scales=%s",
-				$sup_params->getParamById('supplier_ref')));
+				$supplier_name_db = $sup_params->getParamById('supplier_name');
+				$supplier_name_full_db = $sup_params->getParamById('supplier_name_full');
+				$supplier_ref_db = $sup_params->getParamById('supplier_ref');
 				
-				if (!is_array($supplier_ar)|| count($supplier_ar)==0){
-					//new supplier
-					$supplier_ar=$link_master->query_first(sprintf("INSERT INTO suppliers
-					(name,name_full,ext_ref_scales)
-					VALUES (%s,%s,%s) RETURNING id",
-					$sup_params->getParamById('supplier_name'),
-					$sup_params->getParamById('supplier_name_full'),
-					$sup_params->getParamById('supplier_ref')));
+				if(isset($supplier_ids[$supplier_name_db])){
+					$supplier_id = $supplier_ids[$supplier_name_db];
 				}
 				else{
-					$link_master->query(sprintf(
-					"UPDATE suppliers
-					SET name=%s,name_full=%s
-					WHERE ext_ref_scales=%s",
-					$sup_params->getParamById('supplier_name'),
-					$sup_params->getParamById('supplier_name_full'),
-					$sup_params->getParamById('supplier_ref')));
-				}
+					$supplier_ar = $link->query_first(sprintf(
+						"SELECT id,name,name_full
+						FROM suppliers
+						WHERE ext_ref_scales=%s",
+						$supplier_ref_db
+					));
 				
+					if (!is_array($supplier_ar)|| count($supplier_ar)==0){
+						//new supplier
+						$supplier_ar = $link_master->query_first(sprintf(
+							"INSERT INTO suppliers
+							(name,name_full,ext_ref_scales)
+							VALUES (%s,%s,%s) RETURNING id",
+							$supplier_name_db,
+							$supplier_name_full_db,
+							$supplier_ref_db
+						));						
+					}
+					else if($supplier_name_db!=$supplier_ar['name'] || $supplier_name_full_db!=$supplier_ar['name_full']){
+						$link_master->query(sprintf(
+							"UPDATE suppliers
+							SET name=%s,name_full=%s
+							WHERE ext_ref_scales=%s",
+							$supplier_name_db,
+							$supplier_name_full_db,
+							$supplier_ref_db
+						));
+					}
+					$supplier_id = $supplier_ar['id'];
+					$supplier_ids[$supplier_name_db] = $supplier_id;
+				}
+								
 				//carrier
 				$car_params = new ParamsSQL($pm,$link);
 				$car_params->add('carrier_ref',DT_STRING,$doc->carrier_ref);
 				$car_params->add('carrier_name',DT_STRING,$doc->carrier_name);
 				$car_params->add('carrier_name_full',DT_STRING,$doc->carrier_name_full);				
 				
-				$carrier_ar = $link->query_first(
-				sprintf(
-				"SELECT id FROM suppliers
-				WHERE ext_ref_scales=%s",
-				$car_params->getParamById('carrier_ref')));
+				$carrier_name_db = $car_params->getParamById('carrier_name');
+				$carrier_name_full_db = $car_params->getParamById('carrier_name_full');
+				$carrier_ref_db = $car_params->getParamById('carrier_ref');
 				
-				if (!is_array($carrier_ar)|| count($carrier_ar)==0){
-					//new carrier
-					$carrier_ar=$link_master->query_first(sprintf("INSERT INTO suppliers
-					(name,name_full,ext_ref_scales)
-					VALUES (%s,%s,%s) RETURNING id",
-					$car_params->getParamById('carrier_name'),
-					$car_params->getParamById('carrier_name_full'),
-					$car_params->getParamById('carrier_ref')));
+				if(isset($carrier_ids[$carrier_name_db])){
+					$carrier_id = $carrier_ids[$carrier_name_db];
 				}
 				else{
-					$link_master->query(sprintf(
-					"UPDATE suppliers
-					SET name=%s,name_full=%s
-					WHERE ext_ref_scales=%s",
-					$car_params->getParamById('carrier_name'),
-					$car_params->getParamById('carrier_name_full'),
-					$car_params->getParamById('carrier_ref')));
-				}
+					$carrier_ar = $link->query_first(sprintf(
+						"SELECT id,name,name_full
+						FROM suppliers
+						WHERE ext_ref_scales=%s",
+						$carrier_ref_db
+					));
 				
+					if (!is_array($carrier_ar) || count($carrier_ar)==0){
+						//new carrier
+						$carrier_ar = $link_master->query_first(sprintf(
+							"INSERT INTO suppliers
+							(name,name_full,ext_ref_scales)
+							VALUES (%s,%s,%s)
+							RETURNING id",
+							$carrier_name_db,
+							$carrier_name_full_db,
+							$carrier_ref_db
+						));
+					}
+					else if($carrier_name_db!=$carrier_ar['name'] || $carrier_name_full_db!=$carrier_ar['name_full']){
+						$link_master->query(sprintf(
+							"UPDATE suppliers
+							SET name=%s,name_full=%s
+							WHERE ext_ref_scales=%s",
+							$carrier_name_db,
+							$carrier_name_full_db,
+							$carrier_ref_db
+						));
+					}
+					$carrier_id = $carrier_ar['id'];
+					$carrier_ids[$carrier_name_db] = $carrier_id;
+				}
+								
 				//material
 				$mat_params = new ParamsSQL($pm,$link);				
 				$mat_params->add('material',DT_STRING,$doc->material);				
-				$material_ar = $link->query_first(
-				sprintf(
-				"SELECT id FROM raw_materials
-				WHERE name=%s",
-				$mat_params->getParamById('material')));
-				if (!is_array($material_ar)|| count($material_ar)==0){
-					//new material
-					$material_ar=$link_master->query_first(sprintf(
-					"INSERT INTO raw_materials (name)
-					VALUES (%s) RETURNING id",
-					$mat_params->getParamById('material')));
+				$material_db = $mat_params->getParamById('material');
+				if(isset($material_ids[$material_db])){
+					$material_id = $material_ids[$material_db];
+				}
+				else{
+					$material_ar = $link->query_first(sprintf(
+						"SELECT id FROM raw_materials
+						WHERE name=%s",
+						$material_db
+					));
+					if (!is_array($material_ar)|| count($material_ar)==0){
+						//new material
+						$material_ar=$link_master->query_first(sprintf(
+							"INSERT INTO raw_materials (name)
+							VALUES (%s) RETURNING id",
+							$material_db
+						));
+					}
+					$material_id = $material_ar['id'];
+					$material_ids[$material_db] = $material_id;					
 				}
 				
 				//silo
+				$store = "NULL";
 				$cement_silos_id = "NULL";
-				if(isset($doc->silo_name)){
+				if(isset($doc->silo_name)){				
 					$silo_params = new ParamsSQL($pm,$link);				
 					$silo_params->add('silo_name',DT_STRING,$doc->silo_name);
-					$silo_ar = $link->query_first(
-						sprintf("SELECT id
-							FROM cement_silos
-							WHERE weigh_app_name=%s",
-							$silo_params->getParamById('silo_name')
-						)
-					);
-					if(is_array($silo_ar) && count($silo_ar) && $silo_ar['id']){
-						$cement_silos_id = $silo_ar['id'];
+					$store = $silo_params->getParamById('silo_name');
+					if(isset($cement_silos_ids[$store])){
+						$cement_silos_id = $cement_silos_ids[$store];
+					}
+					else{
+						$silo_ar = $link->query_first(
+							sprintf("SELECT id
+								FROM cement_silos
+								WHERE weigh_app_name=%s",
+								$store
+							)
+						);
+						if(is_array($silo_ar) && count($silo_ar) && $silo_ar['id']){
+							$cement_silos_id = $silo_ar['id'];
+							$cement_silos_ids[$store] = $cement_silos_id;
+						}					
 					}
 				}
 				
@@ -586,8 +670,9 @@ class RawMaterial_Controller extends ControllerSQL{
 				$doc_params->add('quant_gross',DT_STRING,$quant_gross);
 				$doc_params->add('quant_net',DT_STRING,$quant_net);
 				$doc_ar = $link->query_first(sprintf(
-				"SELECT id FROM doc_material_procurements WHERE doc_ref=%s",
-				$doc_params->getParamById('doc_ref')));
+					"SELECT id FROM doc_material_procurements WHERE doc_ref=%s",
+					$doc_params->getParamById('doc_ref')
+				));
 				if (!is_array($doc_ar)|| count($doc_ar)==0){
 					//new doc
 					$link_master->query_first(sprintf(
@@ -598,23 +683,25 @@ class RawMaterial_Controller extends ControllerSQL{
 						supplier_id,
 						carrier_id,
 						cement_silos_id,
+						store,
 						driver,
 						vehicle_plate,
 						material_id,
 						quant_gross,
 						quant_net
 					)
-					VALUES (%s,%s,%s,%d,%d,%s,%s,%s,%d,%f,%f)
+					VALUES (%s,%s,%s,%d,%d,%s,%s,%s,%s,%d,%f,%f)
 					RETURNING id",
 					$doc_params->getParamById('date_time'),
 					$doc_params->getParamById('number'),
 					$doc_params->getParamById('doc_ref'),
-					$supplier_ar['id'],
-					$carrier_ar['id'],
+					$supplier_id,
+					$carrier_id,
 					$cement_silos_id,
+					$store,
 					$doc_params->getParamById('driver'),
 					$doc_params->getParamById('vehicle_plate'),
-					$material_ar['id'],
+					$material_id,
 					$quant_gross,
 					$quant_net
 					));
@@ -629,16 +716,18 @@ class RawMaterial_Controller extends ControllerSQL{
 						vehicle_plate=%s,
 						material_id=%d,
 						cement_silos_id=%s,
+						store=%s,
 						quant_gross=%f,quant_net=%f
 					WHERE id=%d",
 					$doc_params->getParamById('date_time'),
 					$doc_params->getParamById('number'),
-					$supplier_ar['id'],
-					$carrier_ar['id'],
+					$supplier_id,
+					$carrier_id,
 					$doc_params->getParamById('driver'),
 					$doc_params->getParamById('vehicle_plate'),
-					$material_ar['id'],
+					$material_id,
 					$cement_silos_id,
+					$store,
 					$quant_gross,
 					$quant_net,
 					$doc_ar['id']
@@ -652,11 +741,12 @@ class RawMaterial_Controller extends ControllerSQL{
 			$descr = "'".str_replace("'",'"',$e->getMessage())."'";
 		}
 		$link_master->query("DELETE FROM raw_material_procur_uploads");
-		$link_master->query(
-			sprintf("INSERT INTO raw_material_procur_uploads
+		$link_master->query(sprintf(
+			"INSERT INTO raw_material_procur_uploads
 			(date_time,result,descr,doc_count)
 			VALUES ('%s',%s,%s,%d)",
-			date('Y-m-d H:i:s'),$res,$descr,$doc_cnt));
+			date('Y-m-d H:i:s'),$res,$descr,$doc_cnt
+		));
 		if ($res == 'false'){
 			throw $e;
 		}
@@ -929,5 +1019,26 @@ class RawMaterial_Controller extends ControllerSQL{
 		);		
 		
 	}
+	
+	public function get_material_cons_tolerance_violation_list($pm){
+		$cond = new ConditionParamsSQL($pm,$this->getDbLink());
+		$dt_from = $cond->getDbVal('date_time','ge',DT_DATETIME);
+		if (!isset($dt_from)){
+			throw new Exception('Не задана дата начала!');
+		}		
+		$dt_to = $cond->getDbVal('date_time','le',DT_DATETIME);
+		if (!isset($dt_to)){
+			throw new Exception('Не задана дата окончания!');
+		}		
+	
+		$this->addNewModel(
+			sprintf("SELECT * FROM material_cons_tolerance_violation_list WHERE date_time BETWEEN %s AND %s",
+				$dt_from,
+				$dt_to
+			),
+			"MaterialConsToleranceViolationList_Model"
+		);
+	}
+	
 }
 ?>

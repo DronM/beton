@@ -87,6 +87,16 @@ function ConcreteType_Model(options){
 	options.fields.price = new FieldFloat("price",filed_options);
 	options.fields.price.getValidator().setMaxLength('15');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	filed_options.alias = 'Есть нормы расхода';
+	filed_options.autoInc = false;	
+	
+	options.fields.material_cons_rates = new FieldBool("material_cons_rates",filed_options);
+	
 			
 		ConcreteType_Model.superclass.constructor.call(this,id,options);
 }

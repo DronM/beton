@@ -16,11 +16,15 @@ CREATE OR REPLACE VIEW public.clients_dialog AS
 		users_ref(u) AS users_ref,
 		
 		cl.inn
+		,users_ref(acc) AS accounts_ref
+		,cl.account_from_date
 		
 	FROM clients cl
 	LEFT JOIN client_types ct ON ct.id = cl.client_type_id
 	LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
-	LEFT JOIN users u ON u.id = cl.manager_id;
+	LEFT JOIN users u ON u.id = cl.manager_id
+	LEFT JOIN users acc ON acc.id = cl.user_id
+	;
 
 ALTER TABLE public.clients_dialog
   OWNER TO beton;

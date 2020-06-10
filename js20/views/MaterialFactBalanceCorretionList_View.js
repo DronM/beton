@@ -56,23 +56,7 @@ function MaterialFactBalanceCorretionList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						,new GridCellHead(id+":grid:head:date_time",{
-							"value":"Дата",
-							"columns":[
-								new GridColumnDateTime({
-									"field":model.getField("date_time"),
-									"dateFormat":"d/m/y H:i",									
-									"searchOptions":{
-										"field":new FieldDate("date_time"),
-										"searchType":"on_beg",
-										"ctrlClass":EditDate
-									}
-								})
-							],
-							"sortable":true,
-							"sort":"desc"
-						})
-						,new GridCellHead(id+":grid:head:balance_date_time",{
+						new GridCellHead(id+":grid:head:balance_date_time",{
 							"value":"Дата остатка",
 							"columns":[
 								new GridColumnDateTime({
@@ -87,7 +71,7 @@ function MaterialFactBalanceCorretionList_View(id,options){
 							],
 							"sortable":true
 						})
-					
+										
 						,new GridCellHead(id+":grid:head:materials_ref",{
 							"value":"Материал",
 							"columns":[
@@ -106,6 +90,42 @@ function MaterialFactBalanceCorretionList_View(id,options){
 							],
 							"sortable":true
 						})					
+						,new GridCellHead(id+":grid:head:required_balance_quant",{
+							"value":"Кол-во фактич.",
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("required_balance_quant"),
+									"length":"19",
+									"precision":"4"
+								})
+							]
+						})
+						/*
+						,new GridCellHead(id+":grid:head:comment_text",{
+							"value":"Комментарий",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("comment_text")
+								})
+							]
+						})
+						*/
+						,new GridCellHead(id+":grid:head:date_time",{
+							"value":"Дата корректировки",
+							"columns":[
+								new GridColumnDateTime({
+									"field":model.getField("date_time"),
+									"dateFormat":"d/m/y H:i",									
+									"searchOptions":{
+										"field":new FieldDate("date_time"),
+										"searchType":"on_beg",
+										"ctrlClass":EditDate
+									}
+								})
+							],
+							"sortable":true,
+							"sort":"desc"
+						})
 						,new GridCellHead(id+":grid:head:users_ref",{
 							"value":"Пользователь",
 							"columns":[
@@ -125,24 +145,6 @@ function MaterialFactBalanceCorretionList_View(id,options){
 								})
 							],
 							"sortable":true
-						})
-						,new GridCellHead(id+":grid:head:required_balance_quant",{
-							"value":"Желаемое количество",
-							"columns":[
-								new GridColumnFloat({
-									"field":model.getField("required_balance_quant"),
-									"length":"19",
-									"precision":"4"
-								})
-							]
-						})
-						,new GridCellHead(id+":grid:head:comment_text",{
-							"value":"Комментарий",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("comment_text")
-								})
-							]
 						})
 						
 					]

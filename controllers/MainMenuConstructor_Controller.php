@@ -33,7 +33,7 @@ class MainMenuConstructor_Controller extends ControllerSQL{
 		/* insert */
 		$pm = new PublicMethod('insert');
 		
-				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner'
+				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
 		$param = new FieldExtInt('user_id'
@@ -65,7 +65,7 @@ class MainMenuConstructor_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner'
+				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client'
 				,array(
 			));
 			$pm->addParam($param);

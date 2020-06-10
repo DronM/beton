@@ -28,6 +28,8 @@ function ProductionMaterialList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagination = null,refresh_int = 0;
 	
+	var show_comment = (CommonHelper.inArray(window.getApp().getServVar("role_id"),["operator","dispatcher"])==-1);
+	
 	if(!options.detailFilters){
 		var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 		window.getApp().getConstantManager().get(constants);	
@@ -107,6 +109,34 @@ function ProductionMaterialList_View(id,options){
 					opts.className = "factQuantViolation";
 					opts.title="Отклонение вышло за допустимые пределы";
 				}
+			}
+			else if(opts.gridColumn.getId()=="production_comment"){
+				opts.className = "quant_editable";
+				opts.attrs = opts.attrs || {};
+				var el = opts.fields.production_comment? opts.fields.production_comment.getValue():null;
+				if(el){
+					opts.attrs.title = "Добавлено:"+DateHelper.format(DateHelper.strtotime(el.date_time),"d/m/y H:i");
+				}
+				
+				
+				opts.events = opts.event || {};
+				opts.events.dblclick = (function(thisForm){
+					return function(e){
+						if(thisForm.m_editMode)return;
+						var grid = thisForm.getElement("grid");
+						var row = DOMHelper.getParentByTagName(e.target,"TR");
+						if(row){							
+							grid.setModelToCurrentRow(row);
+							thisForm.onEditComment(grid.getModel().getFields());
+						}
+						if (e.preventDefault){
+							e.preventDefault();
+						}
+						e.stopPropagation();
+						return false;						
+					}
+				})(self);
+			
 			}
 		},
 		"head":new GridHead(id+"-grid:head",{
@@ -220,6 +250,19 @@ function ProductionMaterialList_View(id,options){
 								})
 							]
 						})
+						,show_comment? new GridCellHead(id+":grid:head:production_comment",{
+							"value":"Комментарий",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("production_comment"),
+									"formatFunction":function(fields){
+										var el = fields.production_comment? fields.production_comment.getValue():null;
+										var res = el? el.comment_text:"";
+										return res;
+									}
+								})
+							]
+						}):null
 						
 					]
 				})
@@ -236,6 +279,21 @@ function ProductionMaterialList_View(id,options){
 }
 extend(ProductionMaterialList_View,ViewAjxList);
 
+ProductionMaterialList_View.prototype.setCommentOnServer = function(newValues,fieldValues){
+	var self = this;
+	var pm = (new ProductionComment_Controller()).getPublicMethod("insert");	
+	pm.setFieldValue("production_site_id",fieldValues.production_site_id);
+	pm.setFieldValue("material_id",fieldValues.material_id);
+	pm.setFieldValue("production_id",fieldValues.production_id);
+	pm.setFieldValue("comment_text",newValues.comment_text);
+	pm.run({
+		"ok":function(){
+			window.showTempNote(fieldValues.material_descr+": установлен комментарий",null,5000);				
+			self.closeForm();
+			self.getElement("grid").onRefresh();
+		}
+	})	
+}
 
 ProductionMaterialList_View.prototype.setCorrectionOnServer = function(newValues,fieldValues){
 	var self = this;
@@ -251,7 +309,7 @@ ProductionMaterialList_View.prototype.setCorrectionOnServer = function(newValues
 	pm.run({
 		"ok":function(){
 			window.showTempNote(fieldValues.material_descr+": откорректирован фактический расход по материалу",null,5000);				
-			self.closeCorrection();
+			self.closeForm();
 			self.getElement("grid").onRefresh();
 		}
 	})	
@@ -283,14 +341,16 @@ ProductionMaterialList_View.prototype.onEditCons = function(fields){
 		"cmdOk":true,
 		"contentHead":"Корректировка фактического расхода "+fields.materials_ref.getValue().getDescr(),
 		"onClickCancel":function(){
-			self.closeCorrection();
+			self.closeForm();
 		},
 		"onClickOk":function(){
 			var res = self.m_view.getValueJSON();
-			/*if(!res||!res.comment_text||!res.comment_text.length){
-				throw new Error("Не указан комментарий корректировки!");
-			}*/
-			self.setCorrectionOnServer(res,self.m_view.fieldValues);
+			if(!res||!res.quant){
+				self.closeForm();
+			}
+			else{
+				self.setCorrectionOnServer(res,self.m_view.fieldValues);
+			}
 		}
 	});
 	this.m_view.fieldValues = {
@@ -298,6 +358,7 @@ ProductionMaterialList_View.prototype.onEditCons = function(fields){
 		"production_site_id":fields.production_site_id.getValue(),
 		"production_id":fields.production_id.getValue(),
 		"material_id":fields.material_id.getValue(),
+		"cement_silo_id":fields.cement_silo_id.getValue(),
 		"material_quant":fields.material_quant.getValue()
 	}
 	
@@ -305,8 +366,54 @@ ProductionMaterialList_View.prototype.onEditCons = function(fields){
 	
 }
 
+ProductionMaterialList_View.prototype.onEditComment = function(fields){
 
-ProductionMaterialList_View.prototype.closeCorrection = function(){
+	this.m_editMode = true;
+	var el = fields.production_comment? fields.production_comment.getValue():null;
+	var comment_text = el? el.comment_text:"";
+	
+	var self = this;
+	this.m_view = new EditJSON("Comment:cont",{
+		"elements":[
+			new EditText("Comment:cont:comment_text",{
+				"labelCaption":"Комментарий:",
+				"rows":3,
+				"value":comment_text,
+				"focus":true
+			})
+		]
+	});
+	this.m_form = new WindowFormModalBS("Comment",{
+		"content":this.m_view,
+		"cmdCancel":true,
+		"cmdOk":true,
+		"contentHead":"Комментарий по материалу: "+fields.materials_ref.getValue().getDescr(),
+		"onClickCancel":function(){
+			self.closeForm();
+		},
+		"onClickOk":function(){
+			var res = self.m_view.getValueJSON();
+			if(!res||!res.comment_text.length){
+				self.closeForm();
+			}
+			else{
+				self.setCommentOnServer(res,self.m_view.fieldValues);
+			}
+		}
+	});
+	this.m_view.fieldValues = {
+		"material_descr":fields.materials_ref.getValue().getDescr(),
+		"production_site_id":fields.production_site_id.getValue(),
+		"production_id":fields.production_id.getValue(),
+		"material_id":fields.material_id.getValue()
+	}
+	
+	this.m_form.open();
+	
+}
+
+
+ProductionMaterialList_View.prototype.closeForm = function(){
 	this.m_view.delDOM()
 	this.m_form.delDOM();
 	delete this.m_view;

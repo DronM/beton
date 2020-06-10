@@ -58,37 +58,79 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$this->getExtDbVal($pm,'material_fact_consumption_id')
 		));
 		*/
+						
+		$this->getDbLinkMaster()->query('BEGIN');
+		try{
+			$silo_set = ($pm->getParamValue('cement_silo_id')&amp;&amp;$pm->getParamValue('cement_silo_id')!='null');
+			
+			$ar = $this->getDbLinkMaster()->query_first(sprintf(
+				"SELECT id FROM material_fact_consumption_corrections
+				WHERE
+					production_site_id=%d
+					AND elkon_id=0
+					AND material_id=%d
+					AND cement_silo_id %s
+					AND production_id=%d"
+				,$this->getExtDbVal($pm,'production_site_id')
+				,$this->getExtDbVal($pm,'material_id')
+				,$silo_set? '='.$this->getExtDbVal($pm,'cement_silo_id'):' IS NULL'
+				,$this->getExtDbVal($pm,'production_id')
+			));
 		
-		$this->getDbLinkMaster()->query(sprintf(
-			"INSERT INTO material_fact_consumption_corrections
-			(production_site_id,
-			date_time,
-			user_id,
-			material_id,
-			cement_silo_id,
-			production_id,
-			quant,
-			comment_text
-			)
-			VALUES(
-			%d,
-			now(),
-			%d,
-			%d,
-			%s,
-			%d,
-			%f,
-			%s
-			)",
-		$this->getExtDbVal($pm,'production_site_id'),
-		$_SESSION['user_id'],
-		$this->getExtDbVal($pm,'material_id'),
-		$pm->getParamValue('cement_silo_id')? $this->getExtDbVal($pm,'cement_silo_id'):'NULL',
-		$this->getExtDbVal($pm,'production_id'),
-		$this->getExtDbVal($pm,'cor_quant'),
-		$this->getExtDbVal($pm,'comment_text')
-		));
+			if(!is_array($ar) || !count($ar) || !isset($ar['id'])){
+				$this->getDbLinkMaster()->query(sprintf(
+					"INSERT INTO material_fact_consumption_corrections
+					(production_site_id,
+					elkon_id,
+					date_time,
+					user_id,
+					material_id,
+					cement_silo_id,
+					production_id,
+					quant,
+					comment_text
+					)
+					VALUES(
+					%d,
+					0,
+					now(),
+					%d,
+					%d,
+					%s,
+					%d,
+					%f,
+					%s
+					)",
+				$this->getExtDbVal($pm,'production_site_id'),
+				$_SESSION['user_id'],
+				$this->getExtDbVal($pm,'material_id'),
+				$silo_set? $this->getExtDbVal($pm,'cement_silo_id'):'NULL',
+				$this->getExtDbVal($pm,'production_id'),
+				$this->getExtDbVal($pm,'cor_quant'),
+				$this->getExtDbVal($pm,'comment_text')
+				));
+			}
+			else{
+				//update
+				$this->getDbLinkMaster()->query(sprintf(
+					"UPDATE material_fact_consumption_corrections SET
+						quant = %f,
+						comment_text = %s
+					WHERE
+						id=%d"
+					,$this->getExtDbVal($pm,'cor_quant')
+					,$this->getExtDbVal($pm,'comment_text')
+					,$ar['id']
+				));
+				
+			}
 		
+			$this->getDbLinkMaster()->query('COMMIT');		
+		}
+		catch (Exception $e){
+			$this->getDbLinkMaster()->query('ROLLBACK');		
+			throw $e;
+		}
 	}
 </xsl:template>
 

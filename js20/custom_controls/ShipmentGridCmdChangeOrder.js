@@ -54,6 +54,7 @@ ShipmentGridCmdChangeOrder.prototype.changeOrder = function(){
 	this.m_grid.setModelToCurrentRow();
 	var f = this.m_grid.getModel().getFields();
 	var id = f.id.getValue();
+	var date_time = f.date_time.getValue();
 	
 	var self = this;
 	WindowQuestion.show({
@@ -63,15 +64,16 @@ ShipmentGridCmdChangeOrder.prototype.changeOrder = function(){
 		"text":"Выбрать новую завку?",
 		"callBack":function(res){
 			if(res==WindowQuestion.RES_YES){
-				self.changeOrderCont(id);
+				self.changeOrderCont(id,date_time);
 			}
 		}
 	});	
 }
 
-ShipmentGridCmdChangeOrder.prototype.changeOrderCont = function(shipmentId){
+ShipmentGridCmdChangeOrder.prototype.changeOrderCont = function(shipmentId,dateTime){
 	var self = this;
 	this.m_view = new OrderForSelectList_View("OrderList:cont",{
+		"dateTime":dateTime,
 		"onSelect":(function(shipmentId){
 			return function(row){
 				self.closeSelect(shipmentId,row.id.getValue());

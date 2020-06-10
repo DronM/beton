@@ -97,6 +97,9 @@ class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
 				'alias'=>'Нетто'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtText('store'
+				,array());
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -189,6 +192,10 @@ class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
 				,array(
 			
 				'alias'=>'Нетто'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtText('store'
+				,array(
 			));
 			$pm->addParam($param);
 		

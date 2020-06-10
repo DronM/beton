@@ -73,6 +73,15 @@ function DOCMaterialProcurementList_View(id,options){
 							],
 							"sortable":true
 						})
+						,new GridCellHead(id+":grid:head:store",{
+							"value":"Место хранения",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("store")
+								})
+							],
+							"sortable":true
+						})
 						
 						,new GridCellHead(id+":grid:head:suppliers_ref",{
 							"value":"Поставщик",

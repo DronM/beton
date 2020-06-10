@@ -11,38 +11,86 @@ function OrderForSelectList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
+	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
+		"field":new FieldDateTime("date_time")
+	});
+	
+	var filters = {
+		"period":{
+			"binding":new CommandBinding({
+				"control":period_ctrl,
+				"field":period_ctrl.getField()
+			}),
+			"bindings":[
+				{"binding":new CommandBinding({
+					"control":period_ctrl.getControlFrom(),
+					"field":period_ctrl.getField()
+					}),
+				"sign":"ge"
+				},
+				{"binding":new CommandBinding({
+					"control":period_ctrl.getControlTo(),
+					"field":period_ctrl.getField()
+					}),
+				"sign":"le"
+				}
+			]
+		}
+	};
 
 	var grid  = new GridAjx(id+":grid",{
 		"model":model,
 		"controller":contr,
 		"editInline":false,
 		"editWinClass":null,
-		"commands":null,
+		/*"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"cmdInsert":false,
+			"cmdEdit":false,
+			"cmdFilter":true,
+			"filters":filters,
+			"variantStorage":options.variantStorage
+		}),*/
+		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"cmdInsert":false,
+			"cmdEdit":false,
+			"cmdAllCommands":false
+		}),
 		"popUpMenu":null,
 		"onSelect":options.onSelect,
 		"filters":[
 			{
 			"field":"date_time"
 			,"sign":"ge"
-			,"val":DateHelper.format(DateHelper.getStartOfShift(),"Y-m-d H:i:s")
+			,"val":DateHelper.format(DateHelper.getStartOfShift(options.dateTime),"Y-m-d H:i:s")
 			}			
 			,{
 			"field":"date_time"
 			,"sign":"le"
-			,"val":DateHelper.format(DateHelper.getEndOfShift(),"Y-m-d H:i:s")
+			,"val":DateHelper.format(DateHelper.getEndOfShift(options.dateTime),"Y-m-d H:i:s")
 			}			
 			
 		],
-		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
-			"cmdInsert":false,
-			"cmdEdit":false,
-			"cmdAllCommands":false
-		}),
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:number",{
+						new GridCellHead(id+":grid:head:date_time",{
+							"value":"Дата",
+							"colAttrs":{"align":"center"},
+							"columns":[
+								new GridColumnDate({
+									"field":model.getField("date_time"),
+									"ctrlClass":EditDate,
+									"searchOptions":{
+										"field":new FieldDate("date_time"),
+										"searchType":"on_beg"
+									}
+									
+								})
+							],
+							"sortable":true
+						})
+						,new GridCellHead(id+":grid:head:number",{
 							"value":"Номер",
 							"colAttrs":{"align":"center"},
 							"columns":[

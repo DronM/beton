@@ -81,7 +81,7 @@ function ShipmentForClientVehOwnerList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
-		"model":model,
+		"model":model,		
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_list_for_client_veh_owner"),
 		"editInline":false,

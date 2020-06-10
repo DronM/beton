@@ -9,7 +9,6 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ConcreteCostList_Model extends ModelSQLBeton{
@@ -30,12 +29,12 @@ class ConcreteCostList_Model extends ModelSQLBeton{
 		$this->addField($f_id);
 		//********************
 		
-		//*** Field date ***
+		//*** Field concrete_costs_h_id ***
 		$f_opts = array();
-		$f_opts['id']="date";
+		$f_opts['id']="concrete_costs_h_id";
 						
-		$f_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date",$f_opts);
-		$this->addField($f_date);
+		$f_concrete_costs_h_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_costs_h_id",$f_opts);
+		$this->addField($f_concrete_costs_h_id);
 		//********************
 		
 		//*** Field concrete_types_ref ***

@@ -44,6 +44,8 @@ function EnumGridColumn_role_types(options){
 
 	options.multyLangValues["ru"]["vehicle_owner"] = "Владелец траспорта";
 
+	options.multyLangValues["ru"]["client"] = "Контрагент";
+
 	
 	options.ctrlClass = options.ctrlClass || Enum_role_types;
 	options.searchOptions = options.searchOptions || {};

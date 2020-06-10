@@ -1,0 +1,44 @@
+<table id={{id}} class="table table-bordered table-responsive table-striped">
+	<thead>
+		<tr>
+			<td rowspan="2">Смена
+			</td>
+			{{#materials}}
+			<td colspan="4">{{material_descr}}
+			</td>
+			{{/materials}}	
+		</tr>
+		<tr>
+			{{#materials}}
+			<td>Расход нормативный
+			</td>
+			<td>Расход фактический
+			</td>
+			<td>Отклонение (+пересыпали, -недосыпали)
+			</td>
+			<td>% отклонение
+			</td>			
+			{{/materials}}	
+		</tr>
+		
+	</thead>
+	
+	<tbody>
+		{{#dates}}
+		<tr>
+			<td>{{date_descr}}
+			</td>
+			{{#materials}}
+			<td align="right">{{norm_quant}}
+			</td>
+			<td align="right">{{fact_quant}}
+			</td>
+			<td align="right">{{diff_quant}}
+			</td>
+			<td align="right">{{diff_percent}}
+			</td>			
+			{{/materials}}	
+		</tr>
+		{{/dates}}
+	</tbody>
+</table>

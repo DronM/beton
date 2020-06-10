@@ -19,7 +19,8 @@ CREATE OR REPLACE VIEW doc_material_procurements_list AS
 	doc.driver,
 	doc.vehicle_plate,
 	doc.quant_gross,
-	doc.quant_net
+	doc.quant_net,
+	store
    FROM doc_material_procurements doc
      LEFT JOIN suppliers sup ON sup.id = doc.supplier_id
      LEFT JOIN suppliers car ON car.id = doc.carrier_id

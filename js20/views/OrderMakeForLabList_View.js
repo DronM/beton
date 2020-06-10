@@ -46,10 +46,12 @@ function OrderMakeForLabList_View(id,options){
 			"template":window.getApp().getTemplate( ((window.getWidthType()=="sm")? "EditPeriodShiftSM":"EditPeriodShift") ),
 			"dateFrom":init_dt,
 			"onChange":function(dateTime){
+				self.enableRefreshing(false);
 				self.m_refreshMethod.setFieldValue("date",dateTime);
 				window.setGlobalWait(true);
 				self.refresh(function(){
 					window.setGlobalWait(false);
+					self.enableRefreshing(true);
 				});
 			}
 		});
@@ -237,6 +239,15 @@ function OrderMakeForLabList_View(id,options){
 			"focus":false
 		}));
 		
+		//Форма оператора
+		
+		this.addElement(
+			new OperatorList_View(id+":OperatorList_View",{
+				"models":options.models,
+				"fromLabList":true
+			})
+		);
+				
 	}
 	
 	
@@ -289,6 +300,9 @@ OrderMakeForLabList_View.prototype.refresh = function(callBack){
 			var grid = self.getElement("veh_schedule_grid");
 			grid.getModel().setData(resp.getModelData("VehicleScheduleMakeOrderList_Model"));
 			grid.onGetData();
+
+			//operator list
+			self.getElement("OperatorList_View").getElement("grid").onGetData(resp);
 
 			if(callBack){
 				callBack();

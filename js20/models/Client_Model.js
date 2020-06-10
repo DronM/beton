@@ -139,6 +139,25 @@ function Client_Model(options){
 	options.fields.inn = new FieldString("inn",filed_options);
 	options.fields.inn.getValidator().setMaxLength('12');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Аккаунт';
+	filed_options.autoInc = false;	
+	
+	options.fields.user_id = new FieldInt("user_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата начала выборки данных';
+	filed_options.autoInc = false;	
+	
+	options.fields.account_from_date = new FieldDate("account_from_date",filed_options);
+	
+			
 			
 			
 		Client_Model.superclass.constructor.call(this,id,options);

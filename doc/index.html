@@ -20,6 +20,7 @@
 <li><a href="#CementSiloBalanceReset_Controller">CementSiloBalanceReset_Controller</a></li>
 <li><a href="#Client_Controller">Client_Controller</a></li>
 <li><a href="#ClientComeFrom_Controller">ClientComeFrom_Controller</a></li>
+<li><a href="#ClientLocalList_Controller">ClientLocalList_Controller</a></li>
 <li><a href="#ClientTel_Controller">ClientTel_Controller</a></li>
 <li><a href="#ClientType_Controller">ClientType_Controller</a></li>
 <li><a href="#ClientValidDuplicate_Controller">ClientValidDuplicate_Controller</a></li>
@@ -57,6 +58,7 @@
 <li><a href="#OrderPump_Controller">OrderPump_Controller</a></li>
 <li><a href="#OwnerList_Controller">OwnerList_Controller</a></li>
 <li><a href="#Production_Controller">Production_Controller</a></li>
+<li><a href="#ProductionComment_Controller">ProductionComment_Controller</a></li>
 <li><a href="#ProductionSite_Controller">ProductionSite_Controller</a></li>
 <li><a href="#ProductionVehicleCorrection_Controller">ProductionVehicleCorrection_Controller</a></li>
 <li><a href="#PumpPrice_Controller">PumpPrice_Controller</a></li>
@@ -165,6 +167,8 @@
 <li><a href="#Shipment_Model">Shipment_Model</a></li>
 <li><a href="#ShipmentList_Model">ShipmentList_Model</a></li>
 <li><a href="#ShipmentForVehOwnerList_Model">ShipmentForVehOwnerList_Model</a></li>
+<li><a href="#ShipmentForClientList_Model">ShipmentForClientList_Model</a></li>
+<li><a href="#OrderForClientList_Model">OrderForClientList_Model</a></li>
 <li><a href="#ShipmentForClientVehOwnerList_Model">ShipmentForClientVehOwnerList_Model</a></li>
 <li><a href="#ShipmentDialog_Model">ShipmentDialog_Model</a></li>
 <li><a href="#ShipmentPumpList_Model">ShipmentPumpList_Model</a></li>
@@ -257,6 +261,7 @@
 <li><a href="#ConcretePrice_Model">ConcretePrice_Model</a></li>
 <li><a href="#MatTotals_Model">MatTotals_Model</a></li>
 <li><a href="#MaterialActionList_Model">MaterialActionList_Model</a></li>
+<li><a href="#MaterialConsToleranceViolationList_Model">MaterialConsToleranceViolationList_Model</a></li>
 <li><a href="#VehicleScheduleMakeOrderList_Model">VehicleScheduleMakeOrderList_Model</a></li>
 <li><a href="#VehFeaturesOnDateList_Model">VehFeaturesOnDateList_Model</a></li>
 <li><a href="#OrderDescr_Model">OrderDescr_Model</a></li>
@@ -318,6 +323,8 @@
 <li><a href="#ProductionList_Model">ProductionList_Model</a></li>
 <li><a href="#ProductionVehicleCorrection_Model">ProductionVehicleCorrection_Model</a></li>
 <li><a href="#ProductionVehicleCorrectionList_Model">ProductionVehicleCorrectionList_Model</a></li>
+<li><a href="#ProductionComment_Model">ProductionComment_Model</a></li>
+<li><a href="#ClientLocalList_Model">ClientLocalList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -708,6 +715,19 @@
 <a href="#ClientComeFrom_Model">Model: ClientComeFrom_Model</a>
 </div>
 </div>
+<div id="ClientLocalList_Controller" class="content_box">
+<h1>ClientLocalList_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ClientLocalList_Model">Model: ClientLocalList_Model</a><h2>update</h2>
+<a href="#ClientLocalList_Model">Model: ClientLocalList_Model</a><h2>delete</h2>
+<a href="#ClientLocalList_Model">Model: ClientLocalList_Model</a><h2>get_list</h2>
+<a href="#ClientLocalList_Model">Model: ClientLocalList_Model</a><h2>get_object</h2>
+<a href="#ClientLocalList_Model">Model: ClientLocalList_Model</a>
+</div>
+</div>
 <div id="ClientTel_Controller" class="content_box">
 <h1>ClientTel_Controller</h1>
 <div class="content_item">
@@ -793,7 +813,8 @@
 <a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a><h2>delete</h2>
 <a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a><h2>get_list</h2>
 <a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a><h2>get_object</h2>
-<a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a>
+<a href="#ConcreteCostHeader_Model">Model: ConcreteCostHeader_Model</a><h2>get_client_price_list</h2>
+<a href="#ConcreteCost_Model">Model: ConcreteCost_Model</a>
 </div>
 </div>
 <div id="ConcreteType_Controller" class="content_box">
@@ -808,7 +829,8 @@
 <a href="#ConcreteTypeList_Model">Model: ConcreteTypeList_Model</a><h2>get_object</h2>
 <a href="#ConcreteTypeList_Model">Model: ConcreteTypeList_Model</a><h2>complete</h2>
 <a href="#ConcreteTypeList_Model">Model: ConcreteTypeList_Model</a><h2>get_list_for_lab</h2>
-<a href="#ConcreteType_Model">Model: ConcreteType_Model</a>
+<a href="#ConcreteType_Model">Model: ConcreteType_Model</a><h2>get_for_client_list</h2>
+<a href="#ConcreteTypeList_Model">Model: ConcreteTypeList_Model</a>
 </div>
 </div>
 <div id="ConcreteTypeMapToProduction_Controller" class="content_box">
@@ -991,6 +1013,7 @@
 <a href="#Destination_Model">Model: Destination_Model</a><h2>get_list</h2>
 <a href="#DestinationList_Model">Model: DestinationList_Model</a><h2>get_object</h2>
 <a href="#DestinationDialog_Model">Model: DestinationDialog_Model</a><h2>complete_dest</h2>
+<a href="#DestinationList_Model">Model: DestinationList_Model</a><h2>get_for_client_list</h2>
 <a href="#DestinationList_Model">Model: DestinationList_Model</a><h2>get_coords_on_name</h2>
 <a href="#Destination_Model">Model: Destination_Model</a><h2>at_dest_avg_time</h2>
 <p>Arguments:</p>
@@ -1583,7 +1606,8 @@
 </div>
 </div>
 <h2>complete</h2>
-<a href="#OrderList_Model">Model: OrderList_Model</a>
+<a href="#OrderList_Model">Model: OrderList_Model</a><h2>get_list_for_client</h2>
+<a href="#OrderForClientList_Model">Model: OrderForClientList_Model</a>
 </div>
 </div>
 <div id="OrderFromClient_Controller" class="content_box">
@@ -1665,6 +1689,19 @@
 </div>
 <h2>get_production_material_list</h2>
 <a href="#ProductionMaterialList_Model">Model: ProductionMaterialList_Model</a>
+</div>
+</div>
+<div id="ProductionComment_Controller" class="content_box">
+<h1>ProductionComment_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ProductionComment_Model">Model: ProductionComment_Model</a><h2>update</h2>
+<a href="#ProductionComment_Model">Model: ProductionComment_Model</a><h2>delete</h2>
+<a href="#ProductionComment_Model">Model: ProductionComment_Model</a><h2>get_list</h2>
+<a href="#ProductionComment_Model">Model: ProductionComment_Model</a><h2>get_object</h2>
+<a href="#ProductionComment_Model">Model: ProductionComment_Model</a>
 </div>
 </div>
 <div id="ProductionSite_Controller" class="content_box">
@@ -1939,6 +1976,24 @@
 								Нет</p>
 </div>
 </div>
+<h2>get_material_cons_tolerance_violation_list</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>templ</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+<h3>inline</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 </div>
 </div>
 <div id="RawMaterialConsRate_Controller" class="content_box">
@@ -2133,7 +2188,8 @@
 <a href="#Shipment_Model">Model: Shipment_Model</a><h2>delete</h2>
 <a href="#Shipment_Model">Model: Shipment_Model</a><h2>get_list</h2>
 <a href="#ShipmentList_Model">Model: ShipmentList_Model</a><h2>get_list_for_veh_owner</h2>
-<a href="#ShipmentForVehOwnerList_Model">Model: ShipmentForVehOwnerList_Model</a><h2>get_list_for_client_veh_owner</h2>
+<a href="#ShipmentForVehOwnerList_Model">Model: ShipmentForVehOwnerList_Model</a><h2>get_list_for_client</h2>
+<a href="#ShipmentForClientList_Model">Model: ShipmentForClientList_Model</a><h2>get_list_for_client_veh_owner</h2>
 <a href="#ShipmentForClientVehOwnerList_Model">Model: ShipmentForClientVehOwnerList_Model</a><h2>get_list_for_order</h2>
 <a href="#ShipmentForOrderList_Model">Model: ShipmentForOrderList_Model</a><h2>get_pump_list</h2>
 <a href="#ShipmentPumpList_Model">Model: ShipmentPumpList_Model</a><h2>get_pump_list_for_veh_owner</h2>
@@ -3841,6 +3897,18 @@
 <div>Required:</div>
 <div>Length:12</div>
 <div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>account_from_date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ClientComeFrom_Model" class="content_box">
@@ -3937,8 +4005,14 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>inn</h2>
-<div>Type:String</div>
+<h2>accounts_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>account_from_date</h2>
+<div>Type:Date</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -4023,6 +4097,30 @@
 <div>Precision:</div>
 <h2>inn</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>accounts_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ClientLocalList_Model" class="content_box">
+<h1>ClientLocalList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -4183,8 +4281,8 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>date</h2>
-<div>Type:Date</div>
+<h2>concrete_costs_h_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:TRUE</div>
 <div>Length:</div>
@@ -4291,9 +4389,27 @@
 <h1>ConcreteCostHeader_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>date</h2>
 <div>Type:Date</div>
 <div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ar</h2>
+<div>Type:Array</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_list</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -4315,8 +4431,8 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>date</h2>
-<div>Type:Date</div>
+<h2>concrete_costs_h_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -4399,6 +4515,12 @@
 <div>Required:</div>
 <div>Length:15</div>
 <div>Precision:2</div>
+<h2>material_cons_rates</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ConcreteTypeList_Model" class="content_box">
@@ -4437,6 +4559,12 @@
 <div>Precision:</div>
 <h2>price</h2>
 <div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_cons_rates</h2>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -4801,6 +4929,12 @@
 <div>Required:</div>
 <div>Length:19</div>
 <div>Precision:2</div>
+<h2>store</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="DOCMaterialProcurementList_Model" class="content_box">
@@ -4898,6 +5032,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>quant_net</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>store</h2>
 <div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -6513,6 +6653,54 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="MaterialConsToleranceViolationList_Model" class="content_box">
+<h1>MaterialConsToleranceViolationList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>materials_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>norm_quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>fact_quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>diff_quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>diff_percent</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="MaterialFactBalanceCorretion_Model" class="content_box">
 <h1>MaterialFactBalanceCorretion_Model</h1>
 <div class="content_item">
@@ -7888,6 +8076,78 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="OrderForClientList_Model" class="content_box">
+<h1>OrderForClientList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>number</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destination_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_ordered</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_shipped</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_balance</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="OrderFromClient_Model" class="content_box">
 <h1>OrderFromClient_Model</h1>
 <div class="content_item">
@@ -8792,6 +9052,54 @@
 <div>Required:</div>
 <div>Length:19</div>
 <div>Precision:4</div>
+<h2>manual_correction</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ProductionComment_Model" class="content_box">
+<h1>ProductionComment_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ProductionList_Model" class="content_box">
@@ -9040,6 +9348,12 @@
 <div>Precision:</div>
 <h2>material_fact_consumption_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_comment</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -11728,6 +12042,84 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="ShipmentForClientList_Model" class="content_box">
+<h1>ShipmentForClientList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>order_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ship_date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destination_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_type_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_exists</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_cost</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>deliv_cost</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>pump_cost</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="ShipmentForClientVehOwnerList_Model" class="content_box">
 <h1>ShipmentForClientVehOwnerList_Model</h1>
 <div class="content_item">
@@ -11919,6 +12311,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>order_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -14958,6 +15356,8 @@
 <h2>supervisor</h2>
 <div>Description:</div>
 <h2>vehicle_owner</h2>
+<div>Description:</div>
+<h2>client</h2>
 <div>Description:</div>
 </div>
 </div>

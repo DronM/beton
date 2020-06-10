@@ -26,6 +26,7 @@
 ,"ru_plant_director":"Нач.базы"
 ,"ru_supervisor":"Смотрящий"
 ,"ru_vehicle_owner":"Владелец траспорта"
+,"ru_client":"Контрагент"
 }
 
 		,"unload_types":{"ru_pump":"насос"

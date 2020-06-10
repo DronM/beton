@@ -8,6 +8,11 @@ $BODY$
 BEGIN
 	
 	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+	
+		IF TG_OP='UPDATE' AND OLD.manual_correction=TRUE AND NEW.manual_correction=TRUE THEN
+			RETURN OLD;
+		END IF;	
+	
 		IF TG_OP='INSERT' OR
 			(TG_OP='UPDATE'
 			AND (
@@ -82,7 +87,7 @@ BEGIN
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
-
+		/*
 		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
 		THEN
 			UPDATE material_fact_consumptions
@@ -90,15 +95,20 @@ BEGIN
 				concrete_type_id = NEW.concrete_type_id
 			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
 		END IF;
-
+		*/
+		
 		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
 		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
 		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
+		OR (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0))
+		OR (coalesce(NEW.concrete_quant,0)<>coalesce(OLD.concrete_quant,0))
 		THEN
 			UPDATE material_fact_consumptions
 			SET
 				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id,
-				vehicle_id = NEW.vehicle_id
+				vehicle_id = NEW.vehicle_id,
+				concrete_type_id = NEW.concrete_type_id,
+				concrete_quant = NEW.concrete_quant
 			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
 		END IF;
 		

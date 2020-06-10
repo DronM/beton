@@ -117,6 +117,18 @@ extend(Client_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Аккаунт";
+	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Дата начала выборки данных";
+	var field = new FieldDate("account_from_date",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -203,6 +215,18 @@ extend(Client_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Аккаунт";
+	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Дата начала выборки данных";
+	var field = new FieldDate("account_from_date",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -270,6 +294,9 @@ extend(Client_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "ИНН";
 	pm.addField(new FieldString("inn",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Аккаунт";
+	pm.addField(new FieldJSON("accounts_ref",f_opts));
 }
 
 			Client_Controller.prototype.addGetObject = function(){

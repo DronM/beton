@@ -128,6 +128,7 @@ function MaterialFactConsumptionCorretion_Model(options){
 	options.fields.comment_text = new FieldText("comment_text",filed_options);
 	
 			
+			
 		MaterialFactConsumptionCorretion_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialFactConsumptionCorretion_Model,ModelXML);

@@ -30,6 +30,7 @@ function Destination_Controller(options){
 	this.addGetList();
 	this.addGetObject();
 	this.add_complete_dest();
+	this.add_get_for_client_list();
 	this.add_get_coords_on_name();
 	this.add_at_dest_avg_time();
 	this.add_route_to_dest_avg_time();
@@ -243,6 +244,13 @@ extend(Destination_Controller,ControllerObjServer);
 		pm.addField(new FieldInt("mid",options));
 	
 			
+	this.addPublicMethod(pm);
+}
+
+			Destination_Controller.prototype.add_get_for_client_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_for_client_list',opts);
+	
 	this.addPublicMethod(pm);
 }
 

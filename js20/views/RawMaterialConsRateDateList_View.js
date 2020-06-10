@@ -86,9 +86,7 @@ function RawMaterialConsRateDateList_View(id,options){
 									}										
 									
 								})
-							],
-							"sortable":true,
-							"sort":"desc"
+							]
 						})
 						,new GridCellHead(id+":grid:head:name",{
 							"value":"Комментарий",

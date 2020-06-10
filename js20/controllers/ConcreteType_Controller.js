@@ -31,6 +31,7 @@ function ConcreteType_Controller(options){
 	this.addGetObject();
 	this.addComplete();
 	this.add_get_list_for_lab();
+	this.add_get_for_client_list();
 		
 }
 extend(ConcreteType_Controller,ControllerObjServer);
@@ -73,6 +74,12 @@ extend(ConcreteType_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Цена";
 	var field = new FieldFloat("price",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Есть нормы расхода";
+	var field = new FieldBool("material_cons_rates",options);
 	
 	pm.addField(field);
 	
@@ -124,6 +131,12 @@ extend(ConcreteType_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Есть нормы расхода";
+	var field = new FieldBool("material_cons_rates",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -170,6 +183,9 @@ extend(ConcreteType_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Цена";
 	pm.addField(new FieldFloat("price",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Есть нормы расхода";
+	pm.addField(new FieldBool("material_cons_rates",f_opts));
 }
 
 			ConcreteType_Controller.prototype.addGetObject = function(){
@@ -196,6 +212,13 @@ extend(ConcreteType_Controller,ControllerObjServer);
 			ConcreteType_Controller.prototype.add_get_list_for_lab = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_list_for_lab',opts);
+	
+	this.addPublicMethod(pm);
+}
+
+			ConcreteType_Controller.prototype.add_get_for_client_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_for_client_list',opts);
 	
 	this.addPublicMethod(pm);
 }

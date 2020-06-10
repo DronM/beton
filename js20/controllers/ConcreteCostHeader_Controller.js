@@ -29,6 +29,7 @@ function ConcreteCostHeader_Controller(options){
 	this.addDelete();
 	this.addGetList();
 	this.addGetObject();
+	this.add_get_client_price_list();
 		
 }
 extend(ConcreteCostHeader_Controller,ControllerObjServer);
@@ -39,8 +40,26 @@ extend(ConcreteCostHeader_Controller,ControllerObjServer);
 	var pm = this.getInsert();
 	
 	var options = {};
+	options.primaryKey = true;options.autoInc = true;
+	var field = new FieldInt("id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.primaryKey = true;
 	var field = new FieldDate("date",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldArray("clients_ar",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldJSONB("clients_list",options);
 	
 	pm.addField(field);
 	
@@ -50,6 +69,8 @@ extend(ConcreteCostHeader_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	pm.addField(new FieldInt("ret_id",{}));
+	
 	
 }
 
@@ -58,12 +79,33 @@ extend(ConcreteCostHeader_Controller,ControllerObjServer);
 	var pm = this.getUpdate();
 	
 	var options = {};
+	options.primaryKey = true;options.autoInc = true;
+	var field = new FieldInt("id",options);
+	
+	pm.addField(field);
+	
+	field = new FieldInt("old_id",{});
+	pm.addField(field);
+	
+	var options = {};
 	options.primaryKey = true;
 	var field = new FieldDate("date",options);
 	
 	pm.addField(field);
 	
 	field = new FieldDate("old_date",{});
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldArray("clients_ar",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldJSONB("clients_list",options);
+	
 	pm.addField(field);
 	
 	var options = {};
@@ -78,6 +120,9 @@ extend(ConcreteCostHeader_Controller,ControllerObjServer);
 			ConcreteCostHeader_Controller.prototype.addDelete = function(){
 	ConcreteCostHeader_Controller.superclass.addDelete.call(this);
 	var pm = this.getDelete();
+	var options = {"required":true};
+		
+	pm.addField(new FieldInt("id",options));
 	var options = {"required":true};
 		
 	pm.addField(new FieldDate("date",options));
@@ -102,10 +147,21 @@ extend(ConcreteCostHeader_Controller,ControllerObjServer);
 
 	var f_opts = {};
 	
+	pm.addField(new FieldInt("id",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldDate("date",f_opts));
 	var f_opts = {};
 	
+	pm.addField(new FieldArray("clients_ar",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSONB("clients_list",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldText("comment_text",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("date");
+	
 }
 
 			ConcreteCostHeader_Controller.prototype.addGetObject = function(){
@@ -114,9 +170,26 @@ extend(ConcreteCostHeader_Controller,ControllerObjServer);
 	var pm = this.getGetObject();
 	var f_opts = {};
 		
+	pm.addField(new FieldInt("id",f_opts));
+	var f_opts = {};
+		
 	pm.addField(new FieldDate("date",f_opts));
 	
 	pm.addField(new FieldString("mode"));
+}
+
+			ConcreteCostHeader_Controller.prototype.add_get_client_price_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_client_price_list',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("client_id",options));
+	
+			
+	this.addPublicMethod(pm);
 }
 
 		

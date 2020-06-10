@@ -29,7 +29,7 @@ class ConcreteCost_Controller extends ControllerSQL{
 
 		/* insert */
 		$pm = new PublicMethod('insert');
-		$param = new FieldExtDate('date'
+		$param = new FieldExtInt('concrete_costs_h_id'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
 		$param = new FieldExtInt('concrete_type_id'
@@ -56,7 +56,7 @@ class ConcreteCost_Controller extends ControllerSQL{
 				,array(
 			));
 			$pm->addParam($param);
-		$param = new FieldExtDate('date'
+		$param = new FieldExtInt('concrete_costs_h_id'
 				,array(
 			));
 			$pm->addParam($param);

@@ -142,6 +142,26 @@ class Client_Model extends ModelSQLBeton{
 		$f_inn=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
 		$this->addField($f_inn);
 		//********************
+		
+		//*** Field user_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Аккаунт';
+		$f_opts['id']="user_id";
+						
+		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
+		$this->addField($f_user_id);
+		//********************
+		
+		//*** Field account_from_date ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Дата начала выборки данных';
+		$f_opts['id']="account_from_date";
+						
+		$f_account_from_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"account_from_date",$f_opts);
+		$this->addField($f_account_from_date);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

@@ -113,6 +113,15 @@ class ShipmentForOrderList_Model extends ModelSQLBeton{
 		$f_order_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_id",$f_opts);
 		$this->addField($f_order_id);
 		//********************
+		
+		//*** Field client_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="client_id";
+						
+		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
+		$this->addField($f_client_id);
+		//********************
 	$this->setRowsPerPage(0);
 	}
 

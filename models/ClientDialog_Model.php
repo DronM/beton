@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ClientDialog_Model extends ModelSQLBeton{
@@ -100,12 +101,22 @@ class ClientDialog_Model extends ModelSQLBeton{
 		$this->addField($f_users_ref);
 		//********************
 		
-		//*** Field inn ***
+		//*** Field accounts_ref ***
 		$f_opts = array();
-		$f_opts['id']="inn";
+		
+		$f_opts['alias']='Аккаунт';
+		$f_opts['id']="accounts_ref";
 						
-		$f_inn=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
-		$this->addField($f_inn);
+		$f_accounts_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"accounts_ref",$f_opts);
+		$this->addField($f_accounts_ref);
+		//********************
+		
+		//*** Field account_from_date ***
+		$f_opts = array();
+		$f_opts['id']="account_from_date";
+						
+		$f_account_from_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"account_from_date",$f_opts);
+		$this->addField($f_account_from_date);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

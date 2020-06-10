@@ -14,6 +14,7 @@ CREATE OR REPLACE VIEW raw_material_cons_rates_list AS
 	FROM raw_material_cons_rates t
 	LEFT JOIN concrete_types AS ctp ON ctp.id=t.concrete_type_id
 	LEFT JOIN raw_materials AS m ON m.id=t.raw_material_id
+	--ORDER BY m.ord
 	;
 	
 ALTER VIEW raw_material_cons_rates_list OWNER TO ;

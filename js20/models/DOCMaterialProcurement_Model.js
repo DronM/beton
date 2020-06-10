@@ -161,6 +161,15 @@ function DOCMaterialProcurement_Model(options){
 	options.fields.quant_net = new FieldFloat("quant_net",filed_options);
 	options.fields.quant_net.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.store = new FieldText("store",filed_options);
+	
 			
 			
 			

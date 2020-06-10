@@ -53,28 +53,7 @@ function CementSiloBalanceResetList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						,new GridCellHead(id+":grid:head:users_ref",{
-							"value":"Пользователь",
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("users_ref"),
-									"form":User_Form,
-									"ctrlClass":UserEditRef,
-									"ctrlBindFieldId":"user_id",
-									"ctrlOptions":{
-										"labelCaption":"",
-										"enabled":(role_id=="admin"||role_id=="owner"),
-									},
-									"searchOptions":{
-										"field":new FieldInt("user_id"),
-										"searchType":"on_match"
-									}									
-								})
-							],
-							"sortable":true
-						})
-					
-						,new GridCellHead(id+":grid:head:date_time",{
+						new GridCellHead(id+":grid:head:date_time",{
 							"value":"Дата",
 							"columns":[
 								new GridColumnDateTime({
@@ -90,7 +69,7 @@ function CementSiloBalanceResetList_View(id,options){
 							],
 							"sortable":true,
 							"sort":"desc"							
-						})
+						})										
 						,new GridCellHead(id+":grid:head:cement_silos_ref",{
 							"value":"Силос",
 							"columns":[
@@ -110,6 +89,7 @@ function CementSiloBalanceResetList_View(id,options){
 							],
 							"sortable":true
 						})
+						/*
 						,new GridCellHead(id+":grid:head:comment_text",{
 							"value":"Комментарий",
 							"columns":[
@@ -118,8 +98,9 @@ function CementSiloBalanceResetList_View(id,options){
 								})
 							]
 						})
+						*/
 						,new GridCellHead(id+":grid:head:quant_required",{
-							"value":"Кол.требуемое",
+							"value":"Кол-во фактич.",
 							"columns":[
 								new GridColumnFloat({
 									"field":model.getField("quant_required"),
@@ -133,7 +114,7 @@ function CementSiloBalanceResetList_View(id,options){
 						})
 						
 						,new GridCellHead(id+":grid:head:quant",{
-							"value":"Кол.уменьшения",
+							"value":"Разница (-не хватило,+ излишек)",
 							"columns":[
 								new GridColumnFloat({
 									"field":model.getField("quant"),
@@ -144,6 +125,26 @@ function CementSiloBalanceResetList_View(id,options){
 									}
 								})
 							]
+						})
+						,new GridCellHead(id+":grid:head:users_ref",{
+							"value":"Пользователь",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("users_ref"),
+									"form":User_Form,
+									"ctrlClass":UserEditRef,
+									"ctrlBindFieldId":"user_id",
+									"ctrlOptions":{
+										"labelCaption":"",
+										"enabled":(role_id=="admin"||role_id=="owner"),
+									},
+									"searchOptions":{
+										"field":new FieldInt("user_id"),
+										"searchType":"on_match"
+									}									
+								})
+							],
+							"sortable":true
 						})
 						
 					]

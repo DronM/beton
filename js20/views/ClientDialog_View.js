@@ -64,6 +64,14 @@ function ClientDialog_View(id,options){
 			"maxLength":"12",
 			"title":"ИНН организации или предпринимателя"
 		}));		
+		
+		this.addElement(new UserEditRef(id+":accounts_ref",{
+			"labelCaption":"Аккаунт:"
+		}));	
+		this.addElement(new EditDate(id+":account_from_date",{
+			"labelCaption":"Дата начала выборки данных для клиента:",
+			"title":"Клиент будет видеть данные начиная с этой даты дальше"
+		}));		
 						
 	}
 	
@@ -79,9 +87,11 @@ function ClientDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("client_kind")})
 		,new DataBinding({"control":this.getElement("manager_comment")})
 		,new DataBinding({"control":this.getElement("manager"),"fieldId":"users_ref"})
+		,new DataBinding({"control":this.getElement("accounts_ref"),"fieldId":"accounts_ref"})
 		,new DataBinding({"control":this.getElement("client_come_from"),"fieldId":"client_come_from"})
 		,new DataBinding({"control":this.getElement("client_type"),"fieldId":"client_type"})
 		,new DataBinding({"control":this.getElement("inn")})
+		,new DataBinding({"control":this.getElement("account_from_date")})
 	]);
 	
 	//write
@@ -93,9 +103,11 @@ function ClientDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("client_kind")})
 		,new CommandBinding({"control":this.getElement("manager_comment")})
 		,new CommandBinding({"control":this.getElement("manager"),"fieldId":"manager_id"})
+		,new CommandBinding({"control":this.getElement("accounts_ref"),"fieldId":"user_id"})
 		,new CommandBinding({"control":this.getElement("client_come_from"),"fieldId":"client_come_from_id"})
 		,new CommandBinding({"control":this.getElement("client_type"),"fieldId":"client_type_id"})
 		,new CommandBinding({"control":this.getElement("inn")})
+		,new CommandBinding({"control":this.getElement("account_from_date")})
 	]);
 	
 	this.addDetailDataSet({

@@ -354,6 +354,11 @@ dsParams.control.getInsertPublicMethod()
 2) Загрузка материалов из elkon теперь с учетом дат.
 
 
+1.072
+raw_material_cons_rates_on_date_id ПОМЕНЯТЬ ORDER BY id->ORDER BY ord Должно коррелировать с RawMaterialConsRate_Controller->get_list()
+
+
+
 
 SELECT 
 (

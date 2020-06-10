@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLDOC.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
@@ -165,6 +166,14 @@ class DOCMaterialProcurement_Model extends ModelSQLDOC{
 						
 		$f_quant_net=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_net",$f_opts);
 		$this->addField($f_quant_net);
+		//********************
+		
+		//*** Field store ***
+		$f_opts = array();
+		$f_opts['id']="store";
+						
+		$f_store=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"store",$f_opts);
+		$this->addField($f_store);
 		//********************
 	
 		$order = new ModelOrderSQL();		

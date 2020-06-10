@@ -82,6 +82,16 @@ class Client_Controller extends ControllerSQL{
 		$param = new FieldExtString('inn'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtInt('user_id'
+				,array(
+				'alias'=>'Аккаунт'
+			));
+		$pm->addParam($param);
+		$param = new FieldExtDate('account_from_date'
+				,array(
+				'alias'=>'Дата начала выборки данных'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -161,6 +171,18 @@ class Client_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		$param = new FieldExtString('inn'
 				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('user_id'
+				,array(
+			
+				'alias'=>'Аккаунт'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtDate('account_from_date'
+				,array(
+			
+				'alias'=>'Дата начала выборки данных'
 			));
 			$pm->addParam($param);
 		

@@ -14,7 +14,7 @@ function ConcreteCostHeaderList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
-		"keyIds":["date"],
+		"keyIds":["id"],
 		"model":model,
 		"controller":contr,
 		"editInline":true,
@@ -40,8 +40,8 @@ function ConcreteCostHeaderList_View(id,options){
 										"detailFilters":{
 											"ConcreteCostList_Model":[
 												{
-												"masterFieldId":"date",
-												"field":"date",
+												"masterFieldId":"id",
+												"field":"concrete_costs_h_id",
 												"sign":"e",
 												"val":"0"
 												}	
@@ -50,8 +50,35 @@ function ConcreteCostHeaderList_View(id,options){
 									}
 									
 								})
-							]
+							],
+							"sortable":true,
+							"sort":"desc"														
 						})
+						,new GridCellHead(id+":grid:head:clients_list",{
+							"value":"Список клиентов",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("clients_list"),
+									"formatFunction":function(fields){
+										var res = "";
+										var v = fields.clients_list.getValue();
+										if(v&&v.rows&&v.rows.length){
+											for(var i=0;i<v.rows.length;i++){
+												if(v.rows[i].fields&&v.rows[i].fields.client){
+													res+= ((res=="")? res:", ")+v.rows[i].fields.client.getDescr();
+												}
+											}
+										}
+										return res;
+									},
+									"ctrlClass":ClientLocalListGrid,
+									"ctrlOptions":{
+										"maxLength":500
+									}
+								})
+							]
+						})						
+						
 						,new GridCellHead(id+":grid:head:comment_text",{
 							"value":"Комментарий",
 							"columns":[
