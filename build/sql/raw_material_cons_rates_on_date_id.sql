@@ -17,7 +17,7 @@ BEGIN
 	FOR materials IN 
 		SELECT id,name FROM raw_materials
 		WHERE concrete_part=true
-		ORDER BY id	
+		ORDER BY ord	
 	LOOP
 		dyn_col_cnt = dyn_col_cnt + 1;
 		dyn_cols = dyn_cols||', ';

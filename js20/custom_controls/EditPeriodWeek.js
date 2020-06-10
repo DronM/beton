@@ -28,8 +28,8 @@ function EditPeriodWeek(id,options){
 }
 extend(EditPeriodWeek,EditPeriodMonth);
 
-EditPeriodWeek.prototype.getDefaulDateFrom = function(){
-	return DateHelper.weekStart();
+EditPeriodWeek.prototype.getPeriodFrom = function(dt){
+	return DateHelper.weekStart(dt);
 }
 
 EditPeriodWeek.prototype.go = function(sign){

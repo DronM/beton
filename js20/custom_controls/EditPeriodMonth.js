@@ -36,7 +36,7 @@ function EditPeriodMonth(id,options){
 	options.periodSelectOptions = {"periodShift":true};
 	
 	this.m_dateFrom = options.dateFrom;	
-	if(!this.m_dateFrom)this.m_dateFrom = this.getDefaulDateFrom();
+	if(!this.m_dateFrom)this.m_dateFrom = this.getPeriodFrom();
 	this.calcDateTo();
 	
 	this.m_filters = options.filters;	
@@ -52,8 +52,8 @@ EditPeriodMonth.prototype.m_dateTo;
 EditPeriodMonth.prototype.m_timeFrom;
 EditPeriodMonth.prototype.shiftLengthMS;
 
-EditPeriodMonth.prototype.getDefaulDateFrom = function(){
-	return DateHelper.monthStart();
+EditPeriodMonth.prototype.getPeriodFrom = function(dt){
+	return DateHelper.monthStart(dt);
 }
 
 EditPeriodMonth.prototype.addControls = function(){
@@ -82,7 +82,11 @@ EditPeriodMonth.prototype.picCustomDate = function(){
 		format:{
 			//called after date is selected
 			toDisplay: function (date, format, language) {
-				self.setDateFrom(new Date(date.getTime()));
+				var constants = {"first_shift_start_time":null};
+				window.getApp().getConstantManager().get(constants);			
+				date = DateHelper.dateStart(date);
+				date = new Date(date.getTime() + DateHelper.timeToMS(constants.first_shift_start_time.getValue()));				
+				self.setDateFrom(date);
 			},
 			//called in ctrl edit?
 			toValue: function (date, format, language) {
@@ -98,7 +102,7 @@ EditPeriodMonth.prototype.picCustomDate = function(){
 		clearBtn:true
 	});
 	
-	p.on('hide', function(ev){
+	p.on("hide", function(ev){
 		//self.getEditControl().applyMask();
 	});					
 	
@@ -111,7 +115,7 @@ EditPeriodMonth.prototype.go = function(sign){
 }
 
 EditPeriodMonth.prototype.setDateFrom = function(dt){
-	this.m_dateFrom = dt;
+	this.m_dateFrom = this.getPeriodFrom(dt);
 	this.calcDateTo();
 	this.updateDateInf();
 		
@@ -125,6 +129,10 @@ EditPeriodMonth.prototype.setDateFrom = function(dt){
 }
 EditPeriodMonth.prototype.getDateFrom = function(){
 	return this.m_dateFrom;
+}
+
+EditPeriodMonth.prototype.getDateTo = function(){
+	return this.m_dateTo;
 }
 
 EditPeriodMonth.prototype.calcDateTo = function(){	

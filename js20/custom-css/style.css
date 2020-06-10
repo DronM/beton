@@ -533,20 +533,21 @@ table td{
 	cursor:pointer;
 }
 
-.order_make_grid tr.order_closed{
-	background-color:#00FF7F;
+/* .order_make_grid  */
+tr.order_closed{
+	background-color:#00FF7F !important;
 }
-.order_make_grid tr.order_not_started{
-	background-color:#FFCC99;
+tr.order_not_started{
+	background-color:#FFCC99 !important;
 }
-.order_make_grid tr.order_started{
-	background-color:#FFFFDD;
+tr.order_started{
+	background-color:#FFFFDD !important;
 }
-.order_make_grid tr.order_no_ship_for_long{
-	background-color:#CCCCFF;
+tr.order_no_ship_for_long{
+	background-color:#CCCCFF !important;
 }
 tr.order_current_row{
-	border:3px solid black;
+	border:3px solid black !important;
 }
 
 .veh_schedule_grid tr.vh_late{

@@ -129,6 +129,15 @@ function OrderForClientList_Model(options){
 	
 	options.fields.quant_balance = new FieldFloat("quant_balance",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Опоздание отгрузки';
+	filed_options.autoInc = false;	
+	
+	options.fields.no_ship_mark = new FieldBool("no_ship_mark",filed_options);
+	
 			
 			
 			

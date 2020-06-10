@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
@@ -132,6 +133,16 @@ class OrderForClientList_Model extends ModelSQLBeton{
 						
 		$f_quant_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_balance",$f_opts);
 		$this->addField($f_quant_balance);
+		//********************
+		
+		//*** Field no_ship_mark ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Опоздание отгрузки';
+		$f_opts['id']="no_ship_mark";
+						
+		$f_no_ship_mark=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"no_ship_mark",$f_opts);
+		$this->addField($f_no_ship_mark);
 		//********************
 	
 		$order = new ModelOrderSQL();		

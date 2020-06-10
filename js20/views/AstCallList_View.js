@@ -180,7 +180,7 @@ function AstCallList_View(id,options){
 								})
 							]
 						})
-					
+						/*
 						,new GridCellHead(id+":grid:head:client_comment",{
 							"value":"Комментарий к клиенту",
 							"columns":[
@@ -189,6 +189,7 @@ function AstCallList_View(id,options){
 								})
 							]
 						})
+						*/
 						,new GridCellHead(id+":grid:head:dur_time",{
 							"value":"Прод-сть",
 							"columns":[
@@ -251,6 +252,7 @@ function AstCallList_View(id,options){
 								})
 							]
 						})
+						/*
 						,new GridCellHead(id+":grid:head:offer_quant",{
 							"value":"Кол-во",
 							"columns":[
@@ -267,7 +269,7 @@ function AstCallList_View(id,options){
 								})
 							]
 						})
-						
+						*/
 					]
 				})
 			]

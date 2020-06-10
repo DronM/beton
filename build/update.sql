@@ -45389,3 +45389,394 @@ CREATE OR REPLACE VIEW orders_for_client_list AS
 	
 ALTER VIEW orders_for_client_list OWNER TO beton;
 
+
+-- ******************* update 10/06/2020 09:57:01 ******************
+-- Function: public.raw_material_cons_rates_on_date_id(integer, integer)
+
+-- DROP FUNCTION public.raw_material_cons_rates_on_date_id(integer, integer);
+
+CREATE OR REPLACE FUNCTION public.raw_material_cons_rates_on_date_id(
+    in_date_id integer,
+    in_concrete_type_id integer)
+  RETURNS SETOF record AS
+$BODY$
+DECLARE
+	materials raw_materials%rowtype;
+	dyn_cols text;
+	dyn_col_cnt int;
+BEGIN
+	dyn_cols = '';
+	dyn_col_cnt = 0;
+	FOR materials IN 
+		SELECT id,name FROM raw_materials
+		WHERE concrete_part=true
+		ORDER BY ord	
+	LOOP
+		dyn_col_cnt = dyn_col_cnt + 1;
+		dyn_cols = dyn_cols||', ';
+		dyn_cols = dyn_cols
+			|| materials.id || '::int' || ' AS mat'||dyn_col_cnt||'_id,'
+			||'(SELECT ROUND(cons.rate,4) FROM cons WHERE cons.concrete_type_id=ct.id AND cons.raw_material_id='||materials.id||' LIMIT 1)'
+			||' AS mat'||dyn_col_cnt||'_rate';
+	END LOOP;	
+	/*
+	RAISE 'SELECT
+		ct.id AS concrete_type_id,
+		ct.name::text AS concrete_type_descr%
+		FROM concrete_types AS ct',dyn_cols;
+	*/
+	RETURN QUERY EXECUTE '
+	WITH cons AS (SELECT * FROM raw_material_cons_rates AS consump WHERE consump.rate_date_id='||in_date_id||')	
+	SELECT
+		ct.id AS concrete_type_id,
+		ct.name::text AS concrete_type_descr' || dyn_cols
+	||' FROM concrete_types AS ct WHERE (('||in_concrete_type_id||'>0 AND ct.id='||in_concrete_type_id||') OR ('||in_concrete_type_id||'=0))
+	AND ct.material_cons_rates
+	ORDER BY ct.name';
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.raw_material_cons_rates_on_date_id(integer, integer)
+  OWNER TO beton;
+
+
+
+-- ******************* update 10/06/2020 10:40:22 ******************
+-- VIEW: orders_for_client_list
+
+--DROP VIEW orders_for_client_list;
+
+CREATE OR REPLACE VIEW orders_for_client_list AS
+	SELECT
+		o.id 
+		,o.date_time
+		,o.number
+		,o.client_id
+		,destinations_ref(dest) AS destinations_ref
+		,o.destination_id
+		,concrete_types_ref(ct) AS concrete_types_ref
+		,o.concrete_type_id
+		,coalesce(o.quant,0) AS quant_ordered
+		,coalesce(sh.quant,0) AS quant_shipped
+		,coalesce(o.quant,0) - coalesce(sh.quant,0) AS quant_balance
+		,CASE
+			WHEN
+				(o.quant - coalesce(sh.quant,0)) > 0::double precision
+				AND (
+					now()::timestamp without time zone::timestamp with time zone - (
+					(SELECT shipments.ship_date_time
+					FROM shipments
+					WHERE shipments.order_id = o.id AND shipments.shipped
+					ORDER BY shipments.ship_date_time DESC
+					LIMIT 1)
+					)::timestamp with time zone
+				) > const_ord_mark_if_no_ship_time_val() THEN TRUE
+			ELSE FALSE
+		END AS no_ship_mark
+
+	FROM orders o
+	LEFT JOIN destinations dest ON dest.id=o.destination_id
+	LEFT JOIN concrete_types ct ON ct.id=o.concrete_type_id
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,sum(t.quant) AS quant
+		FROM shipments t 
+		GROUP BY t.order_id
+	) AS sh ON sh.order_id=o.id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE cl.account_from_date IS NULL OR o.date_time::date>=cl.account_from_date
+	ORDER BY date_time DESC
+	;
+	
+ALTER VIEW orders_for_client_list OWNER TO beton;
+
+
+-- ******************* update 10/06/2020 10:42:51 ******************
+-- VIEW: orders_for_client_list
+
+--DROP VIEW orders_for_client_list;
+
+CREATE OR REPLACE VIEW orders_for_client_list AS
+	SELECT
+		o.id 
+		,o.date_time
+		,o.number
+		,o.client_id
+		,destinations_ref(dest) AS destinations_ref
+		,o.destination_id
+		,concrete_types_ref(ct) AS concrete_types_ref
+		,o.concrete_type_id
+		,coalesce(o.quant,0) AS quant_ordered
+		,coalesce(sh.quant,0) AS quant_shipped
+		,coalesce(o.quant,0) - coalesce(sh.quant,0) AS quant_balance
+		,CASE
+			WHEN
+				(o.quant - coalesce(sh.quant,0)) > 0::double precision
+				AND (
+					now()::timestamp without time zone::timestamp with time zone - sh_last.ship_date_time::timestamp with time zone
+					/*
+					(
+						(SELECT shipments.ship_date_time
+						FROM shipments
+						WHERE shipments.order_id = o.id AND shipments.shipped
+						ORDER BY shipments.ship_date_time DESC
+						LIMIT 1)
+					)::timestamp with time zone
+					*/
+				) > const_ord_mark_if_no_ship_time_val() THEN TRUE
+			ELSE FALSE
+		END AS no_ship_mark
+
+	FROM orders o
+	LEFT JOIN destinations dest ON dest.id=o.destination_id
+	LEFT JOIN concrete_types ct ON ct.id=o.concrete_type_id
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,sum(t.quant) AS quant
+		FROM shipments t 
+		GROUP BY t.order_id
+	) AS sh ON sh.order_id=o.id
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,max(t.ship_date_time) AS ship_date_time
+		FROM shipments t 
+		WHERE t.shipped
+		GROUP BY t.order_id
+	) AS sh_last ON sh_last.order_id=o.id
+	
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE cl.account_from_date IS NULL OR o.date_time::date>=cl.account_from_date
+	ORDER BY date_time DESC
+	;
+	
+ALTER VIEW orders_for_client_list OWNER TO beton;
+
+
+-- ******************* update 10/06/2020 10:52:19 ******************
+-- View: public.orders_make_list
+
+-- DROP VIEW public.orders_make_list CASCADE;
+
+CREATE OR REPLACE VIEW public.orders_make_list2 AS 
+	SELECT
+		o.id,
+		clients_ref(cl) AS clients_ref,
+		destinations_ref(d) AS destinations_ref,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.comment_text,
+		o.descr,
+		o.phone_cel,
+		o.unload_speed,
+		o.date_time,
+		o.date_time_to,
+		o.quant,
+		
+		/*
+		o.quant - COALESCE(
+			( SELECT
+				sum(shipments.quant) AS sum
+			FROM shipments
+			WHERE shipments.order_id = o.id AND shipments.shipped
+			), 0::double precision)
+		AS quant_rest,
+		*/
+		o.quant - coalesce(sh.quant) AS uant_rest,
+		
+		CASE
+		WHEN o.date_time::time without time zone >= const_first_shift_start_time_val()
+			AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
+			AND o.date_time_to::time without time zone >= const_first_shift_start_time_val()
+			AND o.date_time_to::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
+				THEN o.quant
+		WHEN o.date_time::time without time zone >= const_first_shift_start_time_val()
+			AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
+			AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
+				THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, o.date_time::date + (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) - o.date_time) / 60::double precision))::numeric, 2)::double precision
+		ELSE 0::double precision
+		END AS quant_ordered_day,
+		
+		CASE
+			WHEN now()::timestamp without time zone > o.date_time AND now()::timestamp without time zone < o.date_time_to THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, now()::timestamp without time zone::timestamp with time zone - o.date_time::timestamp with time zone) / 60::double precision))::numeric, 2)::double precision
+			WHEN now()::timestamp without time zone > o.date_time_to THEN o.quant
+			ELSE 0::double precision
+		END AS quant_ordered_before_now,
+		
+		/*
+		(SELECT
+			COALESCE(sum(shipments.quant), 0::double precision) AS sum
+		FROM shipments
+		WHERE shipments.order_id = o.id AND shipments.ship_date_time < now()::timestamp without time zone
+		) AS quant_shipped_before_now,
+		*/
+		coalesce(sh_before.quant) AS quant_shipped_before_now,
+		
+		/*
+		(SELECT
+			COALESCE(sum(shipments.quant), 0::double precision) AS sum
+		FROM shipments
+		WHERE shipments.order_id = o.id AND shipments.ship_date_time::time without time zone >= constant_first_shift_start_time()
+			AND shipments.ship_date_time::time without time zone <= (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
+		) AS quant_shipped_day_before_now,
+		*/
+		coalesce(sh_day_before.quant) AS quant_shipped_day_before_now,
+		
+		CASE
+			WHEN
+				(o.quant - coalesce(sh.quant,0)) > 0::double precision
+				AND (
+					now()::timestamp without time zone::timestamp with time zone - sh_last.ship_date_time::timestamp with time zone
+					/*now()::timestamp without time zone::timestamp with time zone - (
+					(SELECT shipments.ship_date_time
+					FROM shipments
+					WHERE shipments.order_id = o.id AND shipments.shipped
+					ORDER BY shipments.ship_date_time DESC
+					LIMIT 1)
+					)::timestamp with time zone
+					*/
+				) > const_ord_mark_if_no_ship_time_val() THEN TRUE
+			ELSE FALSE
+		END AS no_ship_mark,
+		
+		o.payed,
+		o.under_control,
+		o.pay_cash,
+		
+		CASE
+		    WHEN o.pay_cash THEN o.total
+		    ELSE 0::numeric
+		END AS total, 
+		
+		vh.owner AS pump_vehicle_owner,
+		o.unload_type,
+		--vehicle_owners_ref(v_own) AS pump_vehicle_owners_ref,
+		(SELECT
+			owners.row->'fields'->'owner'
+		FROM
+		(
+			SELECT jsonb_array_elements(vh.vehicle_owners->'rows') AS row
+		) AS owners
+		WHERE o.date_time >= (owners.row->'fields'->>'dt_from')::timestamp
+		ORDER BY (owners.row->'fields'->>'dt_from')::timestamp DESC
+		LIMIT 1
+		) AS pump_vehicle_owners_ref,
+		
+		pvh.pump_length AS pump_vehicle_length,
+		pvh.comment_text AS pump_vehicle_comment
+		
+		
+	FROM orders o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+	
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,sum(t.quant) AS quant
+		FROM shipments t 
+		GROUP BY t.order_id
+	) AS sh ON sh.order_id=o.id
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,max(t.ship_date_time) AS ship_date_time
+		FROM shipments t 
+		WHERE t.shipped
+		GROUP BY t.order_id
+	) AS sh_last ON sh_last.order_id=o.id
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,sum(t.quant) AS quant
+		FROM shipments t
+		WHERE t.ship_date_time < now()::timestamp without time zone 
+		GROUP BY t.order_id
+	) AS sh_before ON sh_before.order_id=o.id
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,sum(t.quant) AS quant
+		FROM shipments t
+		WHERE t.ship_date_time::time without time zone >= constant_first_shift_start_time()
+			AND t.ship_date_time::time without time zone <= (const_first_shift_start_time_val()::interval + const_day_shift_length_val())::time without time zone
+		GROUP BY t.order_id
+	) AS sh_day_before ON sh_day_before.order_id=o.id
+	
+	--LEFT JOIN vehicle_owners v_own ON v_own.id = vh.vehicle_owner_id
+	ORDER BY o.date_time;
+
+ALTER TABLE public.orders_make_list2 OWNER TO beton;
+
+
+
+-- ******************* update 10/06/2020 10:56:09 ******************
+-- VIEW: orders_for_client_list
+
+--DROP VIEW orders_for_client_list;
+
+CREATE OR REPLACE VIEW orders_for_client_list AS
+	SELECT
+		o.id 
+		,o.date_time
+		,o.number
+		,o.client_id
+		,destinations_ref(dest) AS destinations_ref
+		,o.destination_id
+		,concrete_types_ref(ct) AS concrete_types_ref
+		,o.concrete_type_id
+		,coalesce(o.quant,0) AS quant_ordered
+		,coalesce(sh.quant,0) AS quant_shipped
+		,coalesce(o.quant,0) - coalesce(sh.quant,0) AS quant_balance
+		,CASE
+			WHEN
+				(o.quant - coalesce(sh.quant,0)) > 0::double precision
+				AND (
+					now()::timestamp without time zone::timestamp with time zone - 
+					--sh_last.ship_date_time::timestamp with time zone
+					
+					(
+						(SELECT shipments.ship_date_time
+						FROM shipments
+						WHERE shipments.order_id = o.id AND shipments.shipped
+						ORDER BY shipments.ship_date_time DESC
+						LIMIT 1)
+					)::timestamp with time zone
+					
+				) > const_ord_mark_if_no_ship_time_val() THEN TRUE
+			ELSE FALSE
+		END AS no_ship_mark
+
+	FROM orders o
+	LEFT JOIN destinations dest ON dest.id=o.destination_id
+	LEFT JOIN concrete_types ct ON ct.id=o.concrete_type_id
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,sum(t.quant) AS quant
+		FROM shipments t 
+		GROUP BY t.order_id
+	) AS sh ON sh.order_id=o.id
+	/*
+	LEFT JOIN (
+		SELECT
+			t.order_id
+			,max(t.ship_date_time) AS ship_date_time
+		FROM shipments t 
+		WHERE t.shipped
+		GROUP BY t.order_id
+	) AS sh_last ON sh_last.order_id=o.id
+	*/
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE cl.account_from_date IS NULL OR o.date_time::date>=cl.account_from_date
+	ORDER BY date_time DESC
+	;
+	
+ALTER VIEW orders_for_client_list OWNER TO beton;
+

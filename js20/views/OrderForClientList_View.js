@@ -17,24 +17,13 @@ function OrderForClientList_View(id,options){
 	window.getApp().getConstantManager().get(constants);
 
 	var period_ctrl = new EditPeriodWeek(id+":filter-ctrl-period",{
-		"field":new FieldDate("date_time")
+		"field":new FieldDateTime("date_time")
 		,"onChange":function(dFrom,dTo){
+			self.setGridFilter(dFrom,dTo);
 			window.setGlobalWait(true);
-			var gr = self.getElement("grid");
-			gr.setFilter({
-				"field":"date_time"
-				,"sign":"ge"
-				,"val":DateHelper.format(dFrom,"Y-m-d")
-			});
-			gr.setFilter({
-				"field":"date_time"
-				,"sign":"le"
-				,"val":DateHelper.format(dTo,"Y-m-d")
-			});
-			
-			gr.onRefresh(function(){
+			self.getElement("grid").onRefresh(function(){
 				window.setGlobalWait(false);
-			});
+			});			
 		}		
 	});
 
@@ -88,6 +77,7 @@ function OrderForClientList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
+		//"className":"table-bordered table-responsive",//table-make_order order_make_grid
 		"model":model,
 		"controller":contr,
 		"keyIds":["id"],
@@ -102,6 +92,31 @@ function OrderForClientList_View(id,options){
 			,"filters":null
 			//,"variantStorage":options.variantStorage
 		}),
+		
+		//Все как в OrderMakeGrid
+		"onEventSetRowOptions":function(opts){
+			opts.className = opts.className||"";
+			var m = this.getModel();
+			var quant_rest = m.getFieldValue("quant_balance");
+			var quant = m.getFieldValue("quant_ordered");
+							
+			if(quant_rest==0){
+				opts.className+= (opts.className.length? " ":"")+"order_closed";
+			}
+			else if (quant_rest==quant
+			&&m.getFieldValue("date_time").getTime()<(DateHelper.time()).getTime() ){
+				opts.className+= (opts.className.length? " ":"")+"order_not_started";
+			}
+			else if (quant_rest!=quant){
+				opts.className+= (opts.className.length? " ":"")+"order_started";
+			}
+			
+			//&&quant_rest&&quant_rest!=quant
+			if (m.getFieldValue("no_ship_mark")){
+				opts.className+= (opts.className.length? " ":"")+"order_no_ship_for_long";
+			}
+			
+		},
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
@@ -269,10 +284,29 @@ function OrderForClientList_View(id,options){
 		"pagination":new pagClass(id+"_page",
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
 		"autoRefresh":false,
-		"refreshInterval":0,
+		"selectedRowClass":"order_current_row",
+		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true
-	}));		
+	}));
+	
+	this.setGridFilter(period_ctrl.getDateFrom(),period_ctrl.getDateTo());		
 }
 extend(OrderForClientList_View,ViewAjxList);
+
+OrderForClientList_View.prototype.setGridFilter = function(dFrom,dTo){
+	dFrom = DateHelper.getStartOfShift(dFrom);	
+	dTo = DateHelper.getEndOfShift(dTo);
+	var gr = this.getElement("grid");
+	gr.setFilter({
+		"field":"date_time"
+		,"sign":"ge"
+		,"val":DateHelper.format(dFrom,"Y-m-d H:i:s")
+	});
+	gr.setFilter({
+		"field":"date_time"
+		,"sign":"le"
+		,"val":DateHelper.format(dTo,"Y-m-d H:i:s")
+	});
+}
 

@@ -34,8 +34,20 @@ if (!$USE_SQLSRV){
 }
 
 
-$q = "SELECT * ManuelKayit.* FROM ManuelKayit
-				WHERE ManuelKayit.Id=2487";
+$q = "SELECT sub.*
+				FROM (
+					SELECT TOP 1
+						ManuelKayit.*,
+						(SELECT TOP 1 Uretim.id
+						FROM Uretim
+						WHERE Uretim.BasTarih > ManuelKayit.M_Tarih
+						ORDER BY Uretim.BasTarih ASC						
+						) AS for_prod_id						
+					FROM ManuelKayit
+					WHERE ManuelKayit.M_Tarih < (SELECT Uretim.BasTarih FROM Uretim WHERE Uretim.Id=93212)
+					ORDER BY ManuelKayit.M_Tarih DESC
+				) AS sub
+				WHERE sub.for_prod_id=93212";
 //WHERE Uretim.Id=91918";
 
 //$q = "SELECT TOP 1 * FROM UretimSonuc";

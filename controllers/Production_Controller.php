@@ -888,6 +888,8 @@ UPDATE public.production_sites
 								 (isset($material_data[$m_id_pref.'_quant']) && ($qt=intval($material_data[$m_id_pref.'_quant'])) )
 								 ||
 								 (isset($material_data[$m_id_pref.'_quant_req']) && ($qt=intval($material_data[$m_id_pref.'_quant_req'])) )
+								 ||
+								 (isset($material_data[$m_id_pref.'_quant_corrected']) && (intval($material_data[$m_id_pref.'_quant_corrected'])) )
 								){
 
 									//******* Силос (только у цемента!) **********

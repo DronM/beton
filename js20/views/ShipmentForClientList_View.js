@@ -19,22 +19,11 @@ function ShipmentForClientList_View(id,options){
 	var period_ctrl = new EditPeriodMonth(id+":filter-ctrl-period",{
 		"field":new FieldDateTime("ship_date")
 		,"onChange":function(dFrom,dTo){
+			self.setGridFilter(dFrom,dTo);
 			window.setGlobalWait(true);
-			var gr = self.getElement("grid");
-			gr.setFilter({
-				"field":"ship_date"
-				,"sign":"ge"
-				,"val":DateHelper.format(dFrom,"Y-m-d")
-			});
-			gr.setFilter({
-				"field":"ship_date"
-				,"sign":"le"
-				,"val":DateHelper.format(dTo,"Y-m-d")
-			});
-			
-			gr.onRefresh(function(){
+			self.getElement("grid").onRefresh(function(){
 				window.setGlobalWait(false);
-			});
+			});			
 		}		
 		
 	});
@@ -253,3 +242,18 @@ function ShipmentForClientList_View(id,options){
 	}));		
 }
 extend(ShipmentForClientList_View,ViewAjxList);
+
+ShipmentForClientList_View.prototype.setGridFilter = function(dFrom,dTo){
+	var gr = this.getElement("grid");
+	gr.setFilter({
+		"field":"ship_date"
+		,"sign":"ge"
+		,"val":DateHelper.format(dFrom,"Y-m-d")
+	});
+	gr.setFilter({
+		"field":"ship_date"
+		,"sign":"le"
+		,"val":DateHelper.format(dTo,"Y-m-d")
+	});
+}
+

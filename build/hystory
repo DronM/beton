@@ -358,6 +358,8 @@ dsParams.control.getInsertPublicMethod()
 raw_material_cons_rates_on_date_id ПОМЕНЯТЬ ORDER BY id->ORDER BY ord Должно коррелировать с RawMaterialConsRate_Controller->get_list()
 
 
+1.00176 10/06/20
+
 
 
 SELECT 
