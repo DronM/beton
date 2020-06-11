@@ -26,11 +26,12 @@ BEGIN
 		
 	ELSIF (TG_WHEN='AFTER' AND TG_OP='INSERT') THEN		
 		INSERT INTO concrete_costs
-		(date,concrete_type_id,price)
+		(date,concrete_type_id,price,concrete_costs_h_id)
 		(SELECT
 			NEW.date,
 			ctp.id,
-			coalesce(coalesce(prices.price,ctp.price),0)
+			coalesce(coalesce(prices.price,ctp.price),0),
+			NEW.id
 		FROM concrete_types AS ctp
 		LEFT JOIN (
 			SELECT

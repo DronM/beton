@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-06-10 13:41:32</lastBuild></version>
+		<lastBuild>2020-06-11 07:52:25</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -81,6 +81,7 @@
 		<version dateOpen="2020-05-21 17:05:39" dateClose="2020-05-21 17:05:40">1.00175</version>
 		<version dateOpen="2020-05-26 12:05:06" dateClose="2020-06-10 09:06:50">1.00176</version>
 		<version dateOpen="2020-06-10 10:06:33" dateClose="2020-06-10 13:06:41">1.00177</version>
+		<version dateOpen="2020-06-11 07:06:48" dateClose="2020-06-11 07:06:52">1.00178</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1192,6 +1193,7 @@
 				<aggFunction alias="total_concrete_cost" expr="sum(concrete_cost)"/>
 				<aggFunction alias="total_deliv_cost" expr="sum(deliv_cost)"/>
 				<aggFunction alias="total_pump_cost" expr="sum(pump_cost)"/>
+				<aggFunction alias="total_total_cost" expr="sum(total_cost)"/>
 			</aggFunctions>
 			<field id="order_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер заявки"/>
 			<field id="client_id" dataType="Int" sysCol="TRUE" alias="Идентификатор клиента"/>
@@ -1205,6 +1207,7 @@
 			<field id="concrete_cost" dataType="Float" alias="Стоимость бетона,руб"/>
 			<field id="deliv_cost" dataType="Float" alias="Стоимость доставки,руб"/>
 			<field id="pump_cost" dataType="Float" alias="Стоимость насоса,руб"/>
+			<field id="total_cost" dataType="Float" alias="Стоимость всего,руб"/>
 			<sql/>
 			<globalFilter id="client_id"/>
 			<globalFilter id="client_from_date" fieldId="ship_date"/>

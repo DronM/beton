@@ -30,6 +30,7 @@ function ShipmentForClientList_Model(options){
 				
 				
 				
+				
 			
 				
 	
@@ -138,6 +139,15 @@ function ShipmentForClientList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.pump_cost = new FieldFloat("pump_cost",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Стоимость всего,руб';
+	filed_options.autoInc = false;	
+	
+	options.fields.total_cost = new FieldFloat("total_cost",filed_options);
 	
 			
 			

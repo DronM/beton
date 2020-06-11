@@ -143,6 +143,16 @@ class ShipmentForClientList_Model extends ModelSQLBeton{
 		$f_pump_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_cost",$f_opts);
 		$this->addField($f_pump_cost);
 		//********************
+		
+		//*** Field total_cost ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Стоимость всего,руб';
+		$f_opts['id']="total_cost";
+						
+		$f_total_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"total_cost",$f_opts);
+		$this->addField($f_total_cost);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		
@@ -154,6 +164,7 @@ $this->setLimitConstant('doc_per_page_count');
 ,array('alias'=>'total_concrete_cost','expr'=>'sum(concrete_cost)')
 ,array('alias'=>'total_deliv_cost','expr'=>'sum(deliv_cost)')
 ,array('alias'=>'total_pump_cost','expr'=>'sum(pump_cost)')
+,array('alias'=>'total_total_cost','expr'=>'sum(total_cost)')
 )
 	);	
 

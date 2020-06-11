@@ -97,8 +97,9 @@ function ShipmentForClientList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:ship_date",{
+						new GridCellHead(id+":grid:head:row0:ship_date",{
 							"value":"Дата",
+							"attrs":{"rowspan":"2"},
 							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnDate({
@@ -113,8 +114,9 @@ function ShipmentForClientList_View(id,options){
 							"sortable":true,
 							"sort":"desc"
 						})
-						,new GridCellHead(id+":grid:head:destinations_ref",{
+						,new GridCellHead(id+":grid:head:row0:destinations_ref",{
 							"value":"Объект",
+							"attrs":{"rowspan":"2"},
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
@@ -129,8 +131,9 @@ function ShipmentForClientList_View(id,options){
 							]
 						})
 					
-						,new GridCellHead(id+":grid:head:concrete_types_ref",{
+						,new GridCellHead(id+":grid:head:row0:concrete_types_ref",{
 							"value":"Марка",
+							"attrs":{"rowspan":"2"},
 							"colAttrs":{"clign":"center"},
 							"columns":[
 								new GridColumnRef({
@@ -145,8 +148,9 @@ function ShipmentForClientList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:pump_exists",{
+						,new GridCellHead(id+":grid:head:row0:pump_exists",{
 							"value":"Есть насос",
+							"attrs":{"rowspan":"2"},
 							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnBool({
@@ -154,10 +158,10 @@ function ShipmentForClientList_View(id,options){
 									,"showFalse":false
 								})
 							]
-						})						
-						
-						,new GridCellHead(id+":grid:head:quant",{
+						})												
+						,new GridCellHead(id+":grid:head:row0:quant",{
 							"value":"Количество",
+							"attrs":{"rowspan":"2"},
 							"colAttrs":{"align":"right"},
 							"columns":[
 								new GridColumn({
@@ -166,8 +170,17 @@ function ShipmentForClientList_View(id,options){
 							]
 						})						
 						
+						,new GridCellHead(id+":grid:head:row0:cost_title",{
+							"value":"Стоимость",
+							"attrs":{"colspan":"4"}
+						})						
+						
+					]
+				})
+				,new GridRow(id+":grid:head:row1",{
+					"elements":[
 						,new GridCellHead(id+":grid:head:concrete_cost",{
-							"value":"Стоимость бетона",
+							"value":"Бетон",
 							"colAttrs":{"align":"right"},
 							"columns":[
 								new GridColumnFloat({
@@ -178,7 +191,7 @@ function ShipmentForClientList_View(id,options){
 						})						
 						
 						,new GridCellHead(id+":grid:head:deliv_cost",{
-							"value":"Стоимость доставки",
+							"value":"Доставка",
 							"colAttrs":{"align":"right"},
 							"columns":[
 								new GridColumnFloat({
@@ -188,7 +201,7 @@ function ShipmentForClientList_View(id,options){
 							]
 						})
 						,new GridCellHead(id+":grid:head:pump_cost",{
-							"value":"Стоимость насоса",
+							"value":"Насос",
 							"colAttrs":{"align":"right"},
 							"columns":[
 								new GridColumnFloat({
@@ -197,8 +210,18 @@ function ShipmentForClientList_View(id,options){
 								})
 							]
 						})						
+						,new GridCellHead(id+":grid:head:total_cost",{
+							"value":"Всего",
+							"colAttrs":{"align":"right"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("total_cost")
+									,"precision":"2"
+								})
+							]
+						})						
 					]
-				})
+				})				
 			]
 		}),
 		"foot":new GridFoot(id+"grid:foot",{
@@ -229,6 +252,12 @@ function ShipmentForClientList_View(id,options){
 							"totalFieldId":"total_pump_cost",
 							"gridColumn":new GridColumnFloat({"id":"tot_pump_cost"})
 						})						
+						,new GridCellFoot(id+":grid:foot:tot_total_cost",{
+							"attrs":{"align":"right"},
+							"totalFieldId":"total_total_cost",
+							"gridColumn":new GridColumnFloat({"id":"tot_total_cost"})
+						})						
+						
 					]
 				})		
 			]
