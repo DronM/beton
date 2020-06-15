@@ -46049,3 +46049,655 @@ CREATE OR REPLACE VIEW shipments_for_client_list AS
 	
 ALTER VIEW shipments_for_client_list OWNER TO beton;
 
+
+-- ******************* update 11/06/2020 08:33:46 ******************
+-- VIEW: shipments_for_client_list
+
+DROP VIEW shipments_for_client_list;
+
+CREATE OR REPLACE VIEW shipments_for_client_list AS
+
+	SELECT
+		sh.order_id
+		,o.client_id
+		,get_shift_start(sh.ship_date_time)::date AS ship_date
+		,o.destination_id
+		,destinations_ref(dest)::text AS destinations_ref
+		,o.concrete_type_id
+		,concrete_types_ref(ct)::text AS concrete_types_ref
+		,(o.pump_vehicle_id IS NOT NULL) AS pump_exists
+		,sum(sh.quant) AS quant
+		
+		,sum( (SELECT pr.price FROM client_price_list(o.client_id) AS pr WHERE pr.concrete_type_id=o.concrete_type_id)*sh.quant ) AS concrete_cost
+		
+		,sum((CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+					coalesce(dest.price,0))			
+				END
+				*
+				shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)			
+		END)::numeric(15,2)
+		) AS deliv_cost
+		
+		,(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0				
+				WHEN (SELECT bool_or(coalesce(t.pump_for_client_cost_edit,FALSE)) FROM shipments t WHERE t.order_id=o.id)
+					THEN (SELECT sum(coalesce(t.pump_for_client_cost,0)::numeric(15,2)) FROM shipments t WHERE t.order_id=o.id)
+				--last ship only!!!
+				ELSE
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,o.date_time)->'keys'->>'id')::int
+								--pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+			END
+		) AS pump_cost
+		
+		--concrete
+		,sum( (SELECT pr.price FROM client_price_list(o.client_id) AS pr WHERE pr.concrete_type_id=o.concrete_type_id)*sh.quant )+
+		--deliv
+		sum((CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN coalesce(dest.price,0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+					coalesce(dest.price,0))			
+				END
+				*
+				shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)			
+		END)::numeric(15,2))+
+		--pump
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0				
+				WHEN (SELECT bool_or(coalesce(t.pump_for_client_cost_edit,FALSE)) FROM shipments t WHERE t.order_id=o.id)
+					THEN (SELECT sum(coalesce(t.pump_for_client_cost,0)::numeric(15,2)) FROM shipments t WHERE t.order_id=o.id)
+				--last ship only!!!
+				ELSE
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,o.date_time)->'keys'->>'id')::int
+								--pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+			END
+		)
+		AS total_cost
+		
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id=sh.order_id
+	LEFT JOIN destinations dest ON dest.id=o.destination_id
+	LEFT JOIN concrete_types ct ON ct.id=o.concrete_type_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE cl.account_from_date IS NULL OR get_shift_start(sh.ship_date_time)>=cl.account_from_date
+	GROUP BY 
+		sh.order_id
+		,o.id
+		,o.date_time
+		,o.client_id
+		,get_shift_start(sh.ship_date_time)::date
+		,o.destination_id
+		,destinations_ref
+		,o.concrete_type_id
+		,concrete_types_ref
+		,o.pump_vehicle_id
+		,pvh.pump_prices
+	ORDER BY get_shift_start(sh.ship_date_time)::date DESC
+	;
+	
+ALTER VIEW shipments_for_client_list OWNER TO beton;
+
+
+-- ******************* update 11/06/2020 09:42:07 ******************
+-- VIEW: material_cons_tolerance_violation_list
+
+DROP VIEW material_cons_tolerance_violation_list;
+
+CREATE OR REPLACE VIEW material_cons_tolerance_violation_list AS
+	SELECT
+		get_shift_start(t.date_time::timestamp without time zone) AS date_time
+		,t.material_id
+		,(t.materials_ref::text)::json AS materials_ref
+		,mat.ord AS material_ord
+		,SUM(t.quant_consuption) AS norm_quant
+		,SUM(t.material_quant) AS fact_quant
+		,(SUM(t.material_quant) - SUM(t.quant_consuption) )::numeric(19,4) AS diff_quant
+		,(abs(SUM(t.material_quant) - SUM(t.quant_consuption)) * 100 / SUM(t.material_quant) )::numeric(19,4) AS diff_percent
+	FROM production_material_list AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.material_id
+	GROUP BY
+		get_shift_start(t.date_time::timestamp without time zone)
+		,t.material_id
+		,t.materials_ref::text
+		,mat.ord
+	ORDER BY get_shift_start(t.date_time::timestamp without time zone) DESC,mat.ord
+	;
+	
+ALTER VIEW material_cons_tolerance_violation_list OWNER TO beton;
+
+
+-- ******************* update 11/06/2020 12:43:44 ******************
+-- VIEW: material_fact_consumptions_list
+
+--DROP VIEW material_fact_consumptions_list CASCADE;
+
+CREATE OR REPLACE VIEW material_fact_consumptions_list AS
+	SELECT
+		t.id,
+		t.date_time,
+		t.upload_date_time,
+		users_ref(u) AS upload_users_ref,
+		production_sites_ref(pr) AS production_sites_ref,
+		t.production_site_id,
+		concrete_types_ref(ct) AS concrete_types_ref,
+		t.concrete_type_production_descr,
+		materials_ref(mat) AS raw_materials_ref,
+		t.raw_material_production_descr,
+		vehicles_ref(vh) AS vehicles_ref,
+		t.vehicle_production_descr,
+		orders_ref(o) AS orders_ref,
+		CASE
+			WHEN sh.id IS NOT NULL THEN
+				'№'||sh.id||' от '||to_char(sh.date_time,'DD/MM/YY HH24:MI:SS')
+			ELSE ''
+		END AS shipments_inf,
+		coalesce(t.concrete_quant,0) AS concrete_quant,
+		coalesce(t.material_quant) AS material_quant,
+		coalesce(t_cor.quant,0) AS material_quant_cor,
+		t.material_quant_req,
+		
+		--Ошибка в марке
+		(t.concrete_type_id IS NOT NULL AND t.concrete_type_id<>o.concrete_type_id) AS err_concrete_type,
+		
+		--ra_mat.quant AS material_quant_shipped,
+		CASE
+			WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+			ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS material_quant_shipped,		
+		
+		
+		/*
+		(
+			CASE
+				WHEN mat.id IS NULL THEN FALSE
+				WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+				ELSE abs(t.material_quant/ra_mat.quant*100-100)>=coalesce(mat.max_required_quant_tolerance_percent,100)
+			END
+		) AS material_quant_tolerance_exceeded,
+		*/
+		prod.material_tolerance_violated AS material_quant_tolerance_exceeded,
+		
+		concrete_types_ref(ct_o) AS order_concrete_types_ref,
+		
+		t.production_id,
+		
+		shipments_ref(sh) AS shipments_ref,
+		prod.id AS production_key,
+		
+		t.concrete_type_id
+				
+		
+	FROM material_fact_consumptions AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+	LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+	LEFT JOIN production_sites AS pr ON pr.id=t.production_site_id
+	LEFT JOIN users AS u ON u.id=t.upload_user_id
+	--LEFT JOIN vehicle_schedule_states AS vh_sch_st ON vh_sch_st.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id=prod.shipment_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	LEFT JOIN concrete_types AS ct_o ON ct_o.id=o.concrete_type_id	
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	--LEFT JOIN production_vehicle_corrections AS v_cor ON v_cor.production_site_id=.production_site_id AND v_cor.production_id=.production_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id
+		AND t_cor.production_id=t.production_id AND t_cor.material_id=t.raw_material_id 
+		 AND t_cor.cement_silo_id=t.cement_silo_id
+	ORDER BY pr.name,t.date_time DESC,mat.name
+	;
+	
+ALTER VIEW material_fact_consumptions_list OWNER TO beton;
+
+
+-- ******************* update 11/06/2020 16:28:31 ******************
+
+		CREATE TABLE raw_material_prices
+		(id serial NOT NULL,date_time timestamp NOT NULL,raw_material_id int NOT NULL REFERENCES raw_materials(id),price  numeric(19,2),set_date_time timestamp
+			DEFAULT CURRENT_TIMESTAMP NOT NULL,user_id int NOT NULL REFERENCES users(id),CONSTRAINT raw_material_prices_pkey PRIMARY KEY (id)
+		);
+
+
+
+-- ******************* update 11/06/2020 16:51:50 ******************
+
+		INSERT INTO views
+		(id,c,f,t,section,descr,limited)
+		VALUES (
+		'10041',
+		'RawMaterialPrice_Controller',
+		'get_list',
+		'RawMaterialPriceList',
+		'Справочники',
+		'Цена на материалы',
+		FALSE
+		);
+
+
+
+-- ******************* update 11/06/2020 16:55:13 ******************
+-- VIEW: raw_material_prices_list
+
+--DROP VIEW raw_material_prices_list;
+
+CREATE OR REPLACE VIEW raw_material_prices_list AS
+	SELECT
+		t.id 
+		,t.date_time
+		,t.raw_material_id
+		,materials_ref(mat) AS raw_materials_ref
+		,t.price
+		,t.set_date_time
+		,t.user_id
+		,users_ref(u) AS users_ref
+	FROM raw_material_prices AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN users AS u ON u.id=t.user_id
+	;
+	
+ALTER VIEW raw_material_prices_list OWNER TO beton;
+
+
+-- ******************* update 12/06/2020 07:44:42 ******************
+-- VIEW: material_avg_consumption_on_ctp
+
+--DROP VIEW material_avg_consumption_on_ctp;
+
+CREATE OR REPLACE VIEW material_avg_consumption_on_ctp AS
+	SELECT
+		t.date_time
+		,concrete_types_ref(ct) AS concrete_types_ref
+		,pr.concrete_quant AS concrete_quant
+		,t.materials_ref
+		,t.quant_consuption AS norm_quant
+		,round(coalesce(m_price.price,0) / 1000 * t.quant_consuption::numeric(19,4),2) AS norm_cost
+		,CASE WHEN pr.concrete_quant=0 THEN 0 ELSE round( (t.quant_consuption/pr.concrete_quant)::numeric(19,4),4) END AS norm_quant_per_m3
+		,CASE WHEN pr.concrete_quant=0 THEN 0 ELSE coalesce(m_price.price,0) / 1000 * t.quant_consuption/pr.concrete_quant END AS norm_cost_per_m3
+		,t.material_quant
+		,round(coalesce(m_price.price,0) / 1000 * t.material_quant::numeric(19,4),2) AS material_cost
+		,CASE WHEN pr.concrete_quant=0 THEN 0 ELSE round( (t.material_quant/pr.concrete_quant)::numeric(19,4),4) END AS material_quant_per_m3
+		,CASE WHEN pr.concrete_quant=0 THEN 0 ELSE coalesce(m_price.price,0) / 1000 * t.material_quant/pr.concrete_quant END AS material_cost_per_m3
+	FROM production_material_list AS t
+	LEFT JOIN productions AS pr ON pr.production_site_id=t.production_site_id AND pr.production_id=t.production_id
+	LEFT JOIN concrete_types AS ct ON ct.id=pr.concrete_type_id
+	LEFT JOIN (
+		SELECT
+			pr.raw_material_id
+			,max(pr.date_time) AS date_time
+		FROM raw_material_prices AS pr
+		GROUP BY pr.raw_material_id
+	) AS m_pr ON m_pr.raw_material_id=t.material_id
+	LEFT JOIN raw_material_prices AS m_price ON m_price.date_time=m_pr.date_time AND m_price.raw_material_id=m_pr.raw_material_id
+	
+	;
+ALTER VIEW material_avg_consumption_on_ctp OWNER TO beton;
+
+
+-- ******************* update 12/06/2020 07:56:50 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	
+	SELECT
+		prod.production_dt_start AS date_time,
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	--LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+
+	GROUP BY
+		prod.production_dt_start,
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 12/06/2020 08:24:37 ******************
+-- Function: public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
+
+-- DROP FUNCTION public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp);
+
+CREATE OR REPLACE FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
+  RETURNS table(
+  	concrete_type_name text
+  	,concrete_type_id int
+  	,material_name text
+  	,material_id int
+  	,concrete_quant numeric(19,4)
+  	,norm_quant numeric(19,4)
+  	,norm_cost numeric(19,2)
+  	,norm_quant_per_m3 numeric(19,2)
+  	,norm_cost_per_m3 numeric(19,2)
+  	,material_quant numeric(19,4)
+  	,material_cost numeric(19,2)
+  	,material_quant_per_m3 numeric(19,2)
+  	,material_cost_per_m3 numeric(19,2)  	
+  ) AS
+$BODY$
+	SELECT		
+		ct.name AS concrete_type_name
+		,ct.id AS concrete_type_id
+		,t.materials_ref->>'descr' AS material_name
+		,(t.materials_ref->'keys'->>'id')::int AS material_id
+		,sum(pr.concrete_quant)::numeric(19,4) AS concrete_quant
+		,sum(t.quant_consuption)::numeric(19,4) AS norm_quant
+		,round( coalesce(m_price.price,0) / 1000 * sum(t.quant_consuption)::numeric(19,4) ,2) AS norm_cost
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (sum(t.quant_consuption)/sum(pr.concrete_quant))::numeric(19,4), 4) END AS norm_quant_per_m3
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (coalesce(m_price.price,0) / 1000 * sum(t.quant_consuption) / sum(pr.concrete_quant))::numeric ,2) END AS norm_cost_per_m3
+		,sum(t.material_quant) AS material_quant
+		,round( coalesce(m_price.price,0) / 1000 * sum(t.material_quant)::numeric(19,4), 2) AS material_cost
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (sum(t.material_quant) / sum(pr.concrete_quant))::numeric(19,4), 4) END AS material_quant_per_m3
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( coalesce(m_price.price,0) / 1000 * sum(t.material_quant) / sum(pr.concrete_quant) ,2) END AS material_cost_per_m3
+	FROM production_material_list AS t
+	LEFT JOIN productions AS pr ON pr.production_site_id=t.production_site_id AND pr.production_id=t.production_id
+	LEFT JOIN concrete_types AS ct ON ct.id=pr.concrete_type_id
+	LEFT JOIN (
+		SELECT
+			pr.raw_material_id
+			,max(pr.date_time) AS date_time
+		FROM raw_material_prices AS pr
+		GROUP BY pr.raw_material_id
+	) AS m_pr ON m_pr.raw_material_id=t.material_id
+	LEFT JOIN raw_material_prices AS m_price ON m_price.date_time=m_pr.date_time AND m_price.raw_material_id=m_pr.raw_material_id
+	WHERE t.date_time>='2020-06-12 06:00'
+	GROUP BY ct.id,ct.name,t.material_ord,t.materials_ref->>'descr',t.materials_ref->'keys'->>'id',m_price.price
+	ORDER BY ct.name,t.material_ord
+	;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+	
+ALTER FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 12/06/2020 08:25:02 ******************
+-- Function: public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
+
+-- DROP FUNCTION public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp);
+
+CREATE OR REPLACE FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
+  RETURNS table(
+  	concrete_type_name text
+  	,concrete_type_id int
+  	,material_name text
+  	,material_id int
+  	,concrete_quant numeric(19,4)
+  	,norm_quant numeric(19,4)
+  	,norm_cost numeric(19,2)
+  	,norm_quant_per_m3 numeric(19,2)
+  	,norm_cost_per_m3 numeric(19,2)
+  	,material_quant numeric(19,4)
+  	,material_cost numeric(19,2)
+  	,material_quant_per_m3 numeric(19,2)
+  	,material_cost_per_m3 numeric(19,2)  	
+  ) AS
+$BODY$
+	SELECT		
+		ct.name AS concrete_type_name
+		,ct.id AS concrete_type_id
+		,t.materials_ref->>'descr' AS material_name
+		,(t.materials_ref->'keys'->>'id')::int AS material_id
+		,sum(pr.concrete_quant)::numeric(19,4) AS concrete_quant
+		,sum(t.quant_consuption)::numeric(19,4) AS norm_quant
+		,round( coalesce(m_price.price,0) / 1000 * sum(t.quant_consuption)::numeric(19,4) ,2) AS norm_cost
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (sum(t.quant_consuption)/sum(pr.concrete_quant))::numeric(19,4), 4) END AS norm_quant_per_m3
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (coalesce(m_price.price,0) / 1000 * sum(t.quant_consuption) / sum(pr.concrete_quant))::numeric ,2) END AS norm_cost_per_m3
+		,sum(t.material_quant) AS material_quant
+		,round( coalesce(m_price.price,0) / 1000 * sum(t.material_quant)::numeric(19,4), 2) AS material_cost
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (sum(t.material_quant) / sum(pr.concrete_quant))::numeric(19,4), 4) END AS material_quant_per_m3
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( coalesce(m_price.price,0) / 1000 * sum(t.material_quant) / sum(pr.concrete_quant) ,2) END AS material_cost_per_m3
+	FROM production_material_list AS t
+	LEFT JOIN productions AS pr ON pr.production_site_id=t.production_site_id AND pr.production_id=t.production_id
+	LEFT JOIN concrete_types AS ct ON ct.id=pr.concrete_type_id
+	LEFT JOIN (
+		SELECT
+			pr.raw_material_id
+			,max(pr.date_time) AS date_time
+		FROM raw_material_prices AS pr
+		GROUP BY pr.raw_material_id
+	) AS m_pr ON m_pr.raw_material_id=t.material_id
+	LEFT JOIN raw_material_prices AS m_price ON m_price.date_time=m_pr.date_time AND m_price.raw_material_id=m_pr.raw_material_id
+	WHERE t.date_time BETWEEN in_date_time_from AND in_date_time_to
+	GROUP BY ct.id,ct.name,t.material_ord,t.materials_ref->>'descr',t.materials_ref->'keys'->>'id',m_price.price
+	ORDER BY ct.name,t.material_ord
+	;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+	
+ALTER FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 12/06/2020 08:34:41 ******************
+-- Function: public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
+
+ DROP FUNCTION public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp);
+
+CREATE OR REPLACE FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
+  RETURNS table(
+  	concrete_type_name text
+  	,concrete_type_id int
+  	,material_name text
+  	,material_id int
+  	,material_ord int
+  	,concrete_quant numeric(19,4)
+  	,norm_quant numeric(19,4)
+  	,norm_cost numeric(19,2)
+  	,norm_quant_per_m3 numeric(19,2)
+  	,norm_cost_per_m3 numeric(19,2)
+  	,material_quant numeric(19,4)
+  	,material_cost numeric(19,2)
+  	,material_quant_per_m3 numeric(19,2)
+  	,material_cost_per_m3 numeric(19,2)  	
+  ) AS
+$BODY$
+	SELECT		
+		ct.name AS concrete_type_name
+		,ct.id AS concrete_type_id
+		,t.materials_ref->>'descr' AS material_name
+		,(t.materials_ref->'keys'->>'id')::int AS material_id
+		,t.material_ord AS material_ord
+		,sum(pr.concrete_quant)::numeric(19,4) AS concrete_quant
+		,sum(t.quant_consuption)::numeric(19,4) AS norm_quant
+		,round( coalesce(m_price.price,0) / 1000 * sum(t.quant_consuption)::numeric(19,4) ,2) AS norm_cost
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (sum(t.quant_consuption)/sum(pr.concrete_quant))::numeric(19,4), 4) END AS norm_quant_per_m3
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (coalesce(m_price.price,0) / 1000 * sum(t.quant_consuption) / sum(pr.concrete_quant))::numeric ,2) END AS norm_cost_per_m3
+		,sum(t.material_quant) AS material_quant
+		,round( coalesce(m_price.price,0) / 1000 * sum(t.material_quant)::numeric(19,4), 2) AS material_cost
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( (sum(t.material_quant) / sum(pr.concrete_quant))::numeric(19,4), 4) END AS material_quant_per_m3
+		,CASE WHEN sum(pr.concrete_quant)=0 THEN 0 ELSE round( coalesce(m_price.price,0) / 1000 * sum(t.material_quant) / sum(pr.concrete_quant) ,2) END AS material_cost_per_m3
+	FROM production_material_list AS t
+	LEFT JOIN productions AS pr ON pr.production_site_id=t.production_site_id AND pr.production_id=t.production_id
+	LEFT JOIN concrete_types AS ct ON ct.id=pr.concrete_type_id
+	LEFT JOIN (
+		SELECT
+			pr.raw_material_id
+			,max(pr.date_time) AS date_time
+		FROM raw_material_prices AS pr
+		GROUP BY pr.raw_material_id
+	) AS m_pr ON m_pr.raw_material_id=t.material_id
+	LEFT JOIN raw_material_prices AS m_price ON m_price.date_time=m_pr.date_time AND m_price.raw_material_id=m_pr.raw_material_id
+	WHERE t.date_time BETWEEN in_date_time_from AND in_date_time_to
+	GROUP BY ct.id,ct.name,t.material_ord,t.materials_ref->>'descr',t.materials_ref->'keys'->>'id',m_price.price
+	ORDER BY ct.name,t.material_ord
+	;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+	
+ALTER FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp) OWNER TO beton;
+
+
+                                                                                                                                                                                                                                                                                                                                  

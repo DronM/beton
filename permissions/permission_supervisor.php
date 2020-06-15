@@ -180,7 +180,19 @@ $permissions = array();
 				
 					$permissions['RawMaterial_Controller_get_material_actions_list']=TRUE;
 				
+					$permissions['RawMaterial_Controller_get_material_avg_cons_on_ctp']=TRUE;
+				
 					$permissions['RawMaterial_Controller_get_material_cons_tolerance_violation_list']=TRUE;
+				
+					$permissions['RawMaterialPrice_Controller_insert']=TRUE;
+				
+					$permissions['RawMaterialPrice_Controller_update']=TRUE;
+				
+					$permissions['RawMaterialPrice_Controller_delete']=TRUE;
+				
+					$permissions['RawMaterialPrice_Controller_get_list']=TRUE;
+				
+					$permissions['RawMaterialPrice_Controller_get_object']=TRUE;
 				
 					$permissions['RawMaterialConsRateDate_Controller_insert']=TRUE;
 				

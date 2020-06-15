@@ -1,24 +1,11 @@
--- Function: public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
+-- Function: public.material_avg_consumption_on_ctp(timestamp without time zone, timestamp without time zone)
 
- DROP FUNCTION public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp);
+-- DROP FUNCTION public.material_avg_consumption_on_ctp(timestamp without time zone, timestamp without time zone);
 
-CREATE OR REPLACE FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
-  RETURNS table(
-  	concrete_type_name text
-  	,concrete_type_id int
-  	,material_name text
-  	,material_id int
-  	,material_ord int
-  	,concrete_quant numeric(19,4)
-  	,norm_quant numeric(19,4)
-  	,norm_cost numeric(19,2)
-  	,norm_quant_per_m3 numeric(19,2)
-  	,norm_cost_per_m3 numeric(19,2)
-  	,material_quant numeric(19,4)
-  	,material_cost numeric(19,2)
-  	,material_quant_per_m3 numeric(19,2)
-  	,material_cost_per_m3 numeric(19,2)  	
-  ) AS
+CREATE OR REPLACE FUNCTION public.material_avg_consumption_on_ctp(
+    IN in_date_time_from timestamp without time zone,
+    IN in_date_time_to timestamp without time zone)
+  RETURNS TABLE(concrete_type_name text, concrete_type_id integer, material_name text, material_id integer, material_ord integer, concrete_quant numeric, norm_quant numeric, norm_cost numeric, norm_quant_per_m3 numeric, norm_cost_per_m3 numeric, material_quant numeric, material_cost numeric, material_quant_per_m3 numeric, material_cost_per_m3 numeric) AS
 $BODY$
 	SELECT		
 		ct.name AS concrete_type_name
@@ -52,7 +39,8 @@ $BODY$
 	;
 $BODY$
   LANGUAGE sql VOLATILE
-  COST 100;
-	
-ALTER FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp) OWNER TO beton;
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.material_avg_consumption_on_ctp(timestamp without time zone, timestamp without time zone)
+  OWNER TO beton;
 

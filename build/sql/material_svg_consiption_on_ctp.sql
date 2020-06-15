@@ -1,6 +1,6 @@
 -- Function: public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
 
- DROP FUNCTION public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp);
+-- DROP FUNCTION public.material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp);
 
 CREATE OR REPLACE FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp)
   RETURNS table(
@@ -54,5 +54,5 @@ $BODY$
   LANGUAGE sql VOLATILE
   COST 100;
 	
-ALTER FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp) OWNER TO beton;
+ALTER FUNCTION material_avg_consumption_on_ctp(in_date_time_from timestamp, in_date_time_to timestamp) OWNER TO ;
 

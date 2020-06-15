@@ -1,13 +1,13 @@
 -- VIEW: shipments_for_client_list
 
-DROP VIEW shipments_for_client_list;
+--DROP VIEW shipments_for_client_list;
 
 CREATE OR REPLACE VIEW shipments_for_client_list AS
 
 	SELECT
 		sh.order_id
 		,o.client_id
-		,get_shift_start(sh.ship_date_time) AS ship_date
+		,get_shift_start(sh.ship_date_time)::date AS ship_date
 		,o.destination_id
 		,destinations_ref(dest)::text AS destinations_ref
 		,o.concrete_type_id
@@ -129,14 +129,14 @@ CREATE OR REPLACE VIEW shipments_for_client_list AS
 		,o.id
 		,o.date_time
 		,o.client_id
-		,get_shift_start(sh.ship_date_time)
+		,get_shift_start(sh.ship_date_time)::date
 		,o.destination_id
 		,destinations_ref
 		,o.concrete_type_id
 		,concrete_types_ref
 		,o.pump_vehicle_id
 		,pvh.pump_prices
-	ORDER BY get_shift_start(sh.ship_date_time) DESC
+	ORDER BY get_shift_start(sh.ship_date_time)::date DESC
 	;
 	
 ALTER VIEW shipments_for_client_list OWNER TO ;

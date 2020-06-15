@@ -23,7 +23,8 @@ class MaterialConsToleranceViolationList_Model extends {
 			
 		//*** Field date_time ***
 		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
+		
+		$f_opts['alias']='Период';
 		$f_opts['id']="date_time";
 						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
@@ -47,6 +48,15 @@ class MaterialConsToleranceViolationList_Model extends {
 						
 		$f_materials_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"materials_ref",$f_opts);
 		$this->addField($f_materials_ref);
+		//********************
+		
+		//*** Field material_ord ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="material_ord";
+						
+		$f_material_ord=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_ord",$f_opts);
+		$this->addField($f_material_ord);
 		//********************
 		
 		//*** Field norm_quant ***

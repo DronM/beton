@@ -16,8 +16,8 @@
  * @param {Object} options
  */
 
-function MaterialConsToleranceViolationList_Model(options){
-	var id = 'MaterialConsToleranceViolationList_Model';
+function RawMaterialPriceList_Model(options){
+	var id = 'RawMaterialPriceList_Model';
 	options = options || {};
 	
 	options.fields = {};
@@ -25,8 +25,17 @@ function MaterialConsToleranceViolationList_Model(options){
 				
 	
 	var filed_options = {};
+	filed_options.primaryKey = true;	
+	filed_options.alias = 'Код';
+	filed_options.autoInc = false;	
+	
+	options.fields.id = new FieldInt("id",filed_options);
+	
+				
+	
+	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Период';
+	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
 	options.fields.date_time = new FieldDateTime("date_time",filed_options);
@@ -38,7 +47,7 @@ function MaterialConsToleranceViolationList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.material_id = new FieldInt("material_id",filed_options);
+	options.fields.raw_material_id = new FieldInt("raw_material_id",filed_options);
 	
 				
 	
@@ -47,7 +56,36 @@ function MaterialConsToleranceViolationList_Model(options){
 	filed_options.alias = 'Материал';
 	filed_options.autoInc = false;	
 	
-	options.fields.materials_ref = new FieldJSON("materials_ref",filed_options);
+	options.fields.raw_materials_ref = new FieldJSON("raw_materials_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Цена';
+	filed_options.autoInc = false;	
+	
+	options.fields.price = new FieldFloat("price",filed_options);
+	options.fields.price.getValidator().setMaxLength('19');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата установки';
+	filed_options.autoInc = false;	
+	
+	options.fields.set_date_time = new FieldDateTime("set_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Пользователь';
+	filed_options.autoInc = false;	
+	
+	options.fields.user_id = new FieldInt("user_id",filed_options);
+	options.fields.user_id.getValidator().setRequired(true);
 	
 				
 	
@@ -56,45 +94,9 @@ function MaterialConsToleranceViolationList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.material_ord = new FieldInt("material_ord",filed_options);
+	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
 	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Расход нормативный';
-	filed_options.autoInc = false;	
-	
-	options.fields.norm_quant = new FieldFloat("norm_quant",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Расход фактический';
-	filed_options.autoInc = false;	
-	
-	options.fields.fact_quant = new FieldFloat("fact_quant",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Отклонение (факт-норм)';
-	filed_options.autoInc = false;	
-	
-	options.fields.diff_quant = new FieldFloat("diff_quant",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Отклонение, %';
-	filed_options.autoInc = false;	
-	
-	options.fields.diff_percent = new FieldFloat("diff_percent",filed_options);
-	
-		MaterialConsToleranceViolationList_Model.superclass.constructor.call(this,id,options);
+		RawMaterialPriceList_Model.superclass.constructor.call(this,id,options);
 }
-extend(MaterialConsToleranceViolationList_Model,ModelXML);
+extend(RawMaterialPriceList_Model,ModelXML);
 

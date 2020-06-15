@@ -430,6 +430,32 @@ class RawMaterial_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('get_material_avg_cons_on_ctp');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('templ',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('inline',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_material_cons_tolerance_violation_list');
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -1038,6 +1064,27 @@ class RawMaterial_Controller extends ControllerSQL{
 			),
 			"MaterialConsToleranceViolationList_Model"
 		);
+	}
+	
+	public function get_material_avg_cons_on_ctp($pm){
+		$cond = new ConditionParamsSQL($pm,$this->getDbLink());
+		$dt_from = $cond->getDbVal('date_time','ge',DT_DATETIME);
+		if (!isset($dt_from)){
+			throw new Exception('Не задана дата начала!');
+		}		
+		$dt_to = $cond->getDbVal('date_time','le',DT_DATETIME);
+		if (!isset($dt_to)){
+			throw new Exception('Не задана дата окончания!');
+		}		
+	
+		$this->addNewModel(
+			sprintf("SELECT * FROM material_avg_consumption_on_ctp(%s,%s)",
+				$dt_from,
+				$dt_to
+			),
+			"MaterialAvgConsumptionOnCtp_Model"
+		);
+	
 	}
 	
 }

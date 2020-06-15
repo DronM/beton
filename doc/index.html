@@ -71,6 +71,7 @@
 <li><a href="#RawMaterialConsRate_Controller">RawMaterialConsRate_Controller</a></li>
 <li><a href="#RawMaterialConsRateDate_Controller">RawMaterialConsRateDate_Controller</a></li>
 <li><a href="#RawMaterialMapToProduction_Controller">RawMaterialMapToProduction_Controller</a></li>
+<li><a href="#RawMaterialPrice_Controller">RawMaterialPrice_Controller</a></li>
 <li><a href="#RawMaterialProcurRate_Controller">RawMaterialProcurRate_Controller</a></li>
 <li><a href="#RawMaterialProcurUpload_Controller">RawMaterialProcurUpload_Controller</a></li>
 <li><a href="#RawMaterialStoreUserData_Controller">RawMaterialStoreUserData_Controller</a></li>
@@ -139,6 +140,8 @@
 <li><a href="#VehicleDialog_Model">VehicleDialog_Model</a></li>
 <li><a href="#Driver_Model">Driver_Model</a></li>
 <li><a href="#RawMaterial_Model">RawMaterial_Model</a></li>
+<li><a href="#RawMaterialPrice_Model">RawMaterialPrice_Model</a></li>
+<li><a href="#RawMaterialPriceList_Model">RawMaterialPriceList_Model</a></li>
 <li><a href="#RawMaterialProcurRate_Model">RawMaterialProcurRate_Model</a></li>
 <li><a href="#RawMaterialProcurRateList_Model">RawMaterialProcurRateList_Model</a></li>
 <li><a href="#RawMaterialProcurUpload_Model">RawMaterialProcurUpload_Model</a></li>
@@ -1976,7 +1979,7 @@
 								Нет</p>
 </div>
 </div>
-<h2>get_material_cons_tolerance_violation_list</h2>
+<h2>get_material_avg_cons_on_ctp</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>templ</h3>
@@ -1994,6 +1997,8 @@
 								Нет</p>
 </div>
 </div>
+<h2>get_material_cons_tolerance_violation_list</h2>
+<a href="#MaterialConsToleranceViolationList_Model">Model: MaterialConsToleranceViolationList_Model</a>
 </div>
 </div>
 <div id="RawMaterialConsRate_Controller" class="content_box">
@@ -2059,6 +2064,19 @@
 <a href="#RawMaterialMapToProduction_Model">Model: RawMaterialMapToProduction_Model</a><h2>get_list</h2>
 <a href="#RawMaterialMapToProductionList_Model">Model: RawMaterialMapToProductionList_Model</a><h2>get_object</h2>
 <a href="#RawMaterialMapToProductionList_Model">Model: RawMaterialMapToProductionList_Model</a>
+</div>
+</div>
+<div id="RawMaterialPrice_Controller" class="content_box">
+<h1>RawMaterialPrice_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#RawMaterialPrice_Model">Model: RawMaterialPrice_Model</a><h2>update</h2>
+<a href="#RawMaterialPrice_Model">Model: RawMaterialPrice_Model</a><h2>delete</h2>
+<a href="#RawMaterialPrice_Model">Model: RawMaterialPrice_Model</a><h2>get_list</h2>
+<a href="#RawMaterialPriceList_Model">Model: RawMaterialPriceList_Model</a><h2>get_object</h2>
+<a href="#RawMaterialPriceList_Model">Model: RawMaterialPriceList_Model</a>
 </div>
 </div>
 <div id="RawMaterialProcurRate_Controller" class="content_box">
@@ -6675,6 +6693,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>material_ord</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>norm_quant</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
@@ -10852,6 +10876,102 @@
 <div>Required:</div>
 <div>Length:19</div>
 <div>Precision:3</div>
+</div>
+</div>
+<div id="RawMaterialPrice_Model" class="content_box">
+<h1>RawMaterialPrice_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>set_date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="RawMaterialPriceList_Model" class="content_box">
+<h1>RawMaterialPriceList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_materials_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>set_date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="RawMaterialProcurRate_Model" class="content_box">

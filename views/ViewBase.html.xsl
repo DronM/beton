@@ -372,7 +372,7 @@
 		<xsl:otherwise>
 			<!-- one level-->
 			<li>
-			    <a href="index.php?c={@c}&amp;f={@f}&amp;t={@t}{$TOKEN}"
+			    <a href="index.php?c={@c}&amp;f={@f}&amp;t={@t}"
 			    onclick="window.getApp().showMenuItem(this,'{@c}','{@f}','{@t}',null,'{@viewdescr}');return false;"
 			    defaultItem="{@default='true'}">
 				<xsl:choose>
@@ -595,7 +595,7 @@ throw Error(CommonHelper.longString(function () {/*
 
 					<ul class="dropdown-menu dropdown-menu-right">
 						<li>
-							<a href="index.php?c=User_Controller&amp;f=get_profile&amp;t=UserProfile{$TOKEN}"
+							<a href="index.php?c=User_Controller&amp;f=get_profile&amp;t=UserProfile"
 							onclick="window.getApp().showMenuItem(this,'User_Controller','get_profile','UserProfile',null,'Профиль');return false;">
 							<i class="icon-user-plus"></i> Профиль
 							</a>

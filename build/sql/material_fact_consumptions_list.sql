@@ -73,7 +73,7 @@ CREATE OR REPLACE VIEW material_fact_consumptions_list AS
 	--LEFT JOIN production_vehicle_corrections AS v_cor ON v_cor.production_site_id=.production_site_id AND v_cor.production_id=.production_id
 	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id
 		AND t_cor.production_id=t.production_id AND t_cor.material_id=t.raw_material_id 
-	
+		 AND t_cor.cement_silo_id=t.cement_silo_id
 	ORDER BY pr.name,t.date_time DESC,mat.name
 	;
 	

@@ -11,6 +11,9 @@ function RepMaterialConsToleranceViolation_View(id,options){
 
 	options = options || {};
 	
+	options.templateOptions = options.templateOptions || {};
+	options.templateOptions.HEAD_TITLE = "Отчет по отколонению от нормативного расхода материалов";
+	
 	var contr = new RawMaterial_Controller();	
 	options.publicMethod = contr.getPublicMethod("get_material_cons_tolerance_violation_list");
 	options.retContentType = "xml";
@@ -78,13 +81,17 @@ RepMaterialConsToleranceViolation_View.prototype.onGetReportData = function(resp
 			ctrl.m_templateOptions.materials.push({
 				"material_descr":m.getFieldValue("materials_ref").getDescr()
 				,"material_id":m.getFieldValue("materials_ref").getKey()
+				,"material_ord":m.getFieldValue("material_ord")
 			});
 			materials.push(material_id);
 		}
 	}
-	
+	ctrl.m_templateOptions.materials.sort(function(a, b){
+		return a.material_ord - b.material_ord;
+	});
 	m.reset();
 	var d_ind = -1,m_ind = 0,material_id;
+	
 	while(m.getNextRow()){
 	
 		date_time = m.getFieldValue("date_time");
@@ -94,7 +101,7 @@ RepMaterialConsToleranceViolation_View.prototype.onGetReportData = function(resp
 				,"materials":[]
 			});
 			d_ind++;
-			for(var m_id in ctrl.m_templateOptions.materials){
+			for(var m_id=0;m_id<ctrl.m_templateOptions.materials.length;m_id++){
 				ctrl.m_templateOptions.dates[d_ind].materials.push({
 					"material_id":ctrl.m_templateOptions.materials[m_id].material_id
 					,"norm_quant":0
@@ -117,9 +124,8 @@ RepMaterialConsToleranceViolation_View.prototype.onGetReportData = function(resp
 		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].fact_quant = m.getFieldValue("fact_quant");
 		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].diff_quant = m.getFieldValue("diff_quant");
 		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].diff_percent = m.getFieldValue("diff_percent");
-		
+		m_ind++;
 	}
-	console.log(ctrl.m_templateOptions)
 	ctrl.updateHTML();
 	ctrl.setVisible(true);
 }

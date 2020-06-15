@@ -7,7 +7,8 @@ CREATE OR REPLACE VIEW material_cons_tolerance_violation_list AS
 		get_shift_start(t.date_time::timestamp without time zone) AS date_time
 		,t.material_id
 		,(t.materials_ref::text)::json AS materials_ref
-		,SUM(t.quant_consuption) AS norm_quant
+		,mat.ord AS material_ord
+		,round(SUM(t.quant_consuption)::numeric(19,4),4) AS norm_quant
 		,SUM(t.material_quant) AS fact_quant
 		,(SUM(t.material_quant) - SUM(t.quant_consuption) )::numeric(19,4) AS diff_quant
 		,(abs(SUM(t.material_quant) - SUM(t.quant_consuption)) * 100 / SUM(t.material_quant) )::numeric(19,4) AS diff_percent

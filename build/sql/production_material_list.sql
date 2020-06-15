@@ -1,6 +1,6 @@
 -- VIEW: production_material_list
 
-DROP VIEW production_material_list;
+--DROP VIEW production_material_list;
 
 CREATE OR REPLACE VIEW production_material_list AS
 	
@@ -97,7 +97,8 @@ CREATE OR REPLACE VIEW production_material_list AS
 	
 		,mat.max_fact_quant_tolerance_percent
 		,row_to_json(pr_com.*) AS production_comment
-	
+		,mat.ord AS material_ord
+		
 	FROM material_fact_consumptions t
 	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
 	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id

@@ -1314,6 +1314,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialFactConsumption_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialAction_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialConsToleranceViolation_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialPriceList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialAvgConsumptionOnCtp_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1732,6 +1734,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ClientLocalList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/ShipmentForClientList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/OrderForClientList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/RawMaterialPrice_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPrice_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPriceList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

@@ -60,6 +60,16 @@ function MaterialFactConsumptionRolledList_View(id,options){
 				"field":new FieldInt("production_site_id")}),
 			"sign":"e"		
 		}
+		,"production_id":{
+			"binding":new CommandBinding({
+				"control":new EditInt(id+":filter-ctrl-production_id",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"№ производства:"
+				}),
+				"field":new FieldInt("production_id")}),
+			"sign":"e"		
+		}
+		
 		,"concrete_type":{
 			"binding":new CommandBinding({
 				"control":new ConcreteTypeEdit(id+":filter-ctrl-concrete_type",{
