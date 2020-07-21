@@ -363,6 +363,19 @@ raw_material_cons_rates_on_date_id ПОМЕНЯТЬ ORDER BY id->ORDER BY ord Д
 1.00178 11/06/20
 
 
+1.00179 21/07/20
+1) При редактировании под lab_worker если изменена сумма, то она сбрасывается в дефолт
+EditMoneyEditable.js добавлен парамтер toggleAllowed
+OrderDialog_View отключена запись не нужных полей
+2) Минимальное количество кубов для доставки берется из колнстанты min_quant_for_ship_cost
+OrderCalc_View.js
+
+3) Переделал текст СМС при отгрузке, жалуются что 
+
+4) EditPeriodShift теперь правильно шагает по периодам, открывает предопределенные периоды
+5) Изменил DateHelper.strtotime() тепаерь работает правильно в Safari
+
+
 SELECT 
 (
 (select quant from rg_material_facts_balance('2020-04-27 06:00','{5}'))

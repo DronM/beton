@@ -15,14 +15,11 @@
 function Enum_email_types(id,options){
 	options = options || {};
 	options.addNotSelected = (options.addNotSelected!=undefined)? options.addNotSelected:true;
-	var multy_lang_values = {"ru_new_account":"Новая учетная запись"
-,"ru_reset_pwd":"Сброс пароля пользователя"
-};
 	options.options = [{"value":"new_account",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"new_account"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"new_account"],
 checked:(options.defaultValue&&options.defaultValue=="new_account")}
 ,{"value":"reset_pwd",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"reset_pwd"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"reset_pwd"],
 checked:(options.defaultValue&&options.defaultValue=="reset_pwd")}
 ];
 	
@@ -30,4 +27,9 @@ checked:(options.defaultValue&&options.defaultValue=="reset_pwd")}
 	
 }
 extend(Enum_email_types,EditSelect);
+
+Enum_email_types.prototype.multyLangValues = {"ru_new_account":"Новая учетная запись"
+,"ru_reset_pwd":"Сброс пароля пользователя"
+};
+
 

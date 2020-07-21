@@ -15,18 +15,14 @@
 function Enum_client_kinds(id,options){
 	options = options || {};
 	options.addNotSelected = (options.addNotSelected!=undefined)? options.addNotSelected:true;
-	var multy_lang_values = {"ru_buyer":"Клиент"
-,"ru_acc":"Бухгалтерия"
-,"ru_else":"Прочие"
-};
 	options.options = [{"value":"buyer",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"buyer"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"buyer"],
 checked:(options.defaultValue&&options.defaultValue=="buyer")}
 ,{"value":"acc",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"acc"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"acc"],
 checked:(options.defaultValue&&options.defaultValue=="acc")}
 ,{"value":"else",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"else"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"else"],
 checked:(options.defaultValue&&options.defaultValue=="else")}
 ];
 	
@@ -34,4 +30,10 @@ checked:(options.defaultValue&&options.defaultValue=="else")}
 	
 }
 extend(Enum_client_kinds,EditSelect);
+
+Enum_client_kinds.prototype.multyLangValues = {"ru_buyer":"Клиент"
+,"ru_acc":"Бухгалтерия"
+,"ru_else":"Прочие"
+};
+
 

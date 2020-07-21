@@ -15,18 +15,14 @@
 function Enum_unload_types(id,options){
 	options = options || {};
 	options.addNotSelected = (options.addNotSelected!=undefined)? options.addNotSelected:true;
-	var multy_lang_values = {"ru_pump":"насос"
-,"ru_band":"лента"
-,"ru_none":"нет"
-};
 	options.options = [{"value":"pump",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"pump"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"pump"],
 checked:(options.defaultValue&&options.defaultValue=="pump")}
 ,{"value":"band",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"band"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"band"],
 checked:(options.defaultValue&&options.defaultValue=="band")}
 ,{"value":"none",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"none"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"none"],
 checked:(options.defaultValue&&options.defaultValue=="none")}
 ];
 	
@@ -34,4 +30,10 @@ checked:(options.defaultValue&&options.defaultValue=="none")}
 	
 }
 extend(Enum_unload_types,EditSelect);
+
+Enum_unload_types.prototype.multyLangValues = {"ru_pump":"насос"
+,"ru_band":"лента"
+,"ru_none":"нет"
+};
+
 

@@ -14,6 +14,8 @@ function OrderDialog_View(id,options){
 	app.getConstantManager().get(constants);
 	
 	var role_id = app.getServVar("role_id");
+	this.m_readOnly = (role_id=="lab_worker");
+	
 	var bool_bs_cl = "control-label "+window.getBsCol(5);
 	var obj_bs_cl = ("control-label "+window.getBsCol(2));
 	
@@ -183,6 +185,7 @@ function OrderDialog_View(id,options){
 		}));	
 		
 		this.addElement(new OrderCalc_View(id+":calc",{
+			"readOnly":this.m_readOnly,
 			"calc":false,
 			"getAvailSpots":function(){
 				self.getAvailSpots();
@@ -227,39 +230,45 @@ function OrderDialog_View(id,options){
 	this.setDataBindings(r_bd);
 	
 	//write
-	this.setWriteBindings([
-		new CommandBinding({
-			"func":function(pm){
-				self.setPublicMethodDateTime(pm);
-				if(self.getTotalEditModified()){
-					pm.setFieldValue("total_edit",!self.m_model.getFieldValue("total_edit"));
+	if(this.m_readOnly){
+		this.setWriteBindings([
+			new CommandBinding({"control":this.getElement("comment_text")})
+		]);
+	}
+	else{
+		this.setWriteBindings([
+			new CommandBinding({
+				"func":function(pm){
+					self.setPublicMethodDateTime(pm);
+					if(self.getTotalEditModified()){
+						pm.setFieldValue("total_edit",!self.m_model.getFieldValue("total_edit"));
+					}
+					else{
+						pm.unsetFieldValue("total_edit");
+					}
 				}
-				else{
-					pm.unsetFieldValue("total_edit");
-				}
-			}
-		})
-		,new CommandBinding({"control":this.getElement("pay_cash")})
-		,new CommandBinding({"control":this.getElement("under_control")})
-		,new CommandBinding({"control":this.getElement("payed")})
-		,new CommandBinding({"control":this.getElement("client"),"fieldId":"client_id"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("destination"),"fieldId":"destination_id"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("quant")})
-		,new CommandBinding({"control":this.getElement("unload_speed")})
-		,new CommandBinding({"control":this.getElement("comment_text")})		
-		,new CommandBinding({"control":this.getElement("calc").getElement("concrete_type"),"fieldId":"concrete_type_id"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("pump_vehicle"),"fieldId":"pump_vehicle_id"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("unload_type")})
-		,new CommandBinding({"control":this.getElement("descr")})
-		,new CommandBinding({"control":this.getElement("phone_cel")})
-		//,new CommandBinding({"control":this.getElement("lang"),"fieldId":"lang_id"})
-		,new CommandBinding({"control":this.getElement("user"),"fieldId":"user_id"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("destination_cost"),"fieldId":"destination_price"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("concrete_cost"),"fieldId":"concrete_price"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("unload_cost"),"fieldId":"unload_price"})
-		,new CommandBinding({"control":this.getElement("calc").getElement("total")})
-	]);
-	
+			})
+			,new CommandBinding({"control":this.getElement("pay_cash")})
+			,new CommandBinding({"control":this.getElement("under_control")})
+			,new CommandBinding({"control":this.getElement("payed")})
+			,new CommandBinding({"control":this.getElement("client"),"fieldId":"client_id"})
+			,new CommandBinding({"control":this.getElement("calc").getElement("destination"),"fieldId":"destination_id"})
+			,new CommandBinding({"control":this.getElement("calc").getElement("quant")})
+			,new CommandBinding({"control":this.getElement("unload_speed")})
+			,new CommandBinding({"control":this.getElement("comment_text")})		
+			,new CommandBinding({"control":this.getElement("calc").getElement("concrete_type"),"fieldId":"concrete_type_id"})
+			,new CommandBinding({"control":this.getElement("calc").getElement("pump_vehicle"),"fieldId":"pump_vehicle_id"})
+			,new CommandBinding({"control":this.getElement("calc").getElement("unload_type")})
+			,new CommandBinding({"control":this.getElement("descr")})
+			,new CommandBinding({"control":this.getElement("phone_cel")})
+			//,new CommandBinding({"control":this.getElement("lang"),"fieldId":"lang_id"})
+			,new CommandBinding({"control":this.getElement("user"),"fieldId":"user_id"})
+			,new CommandBinding({"control":this.getElement("calc").getElement("destination_cost"),"fieldId":"destination_price"})
+			,new CommandBinding({"control":this.getElement("calc").getElement("concrete_cost"),"fieldId":"concrete_price"})
+			,new CommandBinding({"control":this.getElement("calc").getElement("unload_cost"),"fieldId":"unload_price"})
+			,new CommandBinding({"control":this.getElement("calc").getElement("total")})
+		]);
+	}	
 }
 extend(OrderDialog_View,ViewObjectAjx);
 
@@ -372,7 +381,7 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 		DOMHelper.setText(document.getElementById(id+":last_modif_date_time"), DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
 	}
 	
-	if(window.getApp().getServVar("role_id")=="lab_worker"){
+	if(this.m_readOnly){
 		this.setEnabled(false);
 		this.getElement("comment_text").setEnabled(true);
 		this.getControlOK().setEnabled(true);

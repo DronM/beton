@@ -9,7 +9,7 @@ function RawMaterialPriceList_View(id,options){
 	options.templateOptions = options.templateOptions || {};
 	options.templateOptions.HEAD_TITLE = "Цена на материалы";
 	
-	var model = options.models.RawMaterialPriceList_Model;
+	var model = (options.models && options.models.RawMaterialPriceList_Model)? options.models.RawMaterialPriceList_Model : new RawMaterialPriceList_Model();
 	var contr = new RawMaterialPrice_Controller();
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
@@ -26,13 +26,15 @@ function RawMaterialPriceList_View(id,options){
 			"editInline":true,
 			"editWinClass":null,
 			"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+				"variantStorage":!options.detail? options.variantStorage : null,
+				"cmdSearch":!options.detail			
 			}),
 			"popUpMenu":new PopUpMenu(),
 			"head":new GridHead(id+":grid:head",{
 				"elements":[
 					new GridRow(id+":grid:head:row0",{
 						"elements":[
-							new GridCellHead(id+":grid:head:raw_materials_ref",{
+							options.detail?null:new GridCellHead(id+":grid:head:raw_materials_ref",{
 								"value":"Материал",
 								"columns":[
 									new GridColumnRef({
@@ -69,7 +71,7 @@ function RawMaterialPriceList_View(id,options){
 			"pagination":new pagClass(id+"_page",
 				{"countPerPage":constants.doc_per_page_count.getValue()}),		
 			"autoRefresh":false,
-			"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
+			"refreshInterval":!options.detail? (constants.grid_refresh_interval.getValue()*1000) : 0,
 			"rowSelect":false,
 			"focus":true
 		});	

@@ -53,7 +53,7 @@ function OrderMakeList_View(id,options){
 		}
 		//date set
 		var init_dt;
-		if(options.models&&options.models.InitDate&&options.models.InitDate.getNextRow()){
+		if(options.models&&options.models.InitDate&&options.models.InitDate.getNextRow()){			
 			init_dt = DateHelper.strtotime(options.models.InitDate.getFieldValue("dt"));
 		}
 		var per_select = new EditPeriodShift(id+":order_make_filter",{

@@ -592,7 +592,7 @@ MaterialFactConsumptionRolledList_View.prototype.getGridStruc = function(headMod
 		
 		var materials,site_ref,site_id;
 		var m_descr;
-		debugger
+		//debugger
 		while(model.getNextRow()){				
 			materials = model.getFieldValue("materials");
 			site_ref = model.getFieldValue("production_sites_ref");

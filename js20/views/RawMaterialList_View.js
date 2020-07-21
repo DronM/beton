@@ -20,8 +20,8 @@ function RawMaterialList_View(id,options){
 		var grid = new GridAjx(id+":grid",{
 			"model":model,
 			"controller":contr,
-			"editInline":true,
-			"editWinClass":null,
+			"editInline":false,
+			"editWinClass":RawMaterial_Form,
 			"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			}),
 			"popUpMenu":new PopUpMenu(),
@@ -29,6 +29,7 @@ function RawMaterialList_View(id,options){
 				"elements":[
 					new GridRow(id+":grid:head:row0",{
 						"elements":[
+							/*
 							new GridCellHead(id+":grid:head:ord",{
 								"value":"Код",
 								"columns":[
@@ -52,8 +53,9 @@ function RawMaterialList_View(id,options){
 										
 									})
 								]
-							})						
-							,new GridCellHead(id+":grid:head:name",{
+							})
+							*/						
+							new GridCellHead(id+":grid:head:name",{
 								"value":"Наименование",
 								"columns":[
 									new GridColumn({
@@ -64,7 +66,7 @@ function RawMaterialList_View(id,options){
 									})
 								]
 							})
-							,new GridCellHead(id+":grid:head:supply_days_count",{
+							/*,new GridCellHead(id+":grid:head:supply_days_count",{
 								"value":"Дней завоза",
 								"columns":[
 									new GridColumn({
@@ -72,8 +74,8 @@ function RawMaterialList_View(id,options){
 										"ctrlClass":EditInt
 									})
 								]
-							})
-							,new GridCellHead(id+":grid:head:concrete_part",{
+							})*/
+							/*,new GridCellHead(id+":grid:head:concrete_part",{
 								"value":"Для бетона",
 								"columns":[
 									new GridColumnBool({
@@ -81,8 +83,8 @@ function RawMaterialList_View(id,options){
 										"ctrlClass":EditCheckBox
 									})
 								]
-							})
-							,new GridCellHead(id+":grid:head:supply_volume",{
+							})*/
+							/*,new GridCellHead(id+":grid:head:supply_volume",{
 								"value":"V ТС завоза",
 								"columns":[
 									new GridColumn({
@@ -99,7 +101,7 @@ function RawMaterialList_View(id,options){
 										"ctrlClass":EditInt
 									})
 								]
-							})
+							})*/
 							,new GridCellHead(id+":grid:head:min_end_quant",{
 								"value":"Мин.ост,тонн",
 								"columns":[
@@ -121,7 +123,7 @@ function RawMaterialList_View(id,options){
 									})
 								]
 							})
-							,new GridCellHead(id+":grid:head:is_cement",{
+							/*,new GridCellHead(id+":grid:head:is_cement",{
 								"value":"Учет в силосе",
 								"columns":[
 									new GridColumnBool({
@@ -129,7 +131,7 @@ function RawMaterialList_View(id,options){
 									})
 								]
 							})
-						
+							*/
 						]
 					})
 				]

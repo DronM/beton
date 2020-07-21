@@ -112,7 +112,7 @@ class ViewBase extends ViewHTMLXSLT {
 		
 			if ($this->dbLink){
 				$contr = new Constant_Controller($this->dbLink);
-				$list = array('doc_per_page_count','grid_refresh_interval','order_grid_refresh_interval','def_lang');
+				$list = array('doc_per_page_count','grid_refresh_interval','order_grid_refresh_interval','min_quant_for_ship_cost','def_lang');
 				$models['ConstantValueList_Model'] = $contr->getConstantValueModel($list);						
 			}
 		}	
@@ -1235,6 +1235,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/PumpPriceValueList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/VehicleScheduleMakeOrderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialDialog_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialProcurUpload_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialProcurRateList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/Map_View.js'));
@@ -1343,6 +1344,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/VehicleOwnerList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/OrderList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ShipmentList_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/RawMaterial_Form.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));

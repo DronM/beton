@@ -15,10 +15,8 @@
 function Enum_data_types(id,options){
 	options = options || {};
 	options.addNotSelected = (options.addNotSelected!=undefined)? options.addNotSelected:true;
-	var multy_lang_values = {"ru_users":"Пользователи"
-};
 	options.options = [{"value":"users",
-"descr":multy_lang_values[window.getApp().getLocale()+"_"+"users"],
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"users"],
 checked:(options.defaultValue&&options.defaultValue=="users")}
 ];
 	
@@ -26,4 +24,8 @@ checked:(options.defaultValue&&options.defaultValue=="users")}
 	
 }
 extend(Enum_data_types,EditSelect);
+
+Enum_data_types.prototype.multyLangValues = {"ru_users":"Пользователи"
+};
+
 

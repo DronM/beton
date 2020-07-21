@@ -29,7 +29,7 @@
 				<xsl:call-template name="initApp"/>
 				
 				<xsl:call-template name="checkForError"/>				
-				showView();
+				showView();				
 			}
 		</script>
 	</head>

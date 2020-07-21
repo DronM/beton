@@ -42,7 +42,8 @@ extend(EditPeriodDateShift,EditPeriodDateTime);
 EditPeriodDateShift.prototype.setPredefinedPeriod = function(per){
 	if (per=="shift"){
 		this.setCtrlDateTime(this.getControlFrom(),DateHelper.dateStart());
-		this.setCtrlDateTime(this.getControlTo(),new Date(DateHelper.dateStart().getTime()+24*60*60*1000));
+		this.setCtrlDateTime(this.getControlTo(),DateHelper.dateEnd())
+		//new Date(DateHelper.dateStart().getTime()+24*60*60*1000));
 	}				
 	else if (per=="prev_shift"){
 		this.setCtrlDateTime(this.getControlFrom(),DateHelper.dateStart(new Date(DateHelper.time().getTime()-24*60*60*1000)));
@@ -68,9 +69,10 @@ EditPeriodDateShift.prototype.setCtrlDateTime = function(ctrl,dt){
 	dt.setSeconds(0);
 	//
 	var tm = 0;
+	//(this.getControlPeriodSelect().getValue()=="shift"||this.getControlPeriodSelect().getValue()=="prev_shift")
+	//&&
 	if (
-	(this.getControlPeriodSelect().getValue()=="shift"||this.getControlPeriodSelect().getValue()=="prev_shift")
-	&&ctrl.getAttr("name")=="to"){
+	ctrl.getAttr("name")=="to"){
 		tm = 24*60*60*1000;
 	}
 	//dt.setTime(dt.getTime() + DateHelper.timeToMS(ctrl.getTimeValueStr()) + ((ctrl.getAttr("name")=="to")? 24*60*60*1000:0) );

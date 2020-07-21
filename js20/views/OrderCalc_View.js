@@ -15,12 +15,17 @@
 function OrderCalc_View(id,options){
 	options = options || {};	
 	
+	var constants = {"min_quant_for_ship_cost":null};
+	window.getApp().getConstantManager().get(constants);
+	this.m_minQuantForShipCost = constants.min_quant_for_ship_cost.getValue();
+		
 	options.template = options.calc? window.getApp().getTemplate("OrderCalc") : null;
 	
 	this.m_getAvailSpots = options.getAvailSpots;
 	this.m_getPayCash = options.getPayCash;
 	
 	this.m_dialogContext = options.dialogContext;
+	this.m_readOnly = options.readOnly;
 	
 	var self = this;
 	
@@ -142,6 +147,7 @@ function OrderCalc_View(id,options){
 			"value":0,
 			"attrs":{"initvalue":"0.00"},
 			"enabled":false,
+			"toggleAllowed":!this.m_readOnly,
 			"onToggleEditable":function(){
 				self.recalcTotal();
 			}
@@ -201,9 +207,12 @@ OrderCalc_View.prototype.onSelectConcrete = function(f){
 OrderCalc_View.prototype.recalcTotalCont = function(){		
 
 	var quant = this.getElement("quant").getValue();
-	
 	//min quant for destination
 	var quant_for_ship_cost = quant;
+	if(quant_for_ship_cost<this.m_minQuantForShipCost){
+		quant_for_ship_cost = this.m_minQuantForShipCost;
+	}
+	
 	this.m_shipQuantForCostGrade_Model.reset();
 	while(this.m_shipQuantForCostGrade_Model.getNextRow()){
 		var q_to = this.m_shipQuantForCostGrade_Model.getFieldValue("quant_to");

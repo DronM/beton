@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-06-15 06:38:59</lastBuild></version>
+		<lastBuild>2020-07-21 06:44:18</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -82,6 +82,7 @@
 		<version dateOpen="2020-05-26 12:05:06" dateClose="2020-06-10 09:06:50">1.00176</version>
 		<version dateOpen="2020-06-10 10:06:33" dateClose="2020-06-10 13:06:41">1.00177</version>
 		<version dateOpen="2020-06-11 09:06:59" dateClose="2020-06-15 06:06:39">1.00178</version>
+		<version dateOpen="2020-07-16 12:07:31" dateClose="2020-07-21 06:07:44">1.00179</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -3241,7 +3242,7 @@
 		<constant id="max_hour_load" name="Максимальная загрузка завода (куб/час)" descr="" dataType="Int" defaultValue="40"/>
 		<constant id="max_vehicle_at_work" name="Максимальное количество автомобилей на линии" descr="" dataType="Int" defaultValue="20"/>
 		<constant id="min_demurrage_time" name="Минимальное время простоя" descr="Минимальное значение времени за которое считается простой" dataType="Time" defaultValue="00:05"/>
-		<constant id="min_quant_for_ship_cost" name="Минимальный объем (м3) для расчета цены доставки" descr="" dataType="Int" defaultValue="5"/>
+		<constant id="min_quant_for_ship_cost" name="Минимальный объем (м3) для расчета цены доставки" descr="" dataType="Int" defaultValue="5" autoload="TRUE"/>
 		<constant id="no_tracker_signal_warn_interval" name="Интервал, по истечении которого выводится сообщение о неисправном трекере" descr="" dataType="Time" defaultValue="01:00"/>
 		<constant id="ord_mark_if_no_ship_time" name="Выделение цветом заявок при отсутствии отгрузок более данного времени" descr="Если не было отгрузок более данного времени, то заявка будет подсвечена" dataType="Time" defaultValue="01:00"/>
 		<constant id="order_auto_place_tolerance" name="Погрешность для автоматического размещения заявок (м3)" descr="" dataType="Int" defaultValue="10"/>
@@ -5147,6 +5148,7 @@
 		<jsScript file="views/PumpPriceValueList_View.js"/>
 		<jsScript file="views/VehicleScheduleMakeOrderList_View.js"/>
 		<jsScript file="views/RawMaterialList_View.js"/>
+		<jsScript file="views/RawMaterialDialog_View.js"/>
 		<jsScript file="views/RawMaterialProcurUpload_View.js"/>
 		<jsScript file="views/RawMaterialProcurRateList_View.js"/>
 		<jsScript file="views/Map_View.js"/>
@@ -5255,6 +5257,7 @@
 		<jsScript file="forms/VehicleOwnerList_Form.js"/>
 		<jsScript file="forms/OrderList_Form.js"/>
 		<jsScript file="forms/ShipmentList_Form.js"/>
+		<jsScript file="forms/RawMaterial_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="custom_controls/App.enums.js"/>
