@@ -22,6 +22,9 @@ function MaterialFactConsumptionCorretionList_Model(options){
 	
 	options.fields = {};
 	
+			
+				
+			
 				
 	
 	var filed_options = {};

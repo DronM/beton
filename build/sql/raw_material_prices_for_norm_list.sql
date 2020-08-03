@@ -17,4 +17,4 @@ CREATE OR REPLACE VIEW raw_material_prices_for_norm_list AS
 	LEFT JOIN users AS u ON u.id=t.user_id
 	;
 	
-ALTER VIEW raw_material_prices_for_norm_list OWNER TO beton;
+ALTER VIEW raw_material_prices_for_norm_list OWNER TO ;

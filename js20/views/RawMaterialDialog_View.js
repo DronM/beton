@@ -69,6 +69,10 @@ function RawMaterialDialog_View(id,options){
 			"detail":true
 		}));		
 
+		this.addElement(new RawMaterialPriceForNormList_View(id+":price_for_norm_list",{
+			"detail":true
+		}));		
+
 		this.addElement(new RawMaterialProcurRateList_View(id+":procure_rate_list",{
 			"detail":true
 		}));		
@@ -97,7 +101,6 @@ function RawMaterialDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("ord")})
 		,new CommandBinding({"control":this.getElement("concrete_part")})
 		,new CommandBinding({"control":this.getElement("is_cement")})
-		,new CommandBinding({"control":this.getElement("client_kind")})
 		,new CommandBinding({"control":this.getElement("max_fact_quant_tolerance_percent")})
 		,new CommandBinding({"control":this.getElement("min_end_quant")})
 		,new CommandBinding({"control":this.getElement("store_days")})
@@ -107,6 +110,12 @@ function RawMaterialDialog_View(id,options){
 	
 	this.addDetailDataSet({
 		"control":this.getElement("price_list").getElement("grid"),
+		"controlFieldId":"raw_material_id",
+		"fieldId":"id"
+	});
+
+	this.addDetailDataSet({
+		"control":this.getElement("price_for_norm_list").getElement("grid"),
 		"controlFieldId":"raw_material_id",
 		"fieldId":"id"
 	});

@@ -3,14 +3,14 @@
  */
 
 /* constructor */
-function RawMaterialPriceList_View(id,options){
+function RawMaterialPriceForNormList_View(id,options){
 	options = options || {};
 	
 	options.templateOptions = options.templateOptions || {};
-	options.templateOptions.HEAD_TITLE = "Цена на материалы (факт)";
+	options.templateOptions.HEAD_TITLE = "Цена на материалы (подборы)";
 	
-	var model = (options.models && options.models.RawMaterialPriceList_Model)? options.models.RawMaterialPriceList_Model : new RawMaterialPriceList_Model();
-	var contr = new RawMaterialPrice_Controller();
+	var model = (options.models && options.models.RawMaterialPriceForNormList_Model)? options.models.RawMaterialPriceForNormList_Model : new RawMaterialPriceForNormList_Model();
+	var contr = new RawMaterialPriceForNorm_Controller();
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
@@ -79,6 +79,7 @@ function RawMaterialPriceList_View(id,options){
 		
 	}
 		
-	RawMaterialPriceList_View.superclass.constructor.call(this,id,options);
+	RawMaterialPriceForNormList_View.superclass.constructor.call(this,id,options);
 }
-extend(RawMaterialPriceList_View,ViewAjxList);
+extend(RawMaterialPriceForNormList_View,ViewAjxList);
+

@@ -13,7 +13,7 @@ CREATE OR REPLACE VIEW concrete_costs_list AS
 		
 	FROM concrete_costs
 	LEFT JOIN concrete_types AS ctp ON ctp.id=concrete_costs.concrete_type_id
-	ORDER BY concrete_costs.date,ctp.name
+	ORDER BY concrete_costs.date DESC,ctp.name
 	;
 	
 ALTER VIEW concrete_costs_list OWNER TO ;

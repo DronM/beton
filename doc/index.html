@@ -72,6 +72,7 @@
 <li><a href="#RawMaterialConsRateDate_Controller">RawMaterialConsRateDate_Controller</a></li>
 <li><a href="#RawMaterialMapToProduction_Controller">RawMaterialMapToProduction_Controller</a></li>
 <li><a href="#RawMaterialPrice_Controller">RawMaterialPrice_Controller</a></li>
+<li><a href="#RawMaterialPriceForNorm_Controller">RawMaterialPriceForNorm_Controller</a></li>
 <li><a href="#RawMaterialProcurRate_Controller">RawMaterialProcurRate_Controller</a></li>
 <li><a href="#RawMaterialProcurUpload_Controller">RawMaterialProcurUpload_Controller</a></li>
 <li><a href="#RawMaterialStoreUserData_Controller">RawMaterialStoreUserData_Controller</a></li>
@@ -142,6 +143,8 @@
 <li><a href="#RawMaterial_Model">RawMaterial_Model</a></li>
 <li><a href="#RawMaterialPrice_Model">RawMaterialPrice_Model</a></li>
 <li><a href="#RawMaterialPriceList_Model">RawMaterialPriceList_Model</a></li>
+<li><a href="#RawMaterialPriceForNorm_Model">RawMaterialPriceForNorm_Model</a></li>
+<li><a href="#RawMaterialPriceForNormList_Model">RawMaterialPriceForNormList_Model</a></li>
 <li><a href="#RawMaterialProcurRate_Model">RawMaterialProcurRate_Model</a></li>
 <li><a href="#RawMaterialProcurRateList_Model">RawMaterialProcurRateList_Model</a></li>
 <li><a href="#RawMaterialProcurUpload_Model">RawMaterialProcurUpload_Model</a></li>
@@ -2077,6 +2080,19 @@
 <a href="#RawMaterialPrice_Model">Model: RawMaterialPrice_Model</a><h2>get_list</h2>
 <a href="#RawMaterialPriceList_Model">Model: RawMaterialPriceList_Model</a><h2>get_object</h2>
 <a href="#RawMaterialPriceList_Model">Model: RawMaterialPriceList_Model</a>
+</div>
+</div>
+<div id="RawMaterialPriceForNorm_Controller" class="content_box">
+<h1>RawMaterialPriceForNorm_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#RawMaterialPriceForNorm_Model">Model: RawMaterialPriceForNorm_Model</a><h2>update</h2>
+<a href="#RawMaterialPriceForNorm_Model">Model: RawMaterialPriceForNorm_Model</a><h2>delete</h2>
+<a href="#RawMaterialPriceForNorm_Model">Model: RawMaterialPriceForNorm_Model</a><h2>get_list</h2>
+<a href="#RawMaterialPriceForNormList_Model">Model: RawMaterialPriceForNormList_Model</a><h2>get_object</h2>
+<a href="#RawMaterialPriceForNormList_Model">Model: RawMaterialPriceForNormList_Model</a>
 </div>
 </div>
 <div id="RawMaterialProcurRate_Controller" class="content_box">
@@ -10914,6 +10930,102 @@
 <div>Precision:</div>
 <h2>user_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="RawMaterialPriceForNorm_Model" class="content_box">
+<h1>RawMaterialPriceForNorm_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>set_date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="RawMaterialPriceForNormList_Model" class="content_box">
+<h1>RawMaterialPriceForNormList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_materials_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>set_date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

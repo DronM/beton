@@ -1084,7 +1084,38 @@ class RawMaterial_Controller extends ControllerSQL{
 			),
 			"MaterialAvgConsumptionOnCtp_Model"
 		);
-	
+		
+		//корректировка остатков материалов
+		$this->addNewModel(
+			sprintf("SELECT
+					ra.material_id
+					,mat.name AS material_name
+					,sum(ra.quant) AS quant
+					,sum(coalesce(
+						(SELECT m_pr.price
+						FROM raw_material_prices AS m_pr
+						WHERE m_pr.raw_material_id=ra.material_id AND m_pr.date_time<ra.date_time
+						ORDER BY m_pr.date_time DESC
+						LIMIT 1
+						)
+					,0)) AS total
+					
+				FROM ra_material_facts AS ra
+				LEFT JOIN raw_materials AS mat ON mat.id=ra.material_id
+				WHERE
+					ra.date_time BETWEEN %s AND %s
+					AND ra.doc_type IN ('cement_silo_balance_reset','material_fact_balance_correction')
+				GROUP BY
+					ra.material_id,
+					mat.name,
+					mat.ord
+				ORDER BY mat.ord",
+				$dt_from,
+				$dt_to
+			),
+			"MaterialBalanceCorretion_Model"
+		);
+				
 	}
 	
 }

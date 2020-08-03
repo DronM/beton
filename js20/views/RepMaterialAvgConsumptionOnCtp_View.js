@@ -107,5 +107,13 @@ RepMaterialAvgConsumptionOnCtp_View.prototype.onGetReportData = function(respTex
 			WindowPrint.show({content:document.getElementById(self.getId()+":gridTot").outerHTML});
 		}
 	})).toDOM(this.getNode());
+
+	(new ButtonCmd(this.getId()+":printBalanceCorrect",{
+		"title":"Печать таблицы корректировки остатков материалов"
+		,"glyph":"glyphicon-print"
+		,"onClick":function(){
+			WindowPrint.show({content:document.getElementById(self.getId()+":gridBalanceCorrect").outerHTML});
+		}
+	})).toDOM(this.getNode());
 	
 }

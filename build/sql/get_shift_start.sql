@@ -7,8 +7,11 @@ CREATE OR REPLACE FUNCTION get_shift_start(in_date_time timestamp without time z
 $BODY$
 	SELECT
 		CASE
-			WHEN in_date_time::time<const_first_shift_start_time_val() THEN (in_date_time::date - 1)+const_first_shift_start_time_val()
-			ELSE in_date_time::date+const_first_shift_start_time_val()
+			--const_first_shift_start_time_val()
+			--(const_first_shift_start_time_val()::time without time zone)::interval
+			WHEN in_date_time::time without time zone<const_first_shift_start_time_val()::time without time zone THEN
+				(in_date_time::date - '1 day'::interval)+(const_first_shift_start_time_val()::time without time zone)::interval
+			ELSE in_date_time::date+(const_first_shift_start_time_val()::time without time zone)::interval
 		END
 	;
 $BODY$

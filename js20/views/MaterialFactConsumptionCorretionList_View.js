@@ -63,7 +63,12 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 									"ctrlOptions":{
 										"labelCaption":""
 									},
-									"ctrlBindFieldId":"production_site_id"					
+									"ctrlBindFieldId":"production_site_id",
+									"searchOptions":{
+										"field":new FieldInt("production_site_id"),
+										"searchType":"on_match",
+										"typeChange":false
+									}
 								})
 							],
 							"sortable":true
@@ -161,6 +166,7 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:production_id",{
 							"value":"Номер производства",
+							"attrs":{"align":"center"},
 							"columns":[
 								new GridColumn({
 									"field":model.getField("production_id"),
@@ -171,6 +177,7 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:elkon_id",{
 							"value":"Номер записи Elkon",
+							"attrs":{"align":"center"},
 							"columns":[
 								new GridColumn({
 									"field":model.getField("elkon_id"),
@@ -194,6 +201,28 @@ function MaterialFactConsumptionCorretionList_View(id,options){
 				})
 			]
 		}),
+		"foot":new GridFoot(id+"grid:foot",{
+			"autoCalc":true,			
+			"elements":[
+				new GridRow(id+":grid:foot:row0",{
+					"elements":[
+						new GridCell(id+":grid:foot:total_sp1",{
+							"colSpan":"7"
+						})											
+						,new GridCellFoot(id+":grid:foot:tot_quant",{
+							"attrs":{"align":"right"},
+							"totalFieldId":"total_quant",
+							"gridColumn":new GridColumnFloat({
+								"id":"tot_quant",
+								"length":19,
+								"precision":4
+							})
+						})
+					]
+				})		
+			]
+		}),		
+		
 		"pagination":new pagClass(id+"_page",
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
 		

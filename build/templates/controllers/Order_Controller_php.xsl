@@ -47,8 +47,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$dbLink = $this->getDbLink();
 			$dbLinkMaster = $this->getDbLinkMaster();
 			
-			$sms_service = NULL;
-			
 			if (strlen($phone_cel)){
 				//date + rout time
 				$date_time_str = NULL;
@@ -97,15 +95,26 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					}
 				}
 			}
-			//throw new Exception($text);
+			
+			$sms_service = NULL;
 			try{
 				$sms_id = NULL;
 				$sms_id_pump = NULL;
 				
 				if (strlen($phone_cel)){
+					$dbLinkMaster->query(sprintf(
+						"INSERT INTO sms_for_sending
+						(tel,body,sms_type)
+						VALUES (%s,%s,'order')",
+						$phone_cel,
+						$text
+					));					
+					
+					/*
 					$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
 					$sms_id_resp = $sms_service->send($phone_cel,$text,SMS_SIGN,SMS_TEST);				
 					FieldSQLString::formatForDb($this->getDbLink(),$sms_id_resp,$sms_id);								
+					*/
 				}
 				
 				//насоснику
@@ -116,28 +125,52 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					$id
 					));
 
+					/*
 					if (is_null($sms_service)){
 						$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
 					}					
+					*/
 					
 					$pump_sms_mes = NULL;
 					while($pump_sms_ar = $this->getDbLink()->fetch_array($pump_sms_q_id)){
+						$pump_sms_mes = $pump_sms_ar['message'];
+						$dbLinkMaster->query(sprintf(
+							"INSERT INTO sms_for_sending
+							(tel,body,sms_type)
+							VALUES (%s,%s,'%s')",
+							$pump_sms_ar['phone_cel'],
+							$pump_sms_mes,
+							($pumpInsert)? 'order_for_pump_ins':'order_for_pump_del'
+						));					
+					
+						/*
 						$sms_id_resp_pump = $sms_service->send($pump_sms_ar['phone_cel'],$pump_sms_ar['message'],SMS_SIGN,SMS_TEST);
 						FieldSQLString::formatForDb($this->getDbLink(),$sms_id_resp_pump,$sms_id_pump);															
-						$pump_sms_mes = $pump_sms_ar['message'];
+						
+						*/
 					}
 					
 					//ответственному
 					if(!is_null($pump_sms_mes)){
 						$tel_id = $this->pumpActionRespTels( ( ($pumpInsert)? 'order_for_pump_ins':'order_for_pump_upd') );
 						while($tel = $this->getDbLink()->fetch_array($tel_id)){
-							$sms_service->send($tel['phone_cel'],$pump_sms_mes,SMS_SIGN,SMS_TEST);
+							//$sms_service->send($tel['phone_cel'],$pump_sms_mes,SMS_SIGN,SMS_TEST);
+							$dbLinkMaster->query(sprintf(
+								"INSERT INTO sms_for_sending
+								(tel,body,sms_type)
+								VALUES (%s,%s,'%s')",
+								$tel['phone_cel'],
+								$pump_sms_mes,
+								($pumpInsert)? 'order_for_pump_ins':'order_for_pump_del'
+							));												
 						}															
 					}
 				}
 				
 				$q = '';
-				
+				/**
+				 * Не используется !!!
+				 *
 				if ($order_update&amp;&amp;(!is_null($sms_id)||!is_null($sms_id_pump))){
 					$q = sprintf("UPDATE sms_service
 					SET
@@ -165,6 +198,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				if (!is_null($sms_id)||!is_null($sms_id_pump)){
 					$dbLinkMaster->query($q);
 				}
+				 **/
+				
 				$sms_res_str = '';
 				$sms_res_ok = 1;
 			}
@@ -178,6 +213,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$sms_res_ok = 0;
 		}
 		
+		/**
+		 * Больше такая отправка не используется, чтобы иметь возможность
+		 * отслеживать тексты, время и т.д.
+		 */ 
 		$this->addModel(new ModelVars(
 			array('id'=>'SMSSend',
 				'values'=>array(
@@ -189,7 +228,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					)
 				)
 			)
-		);		
+		);
 	}
 	
 	public function insert($pm){

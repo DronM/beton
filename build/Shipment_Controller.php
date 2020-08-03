@@ -920,7 +920,7 @@ class Shipment_Controller extends ControllerSQL{
 		self::addOperatorModels($this,$date_from_db,$date_to_db);
 	}
 		
-	public static function sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode,$quantShipped){
+	public static function sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode){
 		//SMS service
 		if (SMS_ACTIVE) {
 			//Может не быть изменений order_id на слейве после update!!!
@@ -959,7 +959,7 @@ class Shipment_Controller extends ControllerSQL{
 				$text = str_replace('[quant]',$ar['quant'],$text);
 				$text = str_replace('[concrete]',$ar['concrete'],$text);
 				$text = str_replace('[car]',$ar['v_plate'],$text);
-				$text = str_replace('[quant_shipped]',$quantShipped? $quantShipped:$ar['quant_shipped'],$text);
+				$text = str_replace('[quant_shipped]',$ar['quant_shipped'],$text);
 				$text = str_replace('[quant_ordered]',$ar['quant_ordered'],$text);
 				
 				$driver = $ar['d_name'];
@@ -1010,39 +1010,20 @@ class Shipment_Controller extends ControllerSQL{
 	}
 	
 	public static function setShipped($dbLinkMaster,$dbLink,$idForDb,$operatorUserId,$smsResOk,$smsResStr,$interactiveMode){
-	
-		try{
-			$dbLinkMaster->query("BEGIN");
-			
-			$dbLinkMaster->query(
-				sprintf(
-				"UPDATE shipments SET
-					shipped=TRUE,
-					operator_user_id=%d
-				WHERE id=%d",
-				$_SESSION["user_id"],
-				$idForDb
-				)
-			);
+		$dbLinkMaster->query(
+			sprintf(
+			"UPDATE shipments SET
+				shipped=TRUE,
+				operator_user_id=%d
+			WHERE id=%d",
+			$_SESSION["user_id"],
+			$idForDb
+			)
+		);
 		
-			$ar = $dbLinkMaster->query_first(sprintf(
-				"SELECT sum(sh.quant) AS quant_shipped
-				FROM shipments AS sh
-				WHERE sh.order_id=(SELECT t.order_id FROM shipments AS t WHERE t.id=%d)"
-				,$idForDb
-			));
-			$quant_shipped = $ar['quant_shipped'];
-						
-			$dbLinkMaster->query("COMMIT");
-		}
-		catch (Exception $e){
-			$dbLinkMaster->query("ROLLBACK");
-			throw $e;
-		}		
-	
 		Graph_Controller::clearCacheOnShipId($dbLink,$idForDb);		
 		
-		self::sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode,$ar['quant_shipped']);	
+		self::sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode);	
 	}
 	
 	public function set_shipped($pm){
@@ -1056,7 +1037,7 @@ class Shipment_Controller extends ControllerSQL{
 			$_SESSION["user_id"],
 			$sms_res_ok,
 			$sms_res_str,
-			FALSE
+			TRUE
 		);
 		
 		$this->addModel(new ModelVars(
@@ -1073,6 +1054,97 @@ class Shipment_Controller extends ControllerSQL{
 		);				
 	
 	
+		/*
+		$id = $pm->getParamValue("id");	
+		$this->getDbLinkMaster()->query(
+			sprintf(
+			"UPDATE shipments SET
+				shipped=TRUE,
+				operator_user_id=%d
+			WHERE id=%d",
+			$_SESSION["user_id"],
+			$this->getExtDbVal($pm,"id")
+			)
+		);
+		
+		Graph_Controller::clearCacheOnShipId($this->getDbLink(),$id);		
+			
+		//SMS service
+		if (SMS_ACTIVE) {
+			$dbLink = $this->getDbLink();
+			$ar = $dbLink->query_first(sprintf(
+			"SELECT
+				orders.id AS order_id,
+				orders.phone_cel,
+				shipments.quant,
+				concrete_types.name AS concrete,
+				d.name AS d_name,
+				coalesce(d.phone_cel,'') AS d_phone,
+				v.plate AS v_plate,
+				(SELECT pattern FROM sms_patterns
+					WHERE sms_type='ship'::sms_types
+					AND lang_id= orders.lang_id
+				) AS text	
+			FROM orders
+			LEFT JOIN shipments ON shipments.order_id=orders.id
+			LEFT JOIN concrete_types ON concrete_types.id=orders.concrete_type_id
+			LEFT JOIN vehicle_schedules AS vs ON vs.id=shipments.vehicle_schedule_id
+			LEFT JOIN drivers AS d ON d.id=vs.driver_id
+			LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id									
+			WHERE shipments.id=%d"
+			,$this->getExtDbVal($pm,"id"))
+			);
+			
+			if (strlen($ar['phone_cel'])){
+				$text = $ar['text'];
+				$text = str_replace('[quant]',$ar['quant'],$text);
+				$text = str_replace('[concrete]',$ar['concrete'],$text);
+				$text = str_replace('[car]',$ar['v_plate'],$text);
+				
+				$driver = $ar['d_name'];
+				$d_phone = $ar['d_phone'];
+				$d_phone = str_replace('_','',$d_phone);
+				$driver.= ($d_phone!='' && strlen($d_phone)==15)? ' '.$d_phone:'';				
+				$text = str_replace('[driver]',$driver,$text);
+				try{
+					$sms_service = new SMSService(SMS_LOGIN, SMS_PWD);
+					$sms_id_resp = $sms_service->send($ar['phone_cel'],$text,SMS_SIGN,SMS_TEST);
+					$sms_id = NULL;
+					FieldSQLString::formatForDb($this->getDbLink(),$sms_id_resp,$sms_id);
+					$this->getDbLinkMaster()->query(sprintf(
+					"UPDATE sms_service SET
+						shipment_id=%d,
+						sms_id_shipment=%s,
+						shipment_sms_time='%s'
+					WHERE order_id=%d",
+						$this->getExtDbVal($pm,"id"),
+						$sms_id,
+						date('Y-m-d H:i:s'),
+						$ar['order_id'])
+					);
+					
+					$sms_res_str = '';
+					$sms_res_ok = 1;
+				}
+				catch (Exception $e){
+					$sms_res_str = $e->getMessage();
+					$sms_res_ok = 0;
+				}
+				$this->addModel(new ModelVars(
+					array('id'=>'SMSSend',
+						'values'=>array(
+							new Field('sent',DT_INT,
+								array('value'=>$sms_res_ok))
+							,					
+							new Field('resp',DT_STRING,
+								array('value'=>$sms_res_str))
+							)
+						)
+					)
+				);				
+			}
+		}
+		*/
 	}
 	public function unset_shipped(){
 		$pm = $this->getPublicMethod("unset_shipped");
@@ -1568,32 +1640,10 @@ class Shipment_Controller extends ControllerSQL{
 	}
 	
 	public function update($pm){
-		$l = $this->getDbLinkMaster();		
-		try{
-			$l->query("BEGIN");
-			parent::update($pm);
-			
-			$quant_shipped = 0;
-			if($pm->getParamValue("order_id")){
-				$ar = $l->query_first(sprintf(
-					"SELECT sum(sh.quant) AS quant_shipped
-					FROM shipments AS sh
-					WHERE sh.order_id=%d"
-					,$pm->getParamValue("order_id")
-				));
-				$quant_shipped = $ar['quant_shipped'];
-			}
-						
-			$l->query("COMMIT");
-		}
-		catch (Exception $e){
-			$l->query("ROLLBACK");
-			throw $e;
-		}		
+		parent::update($pm);
 		
-		/*
 		if($pm->getParamValue("order_id")){
-			//сменили заявку???
+			//сменили заявку
 			$sms_res_ok = 0;
 			$sms_res_str = '';
 			self::sendShipSMS(
@@ -1602,11 +1652,11 @@ class Shipment_Controller extends ControllerSQL{
 				$this->getExtDbVal($pm,"old_id"),
 				$sms_res_ok,
 				$sms_res_str,
-				FALSE,
-				$quant_shipped
+				TRUE
 			);
+			
 		}
-		*/
+		
 	}
 	
 	public function get_list_for_client($pm){	

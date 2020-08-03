@@ -237,7 +237,6 @@
 	</xsl:if>
 	
 	</xsl:if>
-		
 </xsl:template>
 
 <!--************* Window instance ******************** -->

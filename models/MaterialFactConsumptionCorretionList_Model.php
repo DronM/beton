@@ -169,6 +169,11 @@ class MaterialFactConsumptionCorretionList_Model extends ModelSQLBeton{
 		$this->addField($f_comment_text);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
+	$this->setAggFunctions(
+		array(array('alias'=>'total_quant','expr'=>'sum(quant)')
+)
+	);	
+
 	}
 
 }

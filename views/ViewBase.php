@@ -129,7 +129,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'assets/css/icons/fontawesome/styles.min.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'custom-css/easyTree.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'ext/bootstrap-datepicker/bootstrap-datepicker.standalone.min.css'));
-		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'ext/chart.js-2.8.0/Chart.min.js'));
+		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'ext/chart.js-2.8.0/Chart.min.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'custom-css/style.css'));
 		$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'custom-css/print.css'));
 	
@@ -1316,6 +1316,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialAction_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialConsToleranceViolation_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialPriceList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialPriceForNormList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialAvgConsumptionOnCtp_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
@@ -1739,6 +1740,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/RawMaterialPrice_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPrice_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPriceList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/RawMaterialPriceForNorm_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPriceForNorm_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPriceForNormList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

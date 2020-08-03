@@ -53,7 +53,9 @@ function ConcreteCostList_View(id,options){
 									},
 									"ctrlBindFieldId":"concrete_type_id"
 								})
-							]
+							],
+							"sortable":true,
+							"sort":"asc"							
 						})
 						,new GridCellHead(id+":grid:head:price",{
 							"value":"Цена",

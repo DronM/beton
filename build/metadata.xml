@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-07-21 06:44:18</lastBuild></version>
+		<lastBuild>2020-08-03 05:51:00</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -83,6 +83,7 @@
 		<version dateOpen="2020-06-10 10:06:33" dateClose="2020-06-10 13:06:41">1.00177</version>
 		<version dateOpen="2020-06-11 09:06:59" dateClose="2020-06-15 06:06:39">1.00178</version>
 		<version dateOpen="2020-07-16 12:07:31" dateClose="2020-07-21 06:07:44">1.00179</version>
+		<version dateOpen="2020-07-21 06:07:46" dateClose="2020-08-03 05:08:51">1.00180</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -713,6 +714,28 @@
 			</index>
 		</model>
 		<model id="RawMaterialPriceList" parent="ModelSQLBeton" dataTable="raw_material_prices_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="raw_material_id" dataType="Int" sysCol="TRUE"/>
+			<field id="raw_materials_ref" dataType="JSON" alias="Материал"/>
+			<field id="price" dataType="Float" length="19" precision="2" alias="Цена"/>
+			<field id="set_date_time" dataType="DateTime" alias="Дата установки"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" required="TRUE" alias="Пользователь"/>
+			<field id="users_ref" dataType="JSON" sysCol="TRUE"/>
+		</model>
+		<model id="RawMaterialPriceForNorm" parent="ModelSQLBeton" dataTable="raw_material_prices_for_norm" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Дата"/>
+			<field id="raw_material_id" dataType="Int" refTable="raw_materials" refField="id" required="TRUE" alias="Материал"/>
+			<field id="price" dataType="Float" length="19" precision="2" alias="Цена"/>
+			<field id="set_date_time" dataType="DateTime" dbRequired="TRUE" defaultValue="CURRENT_TIMESTAMP" alias="Дата установки"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" dbRequired="TRUE" alias="Пользователь"/>
+			<index id="raw_material_prices_for_norm_period_idx">
+				<field id="date_time"/>
+				<field id="raw_material_id"/>
+			</index>
+		</model>
+		<model id="RawMaterialPriceForNormList" parent="ModelSQLBeton" dataTable="raw_material_prices_for_norm_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
 			<field id="date_time" dataType="DateTime" alias="Дата"/>
 			<field id="raw_material_id" dataType="Int" sysCol="TRUE"/>
@@ -2926,6 +2949,9 @@
 			</index>
 		</model>
 		<model id="MaterialFactConsumptionCorretionList" parent="ModelSQLBeton" dataTable="material_fact_consumption_corrections_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
@@ -3484,6 +3510,13 @@
 			<publicMethod id="delete" modelId="RawMaterialPrice"/>
 			<publicMethod id="get_list" modelId="RawMaterialPriceList"/>
 			<publicMethod id="get_object" modelId="RawMaterialPriceList"/>
+		</controller>
+		<controller id="RawMaterialPriceForNorm" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="RawMaterialPriceForNorm"/>
+			<publicMethod id="update" modelId="RawMaterialPriceForNorm"/>
+			<publicMethod id="delete" modelId="RawMaterialPriceForNorm"/>
+			<publicMethod id="get_list" modelId="RawMaterialPriceForNormList"/>
+			<publicMethod id="get_object" modelId="RawMaterialPriceForNormList"/>
 		</controller>
 		<controller id="RawMaterialConsRateDate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="RawMaterialConsRateDate"/>
@@ -4506,7 +4539,8 @@
 		<view id="10037" c="CementSilo_Controller" t="CementSiloList" f="get_list" section="Справочники" descr="Соответствие силосов"/>
 		<view id="10039" c="ProductionSite_Controller" t="ProductionSiteForEditList" f="get_list_for_edit" section="Справочники" descr="Заводы (все параметры)"/>
 		<view id="10040" c="UserMapToProduction_Controller" t="UserMapToProductionList" f="get_list" section="Справочники" descr="Соответствие пользователей в производстве и в бетоне"/>
-		<view id="10041" c="RawMaterialPrice_Controller" t="RawMaterialPriceList" f="get_list" section="Справочники" descr="Цена на материалы"/>
+		<view id="10041" c="RawMaterialPrice_Controller" t="RawMaterialPriceList" f="get_list" section="Справочники" descr="Цена на материалы (факт)"/>
+		<view id="10042" c="RawMaterialPriceForNorm_Controller" t="RawMaterialPriceForNormList" f="get_list" section="Справочники" descr="Цена на материалы (дборы)"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -4665,6 +4699,7 @@
 		<serverTemplate id="RepMaterialAction"/>
 		<serverTemplate id="RepMaterialConsToleranceViolation"/>
 		<serverTemplate id="RawMaterialPriceList"/>
+		<serverTemplate id="RawMaterialPriceForNormList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -5229,6 +5264,7 @@
 		<jsScript file="views/RepMaterialAction_View.js"/>
 		<jsScript file="views/RepMaterialConsToleranceViolation_View.js"/>
 		<jsScript file="views/RawMaterialPriceList_View.js"/>
+		<jsScript file="views/RawMaterialPriceForNormList_View.js"/>
 		<jsScript file="views/RepMaterialAvgConsumptionOnCtp_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="forms/ViewList_Form.js"/>
@@ -5652,6 +5688,9 @@
 		<jsScript file="controllers/RawMaterialPrice_Controller.js"/>
 		<jsScript file="models/RawMaterialPrice_Model.js"/>
 		<jsScript file="models/RawMaterialPriceList_Model.js"/>
+		<jsScript file="controllers/RawMaterialPriceForNorm_Controller.js"/>
+		<jsScript file="models/RawMaterialPriceForNorm_Model.js"/>
+		<jsScript file="models/RawMaterialPriceForNormList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>
@@ -5662,7 +5701,7 @@
 		<cssScript file="assets/css/icons/fontawesome/styles.min.css" compressed="TRUE" standalone="TRUE"/>
 		<cssScript file="custom-css/easyTree.css" compressed="FALSE" standalone="TRUE"/>
 		<cssScript file="ext/bootstrap-datepicker/bootstrap-datepicker.standalone.min.css" compressed="TRUE" standalone="TRUE"/>
-		<cssScript file="ext/chart.js-2.8.0/Chart.min.js" compressed="TRUE" standalone="TRUE"/>
+		<cssScript file="ext/chart.js-2.8.0/Chart.min.css" compressed="TRUE" standalone="TRUE"/>
 		<cssScript file="custom-css/style.css" standalone="TRUE"/>
 		<cssScript file="custom-css/print.css" standalone="TRUE"/>
 	</cssScripts>

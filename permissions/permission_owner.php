@@ -194,6 +194,16 @@ $permissions = array();
 				
 					$permissions['RawMaterialPrice_Controller_get_object']=TRUE;
 				
+					$permissions['RawMaterialPriceForNorm_Controller_insert']=TRUE;
+				
+					$permissions['RawMaterialPriceForNorm_Controller_update']=TRUE;
+				
+					$permissions['RawMaterialPriceForNorm_Controller_delete']=TRUE;
+				
+					$permissions['RawMaterialPriceForNorm_Controller_get_list']=TRUE;
+				
+					$permissions['RawMaterialPriceForNorm_Controller_get_object']=TRUE;
+				
 					$permissions['RawMaterialConsRateDate_Controller_insert']=TRUE;
 				
 					$permissions['RawMaterialConsRateDate_Controller_update']=TRUE;

@@ -153,7 +153,7 @@ $BODY$
 		,t.raw_material_id AS material_id
 		,t.concrete_type_id
 		,coalesce(t.concrete_quant,0) AS concrete_quant
-		,sum(coalesce(t.material_quant,0)) AS material_quant
+		,sum(coalesce(t.material_quant,0)) + sum(coalesce(t_cor.quant,0)) AS material_quant
 		,sum(round(
 			coalesce(
 				(SELECT m_pr.price
@@ -162,7 +162,7 @@ $BODY$
 				ORDER BY m_pr.date_time DESC LIMIT 1
 				)
 			,0) * 
-			coalesce(t.material_quant,0)	
+			(coalesce(t.material_quant,0) + coalesce(t_cor.quant,0))
 		,2)) AS material_cost	
 	
 		,CASE
@@ -172,7 +172,7 @@ $BODY$
 		,round(
 			coalesce(
 				(SELECT m_pr.price
-				FROM raw_material_prices AS m_pr
+				FROM raw_material_prices_for_norm AS m_pr
 				WHERE m_pr.raw_material_id=t.raw_material_id AND m_pr.date_time<t.date_time
 				ORDER BY m_pr.date_time DESC LIMIT 1
 				)
@@ -186,6 +186,12 @@ $BODY$
 	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
 	LEFT JOIN shipments AS sh ON sh.id=prod.shipment_id
 	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON
+		t_cor.production_site_id=t.production_site_id
+		AND t_cor.production_id=t.production_id
+		AND t_cor.material_id=t.raw_material_id 
+		AND t_cor.cement_silo_id=t.cement_silo_id
+	
 	WHERE t.date_time BETWEEN in_date_time_from AND in_date_time_to
 	--'2020-07-19 06:00' AND '2020-07-20 06:00'
 	--AND t.raw_material_id=7

@@ -18,7 +18,7 @@
 			<xsl:text>&#160;</xsl:text>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:value-of select="format-number($val,'##0.00')"/>
+			<xsl:value-of select="format-number($val,'###,###.00')"/>
 		</xsl:otherwise>		
 	</xsl:choose>
 </xsl:template>
@@ -38,7 +38,8 @@
 <!-- Main template-->
 <xsl:template match="/">
 	<xsl:apply-templates select="document/model[@id='ModelServResponse']"/>	
-	<xsl:apply-templates select="document/model[@id='MaterialAvgConsumptionOnCtp_Model']"/>		
+	<xsl:apply-templates select="document/model[@id='MaterialAvgConsumptionOnCtp_Model']"/>
+	<xsl:apply-templates select="document/model[@id='MaterialBalanceCorretion_Model']"/>				
 </xsl:template>
 
 <!-- Error -->
@@ -344,6 +345,26 @@
 					</tr>
 				</xsl:for-each>
 			</tbody>
+			<tfoot>
+				<tr>
+					<td>Итого</td>
+					<td align="right">
+						<xsl:call-template name="format_money">
+							<xsl:with-param name="val" select="sum(//row/norm_cost/.)"/>
+						</xsl:call-template>
+					</td>
+					<td align="right">
+						<xsl:call-template name="format_money">
+							<xsl:with-param name="val" select="sum(//row/material_cost/.)"/>
+						</xsl:call-template>																														
+					</td>
+					<td align="right">
+						<xsl:call-template name="format_money">
+							<xsl:with-param name="val" select="sum(//row/norm_cost/.)-sum(//row/material_cost/.)"/>
+						</xsl:call-template>																														
+					</td>
+				</tr>
+			</tfoot>
 		</table>	
 	</div>
 	
@@ -395,6 +416,74 @@
 	</div>
 	
 </xsl:template>
+
+<xsl:template match="model[@id='MaterialBalanceCorretion_Model']">
+	<xsl:variable name="model_id" select="@id"/>	
+	
+	<div>
+		<h3>Корректировка остатков материалов (обнуление)</h3>
+		<div id="RepMaterialAvgConsumptionOnCtp:printBalanceCorrect"/>
+		
+		<table id="RepMaterialAvgConsumptionOnCtp:gridBalanceCorrect" class="table table-bordered table-responsive table-striped">
+			<thead>
+				<tr>
+					<th>Материал</th>
+					<th>Количество</th>
+					<th>Цена</th>
+					<th>Сумма</th>
+				</tr>	
+			</thead>
+			<tbody>
+				<xsl:for-each select="row">
+					<xsl:variable name="row_class">
+						<xsl:choose>
+							<xsl:when test="position() mod 2">odd</xsl:when>
+							<xsl:otherwise>even</xsl:otherwise>													
+						</xsl:choose>
+					</xsl:variable>
+				
+					<tr class="{$row_class}">
+						<td><xsl:value-of select="material_name"/></td>
+												
+						<td align="right">
+							<xsl:call-template name="format_quant">
+								<xsl:with-param name="val" select="quant"/>
+							</xsl:call-template>																														
+						</td>
+						
+						<td align="right">
+							<xsl:call-template name="format_money">
+								<xsl:with-param name="val" select="total div quant"/>
+							</xsl:call-template>																														
+						</td>
+						
+						<td align="right">
+							<xsl:call-template name="format_money">
+								<xsl:with-param name="val" select="total"/>
+							</xsl:call-template>																														
+						</td>
+						
+					</tr>
+				</xsl:for-each>
+			</tbody>		
+			
+			<tfoot>
+				<tr>
+					<td colspan="3">Итого</td>
+					<td align="right">
+						<xsl:call-template name="format_money">
+							<xsl:with-param name="val" select="sum(row/total)"/>
+						</xsl:call-template>
+					</td>
+				</tr>
+			
+			</tfoot>		
+			
+		</table>	
+	</div>
+</xsl:template>
+
+
 
 <!-- header field -->
 
