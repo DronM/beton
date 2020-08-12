@@ -57,7 +57,8 @@
 	
 	<div>
 		<h3>Итоговая таблица</h3>
-		<div id="RepMaterialAvgConsumptionOnCtp:printTot"/>
+		<div id="RepMaterialAvgConsumptionOnCtp:exportTot"/>
+		<div id="RepMaterialAvgConsumptionOnCtp:printTot"/>		
 		
 		<table id="RepMaterialAvgConsumptionOnCtp:gridTot" class="table table-bordered table-responsive table-striped">
 			<thead>
@@ -79,7 +80,7 @@
 			
 						<th colspan="4">Подбор</th>
 						<th colspan="4">Факт</th>
-						<th colspan="4">Отклонение</th>
+						<th colspan="4">Отклонение (+ излишки/- не хватило)</th>
 					</xsl:for-each>	
 				</tr>
 				<tr>
@@ -142,9 +143,9 @@
 							<xsl:sort select="material_ord/."/>
 							<xsl:variable name="concr_row" select="key('concrete_types_materials',concat($concrete_type_id,'|',material_id/.))"/>
 						
+							<!-- Подбор -->
 							<td align="right"><xsl:value-of select="$concr_row/norm_quant/."/></td>
 							<td align="right"><xsl:value-of select="$concr_row/norm_quant_per_m3/."/></td>
-
 							<td align="right">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="$concr_row/norm_cost/."/>
@@ -157,7 +158,7 @@
 								</xsl:call-template>																																
 							</td>
 
-							<!-- -->
+							<!-- Факт -->
 							<td align="right"><xsl:value-of select="$concr_row/material_quant/."/></td>
 							<td align="right"><xsl:value-of select="$concr_row/material_quant_per_m3/."/></td>
 
@@ -172,12 +173,27 @@
 								</xsl:call-template>
 							</td>
 						
-							<!-- -->
-							<td align="right"></td>
-							<td align="right"></td>
-
-							<td align="right"></td>
-							<td align="right"></td>
+							<!-- Отклонение -->
+							<td align="right">
+								<xsl:call-template name="format_quant">
+									<xsl:with-param name="val" select="$concr_row/norm_quant/.-$concr_row/material_quant/."/>
+								</xsl:call-template>																									
+							</td>
+							<td align="right">
+								<xsl:call-template name="format_quant">
+									<xsl:with-param name="val" select="$concr_row/norm_quant_per_m3/.-$concr_row/material_quant_per_m3/."/>
+								</xsl:call-template>																									
+							</td>
+							<td align="right">
+								<xsl:call-template name="format_money">
+									<xsl:with-param name="val" select="$concr_row/norm_cost/.-$concr_row/material_cost/."/>
+								</xsl:call-template>																									
+							</td>
+							<td align="right">
+								<xsl:call-template name="format_money">
+									<xsl:with-param name="val" select="$concr_row/norm_cost_per_m3/.-$concr_row/material_cost_per_m3/."/>
+								</xsl:call-template>																									
+							</td>
 						
 						</xsl:for-each>
 					
@@ -240,20 +256,49 @@
 		
 	<div>
 		<h3>Стоимость 1м3</h3>
-		<div id="RepMaterialAvgConsumptionOnCtp:printConcrTypeCost"/>
+		<div id="RepMaterialAvgConsumptionOnCtp:exportConcrTypeCost"/>
+		<div id="RepMaterialAvgConsumptionOnCtp:printConcrTypeCost"/>		
 		
 		<table id="RepMaterialAvgConsumptionOnCtp:gridConcrTypeCost" class="table table-bordered table-responsive table-striped">
 			<thead>
 				<tr>
-					<td>Марка
-					</td>
-					<td>Расчетная
-					</td>
-					<td>Фактическая
-					</td>
-					<td>Разница
-					</td>
+					<th rowspan="2">Марка
+					</th>
+					<th colspan="{count(//row[generate-id() = generate-id(key('materials',material_id/.)[1])])+1}">Подбор
+					</th>
+					<th colspan="{count(//row[generate-id() = generate-id(key('materials',material_id/.)[1])])+1}">Факт
+					</th>
+					<th rowspan="2">Отклонение (+ излишки/- не хватило)
+					</th>
+				</tr>
+				<tr>
+					<!-- Подбор по материалам -->
+					<xsl:for-each select="//row[generate-id() = generate-id(key('materials',material_id/.)[1])]">
+						<xsl:sort select="material_ord/."/>
+				
+						<xsl:variable name="material_id" select="material_id/."/>
+						<th align="center">
+							<xsl:value-of select="material_name/."/>
+						</th>
+						
+					</xsl:for-each>
+					<th align="center">Итого
+					</th>
+					<!-- Факт по материалам -->
+					<xsl:for-each select="//row[generate-id() = generate-id(key('materials',material_id/.)[1])]">
+						<xsl:sort select="material_ord/."/>
+				
+						<xsl:variable name="material_id" select="material_id/."/>
+						<th align="center">
+							<xsl:value-of select="material_name/."/>
+						</th>
+						
+					</xsl:for-each>
+					<th align="center">Итого
+					</th>
+					
 				</tr>	
+				
 			</thead>
 			<tbody>
 				<xsl:for-each select="//row[generate-id() =
@@ -272,17 +317,38 @@
 					<tr class="{$row_class}">					
 						<td><xsl:value-of select="concrete_type_name/."/></td>					
 					
-						<td align="right">
+						<!-- Подбор -->
+						<xsl:for-each select="//row[generate-id() = generate-id(key('materials',material_id/.)[1])]">
+							<xsl:sort select="material_ord/."/>
+					
+							<xsl:variable name="concr_row" select="key('concrete_types_materials',concat($concrete_type_id,'|',material_id/.))"/>
+						
+							<td align="right"><xsl:value-of select="$concr_row/norm_cost_per_m3/."/></td>
+					
+						</xsl:for-each>					
+						<td align="right" style="font-weight:bolder;">
 							<xsl:call-template name="format_money">							
 								<xsl:with-param name="val" select="sum(//row[concrete_type_id/.=$concrete_type_id]/norm_cost/.) div concrete_quant/."/>
 							</xsl:call-template>							
 						</td>
-						<td align="right">
-							<xsl:call-template name="format_money">
+
+						<!-- Факт -->
+						<xsl:for-each select="//row[generate-id() = generate-id(key('materials',material_id/.)[1])]">
+							<xsl:sort select="material_ord/."/>
+					
+							<xsl:variable name="concr_row" select="key('concrete_types_materials',concat($concrete_type_id,'|',material_id/.))"/>
+						
+							<td align="right"><xsl:value-of select="$concr_row/material_cost_per_m3/."/></td>
+					
+						</xsl:for-each>					
+						<td align="right" style="font-weight:bolder;">
+							<xsl:call-template name="format_money">							
 								<xsl:with-param name="val" select="sum(//row[concrete_type_id/.=$concrete_type_id]/material_cost/.) div concrete_quant/."/>
 							</xsl:call-template>							
 						</td>
-						<td align="right">
+						
+						<!-- Отклонение -->
+						<td align="right" style="font-weight:bolder;">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="(sum(//row[concrete_type_id/.=$concrete_type_id]/norm_cost/.) div concrete_quant/.) - (sum(//row[concrete_type_id/.=$concrete_type_id]/material_cost/.) div concrete_quant/.)"/>
 							</xsl:call-template>																														
@@ -296,7 +362,8 @@
 	<!-- Стоимость материалов-->	
 	<div>
 		<h3>Стоимость материалов</h3>
-		<div id="RepMaterialAvgConsumptionOnCtp:printMatCost"/>
+		<div id="RepMaterialAvgConsumptionOnCtp:exportMatCost"/>
+		<div id="RepMaterialAvgConsumptionOnCtp:printMatCost"/>		
 		
 		<table id="RepMaterialAvgConsumptionOnCtp:gridMatCost" class="table table-bordered table-responsive table-striped">
 			<thead>
@@ -307,7 +374,7 @@
 					</td>
 					<td>Факт
 					</td>
-					<td>Отклонение
+					<td>Отклонение (+ излишки/- не хватило)
 					</td>			
 				</tr>	
 			</thead>
@@ -371,7 +438,8 @@
 	<!-- Объем материалов-->	
 	<div>
 		<h3>Объем материалов</h3>
-		<div id="RepMaterialAvgConsumptionOnCtp:printMatQuant"/>
+		<div id="RepMaterialAvgConsumptionOnCtp:exportMatQuant"/>
+		<div id="RepMaterialAvgConsumptionOnCtp:printMatQuant"/>		
 		
 		<table id="RepMaterialAvgConsumptionOnCtp:gridMatQuant" class="table table-bordered table-responsive table-striped">
 			<thead>
@@ -382,7 +450,7 @@
 					</td>
 					<td>Факт
 					</td>
-					<td>Отклонение
+					<td>Отклонение (+ излишки/- не хватило)
 					</td>			
 				</tr>	
 			</thead>
@@ -422,6 +490,7 @@
 	
 	<div>
 		<h3>Корректировка остатков материалов (обнуление)</h3>
+		<div id="RepMaterialAvgConsumptionOnCtp:exportBalanceCorrect"/>
 		<div id="RepMaterialAvgConsumptionOnCtp:printBalanceCorrect"/>
 		
 		<table id="RepMaterialAvgConsumptionOnCtp:gridBalanceCorrect" class="table table-bordered table-responsive table-striped">

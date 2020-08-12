@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-08-03 05:51:00</lastBuild></version>
+		<lastBuild>2020-08-12 05:27:22</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -84,6 +84,7 @@
 		<version dateOpen="2020-06-11 09:06:59" dateClose="2020-06-15 06:06:39">1.00178</version>
 		<version dateOpen="2020-07-16 12:07:31" dateClose="2020-07-21 06:07:44">1.00179</version>
 		<version dateOpen="2020-07-21 06:07:46" dateClose="2020-08-03 05:08:51">1.00180</version>
+		<version dateOpen="2020-08-03 06:08:32" dateClose="2020-08-12 05:08:27">1.00181</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -240,6 +241,9 @@
 			</value>
 		</enum>
 		<enum id="doc_types">
+			<value id="order">
+				<ru descr="Заявка"/>
+			</value>
 			<value id="material_procurement">
 				<ru descr="Поступление материалов"/>
 			</value>
@@ -1452,6 +1456,7 @@
 			<field id="ship_bal_min" dataType="Int" alias="Остаток"/>
 			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
 			<field id="production_list" dataType="JSON" alias="Список производств elkon"/>
+			<field id="production_quant" dataType="Float" alias="Количество по данным всех производств"/>
 			<!--
 			<field id="production_id" dataType="Int" alias="Номер производства elkon" />
 			<field id="production_concrete_types_ref" dataType="JSON" alias="Марка elkon" />
@@ -2465,12 +2470,17 @@
 			<field id="delivered_date_time" dataType="DateTime"/>
 			<field id="sms_type" dataType="Enum" enumId="sms_types"/>
 			<field id="sms_id" dataType="Text"/>
+			<field id="doc_ref" dataType="JSONB"/>
 			<index id="sms_for_sending_sent_index" unique="FALSE">
 				<field id="sent"/>
 				<field id="delivered"/>
 			</index>
 			<index id="sms_for_sending_date_time_idx">
 				<field id="date_time"/>
+			</index>
+			<index id="sms_for_sending_doc_idx">
+				<expression>(doc_ref-&gt;&gt;'dataType'::text)</expression>
+				<expression>(doc_ref-&gt;'keys'-&gt;&gt;'id'::int)</expression>
 			</index>
 		</model>
 		<model id="EmailTemplate" parent="ModelSQLBeton" dataTable="email_templates" virtual="FALSE">

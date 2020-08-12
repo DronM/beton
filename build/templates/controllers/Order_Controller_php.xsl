@@ -47,6 +47,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$dbLink = $this->getDbLink();
 			$dbLinkMaster = $this->getDbLinkMaster();
 			
+			$ar_doc = $dbLinkMaster->query_first(sprintf("SELECT orders_ref(orders) AS orders_ref FROM orders WHERE id=%d",$id));			
+			
 			if (strlen($phone_cel)){
 				//date + rout time
 				$date_time_str = NULL;
@@ -104,10 +106,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				if (strlen($phone_cel)){
 					$dbLinkMaster->query(sprintf(
 						"INSERT INTO sms_for_sending
-						(tel,body,sms_type)
-						VALUES (%s,%s,'order')",
+						(tel,body,sms_type,doc_ref)
+						VALUES ('%s','%s','order','%s')",
 						$phone_cel,
-						$text
+						$text,
+						$ar_doc['orders_ref']
 					));					
 					
 					/*
@@ -136,11 +139,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 						$pump_sms_mes = $pump_sms_ar['message'];
 						$dbLinkMaster->query(sprintf(
 							"INSERT INTO sms_for_sending
-							(tel,body,sms_type)
-							VALUES (%s,%s,'%s')",
+							(tel,body,sms_type,doc_ref)
+							VALUES ('%s','%s','%s','%s')",
 							$pump_sms_ar['phone_cel'],
 							$pump_sms_mes,
-							($pumpInsert)? 'order_for_pump_ins':'order_for_pump_del'
+							($pumpInsert)? 'order_for_pump_ins':'order_for_pump_del',
+							$ar_doc['orders_ref']
 						));					
 					
 						/*
@@ -157,11 +161,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 							//$sms_service->send($tel['phone_cel'],$pump_sms_mes,SMS_SIGN,SMS_TEST);
 							$dbLinkMaster->query(sprintf(
 								"INSERT INTO sms_for_sending
-								(tel,body,sms_type)
-								VALUES (%s,%s,'%s')",
+								(tel,body,sms_type,doc_ref)
+								VALUES ('%s','%s','%s','%s')",
 								$tel['phone_cel'],
 								$pump_sms_mes,
-								($pumpInsert)? 'order_for_pump_ins':'order_for_pump_del'
+								($pumpInsert)? 'order_for_pump_ins':'order_for_pump_del',
+								$ar_doc['orders_ref']
 							));												
 						}															
 					}

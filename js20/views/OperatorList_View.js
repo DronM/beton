@@ -2,7 +2,7 @@
  *	Andrey Mikhalevich, Katren ltd.
  */
 function OperatorList_View(id,options){	
-	
+
 	options.templateOptions = options.templateOptions || {};
 	options.templateOptions.showPeriod = (!options.fromLabList && CommonHelper.inArray(window.getApp().getServVar("role_id"),["operator","dispatcher"])==-1);
 	
@@ -389,13 +389,14 @@ function OperatorList_View(id,options){
 				opts.className+= (opts.className.length? " ":"")+"operatorNotShipped";
 			}
 			else if(
-				col=="production_id"
+				col=="production_list"
 				&&(
-					m.getFieldValue("tolerance_exceeded")
-					||(m.getFieldValue("shipped") && !m.getFieldValue("production_id")) 
+					//( m.getFieldValue("tolerance_exceeded")||(m.getFieldValue("shipped") && !m.getFieldValue("production_id")) )
+					(m.getFieldValue("production_quant") && m.getFieldValue("production_quant")!=m.getFieldValue("quant"))
 				)
 			){
 				opts.className+= (opts.className.length? " ":"")+"factQuantViolation";
+				opts.title = "Объем по данным производства: "+m.getFieldValue("production_quant")+"м3";
 			}
 		},
 		"head":new GridHead(id+"-grid:head",{

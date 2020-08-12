@@ -75,6 +75,9 @@ extend(SMSForSending_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldText("sms_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSONB("doc_ref",f_opts));
 }
 
 		

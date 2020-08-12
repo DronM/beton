@@ -6,6 +6,7 @@ function OrderMakeList_View(id,options){
 	this.m_lowResDevice = (window.getWidthType()=="sm");
 	options.templateOptions = options.templateOptions || {};	
 	options.templateOptions.showChart = !this.m_lowResDevice;
+	options.templateOptions.showGridHeaders = this.m_lowResDevice;
 	
 	this.m_showProductionSites = !this.m_lowResDevice;
 	options.templateOptions.showProductionSites = this.m_showProductionSites;

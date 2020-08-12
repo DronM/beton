@@ -388,6 +388,10 @@ OrderCalc_View.js
 	- добавлены ручные корректировки material_avg_consumption_on_ctp.sql
 
 
+1.00181 12/08/20
+1) Еще раз изменил DateHelper.strtotime()
+2) Список марок, цена из последней цены прайса и не редактируется!!! concrete_types_list.sql для чтения цен из последнего парйса для всех!!!
+3) Экспорт локальных списков в Excel
 
 
 SELECT 

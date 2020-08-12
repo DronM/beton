@@ -29,7 +29,7 @@ function OrderMakeGrid(id,options){
 	var editable = (role=="admin"||role=="owner"||role=="boss"||role=="manager"||role=="accountant"||role=="sales"||role=="plant_director"||role=="supervisor"||role=="dispatcher");
 
 	var elements,foot;
-	if(w=="sm"){
+	if(w=="sm"||w=="xs"){
 		elements = [
 			new GridCellHead(id+":order_make_grid:head:date_time_time",{
 				"value":"Время",
@@ -43,7 +43,8 @@ function OrderMakeGrid(id,options){
 			})
 		
 			,new GridCellHead(id+":order_make_grid:head:inf1",{
-				"value":"Заявка",
+				"value":"Клиент",
+				"colAttrs":{"data-label":"Клиент"},
 				"columns":[
 					new GridColumn({
 						"id":"inf1",
@@ -78,6 +79,7 @@ function OrderMakeGrid(id,options){
 			})
 			,new GridCellHead(id+":order_make_grid:head:inf3",{
 				"value":"Насос",
+				"colAttrs":{"data-label":"Насос"},
 				"columns":[
 					new GridColumn({
 						"id":"inf3",
@@ -105,7 +107,8 @@ function OrderMakeGrid(id,options){
 			})
 			
 			,new GridCellHead(id+":order_make_grid:head:inf2",{
-				"value":"",
+				"value":"Кол-во,марка",
+				"colAttrs":{"data-label":"Кол-во,марка"},
 				"columns":[
 					new GridColumn({
 						"id":"inf2",

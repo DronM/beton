@@ -203,6 +203,16 @@ class OperatorList_Model extends ModelSQLBeton{
 		$this->addField($f_production_list);
 		//********************
 		
+		//*** Field production_quant ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Количество по данным всех производств';
+		$f_opts['id']="production_quant";
+						
+		$f_production_quant=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_quant",$f_opts);
+		$this->addField($f_production_quant);
+		//********************
+		
 		//*** Field tolerance_exceeded ***
 		$f_opts = array();
 		$f_opts['id']="tolerance_exceeded";

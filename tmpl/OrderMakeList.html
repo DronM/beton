@@ -53,21 +53,34 @@
 			</div>
 		</div>	
 		{{/showProductionSites}}
+		
+		{{#showGridHeaders}}
+		<h4>Остатки материалов</h4>
+		{{/showGridHeaders}}
 		<div class="row order-l-grid">
 			<div id="{{id}}:mat_totals_grid">
 			</div>
-		</div>	
+		</div>			
 				
+		{{#showGridHeaders}}
+		<h4>Назначенные транспорнтные средства</h4>
+		{{/showGridHeaders}}
 		<div class="row order-l-grid">		
 			<div id="{{id}}:veh_assigning" class="row">
 			</div>	
 		</div>	
 		
+		{{#showGridHeaders}}
+		<h4>Все транспорнтные средства</h4>
+		{{/showGridHeaders}}
 		<div class="row order-l-grid">
 			<div id="{{id}}:veh_schedule_grid">
 			</div>	
 		</div>	
 		
+		{{#showGridHeaders}}
+		<h4>Свойства транспорнтных средств</h4>
+		{{/showGridHeaders}}
 		<div class="row order-l-grid">
 			<div id="{{id}}:features_grid">
 			</div>	

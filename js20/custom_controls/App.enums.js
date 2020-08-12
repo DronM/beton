@@ -65,7 +65,8 @@
 ,"ru_reset_pwd":"Сброс пароля пользователя"
 }
 
-		,"doc_types":{"ru_material_procurement":"Поступление материалов"
+		,"doc_types":{"ru_order":"Заявка"
+,"ru_material_procurement":"Поступление материалов"
 ,"ru_shipment":"Отгрузка"
 ,"ru_material_fact_consumption":"Фактический расход материалов"
 ,"ru_material_fact_consumption_correction":"Корректировка фактического расхода материалов"

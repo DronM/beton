@@ -184,6 +184,15 @@ function OperatorList_Model(options){
 	
 	options.fields.production_list = new FieldJSON("production_list",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Количество по данным всех производств';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_quant = new FieldFloat("production_quant",filed_options);
+	
 			
 				
 	

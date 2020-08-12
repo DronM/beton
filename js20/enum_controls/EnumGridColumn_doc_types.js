@@ -18,6 +18,8 @@ function EnumGridColumn_doc_types(options){
 	
 	options.multyLangValues["ru"] = {};
 
+	options.multyLangValues["ru"]["order"] = "Заявка";
+
 	options.multyLangValues["ru"]["material_procurement"] = "Поступление материалов";
 
 	options.multyLangValues["ru"]["shipment"] = "Отгрузка";

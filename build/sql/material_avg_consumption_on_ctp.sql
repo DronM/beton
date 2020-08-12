@@ -130,9 +130,9 @@ $BODY$
 	SELECT
 		ct.name AS concrete_type_name
 		,sub.concrete_type_id	
-		,mat.name
+		,sub.material_name
 		,sub.material_id
-		,mat.ord	
+		,sub.material_ord	
 	
 		,sum(sub.concrete_quant)::numeric(19,4) AS concrete_quant
 		,sum(sub.norm_quant)::numeric(19,4) AS norm_quant
@@ -148,9 +148,10 @@ $BODY$
 	FROM
 	(
 	SELECT
-		--sh.id
 		prod.production_id
 		,t.raw_material_id AS material_id
+		,mat.name AS material_name
+		,mat.ord AS material_ord
 		,t.concrete_type_id
 		,coalesce(t.concrete_quant,0) AS concrete_quant
 		,sum(coalesce(t.material_quant,0)) + sum(coalesce(t_cor.quant,0)) AS material_quant
@@ -161,8 +162,8 @@ $BODY$
 				WHERE m_pr.raw_material_id=t.raw_material_id AND m_pr.date_time<t.date_time
 				ORDER BY m_pr.date_time DESC LIMIT 1
 				)
-			,0) * 
-			(coalesce(t.material_quant,0) + coalesce(t_cor.quant,0))
+			,0) * 			
+			(coalesce(t.material_quant,0)  + coalesce(t_cor.quant,0))
 		,2)) AS material_cost	
 	
 		,CASE
@@ -186,11 +187,12 @@ $BODY$
 	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
 	LEFT JOIN shipments AS sh ON sh.id=prod.shipment_id
 	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
 	LEFT JOIN material_fact_consumption_corrections AS t_cor ON
 		t_cor.production_site_id=t.production_site_id
 		AND t_cor.production_id=t.production_id
 		AND t_cor.material_id=t.raw_material_id 
-		AND t_cor.cement_silo_id=t.cement_silo_id
+		AND (mat.is_cement=FALSE OR t_cor.cement_silo_id=t.cement_silo_id)
 	
 	WHERE t.date_time BETWEEN in_date_time_from AND in_date_time_to
 	--'2020-07-19 06:00' AND '2020-07-20 06:00'
@@ -200,19 +202,21 @@ $BODY$
 		prod.production_id
 		,t.concrete_type_id	
 		,t.raw_material_id
+		,mat.name
+		,mat.ord
 		,t.concrete_quant
 		,norm_quant
 		,norm_cost
 	) AS sub
 	LEFT JOIN concrete_types AS ct ON ct.id=sub.concrete_type_id
-	LEFT JOIN raw_materials AS mat ON mat.id=sub.material_id
+	--LEFT JOIN raw_materials AS mat ON mat.id=sub.material_id
 	GROUP BY
 		ct.name
 		,sub.concrete_type_id	
-		,mat.name
+		,sub.material_name
 		,sub.material_id
-		,mat.ord	
-	ORDER BY ct.name,mat.ord
+		,sub.material_ord	
+	ORDER BY ct.name,sub.material_ord
 	;
 
 

@@ -835,7 +835,8 @@ class Shipment_Controller extends ControllerSQL{
 			sh.production_site_id,
 			production_sites_ref(ps) AS production_sites_ref,
 			users_ref(op_u) AS operators_ref,
-			(SELECT json_agg(row_to_json(productions)) FROM productions WHERE productions.shipment_id=sh.id) AS production_list
+			(SELECT json_agg(row_to_json(productions)) FROM productions WHERE productions.shipment_id=sh.id) AS production_list,
+			coalesce((SELECT sum(concrete_quant) FROM productions WHERE productions.shipment_id=sh.id),0) AS production_quant
 			%s
 		FROM shipments AS sh
 		LEFT JOIN orders o ON o.id = sh.order_id
@@ -943,7 +944,8 @@ class Shipment_Controller extends ControllerSQL{
 					WHERE sh.order_id=orders.id
 					)
 				,0) AS quant_shipped,
-				coalesce(orders.quant,0) AS quant_ordered
+				coalesce(orders.quant,0) AS quant_ordered,
+				shipments_ref(shipments) AS doc_ref
 			FROM orders
 			LEFT JOIN shipments ON shipments.order_id=orders.id
 			LEFT JOIN concrete_types ON concrete_types.id=orders.concrete_type_id
@@ -998,10 +1000,11 @@ class Shipment_Controller extends ControllerSQL{
 					//Отложенная отправка - по-новому (используется из автоотгрузки Production_Controller)
 					$dbLinkMaster->query(sprintf(
 						"INSERT INTO sms_for_sending
-						(tel,body,sms_type)
-						VALUES (%s,%s,'ship')",
+						(tel,body,sms_type,doc_ref)
+						VALUES ('%s','%s','ship','%s')",
 						$ar['phone_cel'],
-						$text
+						$text,
+						$ar['doc_ref']
 					));					
 				}
 			}

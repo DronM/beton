@@ -13,6 +13,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLEnum.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class SMSForSending_Model extends ModelSQLBeton{
 	
@@ -107,6 +108,14 @@ class SMSForSending_Model extends ModelSQLBeton{
 						
 		$f_sms_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sms_id",$f_opts);
 		$this->addField($f_sms_id);
+		//********************
+		
+		//*** Field doc_ref ***
+		$f_opts = array();
+		$f_opts['id']="doc_ref";
+						
+		$f_doc_ref=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"doc_ref",$f_opts);
+		$this->addField($f_doc_ref);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

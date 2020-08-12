@@ -118,6 +118,16 @@ function SMSForSending_Model(options){
 	
 	options.fields.sms_id = new FieldText("sms_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.doc_ref = new FieldJSONB("doc_ref",filed_options);
+	
+			
 			
 			
 		SMSForSending_Model.superclass.constructor.call(this,id,options);

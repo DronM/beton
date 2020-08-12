@@ -40,7 +40,7 @@ function ShipmentForOrderList_View(id,options){
 			var m = this.getModel();
 			if(m.getFieldValue("shipped")){
 				opts.className+=(opts.className.length? " ":"")+"shipped";
-			}		
+			}
 		},
 		"popUpMenu":null,
 		"filters":(options.detailFilters&&options.detailFilters.ShipmentForOrderList_Model)? options.detailFilters.ShipmentForOrderList_Model:null,

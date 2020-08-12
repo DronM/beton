@@ -1,0 +1,1 @@
+psql:/home/andrey/www/htdocs/beton_new/build/sql/last_update.sql:2: ОШИБКА:  столбец "doc_ref" отношения "sms_for_sending" уже существует

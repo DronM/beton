@@ -15,7 +15,10 @@
 function Enum_doc_types(id,options){
 	options = options || {};
 	options.addNotSelected = (options.addNotSelected!=undefined)? options.addNotSelected:true;
-	options.options = [{"value":"material_procurement",
+	options.options = [{"value":"order",
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"order"],
+checked:(options.defaultValue&&options.defaultValue=="order")}
+,{"value":"material_procurement",
 "descr":this.multyLangValues[window.getApp().getLocale()+"_"+"material_procurement"],
 checked:(options.defaultValue&&options.defaultValue=="material_procurement")}
 ,{"value":"shipment",
@@ -43,7 +46,8 @@ checked:(options.defaultValue&&options.defaultValue=="cement_silo_balance_reset"
 }
 extend(Enum_doc_types,EditSelect);
 
-Enum_doc_types.prototype.multyLangValues = {"ru_material_procurement":"Поступление материалов"
+Enum_doc_types.prototype.multyLangValues = {"ru_order":"Заявка"
+,"ru_material_procurement":"Поступление материалов"
 ,"ru_shipment":"Отгрузка"
 ,"ru_material_fact_consumption":"Фактический расход материалов"
 ,"ru_material_fact_consumption_correction":"Корректировка фактического расхода материалов"

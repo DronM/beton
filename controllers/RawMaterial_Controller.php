@@ -1090,7 +1090,7 @@ class RawMaterial_Controller extends ControllerSQL{
 			sprintf("SELECT
 					ra.material_id
 					,mat.name AS material_name
-					,sum(ra.quant) AS quant
+					,sum(CASE WHEN ra.deb THEN 1 ELSE -1 END*ra.quant) AS quant
 					,sum(coalesce(
 						(SELECT m_pr.price
 						FROM raw_material_prices AS m_pr
@@ -1098,7 +1098,7 @@ class RawMaterial_Controller extends ControllerSQL{
 						ORDER BY m_pr.date_time DESC
 						LIMIT 1
 						)
-					,0)) AS total
+					,0)*CASE WHEN ra.deb THEN 1 ELSE -1 END*ra.quant) AS total
 					
 				FROM ra_material_facts AS ra
 				LEFT JOIN raw_materials AS mat ON mat.id=ra.material_id
