@@ -364,18 +364,45 @@ class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
 		$mat_model = new ModelSQL($link,array('id'=>'RawMaterial_Model'));
 		$mat_model->addField(new FieldSQLInt($link,null,null,"id"));
 		$mat_model->addField(new FieldSQLString($link,null,null,"name"));
-		$mat_model->query("SELECT id,name FROM raw_materials WHERE name <>'' ORDER BY id",
+		$mat_model->query("SELECT id,name FROM raw_materials WHERE name <>'' ORDER BY ord",
 		TRUE);
 		$this->addModel($mat_model);			
 	}
 	
 	public function get_shift_list($pm){
-		$link = $this->getDbLink();
-		$this->add_material_model($link);
+		//$link = $this->getDbLink();
+		//$this->add_material_model($link);
 		
-		$this->setListModelId('DOCMaterialProcurementShiftList_Model');
+		$list_model = new DOCMaterialProcurementShiftList_Model($this->getDbLink());
+		$where = $this->conditionFromParams($pm,$list_model);
+		$list_model->addStoredFilter($where);			
+		$list_model->addGlobalFilter($where);
 		
-		$this->get_list($pm);
+		$def_date=null;
+		FieldSQLDateTime::formatForDb(mktime(),$def_date);
+		
+		$this->addNewModel(
+			sprintf(
+			"SELECT DISTINCT ON (m.ord,d.material_id)
+				d.material_id AS id,
+				m.name
+			FROM doc_material_procurements AS d
+			LEFT JOIN raw_materials AS m ON m.id=d.material_id
+			%s
+			GROUP BY m.ord,d.material_id,m.name
+			ORDER BY m.ord",
+			is_null($where)? '' : sprintf(
+				'WHERE date_time::date BETWEEN %s AND %s',
+				$where->getFieldValueForDb('shift_date_time','>=',0,$def_date),
+				$where->getFieldValueForDb('shift_date_time','<=',0,$def_date)
+				)
+			),
+		'RawMaterial_Model');
+		
+		$this->modelGetList($list_model,$pm);
+		
+		//$this->setListModelId('DOCMaterialProcurementShiftList_Model');		
+		//$this->get_list($pm);
 	}
 	
 	/*

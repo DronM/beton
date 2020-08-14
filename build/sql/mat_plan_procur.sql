@@ -7,7 +7,16 @@ CREATE OR REPLACE FUNCTION public.mat_plan_procur(
     IN in_date_time_for_avg_from timestamp without time zone,
     IN in_date_time_for_avg_to timestamp without time zone,
     IN in_material_id integer)
-  RETURNS TABLE(shift timestamp without time zone, material_id integer, concrete_avg_quant numeric, balance_start numeric, mat_avg_cons numeric, quant_to_order numeric, balance_end numeric, mat_tot_cons numeric) AS
+RETURNS TABLE(
+	shift timestamp without time zone,
+	material_id integer,
+	concrete_avg_quant numeric,
+	balance_start numeric,
+	mat_avg_cons numeric,
+	quant_to_order numeric,
+	balance_end numeric,
+	mat_tot_cons numeric
+) AS
 $BODY$
 DECLARE
 	data_row RECORD;
@@ -122,11 +131,11 @@ BEGIN
 				(SELECT
 					rg.material_id,
 					SUM(rg.quant) AS quant
-				FROM rg_materials_balance((SELECT t.shift FROM shift_from t),
-				ARRAY(SELECT m.id
-					FROM mats m
-					WHERE ($4 IS NULL OR $4=0)
-						OR (m.id=$4)
+				--rg_materials_balance
+				FROM rg_material_facts_balance((SELECT t.shift FROM shift_from t),
+					ARRAY(SELECT m.id
+						FROM mats m
+						WHERE ($4 IS NULL OR $4=0) OR (m.id=$4)
 					)
 				) AS rg
 				GROUP BY rg.material_id
@@ -161,9 +170,9 @@ BEGIN
 				) AS mat_cur_shift_consump
 				ON mat_cur_shift_consump.material_id=m.id
 
-			/*Расход материала в неотгруженных на сегодня
-			заявках
-			*/
+			/** Расход материала в неотгруженных на сегодня
+			 * заявках
+			 */
 			LEFT JOIN 
 				(SELECT *
 				FROM mat_cur_shift_virt_cons

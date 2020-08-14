@@ -1,42 +1,7 @@
-SELECT quant from rg_material_facts_balance('2020-04-28 06:00','{5}')
-UNION ALL
-SELECT
---(SELECT quant from rg_cement_balance('2020-04-28 06:00','{2}'))
-+(SELECT quant from rg_cement_balance('2020-04-28 06:00','{3}'))
-+(SELECT quant from rg_cement_balance('2020-04-28 06:00','{4}'))
-+(SELECT quant from rg_cement_balance('2020-04-28 06:00','{5}'))
-
---SELECT quant from rg_cement_balance('2020-04-28 06:00','{5}')
---select * from ra_material_facts where doc_id=62 and doc_type='cement_silo_balance_reset'
---update ra_cement set quant=0 where doc_id=62 and doc_type='cement_silo_balance_reset'
-
-
-
-UPDATE productions
-SET material_tolerance_violated = productions_get_mat_tolerance_violated(
-				2,
-				3209
-			)
-WHERE 	production_site_id = 2 AND production_id = 3209		
-
-
-
-UPDATE productions
-SET concrete_quant = sel.concrete_quant
-FROM
-(SELECT
-	pr.production_id,
-	pr.production_site_id,
-	cons.concrete_quant
-FROM productions AS pr
-LEFT JOIN (
-	SELECT
-		production_site_id,
-		production_id,
-		max(concrete_quant) AS concrete_quant
-	FROM material_fact_consumptions
-	GROUP BY production_site_id,production_id
-) AS cons ON cons.production_site_id=pr.production_site_id AND cons.production_id=pr.production_id
-WHERE pr.concrete_quant=0
-) AS sel
-WHERE productions.production_site_id=sel.production_site_id AND productions.production_id=sel.production_id
+ОЧИСТИТЬ МАТЕРИАЛЫ И ПРИХОДЫ
+select *
+from doc_material_procurements
+WHERE material_id IN
+(select id from raw_materials
+where name='' OR name is null)
+AND quant_net=0 AND quant_gross=0

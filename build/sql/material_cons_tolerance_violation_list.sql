@@ -2,6 +2,8 @@
 
 DROP VIEW material_cons_tolerance_violation_list;
 
+-- НЕ ИСПОЛЬЗОВАТЬ!!!!
+-- ИСПОЛЬЗОВАТЬ ОДНОИМЕННУЮ ФУНКЦИЮ!!!
 CREATE OR REPLACE VIEW material_cons_tolerance_violation_list AS
 	SELECT
 		get_shift_start(t.date_time::timestamp without time zone) AS date_time
@@ -20,6 +22,7 @@ CREATE OR REPLACE VIEW material_cons_tolerance_violation_list AS
 		,t.materials_ref::text
 		,mat.ord
 	ORDER BY get_shift_start(t.date_time::timestamp without time zone) DESC,mat.ord
+	
 	;
 	
 ALTER VIEW material_cons_tolerance_violation_list OWNER TO ;

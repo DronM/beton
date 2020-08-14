@@ -2,6 +2,9 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+<xsl:decimal-format name="num_money" decimal-separator="," grouping-separator=" "/>
+<xsl:decimal-format name="num_quant" decimal-separator="," grouping-separator=" "/>
+
 <xsl:template name="format_num">
 	<xsl:param name="val"/>
 	<xsl:choose>
@@ -16,12 +19,25 @@
 
 <xsl:template name="format_money">
 	<xsl:param name="val"/>
+	
 	<xsl:choose>
 		<xsl:when test="$val='0' or string(number($val))='NaN'">
 			<xsl:text>&#160;</xsl:text>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:value-of select="format-number($val,'##0.00')"/>
+			<xsl:value-of select="format-number($val,'### ###,00','num_money')"/>
+		</xsl:otherwise>		
+	</xsl:choose>
+</xsl:template>
+
+<xsl:template name="format_quant">
+	<xsl:param name="val"/>
+	<xsl:choose>
+		<xsl:when test="$val='0' or string(number($val))='NaN'">
+			<xsl:text>&#160;</xsl:text>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:value-of select="format-number( round(10000*$val) div 10000 ,'##0,0000','num_quant')"/>
 		</xsl:otherwise>		
 	</xsl:choose>
 </xsl:template>
@@ -45,18 +61,6 @@
       <xsl:value-of select="$text" />
     </xsl:otherwise>
   </xsl:choose>
-</xsl:template>
-
-<xsl:template name="format_quant">
-	<xsl:param name="val"/>
-	<xsl:choose>
-		<xsl:when test="$val='0' or string(number($val))='NaN'">
-			<xsl:text>&#160;</xsl:text>
-		</xsl:when>
-		<xsl:otherwise>
-			<xsl:value-of select="format-number( round(1000*$val) div 1000 ,'##0.000')"/>
-		</xsl:otherwise>		
-	</xsl:choose>
 </xsl:template>
 
 </xsl:stylesheet>

@@ -1058,7 +1058,9 @@ class RawMaterial_Controller extends ControllerSQL{
 		}		
 	
 		$this->addNewModel(
-			sprintf("SELECT * FROM material_cons_tolerance_violation_list WHERE date_time BETWEEN %s AND %s",
+			sprintf(
+				"SELECT *
+				FROM material_cons_tolerance_violation_list(%s,%s)",
 				$dt_from,
 				$dt_to
 			),

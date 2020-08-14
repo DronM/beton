@@ -1,40 +1,24 @@
--- VIEW: concrete_types_list
+-- VIEW: cement_silo_balance_resets_list
 
-DROP VIEW concrete_types_list;
+DROP VIEW cement_silo_balance_resets_list;
 
-CREATE OR REPLACE VIEW concrete_types_list AS
+CREATE OR REPLACE VIEW cement_silo_balance_resets_list AS
 	SELECT
-		ctp.id,
-		ctp.name,
-		ctp.code_1c,
-		ctp.pres_norm,
-		ctp.mpa_ratio,
-		--ctp.price
-		coalesce(act_price.price,0) AS price
-		,ctp.material_cons_rates
-	FROM concrete_types AS ctp
-	/*
-	LEFT JOIN (
-		SELECT
-			max(t.date) AS date,
-			t.concrete_type_id
-		FROM concrete_costs AS t
-		GROUP BY t.concrete_type_id
-	) AS last_price ON last_price.concrete_type_id=ctp.id
-	LEFT JOIN concrete_costs AS act_price ON act_price.date=last_price.date AND act_price.concrete_type_id=last_price.concrete_type_id
-	*/
-	
-	LEFT JOIN concrete_costs AS act_price
-	ON
-		act_price.concrete_type_id=ctp.id
-		AND act_price.concrete_costs_h_id= (SELECT t.id
-			FROM concrete_costs_h AS t
-			WHERE clients_list IS NULL
-			ORDER BY t.date DESC
-			LIMIT 1
-		)	
-	
-	ORDER BY ctp.name
+		t.id
+		,t.date_time
+		,t.user_id
+		,users_ref(u) AS users_ref
+		,t.cement_silo_id
+		,cement_silos_ref(sil) AS cement_silos_ref
+		,t.comment_text
+		,ra.quant * CASE WHEN ra.deb THEN 1 ELSE -1 END AS quant
+		,t.quant_required
+		
+	FROM cement_silo_balance_resets AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	LEFT JOIN cement_silos sil ON sil.id=t.cement_silo_id
+	LEFT JOIN ra_cement AS ra ON ra.doc_id = t.id AND ra.doc_type='cement_silo_balance_reset'::doc_types
+	ORDER BY t.date_time DESC
 	;
 	
-ALTER VIEW concrete_types_list OWNER TO beton;
+ALTER VIEW cement_silo_balance_resets_list OWNER TO beton;

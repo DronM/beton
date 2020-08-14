@@ -23,11 +23,11 @@ function DOCMaterialProcurementList_View(id,options){
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdInsert":false,
 			"cmdInsert":false,
-			"cmdDelete":false,
-			"cmdFilter":false,
-			"cmdSearch":false,
-			"filters":null,
-			"variantStorage":null
+			"cmdDelete":true
+			//"cmdFilter":false
+			//"cmdSearch":false
+			//"filters":null,
+			//"variantStorage":null
 		}),
 		"filters":(options.detailFilters&&options.detailFilters.DOCMaterialProcurementList_Model)? options.detailFilters.DOCMaterialProcurementList_Model:null,
 		"popUpMenu":popup_menu,
@@ -109,7 +109,7 @@ function DOCMaterialProcurementList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:driver",{
+						/*,new GridCellHead(id+":grid:head:driver",{
 							"value":"Водитель",
 							"columns":[
 								new GridColumn({
@@ -117,7 +117,7 @@ function DOCMaterialProcurementList_View(id,options){
 								})
 							],
 							"sortable":true
-						})
+						})*/
 						,new GridCellHead(id+":grid:head:quant_net",{
 							"value":"Вес нетто",
 							"colAttrs":{"align":"right"},
@@ -133,7 +133,30 @@ function DOCMaterialProcurementList_View(id,options){
 				})
 			]
 		}),
-		"pagination":new pagClass(id+"_page",
+		"foot":new GridFoot(id+":grid:foot",{
+			"autoCalc":true,			
+			"elements":[
+				new GridRow(id+":grid:foot:row0",{
+					"elements":[
+						new GridCell(id+":grid:foot:sp1",{
+							"value":"Итого",
+							"colSpan":"8"
+						})												
+						,new GridCellFoot(id+":grid:foot:tot_quant_net",{
+							"attrs":{"align":"right"},
+							"calcOper":"sum",
+							"calcFieldId":"quant_net",
+							"gridColumn":new GridColumnFloat({
+								"id":"tot_quant_net",
+								"precision":"4"
+							})
+						})						
+					
+					]
+				})		
+			]
+		}),		
+		"pagination":options.detailFilters? null:new pagClass(id+"_page",
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
 		"autoRefresh":options.detailFilters? true:false,
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,

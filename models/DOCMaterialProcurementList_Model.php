@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLDOC.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
@@ -24,6 +25,8 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		//*** Field id ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
+		
+		$f_opts['alias']='Идентификатор';
 		$f_opts['id']="id";
 						
 		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
@@ -32,6 +35,8 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field date_time ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Дата';
 		$f_opts['id']="date_time";
 						
 		$f_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time",$f_opts);
@@ -40,6 +45,8 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field number ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Номер 1с';
 		$f_opts['id']="number";
 						
 		$f_number=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"number",$f_opts);
@@ -48,6 +55,7 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field processed ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="processed";
 						
 		$f_processed=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"processed",$f_opts);
@@ -56,6 +64,7 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field supplier_id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="supplier_id";
 						
 		$f_supplier_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"supplier_id",$f_opts);
@@ -64,6 +73,8 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field suppliers_ref ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Поставщик';
 		$f_opts['id']="suppliers_ref";
 						
 		$f_suppliers_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"suppliers_ref",$f_opts);
@@ -72,6 +83,7 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field carrier_id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="carrier_id";
 						
 		$f_carrier_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"carrier_id",$f_opts);
@@ -80,14 +92,18 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field carriers_ref ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Перевозчик';
 		$f_opts['id']="carriers_ref";
 						
-		$f_carriers_ref=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"carriers_ref",$f_opts);
+		$f_carriers_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"carriers_ref",$f_opts);
 		$this->addField($f_carriers_ref);
 		//********************
 		
 		//*** Field driver ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Водитель';
 		$f_opts['id']="driver";
 						
 		$f_driver=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver",$f_opts);
@@ -96,6 +112,8 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field vehicle_plate ***
 		$f_opts = array();
+		
+		$f_opts['alias']='ТС';
 		$f_opts['id']="vehicle_plate";
 						
 		$f_vehicle_plate=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_plate",$f_opts);
@@ -104,6 +122,7 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field material_id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="material_id";
 						
 		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
@@ -112,6 +131,8 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field materials_ref ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Материал';
 		$f_opts['id']="materials_ref";
 						
 		$f_materials_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"materials_ref",$f_opts);
@@ -120,6 +141,7 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field cement_silos_id ***
 		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="cement_silos_id";
 						
 		$f_cement_silos_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cement_silos_id",$f_opts);
@@ -128,6 +150,8 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field cement_silos_ref ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Силос';
 		$f_opts['id']="cement_silos_ref";
 						
 		$f_cement_silos_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cement_silos_ref",$f_opts);
@@ -136,22 +160,30 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		
 		//*** Field quant_gross ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Вес';
+		$f_opts['length']=19;
 		$f_opts['id']="quant_gross";
 						
-		$f_quant_gross=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_gross",$f_opts);
+		$f_quant_gross=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_gross",$f_opts);
 		$this->addField($f_quant_gross);
 		//********************
 		
 		//*** Field quant_net ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Вес чистый';
+		$f_opts['length']=19;
 		$f_opts['id']="quant_net";
 						
-		$f_quant_net=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_net",$f_opts);
+		$f_quant_net=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_net",$f_opts);
 		$this->addField($f_quant_net);
 		//********************
 		
 		//*** Field store ***
 		$f_opts = array();
+		
+		$f_opts['alias']='Склад';
 		$f_opts['id']="store";
 						
 		$f_store=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"store",$f_opts);

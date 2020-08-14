@@ -394,6 +394,19 @@ OrderCalc_View.js
 3) Экспорт локальных списков в Excel
 
 
+1.00182
+1) Добил форматирование для экспорта в Excel
+2) Остатки материалов MatTotals_Model переделать остаток на вечер mat_totals.sql
+3) Обнуление остатков силосов CementSiloBalanceResetList_View, cement_silo_balance_resets_list показывает отрицательное и красным
+4) Отчет отклонение от фактического расхода мат-ов неправильно сворачивал при производстве из нескольких силосов
+	Новая функция material_cons_tolerance_violation_list вместо представления
+5) Функция удаления в приходах DOCMaterialProcurementList_View.js
+6) Порядок следования материалов в DOCMaterialProcurement_Controller->get_shift_list
+7) Расшифровка прихода. Фильтрация, итог DOCMaterialProcurementList_View
+
+!!! Учет добавки от нескольких заводов
+
+
 SELECT 
 (
 (select quant from rg_material_facts_balance('2020-04-27 06:00','{5}'))

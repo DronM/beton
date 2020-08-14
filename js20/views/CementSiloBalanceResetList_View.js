@@ -49,6 +49,14 @@ function CementSiloBalanceResetList_View(id,options){
 			"variantStorage":options.variantStorage
 		}),
 		"popUpMenu":popup_menu,
+		"onEventSetCellOptions":function(opts){
+			if(opts.gridColumn.getId()=="quant"&&this.getModel().getFieldValue("quant")<0){
+				opts.attrs = opts.attrs || {};
+				opts.attrs["class"] = opts.attrs["class"] || "";
+				opts.attrs["class"]+= (opts.attrs["class"]=="")? "":" ";
+				opts.attrs["class"]+= "negativeNumber";
+			}
+		},
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
 				new GridRow(id+":grid:head:row0",{

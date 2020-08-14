@@ -11,7 +11,7 @@ CREATE OR REPLACE VIEW cement_silo_balance_resets_list AS
 		,t.cement_silo_id
 		,cement_silos_ref(sil) AS cement_silos_ref
 		,t.comment_text
-		,ra.quant
+		,ra.quant * CASE WHEN ra.deb THEN 1 ELSE -1 END AS quant
 		,t.quant_required
 		
 	FROM cement_silo_balance_resets AS t

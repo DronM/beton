@@ -7,18 +7,22 @@
 
 <xsl:output method="html"/> 
 
+<xsl:decimal-format name="num_money" decimal-separator="," grouping-separator=" "/>
+<xsl:decimal-format name="num_quant" decimal-separator="," grouping-separator=" "/>
+
 <xsl:key name="materials" match="row" use="material_id/."/>
 <xsl:key name="concrete_types" match="row" use="concrete_type_id/."/>
 <xsl:key name="concrete_types_materials" match="row" use="concat(concrete_type_id/.,'|',material_id/.)"/>
 
 <xsl:template name="format_money">
 	<xsl:param name="val"/>
+	
 	<xsl:choose>
 		<xsl:when test="$val='0' or string(number($val))='NaN'">
 			<xsl:text>&#160;</xsl:text>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:value-of select="format-number($val,'###,###.00')"/>
+			<xsl:value-of select="format-number($val,'### ###,00','num_money')"/>
 		</xsl:otherwise>		
 	</xsl:choose>
 </xsl:template>
@@ -30,7 +34,7 @@
 			<xsl:text>&#160;</xsl:text>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:value-of select="format-number( round(10000*$val) div 10000 ,'##0.0000')"/>
+			<xsl:value-of select="format-number( round(10000*$val) div 10000 ,'##0,0000','num_quant')"/>
 		</xsl:otherwise>		
 	</xsl:choose>
 </xsl:template>
@@ -136,7 +140,11 @@
 					<tr class="{$row_class}">					
 						<td><xsl:value-of select="concrete_type_name/."/></td>					
 					
-						<td align="right"><xsl:value-of select="concrete_quant/."/></td>
+						<td align="right" nowrap="nowrap">
+							<xsl:call-template name="format_quant">
+								<xsl:with-param name="val" select="concrete_quant/."/>
+							</xsl:call-template>
+						</td>
 					
 						<xsl:for-each select="//row[generate-id() =
 						generate-id(key('materials',material_id/.)[1])]">
@@ -144,52 +152,70 @@
 							<xsl:variable name="concr_row" select="key('concrete_types_materials',concat($concrete_type_id,'|',material_id/.))"/>
 						
 							<!-- Подбор -->
-							<td align="right"><xsl:value-of select="$concr_row/norm_quant/."/></td>
-							<td align="right"><xsl:value-of select="$concr_row/norm_quant_per_m3/."/></td>
-							<td align="right">
+							<td align="right" nowrap="nowrap">
+								<xsl:call-template name="format_quant">
+									<xsl:with-param name="val" select="$concr_row/norm_quant/."/>
+								</xsl:call-template>								
+							</td>
+							
+							<td align="right" nowrap="nowrap">
+								<xsl:call-template name="format_quant">
+									<xsl:with-param name="val" select="$concr_row/norm_quant_per_m3/."/>
+								</xsl:call-template>								
+							</td>
+							
+							<td align="right" nowrap="nowrap">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="$concr_row/norm_cost/."/>
 								</xsl:call-template>																									
 							</td>
 						
-							<td align="right">
+							<td align="right" nowrap="nowrap">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="$concr_row/norm_cost_per_m3/."/>
 								</xsl:call-template>																																
 							</td>
 
 							<!-- Факт -->
-							<td align="right"><xsl:value-of select="$concr_row/material_quant/."/></td>
-							<td align="right"><xsl:value-of select="$concr_row/material_quant_per_m3/."/></td>
+							<td align="right" nowrap="nowrap">
+								<xsl:call-template name="format_quant">
+									<xsl:with-param name="val" select="$concr_row/material_quant/."/>
+								</xsl:call-template>								
+							</td>
+							<td align="right" nowrap="nowrap">
+								<xsl:call-template name="format_quant">
+									<xsl:with-param name="val" select="$concr_row/material_quant_per_m3/."/>
+								</xsl:call-template>								
+							</td>
 
-							<td align="right">
+							<td align="right" nowrap="nowrap">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="$concr_row/material_cost/."/>
 								</xsl:call-template>																									
 							</td>
-							<td align="right">
+							<td align="right" nowrap="nowrap">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="$concr_row/material_cost_per_m3/."/>
 								</xsl:call-template>
 							</td>
 						
 							<!-- Отклонение -->
-							<td align="right">
+							<td align="right" nowrap="nowrap">
 								<xsl:call-template name="format_quant">
 									<xsl:with-param name="val" select="$concr_row/norm_quant/.-$concr_row/material_quant/."/>
 								</xsl:call-template>																									
 							</td>
-							<td align="right">
+							<td align="right" nowrap="nowrap">
 								<xsl:call-template name="format_quant">
 									<xsl:with-param name="val" select="$concr_row/norm_quant_per_m3/.-$concr_row/material_quant_per_m3/."/>
 								</xsl:call-template>																									
 							</td>
-							<td align="right">
+							<td align="right" nowrap="nowrap">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="$concr_row/norm_cost/.-$concr_row/material_cost/."/>
 								</xsl:call-template>																									
 							</td>
-							<td align="right">
+							<td align="right" nowrap="nowrap">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="$concr_row/norm_cost_per_m3/.-$concr_row/material_cost_per_m3/."/>
 								</xsl:call-template>																									
@@ -205,7 +231,11 @@
 				<tr>
 					<td>Итого
 					</td>
-					<td align="right"><xsl:value-of select="sum(//row[generate-id()=generate-id(key('concrete_types',concrete_type_id/.)[1])]/concrete_quant/node())"/>
+					
+					<td align="right" nowrap="nowrap">
+						<xsl:call-template name="format_quant">
+							<xsl:with-param name="val" select="sum(//row[generate-id()=generate-id(key('concrete_types',concrete_type_id/.)[1])]/concrete_quant/node())"/>
+						</xsl:call-template>															
 					</td>
 					<!-- по материалам -->
 					<xsl:for-each select="//row[generate-id() =
@@ -215,9 +245,14 @@
 						<xsl:variable name="material_id" select="material_id/."/>
 				
 						<!-- Подбор -->
-						<td align="right"><xsl:value-of select="sum(//row[material_id/.=$material_id]/norm_quant/.)"/></td>
+						<td align="right" nowrap="nowrap">
+							<xsl:call-template name="format_quant">
+								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/norm_quant/.)"/>
+							</xsl:call-template>															
+						</td>
+						
 						<td></td>
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/norm_cost/.)"/>
 							</xsl:call-template>						
@@ -225,9 +260,13 @@
 						<td></td>
 					
 						<!-- Факт -->
-						<td align="right"><xsl:value-of select="sum(//row[material_id/.=$material_id]/material_quant/.)"/></td>
+						<td align="right" nowrap="nowrap">
+							<xsl:call-template name="format_quant">
+								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/material_quant/.)"/>
+							</xsl:call-template>																						
+						</td>
 						<td></td>
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/material_cost/.)"/>
 							</xsl:call-template>												
@@ -235,13 +274,13 @@
 						<td></td>
 
 						<!-- Отклонение -->
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_quant">
 								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/norm_quant/.)-sum(//row[material_id/.=$material_id]/material_quant/.)"/>
 							</xsl:call-template>																								
 						</td>
 						<td></td>
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/norm_cost/.)-sum(//row[material_id/.=$material_id]/material_cost/.)"/>
 							</xsl:call-template>																		
@@ -323,10 +362,14 @@
 					
 							<xsl:variable name="concr_row" select="key('concrete_types_materials',concat($concrete_type_id,'|',material_id/.))"/>
 						
-							<td align="right"><xsl:value-of select="$concr_row/norm_cost_per_m3/."/></td>
+							<td align="right" nowrap="nowrap">
+								<xsl:call-template name="format_quant">
+									<xsl:with-param name="val" select="$concr_row/norm_cost_per_m3/."/>
+								</xsl:call-template>																						
+							</td>
 					
 						</xsl:for-each>					
-						<td align="right" style="font-weight:bolder;">
+						<td align="right" nowrap="nowrap" style="font-weight:bolder;">
 							<xsl:call-template name="format_money">							
 								<xsl:with-param name="val" select="sum(//row[concrete_type_id/.=$concrete_type_id]/norm_cost/.) div concrete_quant/."/>
 							</xsl:call-template>							
@@ -338,17 +381,17 @@
 					
 							<xsl:variable name="concr_row" select="key('concrete_types_materials',concat($concrete_type_id,'|',material_id/.))"/>
 						
-							<td align="right"><xsl:value-of select="$concr_row/material_cost_per_m3/."/></td>
+							<td align="right" nowrap="nowrap"><xsl:value-of select="$concr_row/material_cost_per_m3/."/></td>
 					
 						</xsl:for-each>					
-						<td align="right" style="font-weight:bolder;">
+						<td align="right" nowrap="nowrap" style="font-weight:bolder;">
 							<xsl:call-template name="format_money">							
 								<xsl:with-param name="val" select="sum(//row[concrete_type_id/.=$concrete_type_id]/material_cost/.) div concrete_quant/."/>
 							</xsl:call-template>							
 						</td>
 						
 						<!-- Отклонение -->
-						<td align="right" style="font-weight:bolder;">
+						<td align="right" nowrap="nowrap" style="font-weight:bolder;">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="(sum(//row[concrete_type_id/.=$concrete_type_id]/norm_cost/.) div concrete_quant/.) - (sum(//row[concrete_type_id/.=$concrete_type_id]/material_cost/.) div concrete_quant/.)"/>
 							</xsl:call-template>																														
@@ -394,17 +437,17 @@
 					<tr class="{$row_class}">					
 						<td><xsl:value-of select="material_name/."/></td>					
 					
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/norm_cost/.)"/>
 							</xsl:call-template>
 						</td>
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/material_cost/.)"/>
 							</xsl:call-template>																														
 						</td>
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/norm_cost/.)-sum(//row[material_id/.=$material_id]/material_cost/.)"/>
 							</xsl:call-template>																														
@@ -415,17 +458,17 @@
 			<tfoot>
 				<tr>
 					<td>Итого</td>
-					<td align="right">
+					<td align="right" nowrap="nowrap">
 						<xsl:call-template name="format_money">
 							<xsl:with-param name="val" select="sum(//row/norm_cost/.)"/>
 						</xsl:call-template>
 					</td>
-					<td align="right">
+					<td align="right" nowrap="nowrap">
 						<xsl:call-template name="format_money">
 							<xsl:with-param name="val" select="sum(//row/material_cost/.)"/>
 						</xsl:call-template>																														
 					</td>
-					<td align="right">
+					<td align="right" nowrap="nowrap">
 						<xsl:call-template name="format_money">
 							<xsl:with-param name="val" select="sum(//row/norm_cost/.)-sum(//row/material_cost/.)"/>
 						</xsl:call-template>																														
@@ -470,9 +513,17 @@
 					<tr class="{$row_class}">					
 						<td><xsl:value-of select="material_name/."/></td>					
 					
-						<td align="right"><xsl:value-of select="sum(//row[material_id/.=$material_id]/norm_quant/.)"/></td>
-						<td align="right"><xsl:value-of select="sum(//row[material_id/.=$material_id]/material_quant/.)"/></td>
-						<td align="right">
+						<td align="right" nowrap="nowrap">
+							<xsl:call-template name="format_quant">
+								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/norm_quant/.)"/>
+							</xsl:call-template>																													
+						</td>
+						<td align="right" nowrap="nowrap">
+							<xsl:call-template name="format_quant">
+								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/material_quant/.)"/>
+							</xsl:call-template>																													
+						</td>
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_quant">
 								<xsl:with-param name="val" select="sum(//row[material_id/.=$material_id]/norm_quant/.)-sum(//row[material_id/.=$material_id]/material_quant/.)"/>
 							</xsl:call-template>																														
@@ -514,19 +565,19 @@
 					<tr class="{$row_class}">
 						<td><xsl:value-of select="material_name"/></td>
 												
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_quant">
 								<xsl:with-param name="val" select="quant"/>
 							</xsl:call-template>																														
 						</td>
 						
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="total div quant"/>
 							</xsl:call-template>																														
 						</td>
 						
-						<td align="right">
+						<td align="right" nowrap="nowrap">
 							<xsl:call-template name="format_money">
 								<xsl:with-param name="val" select="total"/>
 							</xsl:call-template>																														
@@ -539,7 +590,7 @@
 			<tfoot>
 				<tr>
 					<td colspan="3">Итого</td>
-					<td align="right">
+					<td align="right" nowrap="nowrap">
 						<xsl:call-template name="format_money">
 							<xsl:with-param name="val" select="sum(row/total)"/>
 						</xsl:call-template>

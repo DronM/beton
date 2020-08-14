@@ -264,13 +264,13 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
-	
+	f_opts.alias = "Идентификатор";
 	pm.addField(new FieldInt("id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Дата";
 	pm.addField(new FieldDateTime("date_time",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Номер 1с";
 	pm.addField(new FieldString("number",f_opts));
 	var f_opts = {};
 	
@@ -279,40 +279,40 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldInt("supplier_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Поставщик";
 	pm.addField(new FieldJSON("suppliers_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("carrier_id",f_opts));
 	var f_opts = {};
-	
-	pm.addField(new FieldString("carriers_ref",f_opts));
+	f_opts.alias = "Перевозчик";
+	pm.addField(new FieldJSON("carriers_ref",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Водитель";
 	pm.addField(new FieldString("driver",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "ТС";
 	pm.addField(new FieldString("vehicle_plate",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("material_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Материал";
 	pm.addField(new FieldJSON("materials_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("cement_silos_id",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Силос";
 	pm.addField(new FieldJSON("cement_silos_ref",f_opts));
 	var f_opts = {};
-	
-	pm.addField(new FieldString("quant_gross",f_opts));
+	f_opts.alias = "Вес";
+	pm.addField(new FieldFloat("quant_gross",f_opts));
 	var f_opts = {};
-	
-	pm.addField(new FieldString("quant_net",f_opts));
+	f_opts.alias = "Вес чистый";
+	pm.addField(new FieldFloat("quant_net",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Склад";
 	pm.addField(new FieldString("store",f_opts));
 }
 
@@ -321,7 +321,7 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	
 	var pm = this.getGetObject();
 	var f_opts = {};
-		
+	f_opts.alias = "Идентификатор";	
 	pm.addField(new FieldInt("id",f_opts));
 	
 	pm.addField(new FieldString("mode"));

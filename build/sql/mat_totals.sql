@@ -39,8 +39,11 @@ $BODY$
 		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
 		
 		--остатки на завтра на утро
-		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
-		COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
 		
 		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
 		
@@ -96,17 +99,19 @@ $BODY$
 		GROUP BY ra.material_id
 	) AS proc ON proc.material_id=m.id
 	
+	/*
 	LEFT JOIN (
 		SELECT
 			plan_proc.material_id,
 			plan_proc.balance_start AS quant
 		FROM mat_plan_procur(
-		get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
-		now()::timestamp,
-		now()::timestamp,
-		NULL
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
 		) AS plan_proc
 	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
 	
 	LEFT JOIN (
 		SELECT
@@ -116,6 +121,14 @@ $BODY$
 		WHERE so.date=$1
 		GROUP BY so.material_id
 	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			now()::timestamp,
+			$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
 	
 	WHERE m.concrete_part
 	ORDER BY m.ord;

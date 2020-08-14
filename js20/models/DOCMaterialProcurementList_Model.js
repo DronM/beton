@@ -26,7 +26,7 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	
+	filed_options.alias = 'Идентификатор';
 	filed_options.autoInc = false;	
 	
 	options.fields.id = new FieldInt("id",filed_options);
@@ -35,7 +35,7 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
 	options.fields.date_time = new FieldDateTime("date_time",filed_options);
@@ -44,7 +44,7 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Номер 1с';
 	filed_options.autoInc = false;	
 	
 	options.fields.number = new FieldString("number",filed_options);
@@ -71,7 +71,7 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Поставщик';
 	filed_options.autoInc = false;	
 	
 	options.fields.suppliers_ref = new FieldJSON("suppliers_ref",filed_options);
@@ -89,16 +89,16 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Перевозчик';
 	filed_options.autoInc = false;	
 	
-	options.fields.carriers_ref = new FieldString("carriers_ref",filed_options);
+	options.fields.carriers_ref = new FieldJSON("carriers_ref",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Водитель';
 	filed_options.autoInc = false;	
 	
 	options.fields.driver = new FieldString("driver",filed_options);
@@ -107,7 +107,7 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'ТС';
 	filed_options.autoInc = false;	
 	
 	options.fields.vehicle_plate = new FieldString("vehicle_plate",filed_options);
@@ -125,7 +125,7 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Материал';
 	filed_options.autoInc = false;	
 	
 	options.fields.materials_ref = new FieldJSON("materials_ref",filed_options);
@@ -143,7 +143,7 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Силос';
 	filed_options.autoInc = false;	
 	
 	options.fields.cement_silos_ref = new FieldJSON("cement_silos_ref",filed_options);
@@ -152,25 +152,27 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Вес';
 	filed_options.autoInc = false;	
 	
-	options.fields.quant_gross = new FieldString("quant_gross",filed_options);
+	options.fields.quant_gross = new FieldFloat("quant_gross",filed_options);
+	options.fields.quant_gross.getValidator().setMaxLength('19');
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Вес чистый';
 	filed_options.autoInc = false;	
 	
-	options.fields.quant_net = new FieldString("quant_net",filed_options);
+	options.fields.quant_net = new FieldFloat("quant_net",filed_options);
+	options.fields.quant_net.getValidator().setMaxLength('19');
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
+	filed_options.alias = 'Склад';
 	filed_options.autoInc = false;	
 	
 	options.fields.store = new FieldString("store",filed_options);

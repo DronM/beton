@@ -87,7 +87,7 @@ RepMaterialAvgConsumptionOnCtp_View.prototype.onGetReportData = function(respTex
 		"title":"Экспорт таблицы стоимости м3 в Excel"
 		,"glyph":"glyphicon-save-file"
 		,"onClick":function(){
-			DOMHelper.tableToExcel(self.getId()+":gridBalanceCorrect","Стоимость м3", 'Стоимость_м3.xls');
+			DOMHelper.tableToExcel(self.getId()+":gridConcrTypeCost","Стоимость м3", 'Стоимость_м3.xls');
 		}
 	})).toDOM(this.getNode());
 	

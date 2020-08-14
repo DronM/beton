@@ -12,7 +12,7 @@ function RepMaterialConsToleranceViolation_View(id,options){
 	options = options || {};
 	
 	options.templateOptions = options.templateOptions || {};
-	options.templateOptions.HEAD_TITLE = "Отчет по отколонению от нормативного расхода материалов";
+	options.templateOptions.HEAD_TITLE = "Отчет по отклонению от нормативного расхода материалов";
 	
 	var contr = new RawMaterial_Controller();	
 	options.publicMethod = contr.getPublicMethod("get_material_cons_tolerance_violation_list");
@@ -63,6 +63,14 @@ function RepMaterialConsToleranceViolation_View(id,options){
 	
 }
 extend(RepMaterialConsToleranceViolation_View,ViewReport);
+
+RepMaterialConsToleranceViolation_View.prototype.formatQuantForTmpl = function(v){
+	return CommonHelper.numberFormat(v, 4, ",", " ");
+}
+
+RepMaterialConsToleranceViolation_View.prototype.formatPercentForTmpl = function(v){
+	return CommonHelper.numberFormat(v, 4, ",", " ");
+}
 
 RepMaterialConsToleranceViolation_View.prototype.onGetReportData = function(resp){
 	var m = resp.getModel("MaterialConsToleranceViolationList_Model");
@@ -120,10 +128,10 @@ RepMaterialConsToleranceViolation_View.prototype.onGetReportData = function(resp
 			m_ind++;
 		}
 		
-		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].norm_quant = m.getFieldValue("norm_quant");
-		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].fact_quant = m.getFieldValue("fact_quant");
-		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].diff_quant = m.getFieldValue("diff_quant");
-		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].diff_percent = m.getFieldValue("diff_percent");
+		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].norm_quant = this.formatQuantForTmpl(m.getFieldValue("norm_quant"));
+		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].fact_quant = this.formatQuantForTmpl(m.getFieldValue("fact_quant"));
+		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].diff_quant = this.formatQuantForTmpl(m.getFieldValue("diff_quant"));
+		ctrl.m_templateOptions.dates[d_ind].materials[m_ind].diff_percent = this.formatPercentForTmpl(m.getFieldValue("diff_percent"));
 		m_ind++;
 	}
 	ctrl.updateHTML();

@@ -759,6 +759,11 @@ td.factQuantViolation{
 	background-color:#ffcccc !important;	
 }
 
+td.negativeNumber{
+	background-color:red !important;	
+	color: white !important;	
+}
+
 #OrderMakeList\:mat_totals_grid td.quant_editable{
 	cursor:pointer;
 	background-color:#fcffaa !important;
@@ -808,5 +813,14 @@ td.factQuantViolation{
 		font-weight: bold;
 	}
 	
+}
+
+#OrderMakeList\:order_make_grid th, td {
+	border: solid #000;
+	border-width: 1px 1px;
+	line-height:1em;
+	margin: 0;
+	padding:0.2em;
+	border-spacing: 0;
 }
 

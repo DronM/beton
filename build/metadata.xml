@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-08-12 05:27:22</lastBuild></version>
+		<lastBuild>2020-08-14 05:37:05</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -85,6 +85,7 @@
 		<version dateOpen="2020-07-16 12:07:31" dateClose="2020-07-21 06:07:44">1.00179</version>
 		<version dateOpen="2020-07-21 06:07:46" dateClose="2020-08-03 05:08:51">1.00180</version>
 		<version dateOpen="2020-08-03 06:08:32" dateClose="2020-08-12 05:08:27">1.00181</version>
+		<version dateOpen="2020-08-12 09:08:24" dateClose="2020-08-14 05:08:37">1.00182</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1692,23 +1693,23 @@
 			</registerAtcs>
 		</model>
 		<model id="DOCMaterialProcurementList" parent="ModelSQLDOC" dataTable="doc_material_procurements_list" virtual="TRUE">
-			<field id="id" dataType="Int" primaryKey="TRUE"/>
-			<field id="date_time" dataType="DateTime"/>
-			<field id="number" dataType="String"/>
-			<field id="processed" dataType="String"/>
-			<field id="supplier_id" dataType="Int"/>
-			<field id="suppliers_ref" dataType="JSON"/>
-			<field id="carrier_id" dataType="Int"/>
-			<field id="carriers_ref" dataType="String"/>
-			<field id="driver" dataType="String"/>
-			<field id="vehicle_plate" dataType="String"/>
-			<field id="material_id" dataType="Int"/>
-			<field id="materials_ref" dataType="JSON"/>
-			<field id="cement_silos_id" dataType="Int"/>
-			<field id="cement_silos_ref" dataType="JSON"/>
-			<field id="quant_gross" dataType="String"/>
-			<field id="quant_net" dataType="String"/>
-			<field id="store" dataType="String"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Идентификатор"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="number" dataType="String" alias="Номер 1с"/>
+			<field id="processed" dataType="String" sysCol="TRUE"/>
+			<field id="supplier_id" dataType="Int" sysCol="TRUE"/>
+			<field id="suppliers_ref" dataType="JSON" alias="Поставщик"/>
+			<field id="carrier_id" dataType="Int" sysCol="TRUE"/>
+			<field id="carriers_ref" dataType="JSON" alias="Перевозчик"/>
+			<field id="driver" dataType="String" alias="Водитель"/>
+			<field id="vehicle_plate" dataType="String" alias="ТС"/>
+			<field id="material_id" dataType="Int" sysCol="TRUE"/>
+			<field id="materials_ref" dataType="JSON" alias="Материал"/>
+			<field id="cement_silos_id" dataType="Int" sysCol="TRUE"/>
+			<field id="cement_silos_ref" dataType="JSON" alias="Силос"/>
+			<field id="quant_gross" dataType="Float" length="19" precision="4" alias="Вес"/>
+			<field id="quant_net" dataType="Float" length="19" precision="4" alias="Вес чистый"/>
+			<field id="store" dataType="String" alias="Склад"/>
 		</model>
 		<model id="DOCMaterialProcurementShiftList" parent="ModelSQLDOC" dataTable="doc_material_procurements_shift_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -4606,7 +4607,7 @@
 		<view id="50012" t="LabEntryAvgReport" section="Отчеты" descr="Средние показатели по датам"/>
 		<view id="50013" t="VehicleOwnerTotReport" section="Отчеты" descr="Итоги для владельца ТС"/>
 		<view id="50014" t="RepMaterialAction" section="Отчеты" descr="Отчет по движению материалов"/>
-		<view id="50015" t="RepMaterialConsToleranceViolation" section="Отчеты" descr="Отчет отколонению от нормативного расхода материалов"/>
+		<view id="50015" t="RepMaterialConsToleranceViolation" section="Отчеты" descr="Отчет отклонению от нормативного расхода материалов"/>
 		<view id="50016" t="RepMaterialAvgConsumptionOnCtp" section="Отчеты" descr="Фактический расход материалов по маркам на м3"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
