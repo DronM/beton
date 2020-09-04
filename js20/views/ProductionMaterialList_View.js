@@ -3,13 +3,16 @@
  */
 function ProductionMaterialList_View(id,options){	
 
-	var production_id;
+	var production_id,production_site_id;
 	if(options.detailFilters){	
 		for(var i=0;i<options.detailFilters.ProductionMaterialList_Model.length;i++){
 			if(options.detailFilters.ProductionMaterialList_Model[i].masterFieldId=="production_id"){
 				production_id = options.detailFilters.ProductionMaterialList_Model[i].val;
-				break;
 			}
+			else if(options.detailFilters.ProductionMaterialList_Model[i].masterFieldId=="production_site_id"){
+				production_site_id = options.detailFilters.ProductionMaterialList_Model[i].val;
+			}
+			
 		}
 	}
 	this.HEAD_TITLE = "Списание материалов в производство"+( production_id? " №"+production_id:"" );
@@ -49,8 +52,14 @@ function ProductionMaterialList_View(id,options){
 		"editWinClass":null,
 		"contClassName":options.detailFilters? window.getBsCol(6):null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
-			"cmdInsert":false,
+			"cmdInsert":options.detailFilters?
+				(new ProductionMaterialListGridInsertCmd(id+":grid:cmd:insert",{
+					"production_id":production_id
+					,"production_site_id":production_site_id
+				}))
+				:false,
 			"cmdEdit":false,
+			"cmdCopy":false,
 			"cmdDelete":false,
 			"filters":null,
 			"cmdAllCommands":options.detailFilters? false:true,
@@ -178,7 +187,7 @@ function ProductionMaterialList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("shipments_ref"),
-									"ctrlClass":null,
+									"ctrlClass":ShipmentEdit,
 									"ctrlBindFieldId":"shipment_id",
 									"ctrlOptions":{
 										"labelCaption":""
@@ -192,6 +201,11 @@ function ProductionMaterialList_View(id,options){
 							"columns":[
 								new GridColumn({
 									"field":model.getField("materials_ref"),
+									"ctrlClass":MaterialSelect,
+									"ctrlBindFieldId":"material_id",
+									"ctrlOptions":{
+										"labelCaption":""
+									},
 									"formatFunction":function(fields){
 										var mat = fields.materials_ref.getValue();
 										var res = !mat.isNull()? mat.getDescr():"";
@@ -211,7 +225,10 @@ function ProductionMaterialList_View(id,options){
 							"columns":[
 								new GridColumnFloat({
 									"field":model.getField("quant_consuption"),
-									"precision":"4"
+									"precision":"4",
+									"ctrlOptions":{
+										"enabled":false
+									}									
 								})
 							]
 						})
@@ -246,7 +263,10 @@ function ProductionMaterialList_View(id,options){
 								new GridColumnFloat({
 									"field":model.getField("quant_dif"),
 									"precision":"4",
-									"sign":true
+									"sign":true,
+									"ctrlOptions":{
+										"enabled":false
+									}
 								})
 							]
 						})
@@ -255,6 +275,9 @@ function ProductionMaterialList_View(id,options){
 							"columns":[
 								new GridColumn({
 									"field":model.getField("production_comment"),
+									"ctrlOptions":{
+										"enabled":false
+									},
 									"formatFunction":function(fields){
 										var el = fields.production_comment? fields.production_comment.getValue():null;
 										var res = el? el.comment_text:"";

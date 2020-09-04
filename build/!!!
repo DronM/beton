@@ -5,3 +5,5 @@ WHERE material_id IN
 (select id from raw_materials
 where name='' OR name is null)
 AND quant_net=0 AND quant_gross=0
+
+"1970-01-01 05:00:00"

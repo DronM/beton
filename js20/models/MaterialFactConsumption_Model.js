@@ -50,7 +50,6 @@ function MaterialFactConsumption_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.upload_date_time = new FieldDateTimeTZ("upload_date_time",filed_options);
-	options.fields.upload_date_time.getValidator().setRequired(true);
 	
 				
 	
@@ -60,7 +59,6 @@ function MaterialFactConsumption_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.upload_user_id = new FieldInt("upload_user_id",filed_options);
-	options.fields.upload_user_id.getValidator().setRequired(true);
 	
 				
 	
@@ -70,7 +68,6 @@ function MaterialFactConsumption_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.date_time = new FieldDateTimeTZ("date_time",filed_options);
-	options.fields.date_time.getValidator().setRequired(true);
 	
 				
 	
@@ -80,7 +77,6 @@ function MaterialFactConsumption_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.concrete_type_production_descr = new FieldString("concrete_type_production_descr",filed_options);
-	options.fields.concrete_type_production_descr.getValidator().setRequired(true);
 	options.fields.concrete_type_production_descr.getValidator().setMaxLength('100');
 	
 				
@@ -100,7 +96,6 @@ function MaterialFactConsumption_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.raw_material_production_descr = new FieldString("raw_material_production_descr",filed_options);
-	options.fields.raw_material_production_descr.getValidator().setRequired(true);
 	options.fields.raw_material_production_descr.getValidator().setMaxLength('100');
 	
 				
@@ -120,8 +115,7 @@ function MaterialFactConsumption_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.vehicle_production_descr = new FieldString("vehicle_production_descr",filed_options);
-	options.fields.vehicle_production_descr.getValidator().setRequired(true);
-	options.fields.vehicle_production_descr.getValidator().setMaxLength('5');
+	options.fields.vehicle_production_descr.getValidator().setMaxLength('6');
 	
 				
 	

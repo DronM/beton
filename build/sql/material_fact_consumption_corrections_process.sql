@@ -13,9 +13,16 @@ DECLARE
 BEGIN
 	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
 		
-		--Определить дату по номеру производства
-		SELECT count(*) INTO v_cnt FROM material_fact_consumptions
-		WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id AND raw_material_id=NEW.material_id;
+		SELECT
+			count(*)
+		INTO
+			v_cnt
+		FROM material_fact_consumptions
+		WHERE
+			production_site_id = NEW.production_site_id
+			AND production_id = NEW.production_id
+			AND raw_material_id=NEW.material_id
+		;
 		
 		IF v_cnt = 2 THEN
 			--Если два производство - ВЕРИМ силосу, который прислали, но проверяем на заполненность
@@ -101,9 +108,16 @@ BEGIN
 		PERFORM ra_material_facts_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);
 		PERFORM ra_cement_remove_acts('material_fact_consumption_correction'::doc_types,OLD.id);
 		
-		--Определить дату по номеру производства
-		SELECT count(*) INTO v_cnt FROM material_fact_consumptions
-		WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id AND raw_material_id=NEW.material_id;
+		SELECT
+			count(*)
+		INTO
+			v_cnt
+		FROM material_fact_consumptions
+		WHERE
+			production_site_id = NEW.production_site_id
+			AND production_id = NEW.production_id
+			AND raw_material_id=NEW.material_id
+		;
 		
 		IF v_cnt = 2 THEN
 			--Если два производство - ВЕРИМ силосу, который прислали, но проверяем на заполненность

@@ -13,7 +13,7 @@ function ClientList_View(id,options){
 	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
-	this.addElement(new GridAjx(id+":grid",{
+	this.addElement(new GridAjxScroll(id+":grid",{
 		"model":model,
 		"controller":contr,
 		"editInline":false,
@@ -98,7 +98,7 @@ function ClientList_View(id,options){
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
 		
 		"autoRefresh":false,
-		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
+		//"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true
 	}));	

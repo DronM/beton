@@ -54,25 +54,25 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.required = true;
+	
 	var field = new FieldDateTimeTZ("upload_date_time",options);
 	
 	pm.addField(field);
 	
 	var options = {};
-	options.required = true;
+	
 	var field = new FieldInt("upload_user_id",options);
 	
 	pm.addField(field);
 	
 	var options = {};
-	options.required = true;
+	
 	var field = new FieldDateTimeTZ("date_time",options);
 	
 	pm.addField(field);
 	
 	var options = {};
-	options.required = true;
+	
 	var field = new FieldString("concrete_type_production_descr",options);
 	
 	pm.addField(field);
@@ -84,7 +84,7 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.required = true;
+	
 	var field = new FieldString("raw_material_production_descr",options);
 	
 	pm.addField(field);
@@ -96,7 +96,7 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.required = true;
+	
 	var field = new FieldString("vehicle_production_descr",options);
 	
 	pm.addField(field);

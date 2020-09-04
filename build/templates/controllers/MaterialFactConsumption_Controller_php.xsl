@@ -322,6 +322,124 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 	public function get_report($pm){
 	}
 
+	public function insert($pm){
+		/**
+		 * Имеем такие поля:
+		 * production_id
+		 * production_site_id
+		 * cement_silo_id
+		 * raw_material_id
+		 * material_quant
+		 */
+		
+		$production_site_id = $this->getExtDbVal($pm,'production_site_id');
+		$production_id = $this->getExtDbVal($pm,'production_id');
+		$raw_material_id = $this->getExtDbVal($pm,'raw_material_id');
+		$material_quant = $this->getExtDbVal($pm,'material_quant');
+		
+		//Берем данные по производству
+		$ar_prod = $this->getDbLink()->query_first(sprintf(
+			"SELECT
+				t.id
+				,t.concrete_type_id AS concrete_type_id
+				,ct.name AS concrete_type_production_descr
+				,t.vehicle_id AS vehicle_id
+				,regexp_replace(vh.plate, '\D','','g') AS vehicle_production_descr
+				,t.concrete_quant
+				,(SELECT m.name FROM raw_materials AS m WHERE m.id=%d) AS raw_material_production_descr
+				,t.vehicle_schedule_state_id
+				,t.manual_correction
+			FROM productions AS t
+			LEFT JOIN concrete_types AS ct ON ct.id=t.concrete_type_id
+			LEFT JOIN vehicles AS vh ON vh.id=t.vehicle_id
+			WHERE t.production_site_id=%d AND t.production_id=%d"
+			,$raw_material_id
+			,$production_site_id
+			,$production_id
+		));
+		
+		if(!is_array($ar_prod) || !count($ar_prod) || !isset($ar_prod['id'])){
+			throw new Exception('Производство не найдено!');
+		}
+		
+		try{
+			$this->getDbLinkMaster('BEGIN');
+
+			$this->getDbLinkMaster()->query(
+				sprintf(
+					"INSERT INTO material_fact_consumptions
+					(production_site_id
+					,production_id
+					,cement_silo_id
+					,upload_date_time
+					,date_time
+					,upload_user_id
+					,concrete_type_production_descr
+					,concrete_type_id
+					,raw_material_production_descr
+					,raw_material_id
+					,vehicle_production_descr
+					,vehicle_id
+					,vehicle_schedule_state_id
+					,concrete_quant
+					,material_quant
+					,material_quant_req
+					)
+					VALUES
+					(%d
+					,%d
+					,%s
+					,now()
+					,now()
+					,%d
+					,'%s'
+					,%d
+					,'%s'
+					,%d				
+					,'%s'
+					,%d
+					,%d
+					,%f
+					,%f
+					,%f
+					)"
+					,$this->getExtDbVal($pm,'production_site_id')
+					,$this->getExtDbVal($pm,'production_id')
+					,$this->getExtDbVal($pm,'cement_silo_id')
+					,$_SESSION['user_id']
+					,$ar_prod['concrete_type_production_descr']
+					,$ar_prod['concrete_type_id']
+					,$ar_prod['raw_material_production_descr']
+					,$raw_material_id
+					,$ar_prod['vehicle_production_descr']
+					,$ar_prod['vehicle_id']
+					,$ar_prod['vehicle_schedule_state_id']
+					,$ar_prod['concrete_quant']
+					,$material_quant
+					,$material_quant
+				)
+			);
+			
+			if($ar_prod['manual_correction']!='t'){
+				$this->getDbLinkMaster()->query(
+					sprintf(
+						"UPDATE productions
+						SET manual_correction = TRUE
+						WHERE production_site_id=%d AND production_id=%d"
+						,$production_site_id
+						,$production_id					
+					)
+				);
+			}
+						
+			$this->getDbLinkMaster('COMMIT');
+		}
+		catch(Exception $e){
+			$this->getDbLinkMaster('ROLLBACK');
+			throw $e;
+		}
+	}	
+
 </xsl:template>
 
 </xsl:stylesheet>

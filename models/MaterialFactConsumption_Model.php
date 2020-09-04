@@ -99,7 +99,7 @@ class MaterialFactConsumption_Model extends ModelSQLBeton{
 		
 		//*** Field vehicle_production_descr ***
 		$f_opts = array();
-		$f_opts['length']=5;
+		$f_opts['length']=6;
 		$f_opts['id']="vehicle_production_descr";
 						
 		$f_vehicle_production_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_production_descr",$f_opts);

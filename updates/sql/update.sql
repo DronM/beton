@@ -51649,3 +51649,94 @@ CREATE OR REPLACE VIEW cement_silo_balance_resets_list AS
 	;
 	
 ALTER VIEW cement_silo_balance_resets_list OWNER TO beton;
+
+
+-- ******************* update 14/08/2020 05:51:50 ******************
+-- Trigger: doc_material_procurements_before
+
+ DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+*/    
+-- Trigger: doc_material_procurements_after
+
+ DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+*/    
+
+
+-- ******************* update 14/08/2020 06:02:41 ******************
+-- Trigger: doc_material_procurements_before
+
+-- DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+
+-- DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+    
+
+
+-- ******************* update 14/08/2020 06:03:51 ******************
+-- Trigger: doc_material_procurements_before
+
+ DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+*/    
+-- Trigger: doc_material_procurements_after
+
+ DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+*/    
+
+
+-- ******************* update 14/08/2020 06:05:39 ******************
+-- Trigger: doc_material_procurements_before
+
+-- DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+
+--DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();

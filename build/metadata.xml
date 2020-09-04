@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-08-14 05:37:05</lastBuild></version>
+		<lastBuild>2020-09-04 05:37:56</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -86,6 +86,7 @@
 		<version dateOpen="2020-07-21 06:07:46" dateClose="2020-08-03 05:08:51">1.00180</version>
 		<version dateOpen="2020-08-03 06:08:32" dateClose="2020-08-12 05:08:27">1.00181</version>
 		<version dateOpen="2020-08-12 09:08:24" dateClose="2020-08-14 05:08:37">1.00182</version>
+		<version dateOpen="2020-08-17 13:08:09" dateClose="2020-09-04 05:09:37">1.00183</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2853,14 +2854,14 @@
 		<model id="MaterialFactConsumption" parent="ModelSQLBeton" dataTable="material_fact_consumptions" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id" required="TRUE"/>
-			<field id="upload_date_time" dataType="DateTimeTZ" required="TRUE"/>
-			<field id="upload_user_id" dataType="Int" refTable="users" refField="id" required="TRUE"/>
-			<field id="date_time" dataType="DateTimeTZ" required="TRUE"/>
-			<field id="concrete_type_production_descr" dataType="String" length="100" required="TRUE"/>
+			<field id="upload_date_time" dataType="DateTimeTZ" dbRequired="TRUE"/>
+			<field id="upload_user_id" dataType="Int" refTable="users" refField="id" dbRequired="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ" dbRequired="TRUE"/>
+			<field id="concrete_type_production_descr" dataType="String" length="100" dbRequired="TRUE"/>
 			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id"/>
-			<field id="raw_material_production_descr" dataType="String" length="100" required="TRUE"/>
+			<field id="raw_material_production_descr" dataType="String" length="100" dbRequired="TRUE"/>
 			<field id="raw_material_id" dataType="Int" refTable="raw_materials" refField="id"/>
-			<field id="vehicle_production_descr" dataType="String" length="5" required="TRUE"/>
+			<field id="vehicle_production_descr" dataType="String" length="6" dbRequired="TRUE"/>
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
 			<field id="vehicle_schedule_state_id" dataType="Int" refTable="vehicle_schedule_states" refField="id"/>
 			<field id="concrete_quant" dataType="Float" length="19" precision="4"/>
@@ -5019,6 +5020,7 @@
 		<jsScript file="controls/rs/VariantStorageOpenView.rs_ru.js" resource="ru"/>
 		<jsScript file="controls/GridAjx.js"/>
 		<jsScript file="controls/rs/GridAjx.rs_ru.js" resource="ru"/>
+		<jsScript file="controls/GridAjxScroll.js"/>
 		<jsScript file="controls/TreeAjx.js"/>
 		<jsScript file="controls/GridAjxDOCT.js"/>
 		<jsScript file="controls/GridAjxMaster.js"/>
@@ -5387,6 +5389,7 @@
 		<jsScript file="custom_controls/PumpVehiclePriceListGrid.js"/>
 		<jsScript file="custom_controls/CementSiloEdit.js"/>
 		<jsScript file="custom_controls/ProductionSiteCmdLoadProduction.js"/>
+		<jsScript file="custom_controls/ProductionMaterialListGridInsertCmd.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->

@@ -862,6 +862,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/rs/GridAjx.rs_ru.js'));
 	}
 
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridAjxScroll.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/TreeAjx.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridAjxDOCT.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridAjxMaster.js'));
@@ -1428,6 +1429,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PumpVehiclePriceListGrid.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/CementSiloEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ProductionSiteCmdLoadProduction.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ProductionMaterialListGridInsertCmd.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
