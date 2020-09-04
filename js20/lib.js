@@ -723,7 +723,7 @@ function ValidatorFloat(options){ValidatorFloat.superclass.constructor.call(this
 extend(ValidatorFloat,ValidatorInt);ValidatorFloat.prototype.toNumber=function(v){return parseFloat(v);}
 ValidatorFloat.prototype.correctValue=function(v){var this_dig_sep;var v_str=String(v);if(v_str.indexOf(".")>=0){this_dig_sep=".";}
 else if(v_str.indexOf(",")>=0){this_dig_sep=",";}
-if(this_dig_sep){var js_sep=CommonHelper.getDecimalSeparator();if(js_sep!=this_dig_sep){v=v_str.replace(this_dig_sep,js_sep);}}
+if(this_dig_sep){var js_sep=".";if(js_sep!=this_dig_sep){v=v_str.replace(this_dig_sep,js_sep);}}
 return this.toNumber(v);} 
 function ValidatorEnum(options){options=options||{};this.setEnumValues(options.enumValues);ValidatorEnum.superclass.constructor.call(this,options);}
 extend(ValidatorEnum,Validator);ValidatorEnum.prototype.m_enumValues;ValidatorEnum.prototype.setEnumValues=function(v){this.m_enumValues=v;}

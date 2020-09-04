@@ -416,23 +416,7 @@ OrderCalc_View.js
 !!! 
 
 
-SELECT 
-(
-(select quant from rg_material_facts_balance('2020-04-27 06:00','{5}'))
-+(select sum(quant) from ra_material_facts WHERE deb AND date_time>'2020-04-27 06:00:00' AND material_id=5)
--(select sum(quant) from ra_material_facts WHERE NOT deb AND date_time>'2020-04-27 06:00:00' AND material_id=5)
-) AS calc
-,(select quant from rg_material_facts_balance('{5}')) AS fact
-
-Копия Крона на слейве, автоприменение
---На слейве не работают методы соединения с MSSQL!
---sudo apt-get install php5-sybase
-Нет такого пакета для php7
-extension=/usr/lib/php/20190902/pdo_sqlsrv.so
-Разобраться!!!
-http://www.katren.org/ttt.php
-
----3)!!!Форматирование даты в Сафари и Edge
++3)!!!Форматирование даты в Сафари и Edge
 ---5) Проверить функцию "сменить пароль", если нажал - сразу выкинуть этого пользователя
 ---6) Установить макс.длительность сессии
 
