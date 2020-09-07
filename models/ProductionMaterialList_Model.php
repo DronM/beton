@@ -44,6 +44,26 @@ class ProductionMaterialList_Model extends ModelSQLBeton{
 		$this->addField($f_production_id);
 		//********************
 		
+		//*** Field material_id ***
+		$f_opts = array();
+		$f_opts['primaryKey'] = TRUE;
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="material_id";
+						
+		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
+		$this->addField($f_material_id);
+		//********************
+		
+		//*** Field cement_silo_id ***
+		$f_opts = array();
+		$f_opts['primaryKey'] = TRUE;
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="cement_silo_id";
+						
+		$f_cement_silo_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cement_silo_id",$f_opts);
+		$this->addField($f_cement_silo_id);
+		//********************
+		
 		//*** Field production_sites_ref ***
 		$f_opts = array();
 		
@@ -83,15 +103,6 @@ class ProductionMaterialList_Model extends ModelSQLBeton{
 		$this->addField($f_materials_ref);
 		//********************
 		
-		//*** Field material_id ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="material_id";
-						
-		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
-		$this->addField($f_material_id);
-		//********************
-		
 		//*** Field cement_silos_ref ***
 		$f_opts = array();
 		
@@ -100,15 +111,6 @@ class ProductionMaterialList_Model extends ModelSQLBeton{
 						
 		$f_cement_silos_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cement_silos_ref",$f_opts);
 		$this->addField($f_cement_silos_ref);
-		//********************
-		
-		//*** Field cement_silo_id ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="cement_silo_id";
-						
-		$f_cement_silo_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cement_silo_id",$f_opts);
-		$this->addField($f_cement_silo_id);
 		//********************
 		
 		//*** Field quant_consuption ***

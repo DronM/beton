@@ -1,24 +1,28 @@
--- VIEW: cement_silo_balance_resets_list
+-- VIEW: material_cons_tolerance_violation_list
 
-DROP VIEW cement_silo_balance_resets_list;
+--DROP VIEW material_cons_tolerance_violation_list;
 
-CREATE OR REPLACE VIEW cement_silo_balance_resets_list AS
+-- НЕ ИСПОЛЬЗОВАТЬ!!!!
+-- ИСПОЛЬЗОВАТЬ ОДНОИМЕННУЮ ФУНКЦИЮ!!!
+CREATE OR REPLACE VIEW material_cons_tolerance_violation_list AS
 	SELECT
-		t.id
-		,t.date_time
-		,t.user_id
-		,users_ref(u) AS users_ref
-		,t.cement_silo_id
-		,cement_silos_ref(sil) AS cement_silos_ref
-		,t.comment_text
-		,ra.quant * CASE WHEN ra.deb THEN 1 ELSE -1 END AS quant
-		,t.quant_required
-		
-	FROM cement_silo_balance_resets AS t
-	LEFT JOIN users u ON u.id=t.user_id
-	LEFT JOIN cement_silos sil ON sil.id=t.cement_silo_id
-	LEFT JOIN ra_cement AS ra ON ra.doc_id = t.id AND ra.doc_type='cement_silo_balance_reset'::doc_types
-	ORDER BY t.date_time DESC
+		get_shift_start(t.date_time::timestamp without time zone) AS date_time
+		,t.material_id
+		,(t.materials_ref::text)::json AS materials_ref
+		,mat.ord AS material_ord
+		,round(SUM(t.quant_consuption)::numeric(19,4),4) AS norm_quant
+		,SUM(t.material_quant) AS fact_quant
+		,(SUM(t.material_quant) - SUM(t.quant_consuption) )::numeric(19,4) AS diff_quant
+		,(abs(SUM(t.material_quant) - SUM(t.quant_consuption)) * 100 / SUM(t.material_quant) )::numeric(19,4) AS diff_percent
+	FROM production_material_list AS t
+	LEFT JOIN raw_materials AS mat ON mat.id=t.material_id
+	GROUP BY
+		get_shift_start(t.date_time::timestamp without time zone)
+		,t.material_id
+		,t.materials_ref::text
+		,mat.ord
+	ORDER BY get_shift_start(t.date_time::timestamp without time zone) DESC,mat.ord
+	
 	;
 	
-ALTER VIEW cement_silo_balance_resets_list OWNER TO beton;
+ALTER VIEW material_cons_tolerance_violation_list OWNER TO beton;

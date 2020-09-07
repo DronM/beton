@@ -55,7 +55,9 @@ CREATE OR REPLACE VIEW material_fact_consumptions_list AS
 		shipments_ref(sh) AS shipments_ref,
 		prod.id AS production_key,
 		
-		t.concrete_type_id
+		t.concrete_type_id,
+		
+		prod.production_dt_end
 				
 		
 	FROM material_fact_consumptions AS t

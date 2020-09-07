@@ -267,6 +267,35 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('delete_material');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('production_site_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('production_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('material_id',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('cement_silo_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}	
 	
@@ -673,6 +702,19 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 			throw $e;
 		}
 	}	
+
+	public function delete_material($pm){
+		$this->getDbLinkMaster()->query(
+			sprintf(
+				"DELETE FROM material_fact_consumptions
+				WHERE production_site_id=%d AND production_id=%d AND material_id=%d AND cement_silo_id=%s"
+				,$this->getExtDbVal($pm,'production_site_id')
+				,$this->getExtDbVal($pm,'production_id')
+				,$this->getExtDbVal($pm,'material_id')
+				,$this->getExtDbVal($pm,'cement_silo_id')
+			)
+		);
+	}
 
 
 }

@@ -41,6 +41,14 @@ class MaterialFactConsumptionList_Model extends ModelSQLBeton{
 		$this->addField($f_date_time);
 		//********************
 		
+		//*** Field production_dt_end ***
+		$f_opts = array();
+		$f_opts['id']="production_dt_end";
+						
+		$f_production_dt_end=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_dt_end",$f_opts);
+		$this->addField($f_production_dt_end);
+		//********************
+		
 		//*** Field upload_date_time ***
 		$f_opts = array();
 		$f_opts['id']="upload_date_time";

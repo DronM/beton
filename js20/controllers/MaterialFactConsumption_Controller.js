@@ -32,6 +32,7 @@ function MaterialFactConsumption_Controller(options){
 	this.addGetObject();
 	this.add_upload_production_file();
 	this.add_get_report();
+	this.add_delete_material();
 		
 }
 extend(MaterialFactConsumption_Controller,ControllerObjServer);
@@ -293,6 +294,9 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	pm.addField(new FieldDateTime("date_time",f_opts));
 	var f_opts = {};
 	
+	pm.addField(new FieldDateTime("production_dt_end",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldDateTimeTZ("upload_date_time",f_opts));
 	var f_opts = {};
 	
@@ -433,6 +437,44 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldText("production_file",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			MaterialFactConsumption_Controller.prototype.add_delete_material = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('delete_material',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("production_site_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("production_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("material_id",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("cement_silo_id",options));
 	
 			
 	this.addPublicMethod(pm);

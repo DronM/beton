@@ -47,6 +47,15 @@ function MaterialFactConsumptionList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.production_dt_end = new FieldDateTime("production_dt_end",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.upload_date_time = new FieldDateTimeTZ("upload_date_time",filed_options);
 	
 				

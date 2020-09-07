@@ -1,6 +1,6 @@
 -- VIEW: material_cons_tolerance_violation_list
 
-DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW material_cons_tolerance_violation_list;
 
 -- НЕ ИСПОЛЬЗОВАТЬ!!!!
 -- ИСПОЛЬЗОВАТЬ ОДНОИМЕННУЮ ФУНКЦИЮ!!!

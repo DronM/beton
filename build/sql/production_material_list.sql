@@ -1,5 +1,6 @@
 -- VIEW: production_material_list
 
+--DROP VIEW material_cons_tolerance_violation_list;
 --DROP VIEW production_material_list;
 
 CREATE OR REPLACE VIEW production_material_list AS

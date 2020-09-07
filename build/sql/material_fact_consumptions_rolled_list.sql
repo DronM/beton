@@ -4,9 +4,9 @@
 
 CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 	SELECT
-		date_time,
-		upload_date_time,
-		(upload_users_ref::text)::jsonb AS upload_users_ref,
+		production_dt_end AS date_time,
+		production_dt_end AS upload_date_time,
+		--(upload_users_ref::text)::jsonb AS upload_users_ref, ИНАЧЕ Раздваивает при корректировках (другой юзер!!!)
 		(production_sites_ref::text)::jsonb AS production_sites_ref,
 		production_site_id,
 		(concrete_types_ref::text)::jsonb AS concrete_types_ref,
@@ -35,10 +35,8 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 		production_key
 		
 	FROM material_fact_consumptions_list
-	GROUP BY date_time,
+	GROUP BY production_dt_end,
 		concrete_quant,
-		upload_date_time,
-		upload_users_ref::text,
 		production_sites_ref::text,
 		production_site_id,
 		concrete_types_ref::text,

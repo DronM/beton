@@ -43,6 +43,24 @@ function ProductionMaterialList_Model(options){
 				
 	
 	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.material_id = new FieldInt("material_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.cement_silo_id = new FieldInt("cement_silo_id",filed_options);
+	
+				
+	
+	var filed_options = {};
 	filed_options.primaryKey = false;	
 	filed_options.alias = 'Завод';
 	filed_options.autoInc = false;	
@@ -80,28 +98,10 @@ function ProductionMaterialList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.material_id = new FieldInt("material_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
 	filed_options.alias = 'Силос';
 	filed_options.autoInc = false;	
 	
 	options.fields.cement_silos_ref = new FieldJSON("cement_silos_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.cement_silo_id = new FieldInt("cement_silo_id",filed_options);
 	
 				
 	

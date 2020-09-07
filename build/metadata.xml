@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-09-04 08:30:44</lastBuild></version>
+		<lastBuild>2020-09-07 05:46:35</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -88,6 +88,7 @@
 		<version dateOpen="2020-08-12 09:08:24" dateClose="2020-08-14 05:08:37">1.00182</version>
 		<version dateOpen="2020-08-17 13:08:09" dateClose="2020-09-04 05:09:37">1.00183</version>
 		<version dateOpen="2020-09-04 08:09:30" dateClose="2020-09-04 08:09:30">1.00184</version>
+		<version dateOpen="2020-09-04 09:09:08" dateClose="2020-09-07 05:09:46">1.00185</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1472,13 +1473,13 @@
 		<model id="ProductionMaterialList" parent="ModelSQLBeton" dataTable="production_material_list" virtual="TRUE" server="FALSE">
 			<field id="production_site_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE"/>
 			<field id="production_id" dataType="Int" alias="Номер производства Elkon" primaryKey="TRUE"/>
+			<field id="material_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE"/>
+			<field id="cement_silo_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="shipment_id" dataType="Int" sysCol="TRUE"/>
 			<field id="shipments_ref" dataType="JSON" alias="Отгрузка"/>
 			<field id="materials_ref" dataType="JSON" alias="Материал"/>
-			<field id="material_id" dataType="Int" sysCol="TRUE"/>
 			<field id="cement_silos_ref" dataType="JSON" alias="Силос"/>
-			<field id="cement_silo_id" dataType="Int" sysCol="TRUE"/>
 			<field id="quant_consuption" dataType="Float" alias="Количество по подбору"/>
 			<field id="quant_fact" dataType="Float" alias="Количество факт"/>
 			<field id="quant_fact_req" dataType="Float" alias="Количество факт треб."/>
@@ -2890,6 +2891,7 @@
 		<model id="MaterialFactConsumptionList" parent="ModelSQLBeton" dataTable="material_fact_consumptions_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="date_time" dataType="DateTime"/>
+			<field id="production_dt_end" dataType="DateTime"/>
 			<field id="upload_date_time" dataType="DateTimeTZ"/>
 			<field id="upload_users_ref" dataType="JSON"/>
 			<field id="production_site_id" dataType="Int"/>
@@ -4340,6 +4342,12 @@
 				<field id="production_site_id" dataType="Int" required="TRUE"/>
 				<field id="production_file" dataType="Text"/>
 			</publicMethod>
+			<publicMethod id="delete_material">
+				<field id="production_site_id" dataType="Int" required="TRUE"/>
+				<field id="production_id" dataType="Int" required="TRUE"/>
+				<field id="material_id" dataType="Int" required="TRUE"/>
+				<field id="cement_silo_id" dataType="Int"/>
+			</publicMethod>
 		</controller>
 		<controller id="MaterialFactConsumptionCorretion" parentId="ControllerSQL" state="TRUE">
 			<publicMethod id="insert" modelId="MaterialFactConsumptionCorretion"/>
@@ -4353,7 +4361,7 @@
 				<field id="production_id" dataType="Int" required="TRUE"/>
 				<field id="material_id" dataType="Int" required="TRUE"/>
 				<field id="cement_silo_id" dataType="Int"/>
-				<field id="cor_quant" dataType="Float" length="19" precision="4" required="TRUE"/>
+				<field id="cor_quant" dataType="Float" length="19" precision="4" unsigned="FALSE" required="TRUE"/>
 				<field id="comment_text" dataType="String" length="500"/>
 			</publicMethod>
 		</controller>
@@ -5391,6 +5399,7 @@
 		<jsScript file="custom_controls/CementSiloEdit.js"/>
 		<jsScript file="custom_controls/ProductionSiteCmdLoadProduction.js"/>
 		<jsScript file="custom_controls/ProductionMaterialListGridInsertCmd.js"/>
+		<jsScript file="custom_controls/ProductionMaterialListGridDelCmd.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->

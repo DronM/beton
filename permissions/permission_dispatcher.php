@@ -1028,6 +1028,8 @@ $permissions = array();
 				
 					$permissions['MaterialFactConsumption_Controller_get_report']=TRUE;
 				
+					$permissions['MaterialFactConsumption_Controller_delete_material']=TRUE;
+				
 					$permissions['MaterialFactConsumptionCorretion_Controller_insert']=TRUE;
 				
 					$permissions['MaterialFactConsumptionCorretion_Controller_update']=TRUE;

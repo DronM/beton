@@ -201,7 +201,8 @@ class MaterialFactConsumptionCorretion_Controller extends ControllerSQL{
 	$opts=array();
 	
 		$opts['length']=19;
-		$opts['required']=TRUE;				
+		$opts['required']=TRUE;
+		$opts['unsigned']=FALSE;				
 		$pm->addParam(new FieldExtFloat('cor_quant',$opts));
 	
 				

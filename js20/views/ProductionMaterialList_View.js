@@ -31,7 +31,8 @@ function ProductionMaterialList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagination = null,refresh_int = 0;
 	
-	var show_comment = (CommonHelper.inArray(window.getApp().getServVar("role_id"),["operator","dispatcher"])==-1);
+	var role_id = window.getApp().getServVar("role_id");
+	var show_comment = (CommonHelper.inArray(role_id,["operator","dispatcher"])==-1);
 	
 	if(!options.detailFilters){
 		var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
@@ -60,7 +61,12 @@ function ProductionMaterialList_View(id,options){
 				:false,
 			"cmdEdit":false,
 			"cmdCopy":false,
-			"cmdDelete":false,
+			"cmdDelete":(options.detailFilters && (role_id=="admin"||role_id=="owner"||role_id=="manager"||role_id=="accountant"||role_id=="supervisor"))?
+				(new ProductionMaterialListGridDelCmd(id+":grid:cmd:delete",{
+					"production_id":production_id
+					,"production_site_id":production_site_id
+				}))
+				:false,
 			"filters":null,
 			"cmdAllCommands":options.detailFilters? false:true,
 			"cmdSearch":options.detailFilters? false:true,
