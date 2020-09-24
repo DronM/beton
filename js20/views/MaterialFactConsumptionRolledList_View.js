@@ -97,7 +97,11 @@ function MaterialFactConsumptionRolledList_View(id,options){
 			"cmdInsert":false,
 			"cmdDelete":false,
 			"filters":filters,
-			"variantStorage":options.variantStorage
+			"variantStorage":options.variantStorage,
+			"cmdExport":new GridCmdExportExcelLocal(id+":export",{
+				"fileName":"Фактический расход материалов.xls"
+				,"sheetName":"Фактический расход материалов"
+			})
 		}),
 		"popUpMenu":popup_menu,
 		"onEventSetCellOptions":function(opts){

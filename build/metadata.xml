@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-09-07 05:46:35</lastBuild></version>
+		<lastBuild>2020-09-24 05:56:44</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -89,6 +89,7 @@
 		<version dateOpen="2020-08-17 13:08:09" dateClose="2020-09-04 05:09:37">1.00183</version>
 		<version dateOpen="2020-09-04 08:09:30" dateClose="2020-09-04 08:09:30">1.00184</version>
 		<version dateOpen="2020-09-04 09:09:08" dateClose="2020-09-07 05:09:46">1.00185</version>
+		<version dateOpen="2020-09-08 09:09:46" dateClose="2020-09-24 05:09:56">1.00186</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2432,6 +2433,11 @@
 			<field id="tel" dataType="String" length="15" primaryKey="TRUE"/>
 			<field id="tracker_id" dataType="String" length="15" primaryKey="TRUE"/>
 		</model>
+		<model id="GPSTracker" parent="ModelSQLBeton" dataTable="gps_trackers" virtual="FALSE">
+			<field id="id" dataType="String" length="15" primaryKey="TRUE"/>
+			<field id="sim_number" dataType="String" length="15"/>
+			<field id="sim_id" dataType="String" length="20"/>
+		</model>
 		<model id="MailForSending" parent="ModelSQLBeton" dataTable="mail_for_sending" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE" autoInc="TRUE"/>
 			<field id="date_time" dataType="DateTime" defaultValue="current_timestamp"/>
@@ -4345,7 +4351,7 @@
 			<publicMethod id="delete_material">
 				<field id="production_site_id" dataType="Int" required="TRUE"/>
 				<field id="production_id" dataType="Int" required="TRUE"/>
-				<field id="material_id" dataType="Int" required="TRUE"/>
+				<field id="raw_material_id" dataType="Int" required="TRUE"/>
 				<field id="cement_silo_id" dataType="Int"/>
 			</publicMethod>
 		</controller>
@@ -4355,14 +4361,23 @@
 			<publicMethod id="delete" modelId="MaterialFactConsumptionCorretion"/>
 			<publicMethod id="get_list" modelId="MaterialFactConsumptionCorretionList"/>
 			<publicMethod id="get_object" modelId="MaterialFactConsumptionCorretionList"/>
-			<publicMethod id="operator_insert_correction">
-				<descr>Упрощенный ввод,НО через идентификатор строки фактического расхода вводить нельзя!!! т.к. у нас агрегированные данные, потому через ключи!!!</descr>
+			<publicMethod id="operator_insert_correction" requestType="post">
+				<descr>Упрощенный ввод корректировки расхода,НО через идентификатор строки фактического расхода вводить нельзя!!! т.к. у нас агрегированные данные, потому через ключи!!!</descr>
 				<field id="production_site_id" dataType="Int" required="TRUE"/>
 				<field id="production_id" dataType="Int" required="TRUE"/>
 				<field id="material_id" dataType="Int" required="TRUE"/>
 				<field id="cement_silo_id" dataType="Int"/>
 				<field id="cor_quant" dataType="Float" length="19" precision="4" unsigned="FALSE" required="TRUE"/>
 				<field id="comment_text" dataType="String" length="500"/>
+			</publicMethod>
+			<publicMethod id="operator_add_material_to_production" requestType="post">
+				<descr>Добавление нового материала в производство, когда элкон не зафиксировал</descr>
+				<field id="production_site_id" dataType="Int" required="TRUE"/>
+				<field id="production_id" dataType="Int" required="TRUE"/>
+				<field id="material_id" dataType="Int" required="TRUE"/>
+				<field id="cement_silo_id" dataType="Int"/>
+				<field id="cor_quant" dataType="Float" length="19" precision="4" unsigned="FALSE"/>
+				<field id="comment_text" dataType="Text" length="500"/>
 			</publicMethod>
 		</controller>
 		<controller id="CementSilo" parentId="ControllerSQL" state="TRUE">
@@ -4997,6 +5012,8 @@
 		<jsScript file="controls/rs/GridCmdSearch.rs_ru.js" resource="ru"/>
 		<jsScript file="controls/GridCmdExport.js"/>
 		<jsScript file="controls/rs/GridCmdExport.rs_ru.js" resource="ru"/>
+		<jsScript file="controls/GridCmdExportExcelLocal.js"/>
+		<jsScript file="controls/rs/GridCmdExportExcelLocal.rs_ru.js" resource="ru"/>
 		<jsScript file="controls/GridCmdAllCommands.js"/>
 		<jsScript file="controls/rs/GridCmdAllCommands.rs_ru.js" resource="ru"/>
 		<jsScript file="controls/GridCmdDOCUnprocess.js"/>
@@ -5715,6 +5732,7 @@
 		<jsScript file="controllers/RawMaterialPriceForNorm_Controller.js"/>
 		<jsScript file="models/RawMaterialPriceForNorm_Model.js"/>
 		<jsScript file="models/RawMaterialPriceForNormList_Model.js"/>
+		<jsScript file="models/GPSTracker_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

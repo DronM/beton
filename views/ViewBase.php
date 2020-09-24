@@ -702,6 +702,16 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/rs/GridCmdExport.rs_ru.js'));
 	}
 
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdExportExcelLocal.js'));
+		
+	if (
+	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
+	||
+	(!isset($_SESSION['locale_id']) && DEF_LOCALE=='ru')
+	){
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/rs/GridCmdExportExcelLocal.rs_ru.js'));
+	}
+
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdAllCommands.js'));
 		
 	if (
@@ -1746,6 +1756,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/RawMaterialPriceForNorm_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPriceForNorm_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPriceForNormList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/GPSTracker_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

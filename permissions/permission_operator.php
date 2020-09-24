@@ -1042,6 +1042,8 @@ $permissions = array();
 				
 					$permissions['MaterialFactConsumptionCorretion_Controller_operator_insert_correction']=TRUE;
 				
+					$permissions['MaterialFactConsumptionCorretion_Controller_operator_add_material_to_production']=TRUE;
+				
 					$permissions['CementSilo_Controller_insert']=TRUE;
 				
 					$permissions['CementSilo_Controller_update']=TRUE;

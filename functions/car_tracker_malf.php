@@ -51,4 +51,20 @@ $dbLink->query(
 	WHERE (SELECT v FROM efficiency)<=const_efficiency_warn_k_val()"
 );
 
+$ar = $dbLink->query_first(
+	"SELECT (now()-(recieved_dt+'5 hours'::interval)) > '10 minutes' AS no_data
+	FROM car_tracking
+	ORDER BY recieved_dt DESC
+	LIMIT 1"
+);
+if(is_array($ar) && count($ar) && $ar['no_data']!='f'){
+	//no data!!!
+	exec('/home/andrey/tracking_pg/gpsmon_beton_master stop');
+	sleep(3);
+	exec('/home/andrey/tracking_pg/gpsmon_beton_master start');
+	sleep(3);
+	exec('/home/andrey/tracking_pg/gpsmon_master start');
+	file_put_contents('/home/andrey/tracker_surv.log',date('y-m-d H:i:s').'No data.. restarted!'.PHP_EOL,FILE_APPEND);
+}
+
 ?>

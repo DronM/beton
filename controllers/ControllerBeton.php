@@ -14,7 +14,7 @@ class ControllerBeton extends Controller {
 	
 	/* Output function
 	*/
-	public function write($viewClassId,$viewId){
+	public function write($viewClassId,$viewId,$errorCode=NULL){
 		//!!!ЗВОНКИ!!!
 		if (isset($_SESSION['tel_ext'])){
 			
@@ -24,7 +24,7 @@ class ControllerBeton extends Controller {
 				$this->addModel($call->getModelById('AstCallCurrent_Model'));
 			}
 		}
-		parent::write($viewClassId,$viewId);
+		parent::write($viewClassId,$viewId,$errorCode);
 		/*
 		$view = new $viewClassId($viewId);
 		if ($this->getStatelessClient()){

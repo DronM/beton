@@ -8,10 +8,10 @@ class Child extends ViewBase{
 	protected function addMenu(&$models){
 	}
 	
-	public function write(ArrayObject &$models){
+	public function write(ArrayObject &$models, $errorCode = NULL){
 		//add templates
 		
-		parent::write($models);
+		parent::write($models,$errorCode);
 	}	
 
 }

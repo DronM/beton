@@ -1,28 +1,21 @@
--- VIEW: material_cons_tolerance_violation_list
+-- VIEW: rep_forming
 
---DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW rep_forming;
 
--- НЕ ИСПОЛЬЗОВАТЬ!!!!
--- ИСПОЛЬЗОВАТЬ ОДНОИМЕННУЮ ФУНКЦИЮ!!!
-CREATE OR REPLACE VIEW material_cons_tolerance_violation_list AS
+CREATE OR REPLACE VIEW rep_forming AS
 	SELECT
-		get_shift_start(t.date_time::timestamp without time zone) AS date_time
-		,t.material_id
-		,(t.materials_ref::text)::json AS materials_ref
-		,mat.ord AS material_ord
-		,round(SUM(t.quant_consuption)::numeric(19,4),4) AS norm_quant
-		,SUM(t.material_quant) AS fact_quant
-		,(SUM(t.material_quant) - SUM(t.quant_consuption) )::numeric(19,4) AS diff_quant
-		,(abs(SUM(t.material_quant) - SUM(t.quant_consuption)) * 100 / SUM(t.material_quant) )::numeric(19,4) AS diff_percent
-	FROM production_material_list AS t
-	LEFT JOIN raw_materials AS mat ON mat.id=t.material_id
+		f_op.date_time::date AS form_date
+		,work_shifts_ref(sh) AS work_shifts_ref
+		,count(*) AS tot_cnt
+		,sum(weight) AS tot_weight
+		,sum(volume) AS tot_volume
+		
+	FROM form_operations AS f_op
+	LEFT JOIN work_shifts AS sh ON sh.id=f_op.work_shift_id
 	GROUP BY
-		get_shift_start(t.date_time::timestamp without time zone)
-		,t.material_id
-		,t.materials_ref::text
-		,mat.ord
-	ORDER BY get_shift_start(t.date_time::timestamp without time zone) DESC,mat.ord
-	
+		f_op.date_time::date
+		,sh.*
+		,work_shifts_ref(sh)::text
 	;
 	
-ALTER VIEW material_cons_tolerance_violation_list OWNER TO beton;
+ALTER VIEW rep_forming OWNER TO beton;

@@ -468,7 +468,7 @@ extend(MaterialFactConsumption_Controller,ControllerObjServer);
 	
 		options.required = true;
 	
-		pm.addField(new FieldInt("material_id",options));
+		pm.addField(new FieldInt("raw_material_id",options));
 	
 				
 	

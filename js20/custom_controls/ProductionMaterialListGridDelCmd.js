@@ -61,7 +61,7 @@ ProductionMaterialListGridDelCmd.prototype.onCommandCont = function(materialId,c
 	
 	pm.setFieldValue("production_site_id",this.m_productionSiteId);
 	pm.setFieldValue("production_id",this.m_productionId);
-	pm.setFieldValue("material_id",materialId);
+	pm.setFieldValue("raw_material_id",materialId);
 	pm.setFieldValue("cement_silo_id",cementSiloId);
 	
 	var self = this;

@@ -91,7 +91,7 @@ BEGIN
 			--check last X points to be sure
 			v_true_point = false;
 			FOR v_car_rec IN SELECT lon,lat FROM car_tracking AS t
-					WHERE t.car_id = NEW.car_id
+					WHERE t.car_id = NEW.car_id AND t.gps_valid=1
 					ORDER BY t.period DESC
 					LIMIT constant_geo_zone_check_points_count()-1 OFFSET 1
 			LOOP	
@@ -163,7 +163,7 @@ BEGIN
 				SELECT
 					tr.lon,tr.lat
 				FROM car_tracking AS tr
-				WHERE tr.car_id = NEW.car_id
+				WHERE tr.car_id = NEW.car_id AND tr.gps_valid=1 --16/09/20!!!
 				--(SELECT tracker_id FROM vehicles WHERE plate='864')
 				ORDER BY tr.period DESC
 				LIMIT const_geo_zone_check_points_count_val()	

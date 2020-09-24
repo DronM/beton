@@ -93,8 +93,14 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$mat_model = new ModelSQL($link,array('id'=>'RawMaterial_Model'));
 		$mat_model->addField(new FieldSQLInt($link,null,null,"id"));
 		$mat_model->addField(new FieldSQLString($link,null,null,"name"));
-		$mat_model->query("SELECT id,name FROM raw_materials WHERE name &lt;&gt;'' ORDER BY id",
-		TRUE);
+		$mat_model->query(
+			"SELECT
+				id,name
+			FROM raw_materials
+			WHERE name &lt;&gt;''
+			ORDER BY id"
+			,TRUE
+		);
 		$this->addModel($mat_model);			
 	}
 	

@@ -441,14 +441,15 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 	}	
 
 	public function delete_material($pm){
+		$silo_set = ($pm->getParamValue('cement_silo_id')&amp;&amp;$pm->getParamValue('cement_silo_id')!='null');
 		$this->getDbLinkMaster()->query(
 			sprintf(
 				"DELETE FROM material_fact_consumptions
-				WHERE production_site_id=%d AND production_id=%d AND material_id=%d AND cement_silo_id=%s"
+				WHERE production_site_id=%d AND production_id=%d AND raw_material_id=%d%s"
 				,$this->getExtDbVal($pm,'production_site_id')
 				,$this->getExtDbVal($pm,'production_id')
-				,$this->getExtDbVal($pm,'material_id')
-				,$this->getExtDbVal($pm,'cement_silo_id')
+				,$this->getExtDbVal($pm,'raw_material_id')
+				,$silo_set? sprintf(" AND cement_silo_id=%d",$this->getExtDbVal($pm,'cement_silo_id')):''
 			)
 		);
 	}

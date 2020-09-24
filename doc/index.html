@@ -256,6 +256,7 @@
 <li><a href="#SiteFeedBack_Model">SiteFeedBack_Model</a></li>
 <li><a href="#SiteFeedBackList_Model">SiteFeedBackList_Model</a></li>
 <li><a href="#CarTrackingMalfucntion_Model">CarTrackingMalfucntion_Model</a></li>
+<li><a href="#GPSTracker_Model">GPSTracker_Model</a></li>
 <li><a href="#MailForSending_Model">MailForSending_Model</a></li>
 <li><a href="#MailForSendingAttachment_Model">MailForSendingAttachment_Model</a></li>
 <li><a href="#SMSForSending_Model">SMSForSending_Model</a></li>
@@ -1469,7 +1470,7 @@
 <p>Required:
 								Да</p>
 </div>
-<h3>material_id</h3>
+<h3>raw_material_id</h3>
 <p></p>
 <div class="content_item content_item3">
 <p>Type:Int</p>
@@ -1497,7 +1498,7 @@
 <a href="#MaterialFactConsumptionCorretion_Model">Model: MaterialFactConsumptionCorretion_Model</a><h2>get_list</h2>
 <a href="#MaterialFactConsumptionCorretionList_Model">Model: MaterialFactConsumptionCorretionList_Model</a><h2>get_object</h2>
 <a href="#MaterialFactConsumptionCorretionList_Model">Model: MaterialFactConsumptionCorretionList_Model</a><h2>operator_insert_correction</h2>
-<p class="big">Упрощенный ввод,НО через идентификатор строки фактического расхода вводить нельзя!!! т.к. у нас агрегированные данные, потому через ключи!!!</p>
+<p class="big">Упрощенный ввод корректировки расхода,НО через идентификатор строки фактического расхода вводить нельзя!!! т.к. у нас агрегированные данные, потому через ключи!!!</p>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>production_site_id</h3>
@@ -1541,6 +1542,56 @@
 <p></p>
 <div class="content_item content_item3">
 <p>Type:String</p>
+<p>Required:
+								Нет</p>
+<p>Length:500</p>
+</div>
+</div>
+<h2>operator_add_material_to_production</h2>
+<p class="big">Добавление нового материала в производство, когда элкон не зафиксировал</p>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>production_site_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>production_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>material_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>cement_silo_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Нет</p>
+</div>
+<h3>cor_quant</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Float</p>
+<p>Required:
+								Нет</p>
+<p>Length:19</p>
+<p>Precision:4</p>
+</div>
+<h3>comment_text</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
 <p>Required:
 								Нет</p>
 <p>Length:500</p>
@@ -5582,6 +5633,30 @@
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="GPSTracker_Model" class="content_box">
+<h1>GPSTracker_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:</div>
+<h2>sim_number</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:</div>
+<h2>sim_id</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:20</div>
 <div>Precision:</div>
 </div>
 </div>

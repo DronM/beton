@@ -5,17 +5,19 @@
 CREATE OR REPLACE FUNCTION get_shift_start(in_date_time timestamp without time zone)
   RETURNS timestamp without time zone AS
 $BODY$
+	WITH
+	first_shift_start AS (
+		SELECT val::time without time zone AS v FROM public.const_first_shift_start_time LIMIT 1
+	)
 	SELECT
 		CASE
-			--const_first_shift_start_time_val()
-			--(const_first_shift_start_time_val()::time without time zone)::interval
-			WHEN in_date_time::time without time zone<const_first_shift_start_time_val()::time without time zone THEN
-				(in_date_time::date - '1 day'::interval)+(const_first_shift_start_time_val()::time without time zone)::interval
-			ELSE in_date_time::date+(const_first_shift_start_time_val()::time without time zone)::interval
+			WHEN in_date_time::time without time zone<(SELECT v FROM first_shift_start) THEN
+				(in_date_time::date - '1 day'::interval)+(SELECT v::interval FROM first_shift_start)
+			ELSE in_date_time::date+(SELECT v::interval FROM first_shift_start)
 		END
 	;
 $BODY$
-  LANGUAGE sql IMMUTABLE
+  LANGUAGE sql STABLE
   COST 100;
 ALTER FUNCTION get_shift_start(timestamp without time zone)
   OWNER TO beton;

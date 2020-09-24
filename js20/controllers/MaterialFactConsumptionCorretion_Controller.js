@@ -30,6 +30,7 @@ function MaterialFactConsumptionCorretion_Controller(options){
 	this.addGetList();
 	this.addGetObject();
 	this.add_operator_insert_correction();
+	this.add_operator_add_material_to_production();
 		
 }
 extend(MaterialFactConsumptionCorretion_Controller,ControllerObjServer);
@@ -273,9 +274,11 @@ extend(MaterialFactConsumptionCorretion_Controller,ControllerObjServer);
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('operator_insert_correction',opts);
 	
+	pm.setRequestType('post');
+	
 				
 	/*
-	 Упрощенный ввод,НО через идентификатор строки фактического расхода вводить нельзя!!! т.к. у нас агрегированные данные, потому через ключи!!!
+	 Упрощенный ввод корректировки расхода,НО через идентификатор строки фактического расхода вводить нельзя!!! т.к. у нас агрегированные данные, потому через ключи!!!
 	*/
 
 				
@@ -325,6 +328,67 @@ extend(MaterialFactConsumptionCorretion_Controller,ControllerObjServer);
 		options.maxlength = "500";
 	
 		pm.addField(new FieldString("comment_text",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			MaterialFactConsumptionCorretion_Controller.prototype.add_operator_add_material_to_production = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('operator_add_material_to_production',opts);
+	
+	pm.setRequestType('post');
+	
+				
+	/*
+	 Добавление нового материала в производство, когда элкон не зафиксировал
+	*/
+
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("production_site_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("production_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("material_id",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("cement_silo_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.maxlength = "19";
+	
+		pm.addField(new FieldFloat("cor_quant",options));
+	
+				
+	
+	var options = {};
+	
+		options.maxlength = "500";
+	
+		pm.addField(new FieldText("comment_text",options));
 	
 			
 	this.addPublicMethod(pm);

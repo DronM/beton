@@ -96,13 +96,14 @@ ProductionMaterialListGridInsertCmd.prototype.closeForm = function(){
 
 ProductionMaterialListGridInsertCmd.prototype.addMatOnServer = function(controls){	
 
-	var pm = (new MaterialFactConsumption_Controller()).getPublicMethod("insert");	
+	//через специальный метод!!!
+	var pm = (new MaterialFactConsumptionCorretion_Controller()).getPublicMethod("operator_add_material_to_production");	
 	
 	pm.setFieldValue("production_id",this.m_productionId);
 	pm.setFieldValue("production_site_id",this.m_productionSiteId);
 	pm.setFieldValue("cement_silo_id",controls.cement_silos_ref? controls.cement_silos_ref.getKey():null);
-	pm.setFieldValue("raw_material_id",controls.materials_ref.getKey());
-	pm.setFieldValue("material_quant",controls.quant_fact);
+	pm.setFieldValue("material_id",controls.materials_ref.getKey());
+	pm.setFieldValue("cor_quant",controls.quant_fact);
 	
 	var self = this;
 	pm.run({
