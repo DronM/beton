@@ -474,6 +474,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			"SELECT * FROM cement_silos_for_order_list",
 			'CementSiloForOrderList_Model'
 		);
+
+		//material stores list
+		$this->addNewModel(
+			"SELECT * FROM material_store_for_order_list",
+			'MaterialStoreForOrderList_Model'
+		);
 		
 		//chart
 		$db_link_master = $this->getDbLinkMaster();

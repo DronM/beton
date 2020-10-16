@@ -41,6 +41,7 @@
 <li><a href="#Employee_Controller">Employee_Controller</a></li>
 <li><a href="#EmployeeWorkTimeSchedule_Controller">EmployeeWorkTimeSchedule_Controller</a></li>
 <li><a href="#Enum_Controller">Enum_Controller</a></li>
+<li><a href="#GPSTracker_Controller">GPSTracker_Controller</a></li>
 <li><a href="#Graph_Controller">Graph_Controller</a></li>
 <li><a href="#LabData_Controller">LabData_Controller</a></li>
 <li><a href="#LabEntry_Controller">LabEntry_Controller</a></li>
@@ -92,6 +93,7 @@
 <li><a href="#SiteFeedBack_Controller">SiteFeedBack_Controller</a></li>
 <li><a href="#SpecialistRequest_Controller">SpecialistRequest_Controller</a></li>
 <li><a href="#StoneQuarryVal_Controller">StoneQuarryVal_Controller</a></li>
+<li><a href="#StoreMapToProductionSite_Controller">StoreMapToProductionSite_Controller</a></li>
 <li><a href="#Supplier_Controller">Supplier_Controller</a></li>
 <li><a href="#TelList_Controller">TelList_Controller</a></li>
 <li><a href="#TrackerZoneControl_Controller">TrackerZoneControl_Controller</a></li>
@@ -316,6 +318,7 @@
 <li><a href="#CementSilo_Model">CementSilo_Model</a></li>
 <li><a href="#CementSiloList_Model">CementSiloList_Model</a></li>
 <li><a href="#CementSiloForOrderList_Model">CementSiloForOrderList_Model</a></li>
+<li><a href="#MaterialStoreForOrderList_Model">MaterialStoreForOrderList_Model</a></li>
 <li><a href="#CementSiloBalanceReset_Model">CementSiloBalanceReset_Model</a></li>
 <li><a href="#CementSiloBalanceResetList_Model">CementSiloBalanceResetList_Model</a></li>
 <li><a href="#RGCement_Model">RGCement_Model</a></li>
@@ -332,6 +335,8 @@
 <li><a href="#ProductionVehicleCorrectionList_Model">ProductionVehicleCorrectionList_Model</a></li>
 <li><a href="#ProductionComment_Model">ProductionComment_Model</a></li>
 <li><a href="#ClientLocalList_Model">ClientLocalList_Model</a></li>
+<li><a href="#StoreMapToProductionSite_Model">StoreMapToProductionSite_Model</a></li>
+<li><a href="#StoreMapToProductionSiteList_Model">StoreMapToProductionSiteList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1179,6 +1184,20 @@
 								Нет</p>
 </div>
 </div>
+</div>
+</div>
+<div id="GPSTracker_Controller" class="content_box">
+<h1>GPSTracker_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#GPSTracker_Model">Model: GPSTracker_Model</a><h2>update</h2>
+<a href="#GPSTracker_Model">Model: GPSTracker_Model</a><h2>delete</h2>
+<a href="#GPSTracker_Model">Model: GPSTracker_Model</a><h2>get_list</h2>
+<a href="#GPSTracker_Model">Model: GPSTracker_Model</a><h2>get_object</h2>
+<a href="#GPSTracker_Model">Model: GPSTracker_Model</a><h2>complete</h2>
+<a href="#GPSTracker_Model">Model: GPSTracker_Model</a>
 </div>
 </div>
 <div id="Graph_Controller" class="content_box">
@@ -2545,6 +2564,19 @@
 <a href="#StoneQuarryVal_Model">Model: StoneQuarryVal_Model</a><h2>get_list</h2>
 <a href="#StoneQuarryValList_Model">Model: StoneQuarryValList_Model</a><h2>get_object</h2>
 <a href="#StoneQuarryValList_Model">Model: StoneQuarryValList_Model</a>
+</div>
+</div>
+<div id="StoreMapToProductionSite_Controller" class="content_box">
+<h1>StoreMapToProductionSite_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#StoreMapToProductionSite_Model">Model: StoreMapToProductionSite_Model</a><h2>update</h2>
+<a href="#StoreMapToProductionSite_Model">Model: StoreMapToProductionSite_Model</a><h2>delete</h2>
+<a href="#StoreMapToProductionSite_Model">Model: StoreMapToProductionSite_Model</a><h2>get_list</h2>
+<a href="#StoreMapToProductionSiteList_Model">Model: StoreMapToProductionSiteList_Model</a><h2>get_object</h2>
+<a href="#StoreMapToProductionSiteList_Model">Model: StoreMapToProductionSiteList_Model</a>
 </div>
 </div>
 <div id="Supplier_Controller" class="content_box">
@@ -6865,6 +6897,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>balance_date_time</h2>
 <div>Type:DateTime</div>
 <div>Primary key:</div>
@@ -6926,6 +6964,18 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -7549,6 +7599,42 @@
 <div>Required:</div>
 <div>Length:19</div>
 <div>Precision:3</div>
+</div>
+</div>
+<div id="MaterialStoreForOrderList_Model" class="content_box">
+<h1>MaterialStoreForOrderList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>load_capacity</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>balance</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
 </div>
 </div>
 <div id="Offer_Model" class="content_box">
@@ -8259,6 +8345,12 @@
 <div>Precision:</div>
 <h2>client_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -10435,6 +10527,12 @@
 <div>Required:TRUE</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>quant</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
@@ -10658,6 +10756,12 @@
 <div>Length:19</div>
 <div>Precision:2</div>
 <h2>is_cement</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>dif_store</h2>
 <div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -12421,6 +12525,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>ship_date</h2>
 <div>Type:Date</div>
 <div>Primary key:</div>
@@ -14055,6 +14165,66 @@
 <div>Precision:2</div>
 <h2>v_comment</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="StoreMapToProductionSite_Model" class="content_box">
+<h1>StoreMapToProductionSite_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>store</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>load_capacity</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="StoreMapToProductionSiteList_Model" class="content_box">
+<h1>StoreMapToProductionSiteList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>store</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>load_capacity</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

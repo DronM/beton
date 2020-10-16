@@ -363,8 +363,8 @@
 							<xsl:variable name="concr_row" select="key('concrete_types_materials',concat($concrete_type_id,'|',material_id/.))"/>
 						
 							<td align="right" nowrap="nowrap">
-								<xsl:call-template name="format_quant">
-									<xsl:with-param name="val" select="$concr_row/norm_cost_per_m3/."/>
+								<xsl:call-template name="format_money">
+									<xsl:with-param name="val" select="number($concr_row/norm_cost_per_m3/.)"/>
 								</xsl:call-template>																						
 							</td>
 					
@@ -381,7 +381,11 @@
 					
 							<xsl:variable name="concr_row" select="key('concrete_types_materials',concat($concrete_type_id,'|',material_id/.))"/>
 						
-							<td align="right" nowrap="nowrap"><xsl:value-of select="$concr_row/material_cost_per_m3/."/></td>
+							<td align="right" nowrap="nowrap">
+								<xsl:call-template name="format_money">
+									<xsl:with-param name="val" select="number($concr_row/material_cost_per_m3/.)"/>
+								</xsl:call-template>																						
+							</td>
 					
 						</xsl:for-each>					
 						<td align="right" nowrap="nowrap" style="font-weight:bolder;">

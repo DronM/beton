@@ -41,6 +41,10 @@ function RawMaterialDialog_View(id,options){
 			"labelCaption":"Учитывать в силосе:"
 		}));	
 
+		this.addElement(new EditCheckBox(id+":dif_store",{
+			"labelCaption":"Учитывать по местам хранения:"
+		}));	
+
 		this.addElement(new EditNum(id+":max_fact_quant_tolerance_percent",{
 			"labelCaption":"Максимальный % отклонения от подборов:"
 		}));	
@@ -88,6 +92,7 @@ function RawMaterialDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("ord")})
 		,new DataBinding({"control":this.getElement("concrete_part")})
 		,new DataBinding({"control":this.getElement("is_cement")})
+		,new DataBinding({"control":this.getElement("dif_store")})
 		,new DataBinding({"control":this.getElement("max_fact_quant_tolerance_percent")})
 		,new DataBinding({"control":this.getElement("min_end_quant")})
 		,new DataBinding({"control":this.getElement("store_days")})
@@ -101,6 +106,7 @@ function RawMaterialDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("ord")})
 		,new CommandBinding({"control":this.getElement("concrete_part")})
 		,new CommandBinding({"control":this.getElement("is_cement")})
+		,new CommandBinding({"control":this.getElement("dif_store")})
 		,new CommandBinding({"control":this.getElement("max_fact_quant_tolerance_percent")})
 		,new CommandBinding({"control":this.getElement("min_end_quant")})
 		,new CommandBinding({"control":this.getElement("store_days")})

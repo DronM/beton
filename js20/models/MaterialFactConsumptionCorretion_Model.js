@@ -129,6 +129,10 @@ function MaterialFactConsumptionCorretion_Model(options){
 	
 			
 			
+			
+				
+				
+			
 		MaterialFactConsumptionCorretion_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialFactConsumptionCorretion_Model,ModelXML);

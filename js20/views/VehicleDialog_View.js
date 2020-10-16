@@ -24,15 +24,17 @@ function VehicleDialog_View(id,options){
 	
 	this.addElement(new FeatureEdit(id+":feature"));	
 	
-	this.addElement(new TrackerEdit(id+":tracker_id"));	
+	this.addElement(new GPSTrackerRef(id+":tracker_id"));	
 	
 	this.addElement(new EditString(id+":sim_id",{
 		"maxLength":"20",
-		"labelCaption":"Идентификатор СИМ карты:"
+		"labelCaption":"Идентификатор СИМ карты:",
+		"enabled":false
 	}));	
 
 	this.addElement(new EditPhone(id+":sim_number",{
-		"labelCaption":"Номер телефона СИМ карты:"
+		"labelCaption":"Номер телефона СИМ карты:",
+		"enabled":false
 	}));	
 
 	this.addElement(new EditDateTime(id+":tracker_last_dt",{
@@ -70,8 +72,8 @@ function VehicleDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("owners"),"fieldId":"vehicle_owners"})
 		,new CommandBinding({"control":this.getElement("feature")})
 		,new CommandBinding({"control":this.getElement("tracker_id")})
-		,new CommandBinding({"control":this.getElement("sim_id")})
-		,new CommandBinding({"control":this.getElement("sim_number")})
+		//,new CommandBinding({"control":this.getElement("sim_id")})
+		//,new CommandBinding({"control":this.getElement("sim_number")})
 	]);
 	
 }

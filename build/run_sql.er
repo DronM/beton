@@ -1,4 +1,0 @@
-psql:.run_sql.sql:19: ОШИБКА:  отношение "form_operations" не существует
-СТРОКА 9:  FROM form_operations AS f_op
-                ^
-psql:.run_sql.sql:21: ОШИБКА:  отношение "rep_forming" не существует

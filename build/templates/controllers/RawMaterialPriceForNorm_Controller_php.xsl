@@ -27,6 +27,14 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+
+	public function insert($pm){
+		if($_SESSION['role_id']!='owner'||!$pm->getParamValue('user_id')){
+			$pm->setParamValue('user_id',$_SESSION['user_id']);
+		}
+		parent::insert($pm);
+	}
+
 </xsl:template>
 
 </xsl:stylesheet>

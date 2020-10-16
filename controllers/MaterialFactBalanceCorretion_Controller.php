@@ -32,6 +32,9 @@ class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 		$param = new FieldExtDateTime('date_time'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtInt('production_site_id'
+				,array());
+		$pm->addParam($param);
 		$param = new FieldExtDateTime('balance_date_time'
 				,array());
 		$pm->addParam($param);
@@ -66,6 +69,10 @@ class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtDateTime('date_time'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('production_site_id'
 				,array(
 			));
 			$pm->addParam($param);

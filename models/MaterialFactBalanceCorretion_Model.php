@@ -40,6 +40,14 @@ class MaterialFactBalanceCorretion_Model extends ModelSQLBeton{
 		$this->addField($f_date_time);
 		//********************
 		
+		//*** Field production_site_id ***
+		$f_opts = array();
+		$f_opts['id']="production_site_id";
+						
+		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
+		$this->addField($f_production_site_id);
+		//********************
+		
 		//*** Field balance_date_time ***
 		$f_opts = array();
 		$f_opts['id']="balance_date_time";

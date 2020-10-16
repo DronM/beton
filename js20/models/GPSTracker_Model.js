@@ -22,6 +22,9 @@ function GPSTracker_Model(options){
 	
 	options.fields = {};
 	
+			
+				
+			
 				
 	
 	var filed_options = {};

@@ -27,6 +27,10 @@ function ShipmentForClientList_View(id,options){
 		}		
 		
 	});
+	
+	var role = window.getApp().getServVar("role_id")
+	var ext_user = (role=="vehicle_owner"||role=="client");
+	
 	/*
 	var filters = {
 		"period":{
@@ -130,6 +134,23 @@ function ShipmentForClientList_View(id,options){
 								})
 							]
 						})
+						,ext_user? null:
+							new GridCellHead(id+":grid:head:row0:clients_ref",{
+								"value":"Клиент",
+								"attrs":{"rowspan":"2"},
+								"columns":[
+									new GridColumnRef({
+										"field":model.getField("clients_ref"),
+										"ctrlClass":ClientEdit,
+										"searchOptions":{
+											"field":new FieldInt("client_id"),
+											"searchType":"on_match",
+											"typeChange":false
+										},
+										"form":null
+									})
+								]
+							})
 					
 						,new GridCellHead(id+":grid:head:row0:concrete_types_ref",{
 							"value":"Марка",
@@ -230,7 +251,7 @@ function ShipmentForClientList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":"4"
+							"colSpan":ext_user? "4":"5"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},

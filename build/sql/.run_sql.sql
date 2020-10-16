@@ -1,21 +1,24 @@
--- VIEW: rep_forming
+-- VIEW: material_store_for_order_list
 
---DROP VIEW rep_forming;
+DROP VIEW material_store_for_order_list;
 
-CREATE OR REPLACE VIEW rep_forming AS
+CREATE OR REPLACE VIEW material_store_for_order_list AS
 	SELECT
-		f_op.date_time::date AS form_date
-		,work_shifts_ref(sh) AS work_shifts_ref
-		,count(*) AS tot_cnt
-		,sum(weight) AS tot_weight
-		,sum(volume) AS tot_volume
+		t.id,
+		mat.name AS name,
+		production_sites_ref(pst) AS production_sites_ref,
+		t.load_capacity,
+		bal.quant AS balance
 		
-	FROM form_operations AS f_op
-	LEFT JOIN work_shifts AS sh ON sh.id=f_op.work_shift_id
-	GROUP BY
-		f_op.date_time::date
-		,sh.*
-		,work_shifts_ref(sh)::text
+	FROM store_map_to_production_sites AS t	
+	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id	
+	LEFT JOIN rg_material_facts_balance(
+		'{}'::integer[],
+		(SELECT array_agg(id) FROM raw_materials WHERE dif_store)
+	) AS bal ON bal.production_site_id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=bal.material_id
+	WHERE t.load_capacity>0
+	ORDER BY pst.name,mat.name
 	;
 	
-ALTER VIEW rep_forming OWNER TO beton;
+ALTER VIEW material_store_for_order_list OWNER TO beton;

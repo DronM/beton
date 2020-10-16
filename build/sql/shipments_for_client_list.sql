@@ -116,6 +116,7 @@ CREATE OR REPLACE VIEW shipments_for_client_list AS
 		)
 		AS total_cost
 		
+		,clients_ref(cl) AS clients_ref
 		
 	FROM shipments AS sh
 	LEFT JOIN orders o ON o.id=sh.order_id
@@ -136,6 +137,7 @@ CREATE OR REPLACE VIEW shipments_for_client_list AS
 		,concrete_types_ref
 		,o.pump_vehicle_id
 		,pvh.pump_prices
+		,cl.*
 	ORDER BY get_shift_start(sh.ship_date_time)::date DESC
 	;
 	

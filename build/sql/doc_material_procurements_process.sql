@@ -9,6 +9,8 @@ DECLARE
 	reg_act ra_materials%ROWTYPE;
 	reg_material_facts ra_material_facts%ROWTYPE;
 	reg_cement ra_cement%ROWTYPE;
+	v_dif_store bool;
+	v_production_site_id int;
 BEGIN
 	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
 		RETURN NEW;
@@ -27,13 +29,25 @@ BEGIN
 		reg_act.quant			= NEW.quant_net;
 		PERFORM ra_materials_add_act(reg_act);	
 		
+		SELECT dif_store INTO v_dif_store FROM raw_materials WHERE id=NEW.material_id;
 		--По материалам делаем всегда движения, а если есть учет по силосам и есть силос - то и по силосам
+		--Если учет по заводам (v_dif_store==TRUE)- то по заводам
 		--register actions ra_material_facts
 		reg_material_facts.date_time		= NEW.date_time;
 		reg_material_facts.deb			= true;
 		reg_material_facts.doc_type  		= 'material_procurement'::doc_types;
 		reg_material_facts.doc_id  		= NEW.id;
 		reg_material_facts.material_id		= NEW.material_id;
+		IF coalesce(v_dif_store,FALSE) AND coalesce(NEW.store,'')<>'' THEN
+			--Определить завод по приходу
+			SELECT production_site_id INTO v_production_site_id FROM store_map_to_production_sites WHERE store = NEW.store;
+			--RAISE EXCEPTION 'v_production_site_id=%',v_production_site_id;
+			IF v_production_site_id IS NULL THEN
+				-- no match!
+				INSERT INTO store_map_to_production_sites (store) VALUES (NEW.store);
+			END IF;
+			reg_material_facts.production_site_id = v_production_site_id;
+		END IF;
 		reg_material_facts.quant		= NEW.quant_net;
 		PERFORM ra_material_facts_add_act(reg_material_facts);	
 		

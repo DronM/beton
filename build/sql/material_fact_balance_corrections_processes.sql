@@ -10,6 +10,8 @@ DECLARE
 	reg_cement ra_cement%ROWTYPE;
 	add_quant numeric(19,4);
 	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
 BEGIN
 	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
 		IF NEW.balance_date_time IS NULL THEN
@@ -26,7 +28,17 @@ BEGIN
 
 		ra_date_time = NEW.balance_date_time-'1 second'::interval;
 		
-		IF (SELECT is_cement FROM raw_materials WHERE id=NEW.material_id) THEN
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+		
+		IF v_is_cement THEN
 			--ЦЕМЕНТ
 			RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
 		ELSE
@@ -41,6 +53,12 @@ BEGIN
 				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
 				reg_material_facts.doc_id  		= NEW.id;
 				reg_material_facts.material_id		= NEW.material_id;
+				IF v_dif_store THEN
+					IF NEW.production_site_id IS NULL THEN
+						RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+					END IF;
+					reg_material_facts.production_site_id	= NEW.production_site_id;
+				END IF;
 				reg_material_facts.quant		= abs(add_quant);
 				PERFORM ra_material_facts_add_act(reg_material_facts);	
 			END IF;

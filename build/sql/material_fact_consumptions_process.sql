@@ -7,6 +7,7 @@ CREATE OR REPLACE FUNCTION public.material_fact_consumptions_process()
 $BODY$
 DECLARE
 	v_is_cement bool;
+	v_dif_store bool;
 	reg_material_facts ra_material_facts%ROWTYPE;
 	reg_cement ra_cement%ROWTYPE;	
 BEGIN
@@ -21,7 +22,16 @@ BEGIN
 
 		--Все материалы проходят по регистру учета материалов
 		IF NEW.raw_material_id IS NOT NULL  THEN
-			SELECT is_cement INTO v_is_cement FROM raw_materials WHERE id=NEW.raw_material_id;		
+			--attributes
+			SELECT
+				is_cement
+				,dif_store
+			INTO
+				v_is_cement
+				,v_dif_store
+			FROM raw_materials
+			WHERE id=NEW.raw_material_id;
+			
 			
 			--register actions ra_material_facts
 			reg_material_facts.date_time		= NEW.date_time;
@@ -29,6 +39,12 @@ BEGIN
 			reg_material_facts.doc_type  		= 'material_fact_consumption'::doc_types;
 			reg_material_facts.doc_id  		= NEW.id;
 			reg_material_facts.material_id		= NEW.raw_material_id;
+			IF v_dif_store THEN
+				IF NEW.production_site_id IS NULL THEN
+					RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.raw_material_id);
+				END IF;
+				reg_material_facts.production_site_id	= NEW.production_site_id;
+			END IF;
 			reg_material_facts.quant		= NEW.material_quant;
 			PERFORM ra_material_facts_add_act(reg_material_facts);	
 		END IF;

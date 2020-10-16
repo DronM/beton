@@ -41,6 +41,14 @@ class MaterialFactBalanceCorretionList_Model extends ModelSQLBeton{
 		$this->addField($f_date_time);
 		//********************
 		
+		//*** Field production_site_id ***
+		$f_opts = array();
+		$f_opts['id']="production_site_id";
+						
+		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
+		$this->addField($f_production_site_id);
+		//********************
+		
 		//*** Field balance_date_time ***
 		$f_opts = array();
 		$f_opts['id']="balance_date_time";
@@ -90,6 +98,16 @@ class MaterialFactBalanceCorretionList_Model extends ModelSQLBeton{
 						
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
+		//********************
+		
+		//*** Field production_sites_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Завод';
+		$f_opts['id']="production_sites_ref";
+						
+		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
+		$this->addField($f_production_sites_ref);
 		//********************
 		
 		//*** Field materials_ref ***

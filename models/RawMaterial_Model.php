@@ -138,6 +138,17 @@ class RawMaterial_Model extends ModelSQLBeton{
 		$f_is_cement=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"is_cement",$f_opts);
 		$this->addField($f_is_cement);
 		//********************
+		
+		//*** Field dif_store ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Учет по местам хранения';
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="dif_store";
+						
+		$f_dif_store=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dif_store",$f_opts);
+		$this->addField($f_dif_store);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

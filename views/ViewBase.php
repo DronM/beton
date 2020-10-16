@@ -1318,6 +1318,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/OrderMakeForLabList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/CementSiloForOrderList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MaterialStoreForOrderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ProductionList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ProductionVehicleCorrectionList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ProductionMaterialList_View.js'));
@@ -1329,6 +1330,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialPriceList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialPriceForNormList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RepMaterialAvgConsumptionOnCtp_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/GPSTrackerList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/StoreMapToProductionSiteList_View.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ViewList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/MainMenuConstructor_Form.js'));
@@ -1376,6 +1379,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/FeatureEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/TrackerEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/LangEditRef.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/GPSTrackerRef.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodShift.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodMonth.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditPeriodWeek.js'));
@@ -1757,6 +1761,11 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPriceForNorm_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/RawMaterialPriceForNormList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/GPSTracker_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/GPSTracker_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/StoreMapToProductionSite_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/StoreMapToProductionSite_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/StoreMapToProductionSiteList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialStoreForOrderList_Model.js'));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

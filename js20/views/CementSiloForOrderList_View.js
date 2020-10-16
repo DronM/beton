@@ -36,7 +36,7 @@ CementSiloForOrderList_View.prototype.m_silos;
 
 /* public methods */
 
-CementSiloForOrderList_View.prototype.setData = function(model){
+CementSiloForOrderList_View.prototype.setData = function(modelSilos){
 	
 	/** !!!перересовка только с случае, если изменился состав силосов, иначе просто отрисовка наполненности!!!
 	 * т.е. либо m_silos еще не инициализирована, либо надо проверять новый набор данных...
@@ -47,8 +47,8 @@ CementSiloForOrderList_View.prototype.setData = function(model){
 	if(!is_init){
 		var silo_cnt = 0;
 		var silo_id;
-		while(model.getNextRow()){
-			silo_id = model.getFieldValue("id"); 
+		while(modelSilos.getNextRow()){
+			silo_id = modelSilos.getFieldValue("id"); 
 			if(!this.m_silos["silo_"+silo_id]
 			||!document.getElementById("silo_canvas_"+silo_id)
 			){
@@ -56,7 +56,7 @@ CementSiloForOrderList_View.prototype.setData = function(model){
 			}
 			else if(this.m_silos["silo_"+silo_id]){
 				
-				this.m_silos["silo_"+silo_id].balance = parseFloat(model.getFieldValue("balance"),10);
+				this.m_silos["silo_"+silo_id].balance = parseFloat(modelSilos.getFieldValue("balance"),10);
 				if(isNaN(this.m_silos["silo_"+silo_id].balance)){
 					this.m_silos["silo_"+silo_id].balance = 0;
 				}
@@ -64,12 +64,12 @@ CementSiloForOrderList_View.prototype.setData = function(model){
 			silo_cnt++;
 		}
 		//for(p in this.m_silos)silo_cnt++;
-		if(!redraw && (model.getRowCount()!=silo_cnt)){
+		if(!redraw && (modelSilos.getRowCount()!=silo_cnt)){
 			//console.log("this.m_silos.length="+silo_cnt)
-			//console.log("model.getRowCount()="+model.getRowCount())
+			//console.log("modelSilos.getRowCount()="+modelSilos.getRowCount())
 			redraw = true;
 		}
-		model.reset();
+		modelSilos.reset();
 	}	
 //console.log("is_init="+is_init)
 //console.log("redraw="+redraw)		
@@ -79,11 +79,11 @@ CementSiloForOrderList_View.prototype.setData = function(model){
 			"productionSites":[]
 		};
 		var prod_site,cur_prod_site;
-		while(model.getNextRow()){
-			var s_name = model.getFieldValue("name");
-			var s_id = model.getFieldValue("id");
+		while(modelSilos.getNextRow()){
+			var s_name = modelSilos.getFieldValue("name");
+			var s_id = modelSilos.getFieldValue("id");
 		
-			cur_prod_site = model.getFieldValue("production_sites_ref");
+			cur_prod_site = modelSilos.getFieldValue("production_sites_ref");
 		
 			if(!prod_site || prod_site.productionSiteId!=cur_prod_site.getKey("id")){
 				prod_site = {
@@ -101,8 +101,8 @@ CementSiloForOrderList_View.prototype.setData = function(model){
 			this.m_silos["silo_"+s_id] = {
 				"name":s_name,
 				"id":s_id,
-				"balance":model.getFieldValue("balance"),
-				"load_capacity":model.getFieldValue("load_capacity")
+				"balance":modelSilos.getFieldValue("balance"),
+				"load_capacity":modelSilos.getFieldValue("load_capacity")
 			}
 		}
 		this.setTemplateOptions(templ_opts);		
@@ -161,7 +161,7 @@ CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,
 	var silo_cone_height_k = 0.25;// 1/5		
 	var silo_cone_width = 8;//point part width
 	var silo_width = 56;// 56/8=7 cone parts (even!!!)
-	var fill_tolerance = 2;//2
+	var fill_tolerance = 0;//2
 
 	var silo_cone_height = silo_height * silo_cone_height_k;
 	var silo_cone_parts = Math.floor(silo_width / silo_cone_width);//must be even!

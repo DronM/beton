@@ -7,3 +7,24 @@ where name='' OR name is null)
 AND quant_net=0 AND quant_gross=0
 
 "1970-01-01 05:00:00"
+
+
+
+--SELECT dif_store FROM raw_materials where name='Добавка'
+/*
+SELECT * FROM doc_material_procurements
+WHERE material_id=4 AND coalesce(store,'')<>''
+ORDER BY date_time ASC LIMIT  3;
+*/
+
+update doc_material_procurements
+SET processed=TRUE
+WHERE material_id=4 AND coalesce(store,'')<>''
+
+
+--SELECT * FROM ra_material_facts WHERE doc_type='material_procurement' AND doc_id=48933
+--select * from rg_material_facts where material_id=4 order by date_time DESC limit 20
+/*
+SELECT count(*) FROM doc_material_procurements
+WHERE material_id=4 AND coalesce(store,'')<>''
+*/

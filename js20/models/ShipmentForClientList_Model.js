@@ -54,6 +54,15 @@ function ShipmentForClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Клиент';
+	filed_options.autoInc = false;	
+	
+	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Дата отгрузки';
 	filed_options.autoInc = false;	
 	

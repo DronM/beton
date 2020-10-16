@@ -1,11 +1,13 @@
--- Function: public.rg_material_facts_balance(timestamp without time zone, integer[])
+-- Function: public.rg_material_facts_balance(timestamp without time zone, integer[], integer[])
 
--- DROP FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[]);
+-- DROP FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[], integer[]);
 
 CREATE OR REPLACE FUNCTION public.rg_material_facts_balance(
     IN in_date_time timestamp without time zone,
-    IN in_material_id_ar integer[])
-  RETURNS TABLE(material_id integer, quant numeric) AS
+    IN in_material_id_ar integer[],
+    IN in_production_site_id_ar integer[]
+    )
+  RETURNS TABLE(material_id integer, production_site_id integer, quant numeric) AS
 $BODY$
 	WITH
 	cur_per AS (SELECT rg_period('material_fact'::reg_types, in_date_time) AS v ),
@@ -19,10 +21,12 @@ $BODY$
 	last_calc_per AS (SELECT rg_period_balance('material_fact'::reg_types,rg_calc_period('material_fact'::reg_types)) AS v)
 	SELECT 
 	sub.material_id
+	,sub.production_site_id
 	,SUM(sub.quant) AS quant				
 	FROM(
 		(SELECT
 		b.material_id
+		,b.production_site_id
 		,b.quant				
 		FROM rg_material_facts AS b
 		WHERE
@@ -33,7 +37,7 @@ $BODY$
 				in_date_time < (SELECT v FROM last_calc_per)
 				AND (
 					--forward from previous period
-					( (SELECT t.v FROM act_forward t) AND b.date_time = (SELECT t.v FROM cur_per t)-rg_calc_interval('material_fact'::reg_types)
+					( (SELECT t.v FROM act_forward t) AND b.daЗАВОД №1te_time = (SELECT t.v FROM cur_per t)-rg_calc_interval('material_fact'::reg_types)
 					)
 					--backward from current
 					OR			
@@ -43,6 +47,7 @@ $BODY$
 			)
 		)	
 		AND ( (in_material_id_ar IS NULL OR ARRAY_LENGTH(in_material_id_ar,1) IS NULL) OR (b.material_id=ANY(in_material_id_ar)))
+		AND ( (in_production_site_id_ar IS NULL OR ARRAY_LENGTH(in_production_site_id_ar,1) IS NULL) OR (b.production_site_id=ANY(in_production_site_id_ar)))
 		AND (
 		b.quant<>0
 		)
@@ -50,6 +55,7 @@ $BODY$
 		UNION ALL
 		(SELECT
 		act.material_id
+		,act.production_site_id
 		,CASE act.deb
 			WHEN TRUE THEN act.quant * (SELECT t.v FROM act_sg t)
 			ELSE -act.quant * (SELECT t.v FROM act_sg t)
@@ -79,23 +85,26 @@ $BODY$
 			)
 		)
 		AND (in_material_id_ar IS NULL OR ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (act.material_id=ANY(in_material_id_ar)))
+		AND (in_production_site_id_ar IS NULL OR ARRAY_LENGTH(in_production_site_id_ar,1) IS NULL OR (act.production_site_id=ANY(in_production_site_id_ar)))
 		AND (
 		act.quant<>0
 		)
 		ORDER BY doc_log.date_time,doc_log.id)
 	) AS sub
 	WHERE
-	 (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (sub.material_id=ANY(in_material_id_ar)))
+	 ( (ARRAY_LENGTH(in_material_id_ar,1) IS NULL OR (sub.material_id=ANY(in_material_id_ar))) )
+	 AND
+	 ( (ARRAY_LENGTH(in_production_site_id_ar,1) IS NULL OR (sub.production_site_id=ANY(in_production_site_id_ar))) )
 	GROUP BY
-		sub.material_id
+		sub.material_id,sub.production_site_id
 	HAVING
 		SUM(sub.quant)<>0
 	ORDER BY
-		sub.material_id;
+		sub.material_id,sub.production_site_id;
 $BODY$
   LANGUAGE sql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[])
+ALTER FUNCTION public.rg_material_facts_balance(timestamp without time zone, integer[], integer[])
   OWNER TO beton;
 

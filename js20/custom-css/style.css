@@ -723,6 +723,12 @@ a.tel_in_list{
 	cursor:pointer;	
 }
 
+.storePic{
+	width:200px;
+	height:100px;
+	cursor:pointer;	
+}
+
 .productionSiteGroup{
 	display:inline;
 }
@@ -733,8 +739,16 @@ a.tel_in_list{
 .siloName{
 	font-size:70%;	
 }
+.storeName{
+	font-size:70%;	
+}
 
 .silo_cont{
+	position:relative;
+	font-size:70%;	
+}
+
+.store_cont{
 	position:relative;
 	font-size:70%;	
 }

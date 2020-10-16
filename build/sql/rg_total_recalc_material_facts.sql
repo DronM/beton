@@ -18,29 +18,34 @@ BEGIN
 		periods AS (
 			(SELECT
 				DISTINCT date_trunc('month', date_time) AS d,
-				material_id
+				material_id,production_site_id
 			FROM ra_material_facts)
 			UNION		
 			(SELECT
 				date_time AS d,
-				material_id
+				material_id,production_site_id
 			FROM rg_material_facts WHERE date_time<=v_cur_period
 			)
 			ORDER BY d			
 		)
-		SELECT sub.d,sub.material_id,sub.balance_fact,sub.balance_paper
+		SELECT sub.d,sub.material_id,sub.production_site_id,sub.balance_fact,sub.balance_paper
 		FROM
 		(
 		SELECT
 			periods.d,
 			periods.material_id,
+			periods.production_site_id,
 			COALESCE((
 				SELECT SUM(CASE WHEN deb THEN quant ELSE 0 END)-SUM(CASE WHEN NOT deb THEN quant ELSE 0 END)
-				FROM ra_material_facts AS ra WHERE ra.date_time <= last_month_day(periods.d::date)+'23:59:59'::interval AND ra.material_id=periods.material_id
+				FROM ra_material_facts AS ra WHERE ra.date_time <= last_month_day(periods.d::date)+'23:59:59'::interval
+					AND ra.material_id=periods.material_id
+					AND coalesce(ra.production_site_id,0)=coalesce(periods.production_site_id,0)
 			),0) AS balance_fact,
 			
 			(
-			SELECT SUM(quant) FROM rg_material_facts WHERE date_time=periods.d AND material_id=periods.material_id
+			SELECT SUM(quant) FROM rg_material_facts WHERE date_time=periods.d
+				AND material_id=periods.material_id
+				AND coalesce(production_site_id,0)=coalesce(periods.production_site_id,0)
 			) AS balance_paper
 			
 		FROM periods
@@ -50,28 +55,33 @@ BEGIN
 		
 		UPDATE rg_material_facts AS rg
 		SET quant = period_row.balance_fact
-		WHERE rg.date_time=period_row.d AND rg.material_id=period_row.material_id;
+		WHERE rg.date_time=period_row.d
+			AND rg.material_id=period_row.material_id
+			AND coalesce(rg.production_site_id,0)=coalesce(period_row.production_site_id,0)
+		;
 		
 		IF NOT FOUND THEN
-			INSERT INTO rg_material_facts (date_time,material_id,quant)
-			VALUES (period_row.d,period_row.material_id,period_row.balance_fact);
+			INSERT INTO rg_material_facts (date_time,material_id,production_site_id,quant)
+			VALUES (period_row.d,period_row.material_id,period_row.production_site_id,period_row.balance_fact);
 		END IF;
 	END LOOP;
 
 	--АКТУАЛЬНЫЕ ИТОГИ
 	DELETE FROM rg_material_facts WHERE date_time>v_cur_period;
 	
-	INSERT INTO rg_material_facts (date_time,material_id,quant)
+	INSERT INTO rg_material_facts (date_time,material_id,production_site_id,quant)
 	(
 	SELECT
 		v_act_date_time,
 		rg.material_id,
+		rg.production_site_id,
 		COALESCE(rg.quant,0) +
 		COALESCE((
 		SELECT sum(ra.quant) FROM
 		ra_material_facts AS ra
 		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
 			AND ra.material_id=rg.material_id
+			AND coalesce(ra.production_site_id,0)=coalesce(rg.production_site_id,0)
 			AND ra.deb=TRUE
 		),0) - 
 		COALESCE((
@@ -79,6 +89,7 @@ BEGIN
 		ra_material_facts AS ra
 		WHERE ra.date_time BETWEEN v_cur_period AND last_month_day(v_cur_period::date)+'23:59:59'::interval
 			AND ra.material_id=rg.material_id
+			AND coalesce(ra.production_site_id,0)=coalesce(rg.production_site_id,0)
 			AND ra.deb=FALSE
 		),0)
 		

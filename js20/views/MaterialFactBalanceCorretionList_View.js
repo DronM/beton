@@ -71,6 +71,24 @@ function MaterialFactBalanceCorretionList_View(id,options){
 							],
 							"sortable":true
 						})
+						,new GridCellHead(id+":grid:head:production_sites_ref",{
+							"value":"Завод",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("production_sites_ref"),
+									"ctrlClass":ProductionSiteEdit,
+									"ctrlOptions":{
+										"labelCaption":""
+									},
+									"ctrlBindFieldId":"production_site_id",
+									"searchOptions":{
+										"field":new FieldInt("production_site_id"),
+										"searchType":"on_match"
+									}									
+								})
+							],
+							"sortable":true
+						})					
 										
 						,new GridCellHead(id+":grid:head:materials_ref",{
 							"value":"Материал",

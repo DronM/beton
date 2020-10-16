@@ -80,6 +80,11 @@ class RawMaterial_Controller extends ControllerSQL{
 				'alias'=>'Цемент,учет в силосе'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtBool('dif_store'
+				,array(
+				'alias'=>'Учет по местам хранения'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -152,6 +157,12 @@ class RawMaterial_Controller extends ControllerSQL{
 				,array(
 			
 				'alias'=>'Цемент,учет в силосе'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('dif_store'
+				,array(
+			
+				'alias'=>'Учет по местам хранения'
 			));
 			$pm->addParam($param);
 		

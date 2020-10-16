@@ -181,12 +181,18 @@ extend(MaterialMakeOrderGrid,Grid);
 
 
 /* public methods */
-MaterialMakeOrderGrid.prototype.setCorrectionOnServer = function(newValues,fieldValues){
+MaterialMakeOrderGrid.prototype.setCorrectionOnServer = function(newValues,matDifStore,fieldValues){
 	var self = this;
 	var pm = (new MaterialFactBalanceCorretion_Controller()).getPublicMethod("insert");
 	pm.setFieldValue("material_id",fieldValues.material_id);
 	pm.setFieldValue("comment_text",newValues.comment_text);
 	pm.setFieldValue("required_balance_quant",newValues.quant);
+	if(matDifStore){
+		pm.setFieldValue("production_site_id",newValues.production_sites_ref.getKey("id"));
+	}
+	else{
+		pm.resetFieldValue("production_site_id");
+	}
 	pm.run({
 		"ok":function(){
 			window.showTempNote(fieldValues.material_descr+": откорректирован остаток на утро",null,5000);				
@@ -196,21 +202,35 @@ MaterialMakeOrderGrid.prototype.setCorrectionOnServer = function(newValues,field
 	})	
 }
 
-MaterialMakeOrderGrid.prototype.correctQuant = function(fields){
+MaterialMakeOrderGrid.prototype.correctQuantCont = function(fields,matDifStore){
 	var self = this;
-	this.m_view = new EditJSON("CorrectQuant:cont",{
-		"elements":[
-			new EditFloat("CorrectQuant:cont:quant",{
-				"labelCaption":"Количество:",
-				"length":19,
-				"precision":4,
+	var elements = [];
+	if(matDifStore){
+		elements.push(
+			new ProductionSiteEdit("CorrectQuant:cont:production_sites_ref",{
+				"labelCaption":"Завод:",
+				"required":"true",
 				"focus":true
 			})
-			,new EditText("CorrectQuant:cont:comment_text",{
-				"labelCaption":"Комментарий:",
-				"rows":3
-			})
-		]
+		);
+	}
+	elements.push(
+		new EditFloat("CorrectQuant:cont:quant",{
+			"labelCaption":"Количество:",
+			"length":19,
+			"precision":4,
+			"focus":!matDifStore
+		})
+	);
+	elements.push(
+		new EditText("CorrectQuant:cont:comment_text",{
+			"labelCaption":"Комментарий:",
+			"rows":3
+		})
+	);
+	
+	this.m_view = new EditJSON("CorrectQuant:cont",{
+		"elements":elements
 	});
 	this.m_form = new WindowFormModalBS("CorrectQuant",{
 		"content":this.m_view,
@@ -220,13 +240,15 @@ MaterialMakeOrderGrid.prototype.correctQuant = function(fields){
 		"onClickCancel":function(){
 			self.closeCorrection();
 		},
-		"onClickOk":function(){
-			var res = self.m_view.getValueJSON();
-			/*if(!res||!res.comment_text||!res.comment_text.length){
-				throw new Error("Не указан комментарий корректировки!");
-			}*/
-			self.setCorrectionOnServer(res,self.m_view.fieldValues);
-		}
+		"onClickOk":(function(matDifStore,self){
+			return function(){
+				var res = self.m_view.getValueJSON();
+				if(!res||!res.production_sites_ref||res.production_sites_ref.isNull()){
+					throw new Error("Не указан завод!");
+				}
+				self.setCorrectionOnServer(res,matDifStore,self.m_view.fieldValues);
+			}
+		})(matDifStore,self)
 	});
 	this.m_view.fieldValues = {
 		"material_id":fields.material_id.getValue(),
@@ -234,7 +256,34 @@ MaterialMakeOrderGrid.prototype.correctQuant = function(fields){
 	}
 	
 	this.m_form.open();
+}
+
+MaterialMakeOrderGrid.prototype.correctQuant = function(fields){
 	
+	var mat_id = fields.material_id.getValue();
+	var app = window.getApp();
+	app.m_materialDifStore = app.m_materialDifStore || {};
+	if(app.m_materialDifStore["id"+mat_id]==undefined){
+		//get attribute
+		var self = this;
+		var pm = (new RawMaterial_Controller()).getPublicMethod("get_object");
+		pm.setFieldValue("id",mat_id);
+		pm.run({
+			"ok":(function(fields,matId){
+				return function(resp){
+					var m = resp.getModel("RawMaterial_Model");
+					if(m.getNextRow()){
+						var dif_store = m.getFieldValue("dif_store");
+						window.getApp().m_materialDifStore["id"+matId] = dif_store;
+						self.correctQuantCont(fields,dif_store);
+					}
+				}
+			})(fields,mat_id)
+		});
+	}
+	else{
+		this.correctQuantCont(fields,app.m_materialDifStore["id"+mat_id]);
+	}	
 }
 
 MaterialMakeOrderGrid.prototype.closeCorrection = function(){

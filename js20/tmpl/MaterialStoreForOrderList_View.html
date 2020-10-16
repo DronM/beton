@@ -1,0 +1,16 @@
+<div id={{id}} class="row">
+	{{#productionSites}}
+	<div id="{{id}}:productionSite_{{productionSiteId}}" class="col-{{widthType}}-6" style="height:100px;">
+		{{#stores}}
+		<div id="{{id}}:store_{{storeId}}" class="col-{{widthType}}-4">
+			<div class="storeName">{{storeName}}
+			</div>
+			<canvas id="store_canvas_{{storeId}}" class="storePic">
+			</canvas>
+			<div id="store_cont_{{storeId}}" class="store_cont">
+			</div>			
+		</div>
+		{{/stores}}
+	</div>
+	{{/productionSites}}
+</div>

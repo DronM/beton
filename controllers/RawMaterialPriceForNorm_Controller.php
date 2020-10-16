@@ -160,5 +160,14 @@ class RawMaterialPriceForNorm_Controller extends ControllerSQL{
 		
 	}	
 	
+
+	public function insert($pm){
+		if($_SESSION['role_id']!='owner'||!$pm->getParamValue('user_id')){
+			$pm->setParamValue('user_id',$_SESSION['user_id']);
+		}
+		parent::insert($pm);
+	}
+
+
 }
 ?>

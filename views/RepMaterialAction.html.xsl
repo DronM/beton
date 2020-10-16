@@ -29,7 +29,7 @@
 				<td rowspan="2">Начальный остаток</td>
 				<td rowspan="2">Приход</td>
 				<td colspan="3">Расход</td>
-				<td rowspan="2">Корректировка</td>
+				<td rowspan="2">Корректировка (+ не хватило, - излишки)</td>
 				<td rowspan="2">Конечный остаток</td>
 			</tr>
 			<tr align="center">

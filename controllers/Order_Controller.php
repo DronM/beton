@@ -394,6 +394,10 @@ class Order_Controller extends ControllerSQL{
 		$pm = new PublicMethod('get_make_orders_list');
 		
 				
+					
+					
+				
+				
 	$opts=array();
 			
 		$pm->addParam(new FieldExtInt('id',$opts));
@@ -956,6 +960,12 @@ class Order_Controller extends ControllerSQL{
 		$this->addNewModel(
 			"SELECT * FROM cement_silos_for_order_list",
 			'CementSiloForOrderList_Model'
+		);
+
+		//material stores list
+		$this->addNewModel(
+			"SELECT * FROM material_store_for_order_list",
+			'MaterialStoreForOrderList_Model'
 		);
 		
 		//chart

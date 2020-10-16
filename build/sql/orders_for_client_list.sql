@@ -33,7 +33,8 @@ CREATE OR REPLACE VIEW orders_for_client_list AS
 				) > const_ord_mark_if_no_ship_time_val() THEN TRUE
 			ELSE FALSE
 		END AS no_ship_mark
-
+		,clients_ref(cl) AS clients_ref
+		
 	FROM orders o
 	LEFT JOIN destinations dest ON dest.id=o.destination_id
 	LEFT JOIN concrete_types ct ON ct.id=o.concrete_type_id

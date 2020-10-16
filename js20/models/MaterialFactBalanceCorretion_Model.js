@@ -54,6 +54,15 @@ function MaterialFactBalanceCorretion_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.balance_date_time = new FieldDateTime("balance_date_time",filed_options);
 	
 				
@@ -98,6 +107,10 @@ function MaterialFactBalanceCorretion_Model(options){
 			
 			
 			
+			
+			
+				
+				
 			
 		MaterialFactBalanceCorretion_Model.superclass.constructor.call(this,id,options);
 }

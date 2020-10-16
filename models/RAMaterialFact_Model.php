@@ -83,6 +83,16 @@ class RAMaterialFact_Model extends ModelSQLBeton{
 		$this->addField($f_material_id);
 		//********************
 		
+		//*** Field production_site_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Завод';
+		$f_opts['id']="production_site_id";
+						
+		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
+		$this->addField($f_production_site_id);
+		//********************
+		
 		//*** Field quant ***
 		$f_opts = array();
 		

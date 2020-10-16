@@ -126,6 +126,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Учет по местам хранения";
+	var field = new FieldBool("dif_store",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -210,6 +216,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Учет по местам хранения";
+	var field = new FieldBool("dif_store",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -274,6 +286,9 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Цемент,учет в силосе";
 	pm.addField(new FieldBool("is_cement",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Учет по местам хранения";
+	pm.addField(new FieldBool("dif_store",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("ord");
 	
 }

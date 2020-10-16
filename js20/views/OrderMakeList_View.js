@@ -94,6 +94,10 @@ function OrderMakeList_View(id,options){
 				"model":options.models.CementSiloForOrderList_Model,
 				"listView":this
 			}));
+			this.addElement(new MaterialStoreForOrderList_View(id+":material_stores",{
+				"model":options.models.MaterialStoreForOrderList_Model,
+				"listView":this
+			}));			
 		}
 				
 		//material totals

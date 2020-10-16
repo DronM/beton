@@ -52,6 +52,12 @@ extend(MaterialFactBalanceCorretion_Controller,ControllerObjServer);
 	
 	var options = {};
 	
+	var field = new FieldInt("production_site_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
 	var field = new FieldDateTime("balance_date_time",options);
 	
 	pm.addField(field);
@@ -101,6 +107,12 @@ extend(MaterialFactBalanceCorretion_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldDateTime("date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("production_site_id",options);
 	
 	pm.addField(field);
 	
@@ -168,6 +180,9 @@ extend(MaterialFactBalanceCorretion_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldDateTime("date_time",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("production_site_id",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldDateTime("balance_date_time",f_opts));

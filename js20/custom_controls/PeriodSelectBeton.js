@@ -16,8 +16,8 @@ function PeriodSelectBeton(id,options){
 	options = options || {};	
 
 	if(options.periodShift){
-		this.PERIOD_ALIASES = ["all","shift","prev_shift","week","month","quarter","year"];
-		this.PERIODS = ["Произвольный период","Текущая смена","Предыдущая смена","Текущая неделя","Текущий месяц","Текущий квартал","Текущий год"];
+		this.PERIOD_ALIASES = ["all","shift","prev_shift","week","month","prev_month","quarter","year"];
+		this.PERIODS = ["Произвольный период","Текущая смена","Предыдущая смена","Текущая неделя","Текущий месяц","Предыдущий месяц","Текущий квартал","Текущий год"];
 	}
 	else{
 		this.PERIOD_ALIASES = ["all","day","week","month","quarter","year"];

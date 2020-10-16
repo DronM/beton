@@ -8,6 +8,7 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
  
 class GPSTracker_Model extends ModelSQLBeton{
 	
@@ -45,7 +46,12 @@ class GPSTracker_Model extends ModelSQLBeton{
 		$f_sim_id=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sim_id",$f_opts);
 		$this->addField($f_sim_id);
 		//********************
-	$this->setLimitConstant('doc_per_page_count');
+	
+		$order = new ModelOrderSQL();		
+		$this->setDefaultModelOrder($order);		
+		$direct = 'ASC';
+		$order->addField($f_id,$direct);
+$this->setLimitConstant('doc_per_page_count');
 	}
 
 }

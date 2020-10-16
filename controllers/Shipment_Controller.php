@@ -1017,6 +1017,9 @@ class Shipment_Controller extends ControllerSQL{
 		try{
 			$dbLinkMaster->query("BEGIN");
 			
+			//RETURNING order_id,date_time::date AS date
+			//$upd_res = $dbLinkMaster->query_first(
+			
 			$dbLinkMaster->query(
 				sprintf(
 				"UPDATE shipments SET
@@ -1044,7 +1047,15 @@ class Shipment_Controller extends ControllerSQL{
 		}		
 	
 		Graph_Controller::clearCacheOnShipId($dbLink,$idForDb);		
-		
+		/*
+		if(is_array($upd_res) && count($upd_res)&& isset($upd_res['order_id'])){
+			$ev_params = [
+				'order_id'=>$upd_res['order_id']
+				,'date'=>$upd_res['date']
+			];
+			BetonEventSrv::publish('Shipment.set_shipped',$ev_params);
+		}
+		*/	
 		self::sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode,$ar['quant_shipped']);	
 	}
 	
@@ -1074,8 +1085,7 @@ class Shipment_Controller extends ControllerSQL{
 				)
 			)
 		);				
-	
-	
+		
 	}
 	public function unset_shipped(){
 		$pm = $this->getPublicMethod("unset_shipped");

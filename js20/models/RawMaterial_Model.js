@@ -142,6 +142,16 @@ function RawMaterial_Model(options){
 	
 	options.fields.is_cement = new FieldBool("is_cement",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	filed_options.alias = 'Учет по местам хранения';
+	filed_options.autoInc = false;	
+	
+	options.fields.dif_store = new FieldBool("dif_store",filed_options);
+	
 			
 			
 			

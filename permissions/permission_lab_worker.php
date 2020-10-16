@@ -1146,6 +1146,28 @@ $permissions = array();
 				
 					$permissions['ProductionComment_Controller_get_object']=TRUE;
 				
+					$permissions['GPSTracker_Controller_insert']=TRUE;
+				
+					$permissions['GPSTracker_Controller_update']=TRUE;
+				
+					$permissions['GPSTracker_Controller_delete']=TRUE;
+				
+					$permissions['GPSTracker_Controller_get_list']=TRUE;
+				
+					$permissions['GPSTracker_Controller_get_object']=TRUE;
+				
+					$permissions['GPSTracker_Controller_complete']=TRUE;
+				
+					$permissions['StoreMapToProductionSite_Controller_insert']=TRUE;
+				
+					$permissions['StoreMapToProductionSite_Controller_update']=TRUE;
+				
+					$permissions['StoreMapToProductionSite_Controller_delete']=TRUE;
+				
+					$permissions['StoreMapToProductionSite_Controller_get_list']=TRUE;
+				
+					$permissions['StoreMapToProductionSite_Controller_get_object']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

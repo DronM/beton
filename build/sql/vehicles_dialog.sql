@@ -11,8 +11,11 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 		v.owner,
 		v.feature,
 		v.tracker_id,
-		v.sim_id,
-		v.sim_number,
+		--v.sim_id,
+		gps_tr.sim_id AS sim_id,
+		--v.sim_number,
+		gps_tr.sim_number AS sim_number,
+		
 		NULL::text AS tracker_last_data_descr,
 		CASE
 			WHEN v.tracker_id IS NULL OR v.tracker_id::text = ''::text THEN NULL::timestamp without time zone
@@ -59,6 +62,7 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id
 	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	LEFT JOIN gps_trackers AS gps_tr ON gps_tr.id = v.tracker_id
 	ORDER BY v.plate
 	;
 

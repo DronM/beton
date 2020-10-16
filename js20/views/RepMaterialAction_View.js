@@ -22,7 +22,7 @@ function RepMaterialAction_View(id,options){
 	options.cmdExcel = true;
 	options.cmdPdf = false;
 	
-	var period_ctrl = new EditPeriodDateTime(id+":filter-ctrl-period",{
+	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"valueFrom":(options.templateParams)? options.templateParams.date_from:DateHelper.getStartOfShift(DateHelper.time()),
 		"valueTo":(options.templateParams)? options.templateParams.date_to:DateHelper.getEndOfShift(DateHelper.time()),
 		"field":new FieldDateTime("date_time")

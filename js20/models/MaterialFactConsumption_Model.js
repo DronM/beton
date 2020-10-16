@@ -188,6 +188,10 @@ function MaterialFactConsumption_Model(options){
 			
 			
 			
+			
+				
+				
+			
 		MaterialFactConsumption_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialFactConsumption_Model,ModelXML);

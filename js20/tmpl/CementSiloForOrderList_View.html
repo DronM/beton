@@ -13,6 +13,17 @@
 			</div>			
 		</div>
 		{{/silos}}
+		{{#material_stores}}
+		<div id="{{id}}:material_store_{{materialStoreId}}" class="col-{{widthType}}-4">
+			<div class="materialStoreName">{{materialStoreName}}
+			</div>
+			<canvas id="material_store_canvas_{{materialStoreId}}" class="materialStorePic">
+			</canvas>
+			<div id="material_store_cont_{{materialStoreId}}" class="material_store_cont">
+			</div>			
+		</div>
+		{{/material_stores}}
+		
 	</div>
 	{{/productionSites}}
 </div>

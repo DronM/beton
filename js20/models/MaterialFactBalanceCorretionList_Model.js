@@ -46,6 +46,14 @@ function MaterialFactBalanceCorretionList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
+		
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.balance_date_time = new FieldDateTime("balance_date_time",filed_options);
 		
 	
@@ -95,6 +103,16 @@ function MaterialFactBalanceCorretionList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	
+			
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Завод';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
 	
 			
 				

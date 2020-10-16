@@ -46,6 +46,16 @@ class ShipmentForClientList_Model extends ModelSQLBeton{
 		$this->addField($f_client_id);
 		//********************
 		
+		//*** Field clients_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Клиент';
+		$f_opts['id']="clients_ref";
+						
+		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
+		$this->addField($f_clients_ref);
+		//********************
+		
 		//*** Field ship_date ***
 		$f_opts = array();
 		

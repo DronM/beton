@@ -10,6 +10,7 @@ DECLARE
 	reg_cement ra_cement%ROWTYPE;
 	v_cnt int;
 	v_is_cement bool;
+	v_dif_store bool;
 BEGIN
 	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
 		
@@ -64,6 +65,15 @@ BEGIN
 			PERFORM doc_log_insert('material_fact_consumption_correction'::doc_types,NEW.id,NEW.date_time::timestamp without time zone);
 		END IF;
 
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
 
 		IF NEW.quant <> 0 THEN
 			--register actions ra_material_facts		
@@ -72,12 +82,17 @@ BEGIN
 			reg_material_facts.doc_type  		= 'material_fact_consumption_correction'::doc_types;
 			reg_material_facts.doc_id  		= NEW.id;
 			reg_material_facts.material_id		= NEW.material_id;
+			IF v_dif_store THEN
+				IF NEW.production_site_id IS NULL THEN
+					RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+				END IF;
+				reg_material_facts.production_site_id	= NEW.production_site_id;
+			END IF;
 			reg_material_facts.quant		= NEW.quant;
 			PERFORM ra_material_facts_add_act(reg_material_facts);	
 		END IF;
 
-		IF (SELECT is_cement FROM raw_materials WHERE id=NEW.material_id)
-		AND NEW.cement_silo_id IS NOT NULL THEN
+		IF v_is_cement AND NEW.cement_silo_id IS NOT NULL THEN
 			reg_cement.date_time		= NEW.date_time;
 			reg_cement.deb			= FALSE;
 			reg_cement.doc_type  		= 'material_fact_consumption_correction'::doc_types;
