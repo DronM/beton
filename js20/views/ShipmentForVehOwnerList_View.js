@@ -97,10 +97,13 @@ function ShipmentForVehOwnerList_View(id,options){
 			"cmdFilter":true,
 			"filters":filters,
 			"variantStorage":options.variantStorage,
-			"addCustomCommandsAfter":function(commands){
-				commands.push(new ShipmentForVehOwnerCmdSetAgreed(id+":grid:cmd:setAgreed"));
-			}
-			
+			"addCustomCommandsAfter" : (
+				(window.getApp().getServVar("role_id")=="vehicle_owner")?
+				function(commands){
+					commands.push(new ShipmentForVehOwnerCmdSetAgreed(id+":grid:cmd:setAgreed"));
+				}
+				:null
+				)			
 			//"cmdExport":false
 		}),
 		"popUpMenu":popup_menu,

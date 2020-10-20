@@ -83,7 +83,12 @@ $BODY$
 		FROM rg_materials_balance('{}')
 	) AS bal ON bal.material_id=m.id
 	LEFT JOIN (
-		SELECT * FROM rg_material_facts_balance('{}')
+		--SELECT * FROM rg_material_facts_balance('{}')
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
 	) AS bal_fact ON bal_fact.material_id=m.id
 	
 	LEFT JOIN (

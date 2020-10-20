@@ -58,6 +58,7 @@ CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
 		
 	FROM shipments_list sh
 	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	ORDER BY ship_date_time DESC
 	;
 	
 ALTER VIEW shipments_for_veh_owner_list OWNER TO ;

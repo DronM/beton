@@ -154,3 +154,118 @@ AppBeton.prototype.makeCall = function(tel){
 		}
 	});
 }
+
+/**
+ * opens dialog form
+ */
+AppBeton.prototype.materialQuantCorrection = function(fields){
+	var mat_id = fields.material_id.getValue();
+	this.m_materialDifStore = this.m_materialDifStore || {};
+	if(this.m_materialDifStore["id"+mat_id]==undefined){
+		//get attribute
+		var self = this;
+		var pm = (new RawMaterial_Controller()).getPublicMethod("get_object");
+		pm.setFieldValue("id",mat_id);
+		pm.run({
+			"ok":(function(fields,matId){
+				return function(resp){
+					var m = resp.getModel("RawMaterial_Model");
+					if(m.getNextRow()){
+						var dif_store = m.getFieldValue("dif_store");
+						self.m_materialDifStore["id"+matId] = dif_store;
+						self.materialQuantCorrectionCont(fields,dif_store);
+					}
+				}
+			})(fields,mat_id)
+		});
+	}
+	else{
+		this.materialQuantCorrectionCont(fields,this.m_materialDifStore["id"+mat_id]);
+	}	
+}
+
+AppBeton.prototype.materialQuantCorrectionCont = function(fields,matDifStore){
+	var self = this;
+	var elements = [];
+	if(matDifStore){
+		elements.push(
+			new ProductionSiteEdit("CorrectQuant:cont:production_sites_ref",{
+				"labelCaption":"Завод:",
+				"required":"true",
+				"focus":(!fields.production_site_id),
+				"enabled":(!fields.production_site_id),
+				"value":fields.production_site_id
+			})
+		);
+	}
+	elements.push(
+		new EditFloat("CorrectQuant:cont:quant",{
+			"labelCaption":"Количество:",
+			"length":19,
+			"precision":4,
+			"focus":!(matDifStore&&!fields.production_site_id)
+		})
+	);
+	elements.push(
+		new EditText("CorrectQuant:cont:comment_text",{
+			"labelCaption":"Комментарий:",
+			"rows":3
+		})
+	);
+	
+	this.m_viewMatertialQuantCorrect = new EditJSON("CorrectQuant:cont",{
+		"elements":elements
+	});
+	this.m_formMatertialQuantCorrect = new WindowFormModalBS("CorrectQuant",{
+		"content":this.m_viewMatertialQuantCorrect,
+		"cmdCancel":true,
+		"cmdOk":true,
+		"contentHead":"Корректировка количества "+fields.material_descr.getValue(),
+		"onClickCancel":function(){
+			self.closeMatertialQuantCorrect();
+		},
+		"onClickOk":(function(matDifStore,self){
+			return function(){
+				var res = self.m_viewMatertialQuantCorrect.getValueJSON();
+				if(!res||!res.production_sites_ref||res.production_sites_ref.isNull()){
+					throw new Error("Не указан завод!");
+				}
+				self.setMatertialQuantCorrectOnServer(res,matDifStore,self.m_viewMatertialQuantCorrect.fieldValues);
+			}
+		})(matDifStore,self)
+	});
+	this.m_viewMatertialQuantCorrect.fieldValues = {
+		"material_id":fields.material_id.getValue(),		
+		"material_descr":fields.material_descr.getValue()
+	}
+	this.m_formMatertialQuantCorrect.open();
+}
+
+AppBeton.prototype.setMatertialQuantCorrectOnServer = function(newValues,matDifStore,fieldValues){
+	var self = this;
+	var pm = (new MaterialFactBalanceCorretion_Controller()).getPublicMethod("insert");
+	pm.setFieldValue("material_id",fieldValues.material_id);
+	pm.setFieldValue("comment_text",newValues.comment_text);
+	pm.setFieldValue("required_balance_quant",newValues.quant);
+	if(matDifStore){
+		pm.setFieldValue("production_site_id",newValues.production_sites_ref.getKey("id"));
+	}
+	else{
+		pm.resetFieldValue("production_site_id");
+	}
+	pm.run({
+		"ok":function(){
+			window.showTempNote(fieldValues.material_descr+": откорректирован остаток на утро",null,5000);				
+			self.closeMatertialQuantCorrect();
+			self.m_refresh();
+		}
+	})	
+}
+
+AppBeton.prototype.closeMatertialQuantCorrect = function(){
+	this.m_viewMatertialQuantCorrect.delDOM()
+	this.m_formMatertialQuantCorrect.delDOM();
+	delete this.m_viewMatertialQuantCorrect;
+	delete this.m_formMatertialQuantCorrect;			
+}
+

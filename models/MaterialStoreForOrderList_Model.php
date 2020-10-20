@@ -65,6 +65,15 @@ class MaterialStoreForOrderList_Model extends ModelSQLBeton{
 		$f_balance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"balance",$f_opts);
 		$this->addField($f_balance);
 		//********************
+		
+		//*** Field material_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="material_id";
+						
+		$f_material_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_id",$f_opts);
+		$this->addField($f_material_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

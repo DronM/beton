@@ -74,7 +74,8 @@ function MaterialMakeOrderGrid(id,options){
 											"events":{
 												"dblclick":function(ev){
 													self.setModelToCurrentRow(DOMHelper.getParentByTagName(ev.target,"TR"));
-													self.correctQuant(self.getModel().getFields());
+													//self.correctQuant(self.getModel().getFields());
+													window.getApp().materialQuantCorrection(self.getModel().getFields());
 												}
 											}										
 										},
@@ -181,6 +182,7 @@ extend(MaterialMakeOrderGrid,Grid);
 
 
 /* public methods */
+/*
 MaterialMakeOrderGrid.prototype.setCorrectionOnServer = function(newValues,matDifStore,fieldValues){
 	var self = this;
 	var pm = (new MaterialFactBalanceCorretion_Controller()).getPublicMethod("insert");
@@ -292,4 +294,5 @@ MaterialMakeOrderGrid.prototype.closeCorrection = function(){
 	delete this.m_view;
 	delete this.m_form;			
 }
+*/
 

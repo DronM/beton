@@ -17,7 +17,7 @@ function MaterialStoreForOrderList_View(id,options){
 	this.m_listView = options.listView;
 	this.setData(options.model);
 	options.templateOptions = this.getTemplateOptions();
-	debugger
+	
 	MaterialStoreForOrderList_View.superclass.constructor.call(this,id,"TEMPLATE",options);
 	
 	this.fillStores();
@@ -65,10 +65,10 @@ MaterialStoreForOrderList_View.prototype.setData = function(modelStores){
 		};
 		var prod_site,cur_prod_site;
 		while(modelStores.getNextRow()){
-			var s_name = modelStores.getFieldValue("name");
-			var s_id = modelStores.getFieldValue("id");
-		
 			cur_prod_site = modelStores.getFieldValue("production_sites_ref");
+			
+			var s_name = modelStores.getFieldValue("name");
+			var s_id = cur_prod_site.getKey("id");//modelStores.getFieldValue("id");
 		
 			if(!prod_site || prod_site.productionSiteId!=cur_prod_site.getKey("id")){
 				prod_site = {
@@ -87,9 +87,12 @@ MaterialStoreForOrderList_View.prototype.setData = function(modelStores){
 				"name":s_name,
 				"id":s_id,
 				"balance":modelStores.getFieldValue("balance"),
-				"load_capacity":modelStores.getFieldValue("load_capacity")
+				"load_capacity":modelStores.getFieldValue("load_capacity"),
+				"material_id":modelStores.getFieldValue("material_id")
 			}
 		}
+		console.log("templ_opts=")
+		console.log(templ_opts)
 		this.setTemplateOptions(templ_opts);		
 	}
 		
@@ -103,6 +106,7 @@ MaterialStoreForOrderList_View.prototype.setData = function(modelStores){
 }
 
 MaterialStoreForOrderList_View.prototype.fillStores = function(){	
+
 	for(var store_id in this.m_stores){
 		var store_n = document.getElementById("store_canvas_"+this.m_stores[store_id].id);
 		var store_cont_n = document.getElementById("store_cont_"+this.m_stores[store_id].id);
@@ -121,14 +125,26 @@ MaterialStoreForOrderList_View.prototype.fillStores = function(){
 			}
 			
 			store_n.title = "Остаток:"+((this.m_stores[store_id].balance && !isNaN(this.m_stores[store_id].balance))? this.m_stores[store_id].balance:0);//+", двойной клик для обнуления."
+			console.log("this.m_stores[store_id].material_id="+this.m_stores[store_id].material_id)
+			console.log("this.m_stores[store_id].id="+this.m_stores[store_id].id)
 			if(this.m_stores[store_id].load_percent!=percent){
 				store_n.setAttribute("store_id",this.m_stores[store_id].id);				
 				this.m_stores[store_id].load_percent = percent;
 				this.drawStore(store_n,store_cont_n,0,0,percent);
-				var self = this;
-				EventHelper.add(store_n,"dblclick",function(e){
-					self.onCorrectQuant(e.target.getAttribute("store_id"));
-				});
+				EventHelper.add(
+					store_n,
+					"dblclick",
+					(function(materialId,materialDescr,productionSiteId){
+						return function(e){
+							window.getApp().materialQuantCorrection({
+								"material_id":new FieldInt("material_id",{"value":materialId})
+								,"material_descr":new FieldString("material_descr",{"value":materialDescr})
+								//,"production_sites_ref":new RefType({"keys":{"id":productionSiteId}})
+								,"production_site_id":productionSiteId
+							});
+						}
+					})(this.m_stores[store_id].material_id,this.m_stores[store_id]["name"],this.m_stores[store_id].id)
+				);
 			}
 		}
 	}
@@ -168,8 +184,4 @@ MaterialStoreForOrderList_View.prototype.drawStore = function(storeNode,storeCon
 	DOMHelper.setText(storeContNode,fillPercent+"%");
 	storeContNode.style = "position:relative;top:-"+( (store_height)/2+35)+"px;left:"+( (store_width)/2-25)+"px";
 }
-
-MaterialStoreForOrderList_View.prototype.onCorrectQuant = function(storeId){
-}
-
 

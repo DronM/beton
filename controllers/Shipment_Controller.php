@@ -1231,40 +1231,6 @@ class Shipment_Controller extends ControllerSQL{
 	}
 
 	public function get_list($pm){
-		/*
-		$model = new ShipmentList_Model($this->getDbLink());
-		$is_insert = NULL;
-		$where = NULL;
-		$order = NULL;
-		$limit = NULL;
-		$fields = NULL;
-		$grp_fields = NULL;
-		$agg_fields = NULL;
-		$calc_total = NULL;
-		$this->setQueryOptionsFromParams($model,$pm,$is_insert,$where,$order,
-			$limit,$fields,$grp_fields,$agg_fields,$calc_total
-		);	
-		
-		if(!$order){
-			$order = new ModelOrderSQL();
-			$order->addField($model->getFieldById('ship_date_time'),'DESC');
-		}
-		
-		$join = NULL;$group = NULL;
-		$q = $this->get_list_query();
-		$model->addParamsToSelectQuery(
-			$q,
-			$where,
-			$order,
-			$limit,
-			$join,$group,
-			$calc_total
-		);
-		$model->selectQuery($q,$calc_total,$where,NULL,TRUE);
-		
-		//
-		$this->addModel($model);
-		*/
 		$this->modelGetList(new ShipmentList_Model($this->getDbLink()),$pm);
 	}	
 
@@ -1303,6 +1269,7 @@ class Shipment_Controller extends ControllerSQL{
 		//
 		$this->addModel($model);
 		*/
+		
 		$this->modelGetList(new ShipmentForVehOwnerList_Model($this->getDbLink()),$pm);
 	}
 	

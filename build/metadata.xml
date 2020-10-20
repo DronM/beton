@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-10-16 07:20:58</lastBuild></version>
+		<lastBuild>2020-10-20 05:27:07</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -91,6 +91,7 @@
 		<version dateOpen="2020-09-04 09:09:08" dateClose="2020-09-07 05:09:46">1.00185</version>
 		<version dateOpen="2020-09-08 09:09:46" dateClose="2020-09-24 05:09:56">1.00186</version>
 		<version dateOpen="2020-10-14 12:10:35" dateClose="2020-10-16 07:10:21">1.00187</version>
+		<version dateOpen="2020-10-19 09:10:12" dateClose="2020-10-20 05:10:27">1.00188</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -420,15 +421,17 @@
 			<field id="glyphclass" dataType="String"/>
 		</model>
 		<model id="VariantStorage" parent="ModelSQLBeton" dataTable="variant_storages" virtual="FALSE">
-			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE" required="TRUE"/>
-			<field id="storage_name" dataType="Text" primaryKey="TRUE" required="TRUE"/>
-			<field id="variant_name" dataType="Text" primaryKey="TRUE" required="TRUE"/>
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" required="TRUE"/>
+			<field id="storage_name" dataType="Text" required="TRUE"/>
+			<field id="variant_name" dataType="Text" required="TRUE"/>
 			<field id="default_variant" dataType="Bool"/>
 			<field id="filter_data" dataType="JSON"/>
 			<field id="col_visib_data" dataType="JSON"/>
 			<field id="col_order_data" dataType="JSON"/>
 		</model>
 		<model id="VariantStorageList" parent="ModelSQLBeton" dataTable="variant_storages_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE" required="TRUE"/>
 			<field id="storage_name" dataType="Text" primaryKey="TRUE" required="TRUE"/>
 			<field id="default_variant" dataType="Bool"/>
@@ -3091,6 +3094,7 @@
 			<field id="name" dataType="String" length="100" required="TRUE"/>
 			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
 			<field id="balance" dataType="Float" length="19" precision="4"/>
+			<field id="material_id" dataType="Int" sysCol="TRUE"/>
 		</model>
 		<model id="CementSiloBalanceReset" parent="ModelSQLBeton" dataTable="cement_silo_balance_resets" virtual="FALSE" modelType="DOC" docTypeId="cement_silo_balance_reset">
 			<descr>Обнуление остатков силоса</descr>

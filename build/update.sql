@@ -56738,3 +56738,554 @@ CREATE OR REPLACE VIEW material_store_for_order_list AS
 	
 ALTER VIEW material_store_for_order_list OWNER TO beton;
 
+
+-- ******************* update 16/10/2020 08:22:44 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		--SELECT * FROM rg_material_facts_balance('{}')
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			now()::timestamp,
+			$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 16/10/2020 10:38:15 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		/*AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+		*/
+	ORDER BY CASE WHEN in_production_dt_start>sh.date_time THEN in_production_dt_start - sh.date_time ELSE sh.date_time-in_production_dt_start END
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 16/10/2020 10:39:12 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		/*AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+		*/
+	ORDER BY
+		-- the nearest shipment
+		CASE
+			WHEN in_production_dt_start>sh.date_time THEN in_production_dt_start - sh.date_time
+			ELSE sh.date_time-in_production_dt_start
+		END
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 16/10/2020 11:08:42 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+		
+	ORDER BY
+		-- the nearest shipment
+		CASE
+			WHEN in_production_dt_start>sh.date_time THEN in_production_dt_start - sh.date_time
+			ELSE sh.date_time-in_production_dt_start
+		END
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 16/10/2020 11:09:33 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'60 minutes'::interval AND in_production_dt_start+'60 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		/*AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+		*/
+	ORDER BY
+		-- the nearest shipment
+		CASE
+			WHEN in_production_dt_start>sh.date_time THEN in_production_dt_start - sh.date_time
+			ELSE sh.date_time-in_production_dt_start
+		END
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 16/10/2020 11:35:39 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'90 minutes'::interval AND in_production_dt_start+'90 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		/*AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+		*/
+	ORDER BY
+		-- the nearest shipment
+		CASE
+			WHEN in_production_dt_start>sh.date_time THEN in_production_dt_start - sh.date_time
+			ELSE sh.date_time-in_production_dt_start
+		END
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 19/10/2020 09:02:10 ******************
+-- VIEW: material_store_for_order_list
+
+--DROP VIEW material_store_for_order_list;
+
+CREATE OR REPLACE VIEW material_store_for_order_list AS
+	SELECT
+		t.id,
+		mat.name AS name,
+		production_sites_ref(pst) AS production_sites_ref,
+		t.load_capacity,
+		bal.quant AS balance,
+		bal.material_id AS material_id
+		
+	FROM store_map_to_production_sites AS t	
+	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id	
+	LEFT JOIN rg_material_facts_balance(
+		'{}'::integer[],
+		(SELECT array_agg(id) FROM raw_materials WHERE dif_store)
+	) AS bal ON bal.production_site_id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=bal.material_id
+	WHERE t.load_capacity>0
+	ORDER BY pst.name,mat.name
+	;
+	
+ALTER VIEW material_store_for_order_list OWNER TO beton;
+
+
+-- ******************* update 19/10/2020 15:03:08 ******************
+-- VIEW: shipments_for_veh_owner_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.destination_id,
+		sh.destinations_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.cost,
+		sh.ship_cost_edit,
+		sh.pump_cost_edit,
+		sh.demurrage,
+		sh.demurrage_cost,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		
+		CASE
+		WHEN sh.destination_id = const_self_ship_dest_id_val() THEN 0
+		WHEN dest.price_for_driver IS NOT NULL THEN dest.price_for_driver*shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+		ELSE
+			(WITH
+			act_price AS (
+				SELECT h.date AS d
+				FROM shipment_for_driver_costs_h h
+				WHERE h.date<=sh.ship_date_time::date
+				ORDER BY h.date DESC
+				LIMIT 1
+			)
+			SELECT shdr_cost.price
+			FROM shipment_for_driver_costs AS shdr_cost
+			WHERE
+				shdr_cost.date=(SELECT d FROM act_price)
+				AND shdr_cost.distance_to>=dest.distance
+				/*OR shdr_cost.id=(
+					SELECT t.id
+					FROM shipment_for_driver_costs t
+					WHERE t.date=(SELECT d FROM act_price)
+					ORDER BY t.distance_to LIMIT 1
+				)
+				*/
+			ORDER BY shdr_cost.distance_to ASC
+			LIMIT 1
+			) * shipments_quant_for_cost(sh.quant::numeric,dest.distance::numeric)
+		END AS cost_for_driver
+		
+	FROM shipments_list sh
+	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	ORDER BY ship_date_time DESC
+	;
+	
+ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 19/10/2020 15:10:46 ******************
+-- VIEW: variant_storages_list
+
+--DROP VIEW variant_storages_list;
+
+CREATE OR REPLACE VIEW variant_storages_list AS
+	SELECT
+		user_id,
+		storage_name,
+		variant_name
+	FROM variant_storages
+	;
+	
+ALTER VIEW variant_storages_list OWNER TO beton;
+
+
+-- ******************* update 19/10/2020 15:12:43 ******************
+-- VIEW: variant_storages_list
+
+DROP VIEW variant_storages_list;
+
+CREATE OR REPLACE VIEW variant_storages_list AS
+	SELECT
+		id,
+		user_id,
+		storage_name,
+		variant_name
+	FROM variant_storages
+	;
+	
+ALTER VIEW variant_storages_list OWNER TO beton;
+
+
+-- ******************* update 19/10/2020 16:16:28 ******************
+﻿-- Function: variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean)
+
+--DROP FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean);
+
+CREATE OR REPLACE FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean)
+  RETURNS void AS
+$BODY$  
+BEGIN
+	IF in_default_variant THEN
+		UPDATE variant_storages
+		SET
+			default_variant = FALSE
+		WHERE
+			user_id = in_user_id
+			AND storage_name = in_storage_name
+		;	
+	END IF;
+	
+	UPDATE variant_storages
+	SET
+		--set_time = now(),
+		filter_data = in_filter_data,
+		default_variant = in_default_variant
+	WHERE
+		user_id = in_user_id
+		AND storage_name = in_storage_name
+		AND variant_name = in_variant_name
+	;
+	
+	IF FOUND THEN
+		RETURN;
+	END IF;
+	
+	BEGIN
+		INSERT INTO variant_storages (user_id, storage_name, variant_name, filter_data, default_variant)
+		VALUES(in_user_id, in_storage_name, in_variant_name, in_filter_data, in_default_variant);
+		
+	EXCEPTION WHEN OTHERS THEN
+		UPDATE variant_storages
+		SET
+			--set_time = now(),
+			filter_data = in_filter_data,
+			default_variant = in_default_variant
+		WHERE
+			user_id = in_user_id
+			AND storage_name = in_storage_name
+			AND variant_name = in_variant_name
+		;
+	END;
+	
+	RETURN;
+
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean) OWNER TO beton;
+

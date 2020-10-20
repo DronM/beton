@@ -1,24 +1,57 @@
--- VIEW: material_store_for_order_list
+﻿-- Function: variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean)
 
-DROP VIEW material_store_for_order_list;
+--DROP FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean);
 
-CREATE OR REPLACE VIEW material_store_for_order_list AS
-	SELECT
-		t.id,
-		mat.name AS name,
-		production_sites_ref(pst) AS production_sites_ref,
-		t.load_capacity,
-		bal.quant AS balance
-		
-	FROM store_map_to_production_sites AS t	
-	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id	
-	LEFT JOIN rg_material_facts_balance(
-		'{}'::integer[],
-		(SELECT array_agg(id) FROM raw_materials WHERE dif_store)
-	) AS bal ON bal.production_site_id=t.production_site_id
-	LEFT JOIN raw_materials AS mat ON mat.id=bal.material_id
-	WHERE t.load_capacity>0
-	ORDER BY pst.name,mat.name
+CREATE OR REPLACE FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean)
+  RETURNS void AS
+$BODY$  
+BEGIN
+	IF in_default_variant THEN
+		UPDATE variant_storages
+		SET
+			default_variant = FALSE
+		WHERE
+			user_id = in_user_id
+			AND storage_name = in_storage_name
+		;	
+	END IF;
+	
+	UPDATE variant_storages
+	SET
+		--set_time = now(),
+		filter_data = in_filter_data,
+		default_variant = in_default_variant
+	WHERE
+		user_id = in_user_id
+		AND storage_name = in_storage_name
+		AND variant_name = in_variant_name
 	;
 	
-ALTER VIEW material_store_for_order_list OWNER TO beton;
+	IF FOUND THEN
+		RETURN;
+	END IF;
+	
+	BEGIN
+		INSERT INTO variant_storages (user_id, storage_name, variant_name, filter_data, default_variant)
+		VALUES(in_user_id, in_storage_name, in_variant_name, in_filter_data, in_default_variant);
+		
+	EXCEPTION WHEN OTHERS THEN
+		UPDATE variant_storages
+		SET
+			--set_time = now(),
+			filter_data = in_filter_data,
+			default_variant = in_default_variant
+		WHERE
+			user_id = in_user_id
+			AND storage_name = in_storage_name
+			AND variant_name = in_variant_name
+		;
+	END;
+	
+	RETURN;
+
+END;	
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean) OWNER TO beton;

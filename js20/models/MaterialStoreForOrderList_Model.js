@@ -72,6 +72,15 @@ function MaterialStoreForOrderList_Model(options){
 	options.fields.balance = new FieldFloat("balance",filed_options);
 	options.fields.balance.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.material_id = new FieldInt("material_id",filed_options);
+	
 		MaterialStoreForOrderList_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialStoreForOrderList_Model,ModelXML);

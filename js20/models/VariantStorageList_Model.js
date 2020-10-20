@@ -29,6 +29,15 @@ function VariantStorageList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.id = new FieldInt("id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = true;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.user_id = new FieldInt("user_id",filed_options);
 	options.fields.user_id.getValidator().setRequired(true);
 	

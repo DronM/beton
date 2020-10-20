@@ -8,7 +8,8 @@ CREATE OR REPLACE VIEW material_store_for_order_list AS
 		mat.name AS name,
 		production_sites_ref(pst) AS production_sites_ref,
 		t.load_capacity,
-		bal.quant AS balance
+		bal.quant AS balance,
+		bal.material_id AS material_id
 		
 	FROM store_map_to_production_sites AS t	
 	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id	

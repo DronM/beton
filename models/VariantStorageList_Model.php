@@ -20,6 +20,15 @@ class VariantStorageList_Model extends ModelSQLBeton{
 		
 		$this->setTableName("variant_storages_list");
 			
+		//*** Field id ***
+		$f_opts = array();
+		$f_opts['primaryKey'] = TRUE;
+		$f_opts['id']="id";
+						
+		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
+		$this->addField($f_id);
+		//********************
+		
 		//*** Field user_id ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;

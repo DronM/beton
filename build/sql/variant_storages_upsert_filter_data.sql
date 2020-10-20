@@ -1,13 +1,8 @@
--- Function: public.variant_storages_upsert_filter_data(integer, text, text, text, boolean)
+﻿-- Function: variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean)
 
--- DROP FUNCTION public.variant_storages_upsert_filter_data(integer, text, text, text, boolean);
+--DROP FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean);
 
-CREATE OR REPLACE FUNCTION public.variant_storages_upsert_filter_data(
-    in_user_id integer,
-    in_storage_name text,
-    in_variant_name text,
-    in_filter_data text,
-    in_default_variant boolean)
+CREATE OR REPLACE FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean)
   RETURNS void AS
 $BODY$  
 BEGIN
@@ -24,7 +19,7 @@ BEGIN
 	UPDATE variant_storages
 	SET
 		--set_time = now(),
-		filter_data = in_filter_data::json,
+		filter_data = in_filter_data,
 		default_variant = in_default_variant
 	WHERE
 		user_id = in_user_id
@@ -38,7 +33,7 @@ BEGIN
 	
 	BEGIN
 		INSERT INTO variant_storages (user_id, storage_name, variant_name, filter_data, default_variant)
-		VALUES(in_user_id, in_storage_name, in_variant_name, in_filter_data::json, in_default_variant);
+		VALUES(in_user_id, in_storage_name, in_variant_name, in_filter_data, in_default_variant);
 		
 	EXCEPTION WHEN OTHERS THEN
 		UPDATE variant_storages
@@ -59,6 +54,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.variant_storages_upsert_filter_data(integer, text, text, text, boolean)
-  OWNER TO ;
-
+ALTER FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean) OWNER TO ;
