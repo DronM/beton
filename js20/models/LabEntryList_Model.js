@@ -35,7 +35,7 @@ function LabEntryList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	
+	filed_options.alias = 'Основной ключ! тк. lab_entry может быть NULL';
 	filed_options.autoInc = false;	
 	
 	options.fields.shipment_id = new FieldInt("shipment_id",filed_options);

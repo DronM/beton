@@ -4,7 +4,7 @@
 
 CREATE OR REPLACE VIEW public.lab_entry_list AS 
 	SELECT
-		lab.shipment_id AS id,
+		lab.id AS id,
 		sh.id AS shipment_id,
 		sh.date_time,
 		

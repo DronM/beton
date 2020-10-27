@@ -27,7 +27,7 @@ function VariantStorage_Model(options){
 	var filed_options = {};
 	filed_options.primaryKey = true;	
 	
-	filed_options.autoInc = false;	
+	filed_options.autoInc = true;	
 	
 	options.fields.id = new FieldInt("id",filed_options);
 	
@@ -97,6 +97,7 @@ function VariantStorage_Model(options){
 	
 	options.fields.col_order_data = new FieldJSON("col_order_data",filed_options);
 	
+			
 		VariantStorage_Model.superclass.constructor.call(this,id,options);
 }
 extend(VariantStorage_Model,ModelXML);

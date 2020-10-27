@@ -34,6 +34,8 @@ class LabEntryList_Model extends ModelSQLBeton{
 		//*** Field shipment_id ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
+		
+		$f_opts['alias']='Основной ключ! тк. lab_entry может быть NULL';
 		$f_opts['sysCol']=TRUE;
 		$f_opts['id']="shipment_id";
 						

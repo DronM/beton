@@ -33,9 +33,6 @@ class VariantStorage_Controller extends ControllerSQL{
 
 		/* insert */
 		$pm = new PublicMethod('insert');
-		$param = new FieldExtInt('id'
-				,array());
-		$pm->addParam($param);
 		$param = new FieldExtInt('user_id'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
@@ -57,6 +54,8 @@ class VariantStorage_Controller extends ControllerSQL{
 		$param = new FieldExtJSON('col_order_data'
 				,array());
 		$pm->addParam($param);
+		
+		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		
 		$this->addPublicMethod($pm);

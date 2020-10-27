@@ -5,7 +5,7 @@
 CREATE OR REPLACE VIEW public.lab_entry_detail_list AS 
 	SELECT
 		sh.id AS shipment_id,
-		lab.id,
+		lab.id_key,
 		(sh.id::text || '/'::text) || lab.id::text AS code,
 		sh.date_time AS ship_date_time,
 		lab.ok,

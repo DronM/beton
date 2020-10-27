@@ -23,7 +23,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 
 
 
-require_once('common/ExcelReader/Excel/reader.php');
+//deprecated!
+//require_once('common/ExcelReader/Excel/reader.php');
 
 require_once(FRAME_WORK_PATH.'basic_classes/VariantStorageBeton.php');
 
@@ -434,7 +435,7 @@ class MaterialFactConsumption_Controller extends ControllerSQL{
 
 	//http://localhost/beton_new/?t=MaterialFactConsumptionUpload&v=Child
 	public function upload_production_file($pm){
-		
+		throw new Exception("Method upload_production_file not supported");
 		$data_file = OUTPUT_PATH.DIRECTORY_SEPARATOR.uniqid();
 		if (
 		!$_FILES['production_file']

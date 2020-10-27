@@ -19,10 +19,20 @@ class LabEntry_Model extends ModelSQLBeton{
 		
 		$this->setTableName("lab_entries");
 			
-		//*** Field shipment_id ***
+		//*** Field id ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
-		$f_opts['autoInc']=FALSE;
+		$f_opts['autoInc']=TRUE;
+		
+		$f_opts['alias']='Код';
+		$f_opts['id']="id";
+						
+		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
+		$this->addField($f_id);
+		//********************
+		
+		//*** Field shipment_id ***
+		$f_opts = array();
 		
 		$f_opts['alias']='Отгрузка';
 		$f_opts['id']="shipment_id";

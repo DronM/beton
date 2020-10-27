@@ -62,6 +62,8 @@ class LabEntry_Controller extends ControllerSQL{
 			));
 		$pm->addParam($param);
 		
+		$pm->addParam(new FieldExtInt('ret_id'));
+		
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('LabEntry_Model');
@@ -70,9 +72,15 @@ class LabEntry_Controller extends ControllerSQL{
 		/* update */		
 		$pm = new PublicMethod('update');
 		
-		$pm->addParam(new FieldExtInt('old_shipment_id',array('required'=>TRUE)));
+		$pm->addParam(new FieldExtInt('old_id',array('required'=>TRUE)));
 		
 		$pm->addParam(new FieldExtInt('obj_mode'));
+		$param = new FieldExtInt('id'
+				,array(
+			
+				'alias'=>'Код'
+			));
+			$pm->addParam($param);
 		$param = new FieldExtInt('shipment_id'
 				,array(
 			
@@ -104,9 +112,9 @@ class LabEntry_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-			$param = new FieldExtInt('shipment_id',array(
+			$param = new FieldExtInt('id',array(
 			
-				'alias'=>'Отгрузка'
+				'alias'=>'Код'
 			));
 			$pm->addParam($param);
 		
@@ -118,7 +126,7 @@ class LabEntry_Controller extends ControllerSQL{
 		/* delete */
 		$pm = new PublicMethod('delete');
 		
-		$pm->addParam(new FieldExtInt('shipment_id'
+		$pm->addParam(new FieldExtInt('id'
 		));		
 		
 		$pm->addParam(new FieldExtInt('count'));

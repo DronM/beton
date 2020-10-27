@@ -17,6 +17,9 @@ function ShipmentForVehOwnerList_View(id,options){
 		"field":new FieldDateTime("ship_date_time")
 	});
 
+	var role_id = window.getApp().getServVar("role_id");
+	var smpl_v = (role_id=="vehicle_owner"||role_id=="client")
+
 	var cur_d = (DateHelper.time()).getDate();
 	var prev_month_acc_allowed = (cur_d>=constants.vehicle_owner_accord_from_day.getValue() && cur_d<=constants.vehicle_owner_accord_to_day.getValue());
 	this.m_accDescr = {};
@@ -128,6 +131,15 @@ function ShipmentForVehOwnerList_View(id,options){
 							"sortable":true,
 							"sort":"desc"
 						})
+						,new GridCellHead(id+":grid:head:vehicle_owners_ref",{
+							"value":"Владелец ТС",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("vehicle_owners_ref")
+								})
+							],
+							"sortable":true
+						})
 					
 						,new GridCellHead(id+":grid:head:destinations_ref",{
 							"value":"Объект",
@@ -135,11 +147,11 @@ function ShipmentForVehOwnerList_View(id,options){
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
 									"form":null,
-									"ctrlClass":EditString,
+									"ctrlClass":smpl_v? EditString:DestinationEdit,
 									"searchOptions":{
-										"field":(new FieldString("destinations_ref->descr")),
-										"searchType":"on_part",
-										"typeChange":true
+										"field":smpl_v? (new FieldString("destinations_ref->descr")):(new FieldInt("destination_id")),
+										"searchType":smpl_v? "on_part":"on_match",
+										"typeChange":smpl_v
 									}
 								})
 							],
@@ -204,15 +216,6 @@ function ShipmentForVehOwnerList_View(id,options){
 							"sortable":true
 						})
 						
-						,new GridCellHead(id+":grid:head:vehicle_owners_ref",{
-							"value":"Владелец ТС",
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("vehicle_owners_ref")
-								})
-							],
-							"sortable":true
-						})
 						,new GridCellHead(id+":grid:head:cost",{
 							"value":"Доставка",
 							"colAttrs":{"align":"right"},

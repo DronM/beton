@@ -24,6 +24,7 @@ function LabEntryDetailList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
+		"keyIds":["id_key"],
 		"model":model,
 		"controller":contr,
 		"editInline":true,
@@ -40,6 +41,7 @@ function LabEntryDetailList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
+						/*
 						new GridCellHead(id+":grid:head:code",{
 							"value":"№",
 							"colAttrs":{"align":"center"},
@@ -54,7 +56,8 @@ function LabEntryDetailList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:ok",{
+						,*/
+						new GridCellHead(id+":grid:head:ok",{
 							"value":"ОК",
 							"colAttrs":{"align":"center"},
 							"columns":[

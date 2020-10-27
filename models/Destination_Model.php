@@ -119,7 +119,7 @@ $this->setLimitConstant('doc_per_page_count');
 	}
 	
 	public function update(){
-		$this->queryId = 0;
+		$this->setQueryId(0);
 		$cond_str = '';
 		$assigne_str = '';
 		
@@ -157,7 +157,7 @@ $this->setLimitConstant('doc_per_page_count');
 		$this->getDbLink()->query($q);	
 	}
 	public function insert($needId=FALSE){
-		$this->queryId = 0;
+		$this->setQueryId(0);
 		$field_str = '';
 		$value_str = '';
 		$ids_list = '';
@@ -197,10 +197,12 @@ $this->setLimitConstant('doc_per_page_count');
 			$q.=' returning '.$ids_list;
 		}
 		//throw new Exception('ModelSQL insert q='.$q);
-		$this->queryId = $this->getDbLink()->query($q);
+		
+		$query_id = $this->getDbLink()->query($q);
+		$this->setQueryId($query_id);
 		
 		if ($needId){
-			$ret = $this->getDbLink()->fetch_array($this->queryId);
+			$ret = $this->getDbLink()->fetch_array($query_id);
 		}
 		else{
 			$ret = NULL;

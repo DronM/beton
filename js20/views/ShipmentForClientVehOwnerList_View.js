@@ -13,6 +13,9 @@ function ShipmentForClientVehOwnerList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 
+	var role_id = window.getApp().getServVar("role_id");
+	var smpl_v = (role_id=="vehicle_owner"||role_id=="client")
+
 	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"field":new FieldDateTime("ship_date")
 	});
@@ -40,25 +43,47 @@ function ShipmentForClientVehOwnerList_View(id,options){
 		}
 	};
 	
-	filters.driver = {
-		"binding":new CommandBinding({
-			"control":new EditString(id+":filter-ctrl-driver",{
-				"contClassName":"form-group-filter",
-				"labelCaption":"Водитель:"
-			}),
-			"field":new FieldString("drivers_ref->descr")}),
-		"sign":"lk"		
+	if(smpl_v){
+		filters.driver = {
+			"binding":new CommandBinding({
+				"control":new EditString(id+":filter-ctrl-driver",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Водитель:"
+				}),
+				"field":new FieldString("drivers_ref->descr")}),
+			"sign":"lk"		
+		}
+		filters.vehicle = {
+			"binding":new CommandBinding({
+				"control":new EditString(id+":filter-ctrl-vehicle",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"ТС:"
+				}),
+				"field":new FieldString("vehicles_ref->descr")}),
+			"sign":"lk"		
+		};
 	}
-	filters.vehicle = {
-		"binding":new CommandBinding({
-			"control":new EditString(id+":filter-ctrl-vehicle",{
-				"contClassName":"form-group-filter",
-				"labelCaption":"ТС:"
-			}),
-			"field":new FieldString("vehicles_ref->descr")}),
-		"sign":"lk"		
-	};
-
+	else{
+		filters.driver = {
+			"binding":new CommandBinding({
+				"control":new DriverEditRef(id+":filter-ctrl-driver",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Водитель:"
+				}),
+				"field":new FieldInt("driver_id")}),
+			"sign":"e"		
+		}
+		filters.vehicle = {
+			"binding":new CommandBinding({
+				"control":new VehicleEdit(id+":filter-ctrl-vehicle",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"ТС:"
+				}),
+				"field":new FieldInt("vehicle_id")}),
+			"sign":"e"		
+		};
+	}
+	
 	/*filters.destination = {
 		"binding":new CommandBinding({
 			"control":new DestinationEdit(id+":filter-ctrl-destination",{
@@ -121,11 +146,11 @@ function ShipmentForClientVehOwnerList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("clients_ref"),
-									"ctrlClass":EditString,
+									"ctrlClass":smpl_v? EditString:ClientEdit,
 									"searchOptions":{
-										"field":new FieldString("clients_ref->descr"),
-										"searchType":"on_part",
-										"typeChange":true
+										"field":smpl_v? new FieldString("clients_ref->descr"):new FieldInt("client_id"),
+										"searchType":smpl_v? "on_part":"on_match",
+										"typeChange":smpl_v
 									},
 									"form":null
 								})
@@ -137,11 +162,11 @@ function ShipmentForClientVehOwnerList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
-									"ctrlClass":EditString,
+									"ctrlClass":smpl_v? EditString:DestinationEdit,
 									"searchOptions":{
-										"field":new FieldString("destinations_ref->descr"),
-										"searchType":"on_part",
-										"typeChange":true
+										"field":smpl_v? new FieldString("destinations_ref->descr"):new FieldInt("destination_id"),
+										"searchType":smpl_v? "on_part":"on_match",
+										"typeChange":smpl_v
 									},
 									"form":null
 								})

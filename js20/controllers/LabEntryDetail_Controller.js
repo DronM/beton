@@ -39,14 +39,20 @@ extend(LabEntryDetail_Controller,ControllerObjServer);
 	var pm = this.getInsert();
 	
 	var options = {};
-	options.alias = "Отгрузка";options.primaryKey = true;options.required = true;
-	var field = new FieldInt("shipment_id",options);
+	options.alias = "Код";options.primaryKey = true;options.autoInc = true;
+	var field = new FieldInt("id_key",options);
 	
 	pm.addField(field);
 	
 	var options = {};
-	options.primaryKey = true;options.required = true;
+	options.alias = "Код";
 	var field = new FieldInt("id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Отгрузка";options.required = true;
+	var field = new FieldInt("shipment_id",options);
 	
 	pm.addField(field);
 	
@@ -68,6 +74,8 @@ extend(LabEntryDetail_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	pm.addField(new FieldInt("ret_id",{}));
+	
 	
 }
 
@@ -76,21 +84,24 @@ extend(LabEntryDetail_Controller,ControllerObjServer);
 	var pm = this.getUpdate();
 	
 	var options = {};
-	options.alias = "Отгрузка";options.primaryKey = true;
-	var field = new FieldInt("shipment_id",options);
+	options.alias = "Код";options.primaryKey = true;options.autoInc = true;
+	var field = new FieldInt("id_key",options);
 	
 	pm.addField(field);
 	
-	field = new FieldInt("old_shipment_id",{});
+	field = new FieldInt("old_id_key",{});
 	pm.addField(field);
 	
 	var options = {};
-	options.primaryKey = true;
+	options.alias = "Код";
 	var field = new FieldInt("id",options);
 	
 	pm.addField(field);
 	
-	field = new FieldInt("old_id",{});
+	var options = {};
+	options.alias = "Отгрузка";
+	var field = new FieldInt("shipment_id",options);
+	
 	pm.addField(field);
 	
 	var options = {};
@@ -118,11 +129,8 @@ extend(LabEntryDetail_Controller,ControllerObjServer);
 	LabEntryDetail_Controller.superclass.addDelete.call(this);
 	var pm = this.getDelete();
 	var options = {"required":true};
-	options.alias = "Отгрузка";	
-	pm.addField(new FieldInt("shipment_id",options));
-	var options = {"required":true};
-		
-	pm.addField(new FieldInt("id",options));
+	options.alias = "Код";	
+	pm.addField(new FieldInt("id_key",options));
 }
 
 			LabEntryDetail_Controller.prototype.addGetList = function(){
@@ -144,10 +152,10 @@ extend(LabEntryDetail_Controller,ControllerObjServer);
 
 	var f_opts = {};
 	
-	pm.addField(new FieldInt("shipment_id",f_opts));
+	pm.addField(new FieldInt("id_key",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldInt("id",f_opts));
+	pm.addField(new FieldInt("shipment_id",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldString("code",f_opts));
@@ -192,10 +200,7 @@ extend(LabEntryDetail_Controller,ControllerObjServer);
 	var pm = this.getGetObject();
 	var f_opts = {};
 		
-	pm.addField(new FieldInt("shipment_id",f_opts));
-	var f_opts = {};
-		
-	pm.addField(new FieldInt("id",f_opts));
+	pm.addField(new FieldInt("id_key",f_opts));
 	
 	pm.addField(new FieldString("mode"));
 }

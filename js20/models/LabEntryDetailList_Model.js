@@ -29,16 +29,16 @@ function LabEntryDetailList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.shipment_id = new FieldInt("shipment_id",filed_options);
+	options.fields.id_key = new FieldInt("id_key",filed_options);
 	
 				
 	
 	var filed_options = {};
-	filed_options.primaryKey = true;	
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.id = new FieldInt("id",filed_options);
+	options.fields.shipment_id = new FieldInt("shipment_id",filed_options);
 	
 				
 	

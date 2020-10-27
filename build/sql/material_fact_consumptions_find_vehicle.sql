@@ -1,8 +1,8 @@
-﻿-- Function: material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp)
 
--- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp);
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp);
 
-CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp)
   RETURNS record AS
 $$
 	-- пытаемся определить авто по описанию элкон
@@ -20,6 +20,8 @@ $$
 	WHERE
 		sh.date_time BETWEEN in_production_dt_start-'90 minutes'::interval AND in_production_dt_start+'90 minutes'::interval
 		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND sh.production_site_id = in_production_site_id
+		
 		/*AND sh.quant-coalesce(
 			(SELECT sum(t.concrete_quant)
 			FROM productions t
@@ -37,5 +39,5 @@ $$
 $$
   LANGUAGE sql VOLATILE
   COST 100;
-ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO ;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO ;
 

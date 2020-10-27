@@ -27,6 +27,7 @@ BEGIN
 				NEW.vehicle_schedule_state_id,
 				NEW.shipment_id
 			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_site_id,
 				coalesce(
 					(SELECT v.plate::text
 					FROM production_vehicle_corrections AS p
@@ -96,13 +97,28 @@ BEGIN
 			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
 		END IF;
 		*/
-		
+		/* МЕНЯТЬ ТС ПРИ СМЕНЕ shipment_id*/
 		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
 		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
 		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
 		OR (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0))
 		OR (coalesce(NEW.concrete_quant,0)<>coalesce(OLD.concrete_quant,0))
 		THEN
+			--сменить shipment_id,vehicle_schedule_state_id
+			IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)) THEN
+				SELECT
+					vsch.vehicle_id
+					,vschst.id
+				INTO
+					NEW.vehicle_id
+					,NEW.vehicle_schedule_state_id	
+				FROM shipments AS sh
+				LEFT JOIN vehicle_schedules AS vsch ON vsch.id=sh.vehicle_schedule_id
+				LEFT JOIN vehicle_schedule_states AS vschst ON vschst.schedule_id=sh.vehicle_schedule_id AND vschst.shipment_id=sh.id
+				WHERE sh.id=NEW.shipment_id	
+				;
+			END IF;
+			
 			UPDATE material_fact_consumptions
 			SET
 				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id,

@@ -30,13 +30,15 @@ class LabEntryDetail_Controller extends ControllerSQL{
 
 		/* insert */
 		$pm = new PublicMethod('insert');
+		$param = new FieldExtInt('id'
+				,array('required'=>FALSE,
+				'alias'=>'Код'
+			));
+		$pm->addParam($param);
 		$param = new FieldExtInt('shipment_id'
 				,array('required'=>TRUE,
 				'alias'=>'Отгрузка'
 			));
-		$pm->addParam($param);
-		$param = new FieldExtInt('id'
-				,array('required'=>TRUE));
 		$pm->addParam($param);
 		$param = new FieldExtInt('ok'
 				,array(
@@ -53,6 +55,8 @@ class LabEntryDetail_Controller extends ControllerSQL{
 				'alias'=>'КН'
 			));
 		$pm->addParam($param);
+		
+		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		
 		$this->addPublicMethod($pm);
@@ -62,19 +66,25 @@ class LabEntryDetail_Controller extends ControllerSQL{
 		/* update */		
 		$pm = new PublicMethod('update');
 		
-		$pm->addParam(new FieldExtInt('old_shipment_id',array('required'=>TRUE)));
-		
-		$pm->addParam(new FieldExtInt('old_id',array('required'=>TRUE)));
+		$pm->addParam(new FieldExtInt('old_id_key',array('required'=>TRUE)));
 		
 		$pm->addParam(new FieldExtInt('obj_mode'));
-		$param = new FieldExtInt('shipment_id'
+		$param = new FieldExtInt('id_key'
 				,array(
 			
-				'alias'=>'Отгрузка'
+				'alias'=>'Код'
 			));
 			$pm->addParam($param);
 		$param = new FieldExtInt('id'
 				,array(
+			
+				'alias'=>'Код'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('shipment_id'
+				,array(
+			
+				'alias'=>'Отгрузка'
 			));
 			$pm->addParam($param);
 		$param = new FieldExtInt('ok'
@@ -96,13 +106,9 @@ class LabEntryDetail_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-			$param = new FieldExtInt('shipment_id',array(
+			$param = new FieldExtInt('id_key',array(
 			
-				'alias'=>'Отгрузка'
-			));
-			$pm->addParam($param);
-		
-			$param = new FieldExtInt('id',array(
+				'alias'=>'Код'
 			));
 			$pm->addParam($param);
 		
@@ -114,10 +120,7 @@ class LabEntryDetail_Controller extends ControllerSQL{
 		/* delete */
 		$pm = new PublicMethod('delete');
 		
-		$pm->addParam(new FieldExtInt('shipment_id'
-		));		
-		
-		$pm->addParam(new FieldExtInt('id'
+		$pm->addParam(new FieldExtInt('id_key'
 		));		
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -148,10 +151,7 @@ class LabEntryDetail_Controller extends ControllerSQL{
 		$pm = new PublicMethod('get_object');
 		$pm->addParam(new FieldExtString('mode'));
 		
-		$pm->addParam(new FieldExtInt('shipment_id'
-		));
-		
-		$pm->addParam(new FieldExtInt('id'
+		$pm->addParam(new FieldExtInt('id_key'
 		));
 		
 		

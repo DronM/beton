@@ -13,7 +13,8 @@ BEGIN
 		RETURN OLD;
 	ELSIF (TG_WHEN='AFTER' AND TG_OP='UPDATE') THEN
 		--remove sessions
-		IF (NEW.banned) THEN
+		
+		IF coalesce(NEW.banned,FALSE) AND coalesce(OLD.banned,FALSE)=FALSE  THEN
 			DELETE FROM sessions WHERE id IN (
 				SELECT session_id FROM logins
 				WHERE user_id=NEW.id

@@ -57287,3 +57287,2642 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 ALTER FUNCTION variant_storages_upsert_filter_data(in_user_id int, in_storage_name text, in_variant_name text, in_filter_data json, in_default_variant boolean) OWNER TO beton;
+
+
+-- ******************* update 20/10/2020 16:29:01 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'90 minutes'::interval AND in_production_dt_start+'90 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND sh.production_site_id = in_production_site_id
+		
+		/*AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+		*/
+	ORDER BY
+		-- the nearest shipment
+		CASE
+			WHEN in_production_dt_start>sh.date_time THEN in_production_dt_start - sh.date_time
+			ELSE sh.date_time-in_production_dt_start
+		END
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 20/10/2020 16:30:41 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+	
+		IF TG_OP='UPDATE' AND OLD.manual_correction=TRUE AND NEW.manual_correction=TRUE THEN
+			RETURN OLD;
+		END IF;	
+	
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_site_id,
+				coalesce(
+					(SELECT v.plate::text
+					FROM production_vehicle_corrections AS p
+					LEFT JOIN vehicles AS v ON v.id=p.vehicle_id
+					WHERE p.production_site_id=NEW.production_site_id AND p.production_id=NEW.production_id
+					)
+					,NEW.production_vehicle_descr
+				),
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF NEW.production_dt_end IS NOT NULL THEN
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+		END IF;
+				
+		/*
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
+				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);			
+		END IF;
+		*/
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
+		
+		IF coalesce(
+			(SELECT TRUE
+			FROM production_sites
+			WHERE id = NEW.production_site_id
+			AND NEW.production_id =ANY(missing_elkon_production_ids))
+			,FALSE
+		) THEN
+			UPDATE production_sites
+			SET
+				missing_elkon_production_ids = array_diff(missing_elkon_production_ids,ARRAY[missing_elkon_production_ids])
+			WHERE id = NEW.production_site_id
+			;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		/*
+		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		*/
+		
+		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
+		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
+		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
+		OR (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0))
+		OR (coalesce(NEW.concrete_quant,0)<>coalesce(OLD.concrete_quant,0))
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id,
+				vehicle_id = NEW.vehicle_id,
+				concrete_type_id = NEW.concrete_type_id,
+				concrete_quant = NEW.concrete_quant
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_site_id = OLD.production_site_id AND production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 20/10/2020 18:06:44 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+	
+		IF TG_OP='UPDATE' AND OLD.manual_correction=TRUE AND NEW.manual_correction=TRUE THEN
+			RETURN OLD;
+		END IF;	
+	
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_site_id,
+				coalesce(
+					(SELECT v.plate::text
+					FROM production_vehicle_corrections AS p
+					LEFT JOIN vehicles AS v ON v.id=p.vehicle_id
+					WHERE p.production_site_id=NEW.production_site_id AND p.production_id=NEW.production_id
+					)
+					,NEW.production_vehicle_descr
+				),
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF NEW.production_dt_end IS NOT NULL THEN
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+		END IF;
+				
+		/*
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
+				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);			
+		END IF;
+		*/
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
+		
+		IF coalesce(
+			(SELECT TRUE
+			FROM production_sites
+			WHERE id = NEW.production_site_id
+			AND NEW.production_id =ANY(missing_elkon_production_ids))
+			,FALSE
+		) THEN
+			UPDATE production_sites
+			SET
+				missing_elkon_production_ids = array_diff(missing_elkon_production_ids,ARRAY[missing_elkon_production_ids])
+			WHERE id = NEW.production_site_id
+			;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		/*
+		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		*/
+		/* МЕНЯТЬ ТС ПРИ СМЕНЕ shipment_id*/
+		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
+		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
+		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
+		OR (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0))
+		OR (coalesce(NEW.concrete_quant,0)<>coalesce(OLD.concrete_quant,0))
+		THEN
+			--сменить shipment_id,vehicle_schedule_state_id
+			IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)) THEN
+				SELECT
+					vsch.vehicle_id
+					,vschst.id
+				INTO
+					NEW.vehicle_id
+					,NEW.vehicle_schedule_state_id	
+				FROM shipments AS sh
+				LEFT JOIN vehicle_schedules AS vsch ON vsch.id=sh.vehicle_schedule_id
+				LEFT JOIN vehicle_schedule_states AS vschst ON vschst.schedule_id=sh.vehicle_schedule_id AND vschst.shipment_id=sh.id
+				WHERE sh.id=NEW.shipment_id	
+				;
+			END IF;
+			
+			UPDATE material_fact_consumptions
+			SET
+				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id,
+				vehicle_id = NEW.vehicle_id,
+				concrete_type_id = NEW.concrete_type_id,
+				concrete_quant = NEW.concrete_quant
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_site_id = OLD.production_site_id AND production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 26/10/2020 14:14:14 ******************
+-- View: public.lab_entry_list
+
+ DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		lab.id AS id,
+		sh.id AS shipment_id,
+		sh.date_time,
+		
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time"
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	ORDER BY sh.date_time DESC, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 26/10/2020 14:54:24 ******************
+-- View: public.lab_entry_list
+
+-- DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		lab.id AS id,
+		sh.id AS shipment_id,
+		sh.date_time,
+		
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time"
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	ORDER BY sh.date_time DESC, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 26/10/2020 15:06:50 ******************
+-- View: public.orders_make_for_lab_period_list
+
+-- DROP VIEW public.orders_make_for_lab_period_list;
+
+CREATE OR REPLACE VIEW public.orders_make_for_lab_period_list AS 
+ SELECT o.id,
+    clients_ref(cl.*) AS clients_ref,
+    destinations_ref(d.*) AS destinations_ref,
+    concrete_types_ref(concr.*) AS concrete_types_ref,
+    o.comment_text,
+    o.descr,
+    o.phone_cel,
+    o.unload_speed,
+    o.date_time,
+    o.date_time_to,
+    o.quant,
+    o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision) AS quant_rest,
+        CASE
+            WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time_to::time without time zone >= const_first_shift_start_time_val() AND o.date_time_to::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN o.quant
+            WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, o.date_time::date + (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) - o.date_time) / 60::double precision))::numeric, 2)::double precision
+            ELSE 0::double precision
+        END AS quant_ordered_day,
+        CASE
+            WHEN now()::timestamp without time zone > o.date_time AND now()::timestamp without time zone < o.date_time_to THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, now()::timestamp without time zone::timestamp with time zone - o.date_time::timestamp with time zone) / 60::double precision))::numeric, 2)::double precision
+            WHEN now()::timestamp without time zone > o.date_time_to THEN o.quant
+            ELSE 0::double precision
+        END AS quant_ordered_before_now,
+    ( SELECT COALESCE(sum(shipments.quant), 0::double precision) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.ship_date_time < now()::timestamp without time zone) AS quant_shipped_before_now,
+    ( SELECT COALESCE(sum(shipments.quant), 0::double precision) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.ship_date_time::time without time zone >= constant_first_shift_start_time() AND shipments.ship_date_time::time without time zone <= (const_first_shift_start_time_val()::interval + const_day_shift_length_val())) AS quant_shipped_day_before_now,
+        CASE
+            WHEN (o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+               FROM shipments
+              WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision)) > 0::double precision AND (now()::timestamp without time zone::timestamp with time zone - (( SELECT shipments.ship_date_time
+               FROM shipments
+              WHERE shipments.order_id = o.id AND shipments.shipped
+              ORDER BY shipments.ship_date_time DESC
+             LIMIT 1))::timestamp with time zone) > const_ord_mark_if_no_ship_time_val()::interval THEN true
+            ELSE false
+        END AS no_ship_mark,
+    o.payed,
+    o.under_control,
+    o.pay_cash,
+        CASE
+            WHEN o.pay_cash THEN o.total
+            ELSE 0::numeric
+        END AS total,
+    vh.owner AS pump_vehicle_owner,
+    o.unload_type,
+    ( SELECT (owners."row" -> 'fields'::text) -> 'owner'::text
+           FROM ( SELECT jsonb_array_elements(vh.vehicle_owners -> 'rows'::text) AS "row") owners
+          WHERE o.date_time >= (((owners."row" -> 'fields'::text) ->> 'dt_from'::text)::timestamp without time zone)
+          ORDER BY (((owners."row" -> 'fields'::text) ->> 'dt_from'::text)::timestamp without time zone) DESC
+         LIMIT 1) AS pump_vehicle_owners_ref,
+    pvh.pump_length AS pump_vehicle_length,
+    pvh.comment_text AS pump_vehicle_comment,
+    
+    --ADDED
+    (need_t.need_cnt > 0) AS is_needed  
+    
+   FROM orders o
+     LEFT JOIN clients cl ON cl.id = o.client_id
+     LEFT JOIN destinations d ON d.id = o.destination_id
+     LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+     LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+     LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+     
+  --ADDED   
+  LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = o.concrete_type_id   
+     
+  ORDER BY o.date_time
+  ;
+	
+ALTER TABLE public.orders_make_for_lab_period_list OWNER TO beton;
+
+
+
+-- ******************* update 26/10/2020 15:11:13 ******************
+-- View: public.lab_entry_30days
+
+-- DROP VIEW public.lab_entry_30days;
+
+CREATE OR REPLACE VIEW public.lab_entry_30days
+ AS
+ WITH start_h AS (
+         SELECT date_part('hour'::text, const_first_shift_start_time_val()) AS h
+        ), end_h AS (
+         SELECT date_part('hour'::text, const_first_shift_start_time_val()) + date_part('hour'::text, const_day_shift_length_val()) AS h
+        ), sub AS (
+         SELECT det.concrete_type_id,
+            ct.name AS concrete_name,
+            upper(substr(ct.name::text, 1, 2)) = 'ПБ'::text AS is_pb,
+            sum(det.cnt) AS cnt,
+            sum(det.day_cnt) AS day_cnt,
+            sum(det.selected_cnt) AS selected_cnt,
+            round(avg(det.ok)) AS ok,
+            round(avg(det.p7)) AS p7,
+            round(avg(det.p28)) AS p28
+           FROM ( SELECT o.concrete_type_id,
+                    1 AS cnt,
+                        CASE
+                            WHEN date_part('dow'::text, sh.ship_date_time) = 0::double precision OR date_part('dow'::text, sh.ship_date_time) = 6::double precision THEN 0
+                            WHEN date_part('hour'::text, sh.ship_date_time) < (( SELECT t.h
+                               FROM start_h t)) OR date_part('hour'::text, sh.ship_date_time) >= (( SELECT t.h
+                               FROM end_h t)) THEN 0
+                            ELSE 1
+                        END AS day_cnt,
+                        CASE
+                            WHEN date_part('dow'::text, sh.ship_date_time) > 0::double precision AND date_part('dow'::text, sh.ship_date_time) < 6::double precision AND lab.id IS NOT NULL AND (date_part('hour'::text, sh.ship_date_time) >= (( SELECT t.h
+                               FROM start_h t)) OR date_part('hour'::text, sh.ship_date_time) < (( SELECT t.h
+                               FROM end_h t))) THEN 1
+                            ELSE 0
+                        END AS selected_cnt,
+                    lab.p7,
+                    lab.p28,
+                    lab.ok
+                   FROM shipments sh
+                     LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+                     LEFT JOIN orders o ON o.id = sh.order_id
+                     LEFT JOIN concrete_types ct_1 ON ct_1.id = o.concrete_type_id
+                     LEFT JOIN lab_entry_list_view lab ON lab.shipment_id = sh.id
+                  WHERE sh.ship_date_time >= (now()::timestamp without time zone - ((const_lab_days_for_avg_val() || ' days'::text)::interval)) AND sh.ship_date_time <= now()::timestamp without time zone AND ct_1.pres_norm > 0::numeric) det
+             LEFT JOIN concrete_types ct ON ct.id = det.concrete_type_id
+          GROUP BY det.concrete_type_id, ct.name
+        )
+( SELECT sub.concrete_type_id,
+    sub.concrete_name AS concrete_type_descr,
+    sub.cnt,
+    sub.day_cnt,
+    sub.selected_cnt,
+    ( SELECT round(avg(t.selected_cnt)) AS round
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_avg_cnt,
+        CASE
+            WHEN (( SELECT round(avg(t.selected_cnt)) AS round
+               FROM sub t
+              WHERE t.is_pb = false)) > sub.selected_cnt::numeric THEN (( SELECT round(avg(t.selected_cnt)) AS round
+               FROM sub t
+              WHERE t.is_pb = false)) - sub.selected_cnt::numeric
+            ELSE (( SELECT const_lab_min_sample_count_val() AS const_lab_min_sample_count_val))::numeric
+        END AS need_cnt,
+    sub.ok,
+    sub.p7,
+    sub.p28
+   FROM sub
+  ORDER BY sub.concrete_name)
+UNION ALL
+ SELECT NULL::integer AS concrete_type_id,
+    'ИТОГИ'::character varying AS concrete_type_descr,
+    ( SELECT sum(t.cnt) AS sum
+           FROM sub t) AS cnt,
+    ( SELECT sum(t.day_cnt) AS sum
+           FROM sub t) AS day_cnt,
+    ( SELECT sum(t.selected_cnt) AS sum
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_cnt,
+    ( SELECT sum(t.selected_cnt) AS sum
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_avg_cnt,
+    0 AS need_cnt,
+    ( SELECT round(avg(t.ok)) AS round
+           FROM sub t) AS ok,
+    ( SELECT round(avg(t.p7)) AS round
+           FROM sub t) AS p7,
+    ( SELECT round(avg(t.p28)) AS round
+           FROM sub t) AS p28;
+
+ALTER TABLE public.lab_entry_30days
+    OWNER TO beton;
+
+GRANT ALL ON TABLE public.lab_entry_30days TO beton;
+GRANT SELECT ON TABLE public.lab_entry_30days TO premier;
+
+
+
+
+-- ******************* update 26/10/2020 15:11:21 ******************
+-- View: public.lab_entry_30days
+
+-- DROP VIEW public.lab_entry_30days;
+
+CREATE OR REPLACE VIEW public.lab_entry_30days
+ AS
+ WITH start_h AS (
+         SELECT date_part('hour'::text, const_first_shift_start_time_val()) AS h
+        ), end_h AS (
+         SELECT date_part('hour'::text, const_first_shift_start_time_val()) + date_part('hour'::text, const_day_shift_length_val()) AS h
+        ), sub AS (
+         SELECT det.concrete_type_id,
+            ct.name AS concrete_name,
+            upper(substr(ct.name::text, 1, 2)) = 'ПБ'::text AS is_pb,
+            sum(det.cnt) AS cnt,
+            sum(det.day_cnt) AS day_cnt,
+            sum(det.selected_cnt) AS selected_cnt,
+            round(avg(det.ok)) AS ok,
+            round(avg(det.p7)) AS p7,
+            round(avg(det.p28)) AS p28
+           FROM ( SELECT o.concrete_type_id,
+                    1 AS cnt,
+                        CASE
+                            WHEN date_part('dow'::text, sh.ship_date_time) = 0::double precision OR date_part('dow'::text, sh.ship_date_time) = 6::double precision THEN 0
+                            WHEN date_part('hour'::text, sh.ship_date_time) < (( SELECT t.h
+                               FROM start_h t)) OR date_part('hour'::text, sh.ship_date_time) >= (( SELECT t.h
+                               FROM end_h t)) THEN 0
+                            ELSE 1
+                        END AS day_cnt,
+                        CASE
+                            WHEN date_part('dow'::text, sh.ship_date_time) > 0::double precision AND date_part('dow'::text, sh.ship_date_time) < 6::double precision AND lab.id IS NOT NULL AND (date_part('hour'::text, sh.ship_date_time) >= (( SELECT t.h
+                               FROM start_h t)) OR date_part('hour'::text, sh.ship_date_time) < (( SELECT t.h
+                               FROM end_h t))) THEN 1
+                            ELSE 0
+                        END AS selected_cnt,
+                    lab.p7,
+                    lab.p28,
+                    lab.ok
+                   FROM shipments sh
+                     LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+                     LEFT JOIN orders o ON o.id = sh.order_id
+                     LEFT JOIN concrete_types ct_1 ON ct_1.id = o.concrete_type_id
+                     LEFT JOIN lab_entry_list_view lab ON lab.shipment_id = sh.id
+                  WHERE sh.ship_date_time >= (now()::timestamp without time zone - ((const_lab_days_for_avg_val() || ' days'::text)::interval)) AND sh.ship_date_time <= now()::timestamp without time zone AND ct_1.pres_norm > 0::numeric) det
+             LEFT JOIN concrete_types ct ON ct.id = det.concrete_type_id
+          GROUP BY det.concrete_type_id, ct.name
+        )
+( SELECT sub.concrete_type_id,
+    sub.concrete_name AS concrete_type_descr,
+    sub.cnt,
+    sub.day_cnt,
+    sub.selected_cnt,
+    ( SELECT round(avg(t.selected_cnt)) AS round
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_avg_cnt,
+        CASE
+            WHEN (( SELECT round(avg(t.selected_cnt)) AS round
+               FROM sub t
+              WHERE t.is_pb = false)) > sub.selected_cnt::numeric THEN (( SELECT round(avg(t.selected_cnt)) AS round
+               FROM sub t
+              WHERE t.is_pb = false)) - sub.selected_cnt::numeric
+            ELSE (( SELECT const_lab_min_sample_count_val() AS const_lab_min_sample_count_val))::numeric
+        END AS need_cnt,
+    sub.ok,
+    sub.p7,
+    sub.p28
+   FROM sub
+  ORDER BY sub.concrete_name)
+UNION ALL
+ SELECT NULL::integer AS concrete_type_id,
+    'ИТОГИ'::character varying AS concrete_type_descr,
+    ( SELECT sum(t.cnt) AS sum
+           FROM sub t) AS cnt,
+    ( SELECT sum(t.day_cnt) AS sum
+           FROM sub t) AS day_cnt,
+    ( SELECT sum(t.selected_cnt) AS sum
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_cnt,
+    ( SELECT sum(t.selected_cnt) AS sum
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_avg_cnt,
+    0 AS need_cnt,
+    ( SELECT round(avg(t.ok)) AS round
+           FROM sub t) AS ok,
+    ( SELECT round(avg(t.p7)) AS round
+           FROM sub t) AS p7,
+    ( SELECT round(avg(t.p28)) AS round
+           FROM sub t) AS p28;
+
+ALTER TABLE public.lab_entry_30days
+    OWNER TO beton;
+
+GRANT ALL ON TABLE public.lab_entry_30days TO beton;
+
+
+
+
+-- ******************* update 26/10/2020 15:18:21 ******************
+-- View: public.lab_entry_list_view
+
+-- DROP VIEW public.lab_entry_list_view;
+
+CREATE OR REPLACE VIEW public.lab_entry_list_view
+ AS
+ SELECT lab.shipment_id AS id,
+    sh.id AS shipment_id,
+    sh.date_time,
+    date5_descr(sh.date_time::date) AS ship_date_time_descr,
+    concr.id AS concrete_type_id,
+    concr.name AS concrete_type_descr,
+    ( SELECT round(avg(d.ok)) AS round
+           FROM lab_entry_details d
+          WHERE d.shipment_id = sh.id) AS ok,
+    ( SELECT round(avg(d.weight)) AS round
+           FROM lab_entry_details d
+          WHERE d.shipment_id = sh.id AND d.id >= 3) AS weight,
+    round(
+        CASE
+            WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (( SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+               FROM lab_entry_details s_lab_det
+              WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3)) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+            ELSE 0::numeric
+        END) AS p7,
+    round(
+        CASE
+            WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (( SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+               FROM lab_entry_details s_lab_det
+              WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3)) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+            ELSE 0::numeric
+        END) AS p28,
+    lab.samples,
+    lab.materials,
+    cl.id AS client_id,
+    cl.name AS client_descr,
+    cl.phone_cel AS client_phone,
+    dest.name AS destination_descr,
+    lab.ok2,
+    lab."time"
+   FROM shipments sh
+     LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+     LEFT JOIN orders o ON o.id = sh.order_id
+     LEFT JOIN clients cl ON cl.id = o.client_id
+     LEFT JOIN destinations dest ON dest.id = o.destination_id
+     LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+  ORDER BY sh.date_time, sh.id;
+
+ALTER TABLE public.lab_entry_list_view
+    OWNER TO beton;
+
+GRANT ALL ON TABLE public.lab_entry_list_view TO beton;
+GRANT SELECT ON TABLE public.lab_entry_list_view TO premier;
+
+
+
+
+-- ******************* update 26/10/2020 15:18:27 ******************
+-- View: public.lab_entry_30days
+
+-- DROP VIEW public.lab_entry_30days;
+
+CREATE OR REPLACE VIEW public.lab_entry_30days
+ AS
+ WITH
+ 	start_h AS (
+     	   SELECT date_part('hour'::text, const_first_shift_start_time_val()) AS h
+        ),
+        end_h AS (
+     	   SELECT date_part('hour'::text, const_first_shift_start_time_val()) + date_part('hour'::text, const_day_shift_length_val()) AS h
+        ),
+        sub AS (
+         SELECT
+         	det.concrete_type_id,
+		ct.name AS concrete_name,
+		upper(substr(ct.name::text, 1, 2)) = 'ПБ'::text AS is_pb,
+		sum(det.cnt) AS cnt,
+		sum(det.day_cnt) AS day_cnt,
+		sum(det.selected_cnt) AS selected_cnt,
+		round(avg(det.ok)) AS ok,
+		round(avg(det.p7)) AS p7,
+		round(avg(det.p28)) AS p28
+           FROM ( SELECT o.concrete_type_id,
+                    1 AS cnt,
+                        CASE
+                            WHEN date_part('dow'::text, sh.ship_date_time) = 0::double precision OR date_part('dow'::text, sh.ship_date_time) = 6::double precision THEN 0
+                            WHEN date_part('hour'::text, sh.ship_date_time) < (( SELECT t.h
+                               FROM start_h t)) OR date_part('hour'::text, sh.ship_date_time) >= (( SELECT t.h
+                               FROM end_h t)) THEN 0
+                            ELSE 1
+                        END AS day_cnt,
+                        CASE
+                            WHEN date_part('dow'::text, sh.ship_date_time) > 0::double precision AND date_part('dow'::text, sh.ship_date_time) < 6::double precision AND lab.id IS NOT NULL AND (date_part('hour'::text, sh.ship_date_time) >= (( SELECT t.h
+                               FROM start_h t)) OR date_part('hour'::text, sh.ship_date_time) < (( SELECT t.h
+                               FROM end_h t))) THEN 1
+                            ELSE 0
+                        END AS selected_cnt,
+                    lab.p7,
+                    lab.p28,
+                    lab.ok
+                   FROM shipments sh
+                     LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+                     LEFT JOIN orders o ON o.id = sh.order_id
+                     LEFT JOIN concrete_types ct_1 ON ct_1.id = o.concrete_type_id
+                     LEFT JOIN lab_entry_list_view lab ON lab.shipment_id = sh.id
+                  WHERE sh.ship_date_time >= (now()::timestamp without time zone - ((const_lab_days_for_avg_val() || ' days'::text)::interval)) AND sh.ship_date_time <= now()::timestamp without time zone AND ct_1.pres_norm > 0::numeric
+	) det
+             LEFT JOIN concrete_types ct ON ct.id = det.concrete_type_id
+          GROUP BY det.concrete_type_id, ct.name
+        )
+( SELECT sub.concrete_type_id,
+    sub.concrete_name AS concrete_type_descr,
+    sub.cnt,
+    sub.day_cnt,
+    sub.selected_cnt,
+    ( SELECT round(avg(t.selected_cnt)) AS round
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_avg_cnt,
+        CASE
+            WHEN (( SELECT round(avg(t.selected_cnt)) AS round
+               FROM sub t
+              WHERE t.is_pb = false)) > sub.selected_cnt::numeric THEN (( SELECT round(avg(t.selected_cnt)) AS round
+               FROM sub t
+              WHERE t.is_pb = false)) - sub.selected_cnt::numeric
+            ELSE (( SELECT const_lab_min_sample_count_val() AS const_lab_min_sample_count_val))::numeric
+        END AS need_cnt,
+    sub.ok,
+    sub.p7,
+    sub.p28
+   FROM sub
+  ORDER BY sub.concrete_name)
+UNION ALL
+ SELECT NULL::integer AS concrete_type_id,
+    'ИТОГИ'::character varying AS concrete_type_descr,
+    ( SELECT sum(t.cnt) AS sum
+           FROM sub t) AS cnt,
+    ( SELECT sum(t.day_cnt) AS sum
+           FROM sub t) AS day_cnt,
+    ( SELECT sum(t.selected_cnt) AS sum
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_cnt,
+    ( SELECT sum(t.selected_cnt) AS sum
+           FROM sub t
+          WHERE t.is_pb = false) AS selected_avg_cnt,
+    0 AS need_cnt,
+    ( SELECT round(avg(t.ok)) AS round
+           FROM sub t) AS ok,
+    ( SELECT round(avg(t.p7)) AS round
+           FROM sub t) AS p7,
+    ( SELECT round(avg(t.p28)) AS round
+           FROM sub t) AS p28;
+
+ALTER TABLE public.lab_entry_30days
+    OWNER TO beton;
+
+GRANT ALL ON TABLE public.lab_entry_30days TO beton;
+
+
+
+
+-- ******************* update 26/10/2020 15:20:48 ******************
+-- View: public.orders_make_for_lab_period_list
+
+-- DROP VIEW public.orders_make_for_lab_period_list;
+
+CREATE OR REPLACE VIEW public.orders_make_for_lab_period_list AS 
+ SELECT o.id,
+    clients_ref(cl.*) AS clients_ref,
+    destinations_ref(d.*) AS destinations_ref,
+    concrete_types_ref(concr.*) AS concrete_types_ref,
+    o.comment_text,
+    o.descr,
+    o.phone_cel,
+    o.unload_speed,
+    o.date_time,
+    o.date_time_to,
+    o.quant,
+    o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision) AS quant_rest,
+        CASE
+            WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time_to::time without time zone >= const_first_shift_start_time_val() AND o.date_time_to::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN o.quant
+            WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, o.date_time::date + (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) - o.date_time) / 60::double precision))::numeric, 2)::double precision
+            ELSE 0::double precision
+        END AS quant_ordered_day,
+        CASE
+            WHEN now()::timestamp without time zone > o.date_time AND now()::timestamp without time zone < o.date_time_to THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, now()::timestamp without time zone::timestamp with time zone - o.date_time::timestamp with time zone) / 60::double precision))::numeric, 2)::double precision
+            WHEN now()::timestamp without time zone > o.date_time_to THEN o.quant
+            ELSE 0::double precision
+        END AS quant_ordered_before_now,
+    ( SELECT COALESCE(sum(shipments.quant), 0::double precision) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.ship_date_time < now()::timestamp without time zone) AS quant_shipped_before_now,
+    ( SELECT COALESCE(sum(shipments.quant), 0::double precision) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.ship_date_time::time without time zone >= constant_first_shift_start_time() AND shipments.ship_date_time::time without time zone <= (const_first_shift_start_time_val()::interval + const_day_shift_length_val())) AS quant_shipped_day_before_now,
+        CASE
+            WHEN (o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+               FROM shipments
+              WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision)) > 0::double precision AND (now()::timestamp without time zone::timestamp with time zone - (( SELECT shipments.ship_date_time
+               FROM shipments
+              WHERE shipments.order_id = o.id AND shipments.shipped
+              ORDER BY shipments.ship_date_time DESC
+             LIMIT 1))::timestamp with time zone) > const_ord_mark_if_no_ship_time_val()::interval THEN true
+            ELSE false
+        END AS no_ship_mark,
+    o.payed,
+    o.under_control,
+    o.pay_cash,
+        CASE
+            WHEN o.pay_cash THEN o.total
+            ELSE 0::numeric
+        END AS total,
+    vh.owner AS pump_vehicle_owner,
+    o.unload_type,
+    ( SELECT (owners."row" -> 'fields'::text) -> 'owner'::text
+           FROM ( SELECT jsonb_array_elements(vh.vehicle_owners -> 'rows'::text) AS "row") owners
+          WHERE o.date_time >= (((owners."row" -> 'fields'::text) ->> 'dt_from'::text)::timestamp without time zone)
+          ORDER BY (((owners."row" -> 'fields'::text) ->> 'dt_from'::text)::timestamp without time zone) DESC
+         LIMIT 1) AS pump_vehicle_owners_ref,
+    pvh.pump_length AS pump_vehicle_length,
+    pvh.comment_text AS pump_vehicle_comment,
+    
+    --ADDED
+    (need_t.need_cnt > 0) AS is_needed  
+    
+   FROM orders o
+     LEFT JOIN clients cl ON cl.id = o.client_id
+     LEFT JOIN destinations d ON d.id = o.destination_id
+     LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+     LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+     LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+     
+  --ADDED   
+  LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = o.concrete_type_id   
+     
+  ORDER BY o.date_time
+  ;
+	
+ALTER TABLE public.orders_make_for_lab_period_list OWNER TO beton;
+
+
+
+-- ******************* update 26/10/2020 15:21:45 ******************
+-- View: public.orders_make_for_lab_period_list
+
+ DROP VIEW public.orders_make_for_lab_period_list;
+
+CREATE OR REPLACE VIEW public.orders_make_for_lab_period_list AS 
+ SELECT o.id,
+    clients_ref(cl.*) AS clients_ref,
+    destinations_ref(d.*) AS destinations_ref,
+    concrete_types_ref(concr.*) AS concrete_types_ref,
+    o.comment_text,
+    o.descr,
+    o.phone_cel,
+    o.unload_speed,
+    o.date_time,
+    o.date_time_to,
+    o.quant,
+    o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision) AS quant_rest,
+        CASE
+            WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time_to::time without time zone >= const_first_shift_start_time_val() AND o.date_time_to::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN o.quant
+            WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, o.date_time::date + (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) - o.date_time) / 60::double precision))::numeric, 2)::double precision
+            ELSE 0::double precision
+        END AS quant_ordered_day,
+        CASE
+            WHEN now()::timestamp without time zone > o.date_time AND now()::timestamp without time zone < o.date_time_to THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, now()::timestamp without time zone::timestamp with time zone - o.date_time::timestamp with time zone) / 60::double precision))::numeric, 2)::double precision
+            WHEN now()::timestamp without time zone > o.date_time_to THEN o.quant
+            ELSE 0::double precision
+        END AS quant_ordered_before_now,
+    ( SELECT COALESCE(sum(shipments.quant), 0::double precision) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.ship_date_time < now()::timestamp without time zone) AS quant_shipped_before_now,
+    ( SELECT COALESCE(sum(shipments.quant), 0::double precision) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.ship_date_time::time without time zone >= constant_first_shift_start_time() AND shipments.ship_date_time::time without time zone <= (const_first_shift_start_time_val()::interval + const_day_shift_length_val())) AS quant_shipped_day_before_now,
+        CASE
+            WHEN (o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+               FROM shipments
+              WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision)) > 0::double precision AND (now()::timestamp without time zone::timestamp with time zone - (( SELECT shipments.ship_date_time
+               FROM shipments
+              WHERE shipments.order_id = o.id AND shipments.shipped
+              ORDER BY shipments.ship_date_time DESC
+             LIMIT 1))::timestamp with time zone) > const_ord_mark_if_no_ship_time_val()::interval THEN true
+            ELSE false
+        END AS no_ship_mark,
+    o.payed,
+    o.under_control,
+    o.pay_cash,
+        CASE
+            WHEN o.pay_cash THEN o.total
+            ELSE 0::numeric
+        END AS total,
+    vh.owner AS pump_vehicle_owner,
+    o.unload_type,
+    ( SELECT (owners."row" -> 'fields'::text) -> 'owner'::text
+           FROM ( SELECT jsonb_array_elements(vh.vehicle_owners -> 'rows'::text) AS "row") owners
+          WHERE o.date_time >= (((owners."row" -> 'fields'::text) ->> 'dt_from'::text)::timestamp without time zone)
+          ORDER BY (((owners."row" -> 'fields'::text) ->> 'dt_from'::text)::timestamp without time zone) DESC
+         LIMIT 1) AS pump_vehicle_owners_ref,
+    pvh.pump_length AS pump_vehicle_length,
+    pvh.comment_text AS pump_vehicle_comment
+    
+    --ADDED
+    --,(need_t.need_cnt > 0) AS is_needed  
+    
+   FROM orders o
+     LEFT JOIN clients cl ON cl.id = o.client_id
+     LEFT JOIN destinations d ON d.id = o.destination_id
+     LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+     LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+     LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+     
+  --ADDED   
+  --LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = o.concrete_type_id   
+     
+  ORDER BY o.date_time
+  ;
+	
+ALTER TABLE public.orders_make_for_lab_period_list OWNER TO beton;
+
+
+
+-- ******************* update 26/10/2020 15:25:59 ******************
+-- View: public.orders_make_for_lab_period_list
+
+ DROP VIEW public.orders_make_for_lab_period_list;
+
+CREATE OR REPLACE VIEW public.orders_make_for_lab_period_list AS 
+ SELECT o.id,
+    clients_ref(cl.*) AS clients_ref,
+    destinations_ref(d.*) AS destinations_ref,
+    concrete_types_ref(concr.*) AS concrete_types_ref,
+    o.comment_text,
+    o.descr,
+    o.phone_cel,
+    o.unload_speed,
+    o.date_time,
+    o.date_time_to,
+    o.quant,
+    o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision) AS quant_rest,
+        CASE
+            WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time_to::time without time zone >= const_first_shift_start_time_val() AND o.date_time_to::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN o.quant
+            WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, o.date_time::date + (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) - o.date_time) / 60::double precision))::numeric, 2)::double precision
+            ELSE 0::double precision
+        END AS quant_ordered_day,
+        CASE
+            WHEN now()::timestamp without time zone > o.date_time AND now()::timestamp without time zone < o.date_time_to THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, now()::timestamp without time zone::timestamp with time zone - o.date_time::timestamp with time zone) / 60::double precision))::numeric, 2)::double precision
+            WHEN now()::timestamp without time zone > o.date_time_to THEN o.quant
+            ELSE 0::double precision
+        END AS quant_ordered_before_now,
+    ( SELECT COALESCE(sum(shipments.quant), 0::double precision) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.ship_date_time < now()::timestamp without time zone) AS quant_shipped_before_now,
+    ( SELECT COALESCE(sum(shipments.quant), 0::double precision) AS sum
+           FROM shipments
+          WHERE shipments.order_id = o.id AND shipments.ship_date_time::time without time zone >= constant_first_shift_start_time() AND shipments.ship_date_time::time without time zone <= (const_first_shift_start_time_val()::interval + const_day_shift_length_val())) AS quant_shipped_day_before_now,
+        CASE
+            WHEN (o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+               FROM shipments
+              WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision)) > 0::double precision AND (now()::timestamp without time zone::timestamp with time zone - (( SELECT shipments.ship_date_time
+               FROM shipments
+              WHERE shipments.order_id = o.id AND shipments.shipped
+              ORDER BY shipments.ship_date_time DESC
+             LIMIT 1))::timestamp with time zone) > const_ord_mark_if_no_ship_time_val()::interval THEN true
+            ELSE false
+        END AS no_ship_mark,
+    o.payed,
+    o.under_control,
+    o.pay_cash,
+        CASE
+            WHEN o.pay_cash THEN o.total
+            ELSE 0::numeric
+        END AS total,
+    vh.owner AS pump_vehicle_owner,
+    o.unload_type,
+    ( SELECT (owners."row" -> 'fields'::text) -> 'owner'::text
+           FROM ( SELECT jsonb_array_elements(vh.vehicle_owners -> 'rows'::text) AS "row") owners
+          WHERE o.date_time >= (((owners."row" -> 'fields'::text) ->> 'dt_from'::text)::timestamp without time zone)
+          ORDER BY (((owners."row" -> 'fields'::text) ->> 'dt_from'::text)::timestamp without time zone) DESC
+         LIMIT 1) AS pump_vehicle_owners_ref,
+    pvh.pump_length AS pump_vehicle_length,
+    pvh.comment_text AS pump_vehicle_comment
+    
+    --ADDED
+    ,(need_t.need_cnt > 0) AS is_needed  
+    
+   FROM orders o
+     LEFT JOIN clients cl ON cl.id = o.client_id
+     LEFT JOIN destinations d ON d.id = o.destination_id
+     LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+     LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+     LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+     
+  --ADDED   
+  LEFT JOIN lab_entry_30days need_t ON need_t.concrete_type_id = o.concrete_type_id   
+     
+  ORDER BY o.date_time
+  ;
+	
+ALTER TABLE public.orders_make_for_lab_period_list OWNER TO beton;
+
+
+
+-- ******************* update 26/10/2020 15:49:13 ******************
+-- View: public.lab_entry_detail_list
+
+ DROP VIEW public.lab_entry_detail_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_detail_list AS 
+	SELECT
+		sh.id AS shipment_id,
+		lab.id_key,
+		(sh.id::text || '/'::text) || lab.id::text AS code,
+		sh.date_time AS ship_date_time,
+		lab.ok,
+		lab.weight,
+		round(
+			CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN
+			(
+				SELECT avg(round(s_lab_det.kn::numeric / concr.mpa_ratio, 2)) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			) / concr.pres_norm * 100::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+			CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN
+			(
+				SELECT avg(round(s_lab_det.kn::numeric / concr.mpa_ratio, 2)) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			) / concr.pres_norm * 100::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		CASE
+			WHEN lab.id < 3 THEN (sh.date_time::date + '7 days'::interval)::date
+			ELSE (sh.date_time::date + '28 days'::interval)::date
+		END AS p_date,
+		
+		lab.kn,
+		round(lab.kn::numeric / concr.mpa_ratio, 2) AS mpa,
+		
+		round(
+		CASE
+			WHEN lab.id < 3 THEN
+			(
+				SELECT avg(round(s_lab_det.kn::numeric / concr.mpa_ratio, 2)) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			ELSE (
+				SELECT avg(round(s_lab_det.kn::numeric / concr.mpa_ratio, 2)) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+		END, 2) AS mpa_avg,
+		
+		concr.pres_norm
+		
+	FROM lab_entry_details lab
+	LEFT JOIN shipments sh ON sh.id = lab.shipment_id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	ORDER BY lab.shipment_id, lab.id;
+
+ALTER TABLE public.lab_entry_detail_list OWNER TO beton;
+
+
+
+-- ******************* update 26/10/2020 16:03:15 ******************
+-- Function: public.users_process()
+
+-- DROP FUNCTION public.users_process();
+
+CREATE OR REPLACE FUNCTION public.users_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		DELETE FROM logins
+		WHERE user_id = OLD.id;
+		
+		RETURN OLD;
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='UPDATE') THEN
+		--remove sessions
+		
+		IF coalesce(NEW.banned,FALSE) AND coalesce(OLD.banned,FALSE)=FALSE  THEN
+			DELETE FROM sessions WHERE id IN (
+				SELECT session_id FROM logins
+				WHERE user_id=NEW.id
+			);
+			UPDATE logins
+			SET date_time_out = now()
+			WHERE user_id=NEW.id AND date_time_out IS NULL;
+		END IF;
+		
+		RETURN NEW;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.users_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/10/2020 16:04:23 ******************
+-- Function: public.users_process()
+
+-- DROP FUNCTION public.users_process();
+
+CREATE OR REPLACE FUNCTION public.users_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		DELETE FROM logins
+		WHERE user_id = OLD.id;
+		
+		RETURN OLD;
+	ELSIF (TG_WHEN='AFTER' AND TG_OP='UPDATE') THEN
+		--remove sessions
+		
+		IF coalesce(NEW.banned,FALSE) AND coalesce(OLD.banned,FALSE)=FALSE  THEN
+			DELETE FROM sessions WHERE id IN (
+				SELECT session_id FROM logins
+				WHERE user_id=NEW.id
+			);
+			UPDATE logins
+			SET date_time_out = now()
+			WHERE user_id=NEW.id AND date_time_out IS NULL;
+		END IF;
+		
+		RETURN NEW;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.users_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 26/10/2020 16:42:49 ******************
+﻿-- Function: material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+ DROP FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone);
+
+CREATE OR REPLACE FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+  RETURNS TABLE(
+  	is_cement bool,
+  	material_name text,
+  	quant_start numeric(19,4),
+  	quant_deb numeric(19,4),
+  	quant_kred numeric(19,4),
+  	pr1_quant_kred numeric(19,4),
+  	pr2_quant_kred numeric(19,4),
+  	quant_correction numeric(19,4),
+  	quant_end numeric(19,4)
+  
+  ) AS
+$$
+	--По цементу
+	(
+	SELECT
+		TRUE AS is_cement,
+		sil.name::text AS material_name,
+		coalesce(bal_start.quant,0) AS quant_start,	
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	FROM cement_silos AS sil
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_cement_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.cement_silos_id=sil.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_deb ON ra_deb.cement_silos_id = sil.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=1 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=2 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_kred ON ra_kred.cement_silos_id = sil.id 
+	ORDER BY sil.name
+	)
+	
+	UNION ALL
+	
+	--По материалам
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id 
+	WHERE concrete_part AND NOT is_cement AND NOT coalesce(dif_store,FALSE)
+	ORDER BY ord
+	)
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone) OWNER TO beton;
+
+
+-- ******************* update 26/10/2020 16:44:29 ******************
+﻿-- Function: material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+ DROP FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone);
+
+CREATE OR REPLACE FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+  RETURNS TABLE(
+  	is_cement bool,
+  	material_name text,
+  	quant_start numeric(19,4),
+  	quant_deb numeric(19,4),
+  	quant_kred numeric(19,4),
+  	pr1_quant_kred numeric(19,4),
+  	pr2_quant_kred numeric(19,4),
+  	quant_correction numeric(19,4),
+  	quant_end numeric(19,4)
+  
+  ) AS
+$$
+	--По цементу
+	(
+	SELECT
+		TRUE AS is_cement,
+		sil.name::text AS material_name,
+		coalesce(bal_start.quant,0) AS quant_start,	
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	FROM cement_silos AS sil
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_cement_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.cement_silos_id=sil.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_deb ON ra_deb.cement_silos_id = sil.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=1 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=2 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_kred ON ra_kred.cement_silos_id = sil.id 
+	ORDER BY sil.name
+	)
+	
+	UNION ALL
+	
+	--По материалам без складов
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id 
+	WHERE concrete_part AND NOT is_cement AND NOT coalesce(dif_store,FALSE)
+	ORDER BY ord
+	)
+	
+	UNION ALL
+	
+	--По материалам с местами хранения
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id 
+	WHERE concrete_part AND NOT is_cement AND coalesce(dif_store,FALSE)=TRUE
+	ORDER BY ord
+	)
+	
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone) OWNER TO beton;
+
+
+-- ******************* update 26/10/2020 16:45:17 ******************
+﻿-- Function: material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+ DROP FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone);
+
+CREATE OR REPLACE FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+  RETURNS TABLE(
+  	is_cement bool,
+  	material_name text,
+  	quant_start numeric(19,4),
+  	quant_deb numeric(19,4),
+  	quant_kred numeric(19,4),
+  	pr1_quant_kred numeric(19,4),
+  	pr2_quant_kred numeric(19,4),
+  	quant_correction numeric(19,4),
+  	quant_end numeric(19,4)
+  
+  ) AS
+$$
+	--По цементу
+	(
+	SELECT
+		TRUE AS is_cement,
+		sil.name::text AS material_name,
+		coalesce(bal_start.quant,0) AS quant_start,	
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	FROM cement_silos AS sil
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_cement_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.cement_silos_id=sil.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_deb ON ra_deb.cement_silos_id = sil.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=1 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=2 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_kred ON ra_kred.cement_silos_id = sil.id 
+	ORDER BY sil.name
+	)
+	
+	UNION ALL
+	
+	--По материалам без складов
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id 
+	WHERE concrete_part AND NOT is_cement AND NOT coalesce(dif_store,FALSE)
+	ORDER BY ord
+	)
+	
+	UNION ALL
+	
+	--По материалам с местами хранения
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}','{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id 
+	WHERE concrete_part AND NOT is_cement AND coalesce(dif_store,FALSE)=TRUE
+	ORDER BY ord
+	)
+	
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone) OWNER TO beton;
+
+
+-- ******************* update 26/10/2020 17:01:10 ******************
+﻿-- Function: material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+ DROP FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone);
+
+CREATE OR REPLACE FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+  RETURNS TABLE(
+  	is_cement bool,
+  	material_name text,
+  	quant_start numeric(19,4),
+  	quant_deb numeric(19,4),
+  	quant_kred numeric(19,4),
+  	pr1_quant_kred numeric(19,4),
+  	pr2_quant_kred numeric(19,4),
+  	quant_correction numeric(19,4),
+  	quant_end numeric(19,4)
+  
+  ) AS
+$$
+	--По цементу
+	(
+	SELECT
+		TRUE AS is_cement,
+		sil.name::text AS material_name,
+		coalesce(bal_start.quant,0) AS quant_start,	
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	FROM cement_silos AS sil
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_cement_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.cement_silos_id=sil.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_deb ON ra_deb.cement_silos_id = sil.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=1 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=2 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_kred ON ra_kred.cement_silos_id = sil.id 
+	ORDER BY sil.name
+	)
+	
+	UNION ALL
+	
+	--По материалам без складов
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id 
+	WHERE concrete_part AND NOT is_cement AND NOT coalesce(dif_store,FALSE)
+	ORDER BY ord
+	)
+	
+	UNION ALL
+	
+	--По материалам с местами хранения
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name||' '||coalesce(st_map.store,'') AS name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}','{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.production_site_id,
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.production_site_id,ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id  AND ra_deb.production_site_id=bal_start.production_site_id
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.production_site_id,
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.production_site_id,ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id AND ra_kred.production_site_id=bal_start.production_site_id
+	
+	LEFT JOIN store_map_to_production_sites AS st_map ON st_map.production_site_id=bal_start.production_site_id
+	
+	WHERE concrete_part AND NOT is_cement AND coalesce(dif_store,FALSE)=TRUE
+	ORDER BY ord
+	)
+	
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone) OWNER TO beton;
+
+
+-- ******************* update 26/10/2020 17:01:19 ******************
+﻿-- Function: material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+ DROP FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone);
+
+CREATE OR REPLACE FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+  RETURNS TABLE(
+  	is_cement bool,
+  	material_name text,
+  	quant_start numeric(19,4),
+  	quant_deb numeric(19,4),
+  	quant_kred numeric(19,4),
+  	pr1_quant_kred numeric(19,4),
+  	pr2_quant_kred numeric(19,4),
+  	quant_correction numeric(19,4),
+  	quant_end numeric(19,4)
+  
+  ) AS
+$$
+	--По цементу
+	(
+	SELECT
+		TRUE AS is_cement,
+		sil.name::text AS material_name,
+		coalesce(bal_start.quant,0) AS quant_start,	
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	FROM cement_silos AS sil
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_cement_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.cement_silos_id=sil.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_deb ON ra_deb.cement_silos_id = sil.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.cement_silos_id,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='cement_silo_balance_reset' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=1 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN ra.doc_type<>'cement_silo_balance_reset' AND sl.production_site_id=2 THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_cement AS ra
+		LEFT JOIN cement_silos AS sl ON sl.id=ra.cement_silos_id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.cement_silos_id
+	) AS ra_kred ON ra_kred.cement_silos_id = sil.id 
+	ORDER BY sil.name
+	)
+	
+	UNION ALL
+	
+	--По материалам без складов
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id 
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id 
+	WHERE concrete_part AND NOT is_cement AND NOT coalesce(dif_store,FALSE)
+	ORDER BY ord
+	)
+	
+	UNION ALL
+	
+	--По материалам с местами хранения
+	(
+	SELECT
+		FALSE AS is_cement,
+		m.name||', '||coalesce(st_map.store,'') AS name,
+		coalesce(bal_start.quant,0) AS quant_start,
+		coalesce(ra_deb.quant,0) AS quant_deb,
+		coalesce(ra_kred.quant,0) AS quant_kred,
+		coalesce(ra_kred.pr1_quant,0) AS pr1_quant_kred,
+		coalesce(ra_kred.pr2_quant,0) AS pr2_quant_kred,
+		coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant_correction,0) AS quant_correction,
+		coalesce(bal_start.quant,0)+coalesce(ra_deb.quant,0)+coalesce(ra_deb.quant_correction,0)-coalesce(ra_kred.quant,0)-coalesce(ra_kred.quant_correction,0) AS quant_end
+	
+	FROM raw_materials AS m
+	
+	--остаток нач
+	LEFT JOIN (SELECT * FROM rg_material_facts_balance(in_date_time_from,'{}','{}')) AS bal_start ON bal_start.material_id=m.id
+	
+	--Приход
+	LEFT JOIN (
+		SELECT
+			ra.production_site_id,
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction
+			
+		FROM ra_material_facts AS ra
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND ra.deb
+		GROUP BY ra.production_site_id,ra.material_id
+	) AS ra_deb ON ra_deb.material_id = m.id  AND ra_deb.production_site_id=bal_start.production_site_id
+	
+	--Расход
+	LEFT JOIN (
+		SELECT
+			ra.production_site_id,
+			ra.material_id,
+			sum(
+				CASE
+					WHEN ra.doc_type='material_fact_balance_correction' THEN 0
+					ELSE ra.quant
+				END
+			) AS quant,
+			sum(
+				CASE
+					-- OR ra.doc_type='material_fact_consumption_correction'
+					WHEN doc_type='material_fact_balance_correction' THEN ra.quant
+					ELSE 0
+				END
+			) AS quant_correction,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=1)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=1)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr1_quant,
+			sum(
+				CASE
+					WHEN (ra.doc_type='material_fact_consumption' AND cons.production_site_id=2)
+						OR
+						(ra.doc_type='material_fact_consumption_correction' AND cons_cor.production_site_id=2)
+						THEN ra.quant
+					ELSE 0
+				END
+			) AS pr2_quant
+			
+		FROM ra_material_facts AS ra
+		LEFT JOIN material_fact_consumptions AS cons ON ra.doc_type='material_fact_consumption' AND ra.doc_id=cons.id
+		LEFT JOIN material_fact_consumption_corrections AS cons_cor ON ra.doc_type='material_fact_consumption_correction' AND ra.doc_id=cons_cor.id
+		WHERE ra.date_time BETWEEN in_date_time_from AND in_date_time_to AND NOT ra.deb
+		GROUP BY ra.production_site_id,ra.material_id
+	) AS ra_kred ON ra_kred.material_id = m.id AND ra_kred.production_site_id=bal_start.production_site_id
+	
+	LEFT JOIN store_map_to_production_sites AS st_map ON st_map.production_site_id=bal_start.production_site_id
+	
+	WHERE concrete_part AND NOT is_cement AND coalesce(dif_store,FALSE)=TRUE
+	ORDER BY ord
+	)
+	
+	;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone) OWNER TO beton;

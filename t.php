@@ -13,5 +13,8 @@ return;
 $list = json_decode(json_decode($s)->value);
 var_dump($list);
 */
-echo intval('01');
+//echo intval('01');
+
+	$h_list = implode('</br>',getallheaders());
+	echo $h_list
 ?>

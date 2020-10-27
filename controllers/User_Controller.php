@@ -643,12 +643,22 @@ class User_Controller extends ControllerSQL{
 			
 			$pubKey = uniqid();
 			
+			$headers = '';
+			$skeep_hd = ['if-modified-since','cookie','referer','connection','accept-encoding','accept-language','accept','content-length','content-type'];
+			foreach(getallheaders() as $h_k=>$h_v){
+				if(in_array(strtolower($h_k),$skeep_hd)===FALSE){
+					$headers.= ($headers=='')? '':PHP_EOL;
+					$headers.= $h_k.':'.$h_v;
+				}
+			}
+			
 			$log_ar = $this->getDbLinkMaster()->query_first(
 				sprintf("UPDATE logins SET 
 					user_id = %d,
 					pub_key = '%s',
 					date_time_in = now(),
-					set_date_time = now()
+					set_date_time = now(),
+					headers='%s'
 					FROM (
 						SELECT
 							l.id AS id
@@ -659,7 +669,10 @@ class User_Controller extends ControllerSQL{
 					) AS s
 					WHERE s.id = logins.id
 					RETURNING logins.id",
-					intval($ar['id']),$pubKey,session_id()
+					intval($ar['id']),
+					$pubKey,
+					$headers,
+					session_id()
 				)
 			);				
 			if (!$log_ar['id']){
@@ -667,13 +680,14 @@ class User_Controller extends ControllerSQL{
 				$log_ar = $this->getDbLinkMaster()->query_first(
 					sprintf(
 						"INSERT INTO logins
-						(date_time_in,ip,session_id,pub_key,user_id)
+						(date_time_in,ip,session_id,pub_key,user_id,headers)
 						VALUES(now(),'%s','%s','%s',%d)
 						RETURNING id",
 						$_SERVER["REMOTE_ADDR"],
 						session_id(),
 						$pubKey,
-						$ar['id']
+						$ar['id'],
+						$headers
 					)
 				);								
 			}
@@ -1131,6 +1145,7 @@ class User_Controller extends ControllerSQL{
 			throw new Exception('Permission denied!');
 		}
 		parent::update($pm);
+		
 	}
 
 	public function update_production_site($pm){

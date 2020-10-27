@@ -110,6 +110,7 @@ function LabEntryList_View(id,options){
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
+		"keyIds":["shipment_id"],
 		"model":model,
 		"controller":contr,
 		"editInline":true,

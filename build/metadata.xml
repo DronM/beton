@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-10-20 05:27:07</lastBuild></version>
+		<lastBuild>2020-10-27 05:46:42</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -92,6 +92,7 @@
 		<version dateOpen="2020-09-08 09:09:46" dateClose="2020-09-24 05:09:56">1.00186</version>
 		<version dateOpen="2020-10-14 12:10:35" dateClose="2020-10-16 07:10:21">1.00187</version>
 		<version dateOpen="2020-10-19 09:10:12" dateClose="2020-10-20 05:10:27">1.00188</version>
+		<version dateOpen="2020-10-26 13:10:38" dateClose="2020-10-27 05:10:46">1.00189</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -421,7 +422,7 @@
 			<field id="glyphclass" dataType="String"/>
 		</model>
 		<model id="VariantStorage" parent="ModelSQLBeton" dataTable="variant_storages" virtual="FALSE">
-			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id" required="TRUE"/>
 			<field id="storage_name" dataType="Text" required="TRUE"/>
 			<field id="variant_name" dataType="Text" required="TRUE"/>
@@ -429,6 +430,10 @@
 			<field id="filter_data" dataType="JSON"/>
 			<field id="col_visib_data" dataType="JSON"/>
 			<field id="col_order_data" dataType="JSON"/>
+			<index id="variant_storages_user_idx" unique="TRUE">
+				<field id="user_id"/>
+				<field id="storage_name"/>
+			</index>
 		</model>
 		<model id="VariantStorageList" parent="ModelSQLBeton" dataTable="variant_storages_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -2006,15 +2011,19 @@
 			<sql/>
 		</model>
 		<model id="LabEntry" parent="ModelSQLBeton" dataTable="lab_entries" virtual="FALSE">
-			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="shipment_id" dataType="Int" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
 			<field id="samples" dataType="Text" alias="Подборы"/>
 			<field id="materials" dataType="Text" alias="Материалы"/>
 			<field id="ok2" dataType="Text" alias="OK2"/>
 			<field id="time" dataType="Text" alias="Время"/>
+			<index id="lab_entries_shipment_id_idx" unique="FALSE">
+				<field id="shipment_id"/>
+			</index>
 		</model>
 		<model id="LabEntryList" parent="ModelSQLBeton" dataTable="lab_entry_list" virtual="TRUE">
 			<field id="id" dataType="Int" sysCol="TRUE"/>
-			<field id="shipment_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="shipment_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE" alias="Основной ключ! тк. lab_entry может быть NULL"/>
 			<field id="date_time" dataType="DateTime"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
@@ -2036,18 +2045,19 @@
 			<sql/>
 		</model>
 		<model id="LabEntryDetail" parent="ModelSQLBeton" dataTable="lab_entry_details" virtual="FALSE">
-			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
-			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE"/>
+			<field id="id_key" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="id" dataType="Int" required="FALSE" alias="Код"/>
+			<field id="shipment_id" dataType="Int" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
 			<field id="ok" dataType="Int" alias="ОК"/>
 			<field id="weight" dataType="Int" alias="Масса"/>
 			<field id="kn" dataType="Int" alias="КН"/>
-			<index id="lab_entry_details_shipment_id_index">
+			<index id="lab_entry_details_shipment_id_idx">
 				<field id="shipment_id"/>
 			</index>
 		</model>
 		<model id="LabEntryDetailList" parent="ModelSQLBeton" dataTable="lab_entry_detail_list" virtual="TRUE">
-			<field id="shipment_id" dataType="Int" primaryKey="TRUE"/>
-			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="id_key" dataType="Int" primaryKey="TRUE"/>
+			<field id="shipment_id" dataType="Int"/>
 			<field id="code" dataType="String"/>
 			<field id="ship_date_time" dataType="DateTime" alias="Дата"/>
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>

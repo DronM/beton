@@ -46,7 +46,7 @@ extend(VariantStorage_Controller,ControllerObjServer);
 	var pm = this.getInsert();
 	
 	var options = {};
-	options.primaryKey = true;
+	options.primaryKey = true;options.autoInc = true;
 	var field = new FieldInt("id",options);
 	
 	pm.addField(field);
@@ -92,6 +92,8 @@ extend(VariantStorage_Controller,ControllerObjServer);
 	var field = new FieldJSON("col_order_data",options);
 	
 	pm.addField(field);
+	
+	pm.addField(new FieldInt("ret_id",{}));
 	
 	
 }
@@ -261,7 +263,7 @@ extend(VariantStorage_Controller,ControllerObjServer);
 	var pm = this.getUpdate();
 	
 	var options = {};
-	options.primaryKey = true;
+	options.primaryKey = true;options.autoInc = true;
 	var field = new FieldInt("id",options);
 	
 	pm.addField(field);

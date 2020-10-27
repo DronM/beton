@@ -18,26 +18,36 @@ class LabEntryDetail_Model extends ModelSQLBeton{
 		
 		$this->setTableName("lab_entry_details");
 			
-		//*** Field shipment_id ***
+		//*** Field id_key ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
-		$f_opts['autoInc']=FALSE;
+		$f_opts['autoInc']=TRUE;
+		
+		$f_opts['alias']='Код';
+		$f_opts['id']="id_key";
+						
+		$f_id_key=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id_key",$f_opts);
+		$this->addField($f_id_key);
+		//********************
+		
+		//*** Field id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Код';
+		$f_opts['id']="id";
+						
+		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
+		$this->addField($f_id);
+		//********************
+		
+		//*** Field shipment_id ***
+		$f_opts = array();
 		
 		$f_opts['alias']='Отгрузка';
 		$f_opts['id']="shipment_id";
 						
 		$f_shipment_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_id",$f_opts);
 		$this->addField($f_shipment_id);
-		//********************
-		
-		//*** Field id ***
-		$f_opts = array();
-		$f_opts['primaryKey'] = TRUE;
-		$f_opts['autoInc']=FALSE;
-		$f_opts['id']="id";
-						
-		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
-		$this->addField($f_id);
 		//********************
 		
 		//*** Field ok ***
