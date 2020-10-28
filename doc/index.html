@@ -2156,6 +2156,8 @@
 								Да</p>
 </div>
 </div>
+<h2>complete</h2>
+<a href="#RawMaterialConsRateDateList_Model">Model: RawMaterialConsRateDateList_Model</a>
 </div>
 </div>
 <div id="RawMaterialMapToProduction_Controller" class="content_box">
@@ -5936,15 +5938,9 @@
 <h1>LabEntry_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
-<h2>id</h2>
-<div>Type:Int</div>
-<div>Primary key:TRUE</div>
-<div>Required:FALSE</div>
-<div>Length:</div>
-<div>Precision:</div>
 <h2>shipment_id</h2>
 <div>Type:Int</div>
-<div>Primary key:</div>
+<div>Primary key:TRUE</div>
 <div>Required:TRUE</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -5968,6 +5964,12 @@
 <div>Precision:</div>
 <h2>time</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>rate_date_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -6200,15 +6202,15 @@
 <h1>LabEntryList_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
-<h2>id</h2>
-<div>Type:Int</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
 <h2>shipment_id</h2>
 <div>Type:Int</div>
 <div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>samples_exist</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -6316,6 +6318,18 @@
 <div>Precision:</div>
 <h2>time</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>rate_dates_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>rate_date_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -10839,6 +10853,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>code</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="RawMaterialConsRateDateList_Model" class="content_box">
@@ -10865,6 +10885,12 @@
 <div>Precision:</div>
 <h2>name</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>code</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

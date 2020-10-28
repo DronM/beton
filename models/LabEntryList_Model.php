@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class LabEntryList_Model extends ModelSQLBeton{
@@ -22,15 +23,6 @@ class LabEntryList_Model extends ModelSQLBeton{
 		
 		$this->setTableName("lab_entry_list");
 			
-		//*** Field id ***
-		$f_opts = array();
-		$f_opts['sysCol']=TRUE;
-		$f_opts['id']="id";
-						
-		$f_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"id",$f_opts);
-		$this->addField($f_id);
-		//********************
-		
 		//*** Field shipment_id ***
 		$f_opts = array();
 		$f_opts['primaryKey'] = TRUE;
@@ -41,6 +33,16 @@ class LabEntryList_Model extends ModelSQLBeton{
 						
 		$f_shipment_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_id",$f_opts);
 		$this->addField($f_shipment_id);
+		//********************
+		
+		//*** Field samples_exist ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Подборы';
+		$f_opts['id']="samples_exist";
+						
+		$f_samples_exist=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"samples_exist",$f_opts);
+		$this->addField($f_samples_exist);
 		//********************
 		
 		//*** Field date_time ***
@@ -207,6 +209,25 @@ class LabEntryList_Model extends ModelSQLBeton{
 						
 		$f_time=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"time",$f_opts);
 		$this->addField($f_time);
+		//********************
+		
+		//*** Field rate_dates_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Подбор';
+		$f_opts['id']="rate_dates_ref";
+						
+		$f_rate_dates_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"rate_dates_ref",$f_opts);
+		$this->addField($f_rate_dates_ref);
+		//********************
+		
+		//*** Field rate_date_id ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="rate_date_id";
+						
+		$f_rate_date_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"rate_date_id",$f_opts);
+		$this->addField($f_rate_date_id);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

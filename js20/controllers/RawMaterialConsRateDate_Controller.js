@@ -30,6 +30,7 @@ function RawMaterialConsRateDate_Controller(options){
 	this.addGetList();
 	this.addGetObject();
 	this.add_recalc_consumption();
+	this.addComplete();
 		
 }
 extend(RawMaterialConsRateDate_Controller,ControllerObjServer);
@@ -54,6 +55,12 @@ extend(RawMaterialConsRateDate_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Наименование";
 	var field = new FieldText("name",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Номер подбора";
+	var field = new FieldInt("code",options);
 	
 	pm.addField(field);
 	
@@ -84,6 +91,12 @@ extend(RawMaterialConsRateDate_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Наименование";
 	var field = new FieldText("name",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Номер подбора";
+	var field = new FieldInt("code",options);
 	
 	pm.addField(field);
 	
@@ -127,6 +140,9 @@ extend(RawMaterialConsRateDate_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Комментарий";
 	pm.addField(new FieldText("name",f_opts));
+	var f_opts = {};
+	f_opts.alias = "№ подбора";
+	pm.addField(new FieldInt("code",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("dt");
 	
 }
@@ -156,6 +172,16 @@ extend(RawMaterialConsRateDate_Controller,ControllerObjServer);
 	
 			
 	this.addPublicMethod(pm);
+}
+
+			RawMaterialConsRateDate_Controller.prototype.addComplete = function(){
+	RawMaterialConsRateDate_Controller.superclass.addComplete.call(this);
+	
+	var f_opts = {};
+	f_opts.alias = "";
+	var pm = this.getComplete();
+	pm.addField(new FieldInt("code",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("code");	
 }
 
 		

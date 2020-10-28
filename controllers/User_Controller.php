@@ -645,6 +645,17 @@ class User_Controller extends ControllerSQL{
 			
 			$headers = '';
 			$skeep_hd = ['if-modified-since','cookie','referer','connection','accept-encoding','accept-language','accept','content-length','content-type'];
+			if (!function_exists('getallheaders')){
+				function getallheaders(){
+					$headers = [];
+					foreach ($_SERVER as $name => $value){
+						if (substr($name, 0, 5) == 'HTTP_'){
+							$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+						}
+					}
+					return $headers;
+				}
+			} 			
 			foreach(getallheaders() as $h_k=>$h_v){
 				if(in_array(strtolower($h_k),$skeep_hd)===FALSE){
 					$headers.= ($headers=='')? '':PHP_EOL;
@@ -681,7 +692,7 @@ class User_Controller extends ControllerSQL{
 					sprintf(
 						"INSERT INTO logins
 						(date_time_in,ip,session_id,pub_key,user_id,headers)
-						VALUES(now(),'%s','%s','%s',%d)
+						VALUES(now(),'%s','%s','%s',%d,'%s')
 						RETURNING id",
 						$_SERVER["REMOTE_ADDR"],
 						session_id(),

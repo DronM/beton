@@ -26,15 +26,6 @@ function LabEntry_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	filed_options.alias = 'Код';
-	filed_options.autoInc = true;	
-	
-	options.fields.id = new FieldInt("id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
 	filed_options.alias = 'Отгрузка';
 	filed_options.autoInc = false;	
 	
@@ -76,6 +67,15 @@ function LabEntry_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.time = new FieldText("time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Подбор';
+	filed_options.autoInc = false;	
+	
+	options.fields.rate_date_id = new FieldInt("rate_date_id",filed_options);
 	
 			
 		LabEntry_Model.superclass.constructor.call(this,id,options);

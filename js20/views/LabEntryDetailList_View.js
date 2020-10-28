@@ -41,7 +41,6 @@ function LabEntryDetailList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						/*
 						new GridCellHead(id+":grid:head:code",{
 							"value":"№",
 							"colAttrs":{"align":"center"},
@@ -56,7 +55,7 @@ function LabEntryDetailList_View(id,options){
 								})
 							]
 						})
-						,*/
+						,
 						new GridCellHead(id+":grid:head:ok",{
 							"value":"ОК",
 							"colAttrs":{"align":"center"},

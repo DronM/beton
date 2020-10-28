@@ -25,20 +25,20 @@ function LabEntryList_Model(options){
 				
 	
 	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.id = new FieldInt("id",filed_options);
-	
-				
-	
-	var filed_options = {};
 	filed_options.primaryKey = true;	
 	filed_options.alias = 'Основной ключ! тк. lab_entry может быть NULL';
 	filed_options.autoInc = false;	
 	
 	options.fields.shipment_id = new FieldInt("shipment_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Подборы';
+	filed_options.autoInc = false;	
+	
+	options.fields.samples_exist = new FieldBool("samples_exist",filed_options);
 	
 				
 	
@@ -201,6 +201,24 @@ function LabEntryList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.time = new FieldText("time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Подбор';
+	filed_options.autoInc = false;	
+	
+	options.fields.rate_dates_ref = new FieldJSON("rate_dates_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.rate_date_id = new FieldInt("rate_date_id",filed_options);
 	
 			
 		LabEntryList_Model.superclass.constructor.call(this,id,options);

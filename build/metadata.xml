@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-10-27 05:46:42</lastBuild></version>
+		<lastBuild>2020-10-28 05:59:51</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -93,6 +93,7 @@
 		<version dateOpen="2020-10-14 12:10:35" dateClose="2020-10-16 07:10:21">1.00187</version>
 		<version dateOpen="2020-10-19 09:10:12" dateClose="2020-10-20 05:10:27">1.00188</version>
 		<version dateOpen="2020-10-26 13:10:38" dateClose="2020-10-27 05:10:46">1.00189</version>
+		<version dateOpen="2020-10-27 09:10:42" dateClose="2020-10-28 05:10:59">1.00190</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -812,6 +813,7 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE" autoInc="TRUE"/>
 			<field id="dt" dataType="Date" required="TRUE" alias="Дата"/>
 			<field id="name" dataType="Text" alias="Наименование"/>
+			<field id="code" dataType="Int" alias="Номер подбора"/>
 			<index id="raw_material_cons_rate_dates_dt_index">
 				<field id="dt"/>
 			</index>
@@ -855,6 +857,7 @@
 			<field id="dt" dataType="Date" sysCol="TRUE"/>
 			<field id="period" dataType="Text" alias="Период"/>
 			<field id="name" dataType="Text" alias="Комментарий"/>
+			<field id="code" dataType="Int" alias="№ подбора"/>
 		</model>
 		<model id="PumpPrice" parent="ModelSQLBeton" dataTable="pump_prices" virtual="FALSE">
 			<field id="id" autoInc="TRUE" primaryKey="TRUE" dataType="Int"/>
@@ -2011,19 +2014,19 @@
 			<sql/>
 		</model>
 		<model id="LabEntry" parent="ModelSQLBeton" dataTable="lab_entries" virtual="FALSE">
-			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
-			<field id="shipment_id" dataType="Int" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
+			<field id="shipment_id" dataType="Int" required="TRUE" primaryKey="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
 			<field id="samples" dataType="Text" alias="Подборы"/>
 			<field id="materials" dataType="Text" alias="Материалы"/>
 			<field id="ok2" dataType="Text" alias="OK2"/>
 			<field id="time" dataType="Text" alias="Время"/>
+			<field id="rate_date_id" dataType="Int" refTable="raw_material_cons_rate_dates" refField="id" alias="Подбор"/>
 			<index id="lab_entries_shipment_id_idx" unique="FALSE">
 				<field id="shipment_id"/>
 			</index>
 		</model>
 		<model id="LabEntryList" parent="ModelSQLBeton" dataTable="lab_entry_list" virtual="TRUE">
-			<field id="id" dataType="Int" sysCol="TRUE"/>
 			<field id="shipment_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE" alias="Основной ключ! тк. lab_entry может быть NULL"/>
+			<field id="samples_exist" dataType="Bool" alias="Подборы"/>
 			<field id="date_time" dataType="DateTime"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="production_site_id" dataType="Int" sysCol="TRUE"/>
@@ -2042,6 +2045,8 @@
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
 			<field id="ok2" dataType="Text" alias="ОК2"/>
 			<field id="time" dataType="Text" alias="Время"/>
+			<field id="rate_dates_ref" dataType="JSON" alias="Подбор"/>
+			<field id="rate_date_id" dataType="Int" sysCol="TRUE"/>
 			<sql/>
 		</model>
 		<model id="LabEntryDetail" parent="ModelSQLBeton" dataTable="lab_entry_details" virtual="FALSE">
@@ -3626,6 +3631,7 @@
 			<publicMethod id="recalc_consumption">
 				<field id="period_id" dataType="Int" required="TRUE"/>
 			</publicMethod>
+			<publicMethod id="complete" modelId="RawMaterialConsRateDateList" patternFieldId="code"/>
 		</controller>
 		<controller id="RawMaterialProcurRate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="RawMaterialProcurRate"/>
@@ -4833,6 +4839,7 @@
 		<serverTemplate id="RawMaterialPriceForNormList"/>
 		<serverTemplate id="GPSTrackerList" class="list"/>
 		<serverTemplate id="StoreMapToProductionSiteList" class="list"/>
+		<serverTemplate id="LabEntryReportList"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="tmpl/FatalException.html"/>
@@ -5434,6 +5441,7 @@
 		<jsScript file="forms/OrderList_Form.js"/>
 		<jsScript file="forms/ShipmentList_Form.js"/>
 		<jsScript file="forms/RawMaterial_Form.js"/>
+		<jsScript file="forms/RawMaterialConsRateDateList_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="custom_controls/App.enums.js"/>
@@ -5519,6 +5527,7 @@
 		<jsScript file="custom_controls/ProductionSiteCmdLoadProduction.js"/>
 		<jsScript file="custom_controls/ProductionMaterialListGridInsertCmd.js"/>
 		<jsScript file="custom_controls/ProductionMaterialListGridDelCmd.js"/>
+		<jsScript file="custom_controls/RawMaterialConsRateDateEdit.js"/>
 		<jsScript file="views/rs_ru.js"/>
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->

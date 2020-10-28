@@ -59928,3 +59928,455 @@ $$
   COST 100;
 ALTER FUNCTION material_actions(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone) OWNER TO beton;
 
+
+-- ******************* update 27/10/2020 09:39:19 ******************
+-- View: public.lab_entry_list
+
+ DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		sh.id AS shipment_id,
+		sh.date_time,
+		
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time"
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	ORDER BY sh.date_time DESC, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 27/10/2020 09:57:33 ******************
+-- View: public.lab_entry_list
+
+ DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		sh.id AS shipment_id,
+		sh.date_time,
+		lab.shipment_id IS NOT NULL AS id,
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time"
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	ORDER BY sh.date_time DESC, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 27/10/2020 09:57:56 ******************
+-- View: public.lab_entry_list
+
+ DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		sh.id AS shipment_id,
+		sh.date_time,
+		lab.shipment_id IS NOT NULL AS samples_exist,
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time"
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	ORDER BY sh.date_time DESC, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 27/10/2020 12:55:02 ******************
+
+		ALTER TABLE raw_material_cons_rate_dates ADD COLUMN code int;
+
+
+
+-- ******************* update 27/10/2020 12:58:22 ******************
+-- View: raw_material_cons_rates_dates_list
+
+-- DROP VIEW raw_material_cons_rates_dates_list;
+
+CREATE OR REPLACE VIEW raw_material_cons_rates_dates_list AS 
+	SELECT
+		d_from.id,
+		d_from.dt,
+		date8_descr(d_from.dt) AS dt_descr,
+		(date8_descr(d_from.dt)::text || ' - '::text) || COALESCE(
+			( SELECT date8_descr((d_to.dt - '1 day'::interval)::date)::text AS date
+			FROM raw_material_cons_rate_dates d_to
+			WHERE d_to.dt > d_from.dt
+			ORDER BY d_to.dt
+			LIMIT 1
+			),
+			CASE
+				WHEN now()::date < d_from.dt THEN '---'::text
+				ELSE date8_descr(now()::date)::text
+			END
+		) AS period,
+		d_from.name,
+		d_from.code
+		
+	FROM raw_material_cons_rate_dates d_from
+	ORDER BY d_from.dt DESC;
+
+ALTER TABLE raw_material_cons_rates_dates_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 27/10/2020 13:09:35 ******************
+
+		ALTER TABLE lab_entries ADD COLUMN rate_date_id int REFERENCES raw_material_cons_rate_dates(id);
+
+
+
+-- ******************* update 27/10/2020 13:18:26 ******************
+-- Function: public.raw_material_cons_rate_dates_ref(raw_material_cons_rate_dates)
+
+-- DROP FUNCTION public.raw_material_cons_rate_dates_ref(raw_material_cons_rate_dates);
+
+CREATE OR REPLACE FUNCTION public.raw_material_cons_rate_dates_ref(raw_material_cons_rate_dates)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',
+			CASE
+				WHEN length(coalesce($1.code::text,''))>0 THEN
+					'№ ' || coalesce($1.code::text,'') || ','
+				ELSE ''
+			END
+			|| to_char($1.dt::date,'DD/MM/YY'),
+		'dataType','raw_material_cons_rate_dates'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.raw_material_cons_rate_dates_ref(raw_material_cons_rate_dates) OWNER TO beton;
+
+
+
+-- ******************* update 27/10/2020 13:20:17 ******************
+-- View: public.lab_entry_list
+
+ DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		sh.id AS shipment_id,
+		sh.date_time,
+		lab.shipment_id IS NOT NULL AS samples_exist,
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time",
+		
+		raw_material_cons_rate_dates_ref(rt_d) AS raw_material_cons_rate_dates_ref
+		
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	LEFT JOIN raw_material_cons_rate_dates AS rt_d ON rt_d.id = lab.rate_date_id
+	ORDER BY sh.date_time DESC, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 27/10/2020 13:35:07 ******************
+-- View: public.lab_entry_list
+
+ DROP VIEW public.lab_entry_list;
+
+CREATE OR REPLACE VIEW public.lab_entry_list AS 
+	SELECT
+		sh.id AS shipment_id,
+		sh.date_time,
+		lab.shipment_id IS NOT NULL AS samples_exist,
+		production_sites_ref(pr_site) AS production_sites_ref,
+		sh.production_site_id,
+		
+		concr.id AS concrete_type_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		(
+			SELECT round(avg(d.ok)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id
+		) AS ok,
+		
+		(
+			SELECT round(avg(d.weight)) AS round
+			FROM lab_entry_details d
+			WHERE d.shipment_id = sh.id AND d.id >= 3
+		) AS weight,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id < 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p7,
+		
+		round(
+		CASE
+			WHEN concr.pres_norm IS NOT NULL AND concr.pres_norm > 0::numeric THEN (
+			(
+				SELECT avg(s_lab_det.kn::numeric / concr.mpa_ratio) AS avg
+				FROM lab_entry_details s_lab_det
+				WHERE s_lab_det.shipment_id = sh.id AND s_lab_det.id >= 3
+			)
+			) / concr.pres_norm * 100::numeric * 2::numeric / 2::numeric
+			ELSE 0::numeric
+		END) AS p28,
+		
+		lab.samples,
+		lab.materials,
+		cl.id AS client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.phone_cel AS client_phone,
+		o.destination_id,
+		destinations_ref(dest) AS destinations_ref,
+		lab.ok2,
+		lab."time",
+		
+		raw_material_cons_rate_dates_ref(rt_d) AS raw_material_cons_rate_dates_ref,
+		lab.rate_date_id
+		
+	FROM shipments sh
+	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	LEFT JOIN raw_material_cons_rate_dates AS rt_d ON rt_d.id = lab.rate_date_id
+	ORDER BY sh.date_time DESC, sh.id;
+
+ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+

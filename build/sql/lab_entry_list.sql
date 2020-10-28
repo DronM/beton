@@ -1,13 +1,12 @@
 -- View: public.lab_entry_list
 
--- DROP VIEW public.lab_entry_list;
+ DROP VIEW public.lab_entry_list;
 
 CREATE OR REPLACE VIEW public.lab_entry_list AS 
 	SELECT
-		lab.id AS id,
 		sh.id AS shipment_id,
 		sh.date_time,
-		
+		lab.shipment_id IS NOT NULL AS samples_exist,
 		production_sites_ref(pr_site) AS production_sites_ref,
 		sh.production_site_id,
 		
@@ -57,7 +56,11 @@ CREATE OR REPLACE VIEW public.lab_entry_list AS
 		o.destination_id,
 		destinations_ref(dest) AS destinations_ref,
 		lab.ok2,
-		lab."time"
+		lab."time",
+		
+		raw_material_cons_rate_dates_ref(rt_d) AS raw_material_cons_rate_dates_ref,
+		lab.rate_date_id
+		
 	FROM shipments sh
 	LEFT JOIN lab_entries lab ON lab.shipment_id = sh.id
 	LEFT JOIN orders o ON o.id = sh.order_id
@@ -65,6 +68,7 @@ CREATE OR REPLACE VIEW public.lab_entry_list AS
 	LEFT JOIN destinations dest ON dest.id = o.destination_id
 	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
 	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
+	LEFT JOIN raw_material_cons_rate_dates AS rt_d ON rt_d.id = lab.rate_date_id
 	ORDER BY sh.date_time DESC, sh.id;
 
 ALTER TABLE public.lab_entry_list OWNER TO ;

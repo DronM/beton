@@ -51,6 +51,15 @@ function RawMaterialConsRateDate_Model(options){
 	
 	options.fields.name = new FieldText("name",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Номер подбора';
+	filed_options.autoInc = false;	
+	
+	options.fields.code = new FieldInt("code",filed_options);
+	
 			
 		RawMaterialConsRateDate_Model.superclass.constructor.call(this,id,options);
 }

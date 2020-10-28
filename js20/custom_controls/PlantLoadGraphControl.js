@@ -8,18 +8,6 @@ function PlantLoadGraphControl(id,options){
 	this.getNode().height = 60;
 	var ctx = this.getNode().getContext('2d');
 
-	if(!window.chartColors){
-		window.chartColors = {
-			red: 'rgb(255, 99, 132)',
-			orange: 'rgb(255, 159, 64)',
-			yellow: 'rgb(255, 205, 86)',
-			green: 'rgb(75, 192, 192)',
-			blue: 'rgb(54, 162, 235)',
-			purple: 'rgb(153, 102, 255)',
-			grey: 'rgb(201, 203, 207)'
-		};	
-	}
-	
 	this.m_chart = new Chart(ctx, {
 		"type":"line",
 		"options": {
@@ -84,28 +72,31 @@ PlantLoadGraphControl.prototype.setModel = function(model){
 		
 		this.m_chartDataPrevStr = chart_data_s;
 		var chart_data = CommonHelper.unserialize(chart_data_s);
+		
+		var colors = window.getApp().getChartColors();
+		
 		this.m_chart.data = {
 			"labels":chart_data.times,
 			"datasets":[
 				{"label": "Макс.загрузка",
 			    	"data":chart_data.norm,
-			    	"backgroundColor":window.chartColors.red,
-			 	"borderColor":window.chartColors.red,
+			    	"backgroundColor":colors.red,
+			 	"borderColor":colors.red,
 			 	"borderDash":[5, 5],
 			   	"borderWidth":3,
 			   	"fill":false
 				}
 				,{"label": "Заявки",
 			    	"data":chart_data.orders,
-			    	"backgroundColor":window.chartColors.green,
-			 	"borderColor":window.chartColors.green,
+			    	"backgroundColor":colors.green,
+			 	"borderColor":colors.green,
 			   	"borderWidth":4,
 			   	"fill":false
 				}
 				,{"label": "Отгрузки",
 			    	"data":chart_data.shipments,
-			    	"backgroundColor":window.chartColors.yellow,
-			 	"borderColor":window.chartColors.yellow,
+			    	"backgroundColor":colors.yellow,
+			 	"borderColor":colors.yellow,
 			   	"borderWidth":4,
 			   	"fill":false
 				}

@@ -39,6 +39,11 @@ class RawMaterialConsRateDate_Controller extends ControllerSQL{
 				'alias'=>'Наименование'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtInt('code'
+				,array(
+				'alias'=>'Номер подбора'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -67,6 +72,12 @@ class RawMaterialConsRateDate_Controller extends ControllerSQL{
 				,array(
 			
 				'alias'=>'Наименование'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtInt('code'
+				,array(
+			
+				'alias'=>'Номер подбора'
 			));
 			$pm->addParam($param);
 		
@@ -131,6 +142,17 @@ class RawMaterialConsRateDate_Controller extends ControllerSQL{
 	
 			
 		$this->addPublicMethod($pm);
+
+			
+		/* complete  */
+		$pm = new PublicMethod('complete');
+		$pm->addParam(new FieldExtString('pattern'));
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('ic'));
+		$pm->addParam(new FieldExtInt('mid'));
+		$pm->addParam(new FieldExtString('code'));		
+		$this->addPublicMethod($pm);					
+		$this->setCompleteModelId('RawMaterialConsRateDateList_Model');
 
 		
 	}	

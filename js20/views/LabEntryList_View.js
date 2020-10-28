@@ -84,7 +84,7 @@ function LabEntryList_View(id,options){
 	
 	var self = this;
 	this.addElement(
-		new EditCheckBox(id+":filter-id",{
+		new EditCheckBox(id+":filter-samples_exist",{
 			"labelCaption":"Только отобранные",
 			"labelAlign":"right",
 			"className":"col-lg-2",
@@ -94,9 +94,9 @@ function LabEntryList_View(id,options){
 				"change":function(){
 					var gr = self.getElement("grid");
 					gr.setFilter({
-						"field":"id",
-						"sign":"in",
-						"val":this.getValue()? "1":"0"
+						"field":"samples_exist",
+						"sign":"e",
+						"val":this.getValue()//? "1":"0"
 					});
 					window.setGlobalWait(true);
 					gr.onRefresh(function(){
@@ -272,6 +272,20 @@ function LabEntryList_View(id,options){
 								})
 							]
 						})
+						/*,new GridCellHead(id+":grid:head:rate_dates_ref",{
+							"value":"Подборы (справочник)",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("rate_dates_ref"),
+									"ctrlClass":RawMaterialConsRateDateEdit,
+									"ctrlBindFieldId":"rate_date_id",
+									"ctrlOptions":{
+										"labelCaption":""
+									}																		
+								})
+							]
+						})
+						*/
 						,new GridCellHead(id+":grid:head:ok2",{
 							"value":"ОК2",
 							"colAttrs":{"align":"left"},

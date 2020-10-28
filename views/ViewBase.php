@@ -1360,6 +1360,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/OrderList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ShipmentList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/RawMaterial_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/RawMaterialConsRateDateList_Form.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));
@@ -1445,6 +1446,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ProductionSiteCmdLoadProduction.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ProductionMaterialListGridInsertCmd.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ProductionMaterialListGridDelCmd.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/RawMaterialConsRateDateEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_ru.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		

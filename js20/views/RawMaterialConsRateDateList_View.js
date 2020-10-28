@@ -83,11 +83,21 @@ function RawMaterialConsRateDateList_View(id,options){
 												}	
 											]
 										}													
-									}										
-									
+									}																			
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:code",{
+							"value":"№ подбора",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("code"),
+									"ctrlClass":EditInt
+								})
+							]
+						})
+					
+						
 						,new GridCellHead(id+":grid:head:name",{
 							"value":"Комментарий",
 							"columns":[

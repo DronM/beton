@@ -46,13 +46,7 @@ extend(LabEntry_Controller,ControllerObjServer);
 	var pm = this.getInsert();
 	
 	var options = {};
-	options.alias = "Код";options.primaryKey = true;options.autoInc = true;
-	var field = new FieldInt("id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	options.alias = "Отгрузка";options.required = true;
+	options.alias = "Отгрузка";options.primaryKey = true;options.required = true;
 	var field = new FieldInt("shipment_id",options);
 	
 	pm.addField(field);
@@ -81,7 +75,11 @@ extend(LabEntry_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
-	pm.addField(new FieldInt("ret_id",{}));
+	var options = {};
+	options.alias = "Подбор";
+	var field = new FieldInt("rate_date_id",options);
+	
+	pm.addField(field);
 	
 	
 }
@@ -91,18 +89,12 @@ extend(LabEntry_Controller,ControllerObjServer);
 	var pm = this.getUpdate();
 	
 	var options = {};
-	options.alias = "Код";options.primaryKey = true;options.autoInc = true;
-	var field = new FieldInt("id",options);
-	
-	pm.addField(field);
-	
-	field = new FieldInt("old_id",{});
-	pm.addField(field);
-	
-	var options = {};
-	options.alias = "Отгрузка";
+	options.alias = "Отгрузка";options.primaryKey = true;
 	var field = new FieldInt("shipment_id",options);
 	
+	pm.addField(field);
+	
+	field = new FieldInt("old_shipment_id",{});
 	pm.addField(field);
 	
 	var options = {};
@@ -126,6 +118,12 @@ extend(LabEntry_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Время";
 	var field = new FieldText("time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Подбор";
+	var field = new FieldInt("rate_date_id",options);
 	
 	pm.addField(field);
 	
@@ -136,8 +134,8 @@ extend(LabEntry_Controller,ControllerObjServer);
 	LabEntry_Controller.superclass.addDelete.call(this);
 	var pm = this.getDelete();
 	var options = {"required":true};
-	options.alias = "Код";	
-	pm.addField(new FieldInt("id",options));
+	options.alias = "Отгрузка";	
+	pm.addField(new FieldInt("shipment_id",options));
 }
 
 			LabEntry_Controller.prototype.addGetList = function(){
@@ -158,11 +156,11 @@ extend(LabEntry_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
-	
-	pm.addField(new FieldInt("id",f_opts));
-	var f_opts = {};
 	f_opts.alias = "Основной ключ! тк. lab_entry может быть NULL";
 	pm.addField(new FieldInt("shipment_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Подборы";
+	pm.addField(new FieldBool("samples_exist",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldDateTime("date_time",f_opts));
@@ -217,6 +215,12 @@ extend(LabEntry_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Время";
 	pm.addField(new FieldText("time",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Подбор";
+	pm.addField(new FieldJSON("rate_dates_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("rate_date_id",f_opts));
 }
 
 			LabEntry_Controller.prototype.addGetObject = function(){

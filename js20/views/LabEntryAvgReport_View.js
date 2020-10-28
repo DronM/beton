@@ -13,7 +13,7 @@ function LabEntryAvgReport_View(id,options){
 	
 	var contr = new LabEntry_Controller();	
 	options.publicMethod = contr.getPublicMethod("lab_avg_report");
-	options.reportViewId = "ViewHTMLXSLT";
+	//options.reportViewId = "ViewHTMLXSLT";
 	options.templateId = "LabAvgValsReport";
 	
 	options.cmdMake = true;
@@ -135,8 +135,167 @@ function LabEntryAvgReport_View(id,options){
 			}; 
 		}
 	}		
+	
+	
+	
 	LabEntryAvgReport_View.superclass.constructor.call(this, id, options);
 	
 }
 extend(LabEntryAvgReport_View,ViewReport);
+
+LabEntryAvgReport_View.prototype.getReportType = function(){	
+	return this.m_commands.getCmdFilter().getFilter().getFilter("report_type").binding.getControl().getValue();
+}
+
+LabEntryAvgReport_View.prototype.onReport = function(){	
+
+	var is_chart = (this.getReportType()=="chart");
+	this.setReportViewId(is_chart? "ViewXML":"ViewHTMLXSLT");
+	this.m_retContentType = is_chart? "xml":"text";
+	if(window["lab_avg_report"]){
+		window["lab_avg_report"] = undefined;
+	}
+	LabEntryAvgReport_View.superclass.onReport.call(this);
+}
+
+/**
+ * respData text | xml
+ */
+LabEntryAvgReport_View.prototype.onGetReportData = function(respData){
+	
+	if(this.getReportType()=="chart"){
+		//chart
+		var m = respData.getModel("lab_avg_report");
+		
+		var chart_data = {
+			"dates":[],
+			"concrete_types":{},
+			"data_sets":[]
+		}
+		
+		var d,ct_id;
+		while(m.getNextRow()){
+			d = m.getFieldValue("date_descr");
+			
+			if(CommonHelper.inArray(d,chart_data.dates)<0){
+				chart_data.dates.push(d);
+			}
+			ct_id = "ct_"+m.getFieldValue("concrete_type_id");
+			
+			if(!chart_data.concrete_types[ct_id]){
+				chart_data.concrete_types[ct_id] = {
+					"descr":m.getFieldValue("concrete_type_descr")
+					,"vals":{}
+				};
+			}
+			chart_data.concrete_types[ct_id].vals[d] = m.getFieldValue("val");
+		}
+		chart_data.dates.sort();
+		var v;
+		var ct_ind=0;
+		var color,red_v=255,gr_v =99;
+		chart_data.data_sets = [];
+		for(var ct_id in chart_data.concrete_types){			
+			var date_vals = [];			
+			for(var i=0;i<chart_data.dates.length;i++){
+				date_vals.push(chart_data.concrete_types[ct_id].vals[chart_data.dates[i]]);				
+			}
+			color = 'rgb('+red_v+', '+gr_v+', 132)';
+			chart_data.data_sets.push({
+				"label": "Показатели "+chart_data.concrete_types[ct_id].descr,
+			    	"data":date_vals,
+			    	"backgroundColor":color,
+			 	"borderColor":color,
+			 	//"borderDash":[5, 5],
+			   	"borderWidth":1,
+			   	"fill":false
+			});
+			
+			red_v-=50;
+			if(red_v<0){
+				red_v = 0;
+			}
+			else if(red_v==0){
+				gr_v-=5;
+			}
+			ct_ind++;
+		}
+		
+		//console.log(chart_data)
+		
+		var canv = document.getElementById("avg_rep_canvas");
+		if(canv){
+			this.m_reportControl.getNode().removeChild(canv);
+		}
+		canv = document.createElement("canvas");
+		canv.id = "avg_rep_canvas";
+		this.m_reportControl.getNode().appendChild(canv);
+		canv.height = 150;
+		
+		this.m_chart = new Chart(canv.getContext("2d"), {
+			"type":"line",
+			"options": {
+				"responsive": true,
+				"elements":{
+					"point":{
+						"radius": 3
+						,"pointStyle":"circle"
+					}
+				},			
+				"title": {
+					"display": true,
+					"text": "Статистика формовки"
+				},
+				"tooltips": {
+					"mode": "index",
+					"intersect": false
+				},
+				"hover": {
+					"mode":"nearest",
+					"intersect":true
+				},
+				"scales": {
+					"xAxes":[{
+						"display": true,
+						"scaleLabel":{
+							"display":true,
+							"labelString":"Даты"
+						},
+						"gridLines":{
+							"color":"rgba(0, 0, 0, 0)",
+						}					
+					}],
+					"yAxes":[{
+						"display": true,
+						/*"ticks":{
+							"min": 0,
+			    				"max": 100,
+			    				"stepSize":20
+						},*/					
+						"scaleLabel":{
+							"display": true,
+							"labelString":"Значение"
+						},
+						"gridLines":{
+							"color":"rgba(0, 0, 0, 0)"
+						}										
+					}]
+				}
+			}	    
+		});
+
+		var colors = window.getApp().getChartColors();
+		this.m_chart.data = {
+			"labels":chart_data.dates,
+			"datasets":chart_data.data_sets
+		};
+		this.m_chart.update();		
+		
+	}
+	else{
+		//html
+		this.m_reportControl.m_node.innerHTML = respData;	
+	}
+}
+
 

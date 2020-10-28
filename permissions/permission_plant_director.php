@@ -216,6 +216,8 @@ $permissions = array();
 				
 					$permissions['RawMaterialConsRateDate_Controller_recalc_consumption']=TRUE;
 				
+					$permissions['RawMaterialConsRateDate_Controller_complete']=TRUE;
+				
 					$permissions['RawMaterialProcurRate_Controller_insert']=TRUE;
 				
 					$permissions['RawMaterialProcurRate_Controller_update']=TRUE;

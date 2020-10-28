@@ -19,7 +19,8 @@ CREATE OR REPLACE VIEW raw_material_cons_rates_dates_list AS
 				ELSE date8_descr(now()::date)::text
 			END
 		) AS period,
-		d_from.name
+		d_from.name,
+		d_from.code
 		
 	FROM raw_material_cons_rate_dates d_from
 	ORDER BY d_from.dt DESC;

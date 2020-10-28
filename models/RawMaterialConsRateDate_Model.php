@@ -49,6 +49,16 @@ class RawMaterialConsRateDate_Model extends ModelSQLBeton{
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
+		
+		//*** Field code ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Номер подбора';
+		$f_opts['id']="code";
+						
+		$f_code=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"code",$f_opts);
+		$this->addField($f_code);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

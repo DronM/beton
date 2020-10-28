@@ -59,6 +59,16 @@ class RawMaterialConsRateDateList_Model extends ModelSQLBeton{
 		$f_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
 		//********************
+		
+		//*** Field code ***
+		$f_opts = array();
+		
+		$f_opts['alias']='№ подбора';
+		$f_opts['id']="code";
+						
+		$f_code=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"code",$f_opts);
+		$this->addField($f_code);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

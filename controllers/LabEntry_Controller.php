@@ -61,8 +61,11 @@ class LabEntry_Controller extends ControllerSQL{
 				'alias'=>'Время'
 			));
 		$pm->addParam($param);
-		
-		$pm->addParam(new FieldExtInt('ret_id'));
+		$param = new FieldExtInt('rate_date_id'
+				,array(
+				'alias'=>'Подбор'
+			));
+		$pm->addParam($param);
 		
 		
 		$this->addPublicMethod($pm);
@@ -72,15 +75,9 @@ class LabEntry_Controller extends ControllerSQL{
 		/* update */		
 		$pm = new PublicMethod('update');
 		
-		$pm->addParam(new FieldExtInt('old_id',array('required'=>TRUE)));
+		$pm->addParam(new FieldExtInt('old_shipment_id',array('required'=>TRUE)));
 		
 		$pm->addParam(new FieldExtInt('obj_mode'));
-		$param = new FieldExtInt('id'
-				,array(
-			
-				'alias'=>'Код'
-			));
-			$pm->addParam($param);
 		$param = new FieldExtInt('shipment_id'
 				,array(
 			
@@ -111,10 +108,16 @@ class LabEntry_Controller extends ControllerSQL{
 				'alias'=>'Время'
 			));
 			$pm->addParam($param);
-		
-			$param = new FieldExtInt('id',array(
+		$param = new FieldExtInt('rate_date_id'
+				,array(
 			
-				'alias'=>'Код'
+				'alias'=>'Подбор'
+			));
+			$pm->addParam($param);
+		
+			$param = new FieldExtInt('shipment_id',array(
+			
+				'alias'=>'Отгрузка'
 			));
 			$pm->addParam($param);
 		
@@ -126,7 +129,7 @@ class LabEntry_Controller extends ControllerSQL{
 		/* delete */
 		$pm = new PublicMethod('delete');
 		
-		$pm->addParam(new FieldExtInt('id'
+		$pm->addParam(new FieldExtInt('shipment_id'
 		));		
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -265,7 +268,8 @@ class LabEntry_Controller extends ControllerSQL{
 
 		
 	}
-	public function modelGetList(ModelSQL $model,$pm=null){
+	
+	public function modelGetList($model,$pm=null){
 		$this->beforeSelect();
 		if (is_null($pm)){
 			$pm = $this->getPublicMethod(ControllerDb::METH_GET_LIST);		
@@ -402,18 +406,14 @@ class LabEntry_Controller extends ControllerSQL{
 	
 	private function insert_update($pm,$insert){
 		$link = $this->getDbLinkMaster();
-		$params = new ParamsSQL($pm,$link);
-		$params->addAll();
-		$pref = (!$insert)? 'old_':'';
-		
+		$shipment_id = $this->getExtVal($pm,((!$insert)? 'old_':'').'shipment_id');
 		$link->query(sprintf(
-		"SELECT lab_entry_update(
-			%d,%s,%s,%s,%s)",
-			$params->getParamById($pref.'shipment_id'),
-			$params->getParamById('samples'),
-			$params->getParamById('materials'),
-			$params->getParamById('ok2'),
-			$params->getParamById('time')
+		"SELECT lab_entry_update(%d,%s,%s,%s,%s)",
+			$shipment_id,
+			$this->getExtDbVal($pm,'samples'),
+			$this->getExtDbVal($pm,'materials'),
+			$this->getExtDbVal($pm,'ok2'),
+			$this->getExtDbVal($pm,'time')
 		));
 	}
 	public function insert($pm){
@@ -506,6 +506,9 @@ class LabEntry_Controller extends ControllerSQL{
 		$this->addNewModel($q,'lab_avg_report');
 	}
 	
+	/**
+	 * Устарел! использовать JavaScript library!
+	 */
 	private function lab_avg_report_chart($cond){
 		$concr_types = array();
 		$q = $this->lab_avg_report_data($cond,$concr_types);
@@ -599,6 +602,8 @@ class LabEntry_Controller extends ControllerSQL{
 	}	
 	public function lab_avg_report($pm){
 		$cond = new CondParamsSQL($pm,$this->getDbLink());
+		$this->lab_avg_report_table($cond);
+		/*
 		if ($cond->getVal('report_type','e')=='table'){
 			$this->lab_avg_report_table($cond);
 		}
@@ -608,6 +613,7 @@ class LabEntry_Controller extends ControllerSQL{
 		else{
 			throw new Exception("Unknown report type!");
 		}
+		*/
 	}
 	
 }
