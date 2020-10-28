@@ -78,6 +78,25 @@ function LabEntryList_View(id,options){
 				"field":new FieldInt("destination_id")}),
 			"sign":"e"		
 		}
+		,"ok":{
+			"binding":new CommandBinding({
+				"control":new EditInt(id+":filter-ctrl-ok",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"ОК:"
+				}),
+				"field":new FieldInt("ok")}),
+			"sign":"e"		
+		}
+		,"shipment_id":{
+			"binding":new CommandBinding({
+				"control":new ShipmentEdit(id+":filter-ctrl-shipment",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Отгрузка:",
+					"keyIds":["shipment_id"]
+				}),
+				"field":new FieldInt("shipment_id")}),
+			"sign":"e"		
+		}
 		
 		};
 	}
@@ -93,11 +112,17 @@ function LabEntryList_View(id,options){
 			"events":{
 				"change":function(){
 					var gr = self.getElement("grid");
-					gr.setFilter({
-						"field":"samples_exist",
-						"sign":"e",
-						"val":this.getValue()//? "1":"0"
-					});
+					var sel = this.getValue();
+					if(sel){
+						gr.setFilter({
+							"field":"samples_exist",
+							"sign":"e",
+							"val":"1"
+						});
+					}
+					else{
+						gr.unsetFilter("samples_exist"+"e");
+					}
 					window.setGlobalWait(true);
 					gr.onRefresh(function(){
 						window.setGlobalWait(false);
@@ -109,7 +134,7 @@ function LabEntryList_View(id,options){
 	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
-	this.addElement(new GridAjx(id+":grid",{
+	var grid = new GridAjx(id+":grid",{
 		"keyIds":["shipment_id"],
 		"model":model,
 		"controller":contr,
@@ -139,6 +164,10 @@ function LabEntryList_View(id,options){
 									"ctrlOptions":{
 										"labelCaption":"",
 										"enabled":false
+									},
+									"searchOptions":{
+										"field":new FieldInt("shipment_id"),
+										"searchType":"on_match"
 									},
 									"master":true,
 									"detailViewClass":LabEntryDetailList_View,
@@ -272,20 +301,23 @@ function LabEntryList_View(id,options){
 								})
 							]
 						})
-						/*,new GridCellHead(id+":grid:head:rate_dates_ref",{
+						,new GridCellHead(id+":grid:head:raw_material_cons_rate_dates_ref",{
 							"value":"Подборы (справочник)",
 							"columns":[
 								new GridColumnRef({
-									"field":model.getField("rate_dates_ref"),
+									"field":model.getField("raw_material_cons_rate_dates_ref"),
 									"ctrlClass":RawMaterialConsRateDateEdit,
 									"ctrlBindFieldId":"rate_date_id",
 									"ctrlOptions":{
-										"labelCaption":""
+										"labelCaption":"",
+										"onSelect":function(fields){
+											self.setCodeToEditForm(fields.code.getValue());
+										}
 									}																		
 								})
 							]
 						})
-						*/
+						
 						,new GridCellHead(id+":grid:head:ok2",{
 							"value":"ОК2",
 							"colAttrs":{"align":"left"},
@@ -323,10 +355,31 @@ function LabEntryList_View(id,options){
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true
-	}));	
+	});	
 	
 
-
+	//перекрытие чтобы не удалялась строка
+	
+	grid.afterServerDelRow = function(){
+		this.setEnabled(true);
+		window.showTempNote(this.NT_REC_DELETED,null,this.m_onDelOkMesTimeout);			
+		this.focus();
+		this.onRefresh();
+	}
+	
+	this.addElement(grid);
 }
 extend(LabEntryList_View,ViewAjxList);
+
+
+LabEntryList_View.prototype.setCodeToEditForm = function(code){
+	var view = this.getElement("grid").getEditViewObj();
+	if(view){
+		view.getElement("samples").setValue(code);
+	}
+}
+
+
+
+
 

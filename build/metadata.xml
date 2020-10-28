@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-10-28 05:59:51</lastBuild></version>
+		<lastBuild>2020-10-28 12:02:09</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -94,6 +94,7 @@
 		<version dateOpen="2020-10-19 09:10:12" dateClose="2020-10-20 05:10:27">1.00188</version>
 		<version dateOpen="2020-10-26 13:10:38" dateClose="2020-10-27 05:10:46">1.00189</version>
 		<version dateOpen="2020-10-27 09:10:42" dateClose="2020-10-28 05:10:59">1.00190</version>
+		<version dateOpen="2020-10-28 10:10:33" dateClose="2020-10-28 12:10:02">1.00191</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2045,7 +2046,7 @@
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
 			<field id="ok2" dataType="Text" alias="ОК2"/>
 			<field id="time" dataType="Text" alias="Время"/>
-			<field id="rate_dates_ref" dataType="JSON" alias="Подбор"/>
+			<field id="raw_material_cons_rate_dates_ref" dataType="JSON" alias="Подбор"/>
 			<field id="rate_date_id" dataType="Int" sysCol="TRUE"/>
 			<sql/>
 		</model>
@@ -3778,7 +3779,7 @@
 			</publicMethod>
 			<publicMethod id="owner_set_pump_agreed_all"/>
 			<publicMethod id="get_shipped_vihicles_list" modelId="ShippedVehicleList"/>
-			<publicMethod id="complete" modelId="OrderList" patternFieldId="id"/>
+			<publicMethod id="complete" modelId="ShipmentList" patternFieldId="id"/>
 		</controller>
 		<controller id="Login" parentId="ControllerSQL" state="TRUE" noState="TRUE">
 			<publicMethod id="get_list" modelId="LoginList"/>

@@ -63,13 +63,17 @@ function RawMaterialConsRateDateList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:period",{
+						new GridCellHead(id+":grid:head:dt",{
 							"value":"Период",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("period"),
+									"field":model.getField("dt"),
 									"ctrlClass":EditDate,
-									"ctrlBindFieldId":"dt",
+									"ctrlBindField":model.getField("dt"),
+									//"ctrlBindFieldId":"dt",
+									"formatFunction":function(fields){
+										return fields.period.getValue();
+									},
 									"master":true,
 									"detailViewClass":RawMaterialConsRateList_View,
 									"detailViewOptions":{

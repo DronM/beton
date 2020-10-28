@@ -168,13 +168,15 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$link = $this->getDbLinkMaster();
 		$shipment_id = $this->getExtVal($pm,((!$insert)? 'old_':'').'shipment_id');
 		$link->query(sprintf(
-		"SELECT lab_entry_update(%d,%s,%s,%s,%s)",
-			$shipment_id,
-			$this->getExtDbVal($pm,'samples'),
-			$this->getExtDbVal($pm,'materials'),
-			$this->getExtDbVal($pm,'ok2'),
-			$this->getExtDbVal($pm,'time')
-		));
+			"SELECT lab_entry_update(%d,%s,%s,%s,%s,%d)",
+				$shipment_id
+				,$this->getExtDbVal($pm,'samples')
+				,$this->getExtDbVal($pm,'materials')
+				,$this->getExtDbVal($pm,'ok2')
+				,$this->getExtDbVal($pm,'time')
+				,$this->getExtDbVal($pm,'rate_date_id')
+			)
+		);
 	}
 	public function insert($pm){
 		$this->insert_update($pm,TRUE);

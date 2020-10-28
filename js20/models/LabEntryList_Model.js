@@ -209,7 +209,7 @@ function LabEntryList_Model(options){
 	filed_options.alias = 'Подбор';
 	filed_options.autoInc = false;	
 	
-	options.fields.rate_dates_ref = new FieldJSON("rate_dates_ref",filed_options);
+	options.fields.raw_material_cons_rate_dates_ref = new FieldJSON("raw_material_cons_rate_dates_ref",filed_options);
 	
 				
 	

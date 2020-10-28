@@ -615,7 +615,7 @@ class Shipment_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtInt('mid'));
 		$pm->addParam(new FieldExtString('id'));		
 		$this->addPublicMethod($pm);					
-		$this->setCompleteModelId('OrderList_Model');
+		$this->setCompleteModelId('ShipmentList_Model');
 
 		
 	}

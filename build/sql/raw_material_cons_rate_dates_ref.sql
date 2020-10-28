@@ -12,10 +12,10 @@ $BODY$
 		'descr',
 			CASE
 				WHEN length(coalesce($1.code::text,''))>0 THEN
-					'№ ' || coalesce($1.code::text,'') || ','
+					'№ ' || coalesce($1.code::text,'') || ' '
 				ELSE ''
 			END
-			|| to_char($1.dt::date,'DD/MM/YY'),
+			|| 'от '||to_char($1.dt::date,'DD/MM/YY'),
 		'dataType','raw_material_cons_rate_dates'
 	);
 $BODY$

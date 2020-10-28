@@ -114,7 +114,11 @@ function MaterialFactBalanceCorretionList_View(id,options){
 								new GridColumnFloat({
 									"field":model.getField("required_balance_quant"),
 									"length":"19",
-									"precision":"4"
+									"precision":"4",
+									"ctrlClass":EditFloat,
+									"ctrlOptions":{
+										"precision":"4"
+									}
 								})
 							]
 						})

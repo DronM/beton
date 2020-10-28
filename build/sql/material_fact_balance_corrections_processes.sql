@@ -41,9 +41,17 @@ BEGIN
 		IF v_is_cement THEN
 			--ЦЕМЕНТ
 			RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
-		ELSE
-			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0)			
-					- NEW.required_balance_quant;
+		ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+		ELSE 		
+			IF v_dif_store THEN
+				--different query
+				add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+			ELSE
+				add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0);
+			END IF;
+			add_quant = add_quant - NEW.required_balance_quant;
+			
 			--RAISE EXCEPTION 'BALANCE=%',add_quant;
 			IF add_quant <> 0 THEN
 				--RAISE EXCEPTION 'add_quant=%',add_quant;
@@ -53,12 +61,7 @@ BEGIN
 				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
 				reg_material_facts.doc_id  		= NEW.id;
 				reg_material_facts.material_id		= NEW.material_id;
-				IF v_dif_store THEN
-					IF NEW.production_site_id IS NULL THEN
-						RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
-					END IF;
-					reg_material_facts.production_site_id	= NEW.production_site_id;
-				END IF;
+				reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
 				reg_material_facts.quant		= abs(add_quant);
 				PERFORM ra_material_facts_add_act(reg_material_facts);	
 			END IF;

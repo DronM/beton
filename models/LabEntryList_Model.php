@@ -211,14 +211,14 @@ class LabEntryList_Model extends ModelSQLBeton{
 		$this->addField($f_time);
 		//********************
 		
-		//*** Field rate_dates_ref ***
+		//*** Field raw_material_cons_rate_dates_ref ***
 		$f_opts = array();
 		
 		$f_opts['alias']='Подбор';
-		$f_opts['id']="rate_dates_ref";
+		$f_opts['id']="raw_material_cons_rate_dates_ref";
 						
-		$f_rate_dates_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"rate_dates_ref",$f_opts);
-		$this->addField($f_rate_dates_ref);
+		$f_raw_material_cons_rate_dates_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"raw_material_cons_rate_dates_ref",$f_opts);
+		$this->addField($f_raw_material_cons_rate_dates_ref);
 		//********************
 		
 		//*** Field rate_date_id ***

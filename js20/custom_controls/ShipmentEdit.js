@@ -15,16 +15,16 @@ function ShipmentEdit(id,options){
 	options.selectDescrIds = options.selectDescrIds || ["id"];
 	
 	//форма редактирования элемента
-	options.editWinClass = null;
+	options.editWinClass = ShipmentDialog_Form;
 	
 	options.acMinLengthForQuery = 1;
 	options.acController = new Shipment_Controller();
 	options.acModel = new ShipmentList_Model();
 	options.acPatternFieldId = options.acPatternFieldId || "id";
 	options.acKeyFields = options.acKeyFields || [options.acModel.getField("id")];
-	//options.acDescrFields = options.acDescrFields || [options.acModel.getField("number"),options.acModel.getField("date_time")];
+	//options.acDescrFields = options.acDescrFields || [options.acModel.getField("number"),options.acModel.getField("ship_date_time")];
 	options.acDescrFunction = function(fields){
-		return fields.id.getValue()+" от "+DateHelper.format(fields.date_time.getValue(),"d/m/y H:i")+" ("+fields.clients_ref.getValue().getDescr()+")";
+		return fields.id.getValue()+" от "+DateHelper.format(fields.ship_date_time.getValue(),"d/m/y H:i")+" ("+fields.clients_ref.getValue().getDescr()+")";
 	}
 	options.acICase = options.acICase || "1";
 	options.acMid = options.acMid || "1";

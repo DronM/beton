@@ -60376,3 +60376,347 @@ CREATE OR REPLACE VIEW public.lab_entry_list AS
 	ORDER BY sh.date_time DESC, sh.id;
 
 ALTER TABLE public.lab_entry_list OWNER TO beton;
+
+
+
+
+-- ******************* update 28/10/2020 11:23:57 ******************
+-- FUNCTION: public.lab_entry_update(integer, text, text, text, text)
+
+-- DROP FUNCTION public.lab_entry_update(integer, text, text, text, text);
+
+CREATE OR REPLACE FUNCTION public.lab_entry_update(
+	in_shipment_id integer,
+	in_samples text,
+	in_materials text,
+	in_ok2 text,
+	in_time text,
+	in_rate_date_id int)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
+BEGIN
+	UPDATE lab_entries
+	SET
+		samples = in_samples,
+		materials = in_materials,
+		ok2 = in_ok2,
+		time = in_time,
+		rate_date_id = in_rate_date_id
+	WHERE shipment_id=in_shipment_id;
+	IF NOT FOUND THEN
+		BEGIN
+			INSERT INTO lab_entries
+				(shipment_id,samples,materials,ok2,time,rate_date_id)
+			VALUES (in_shipment_id,in_samples,in_materials,in_ok2,in_time,in_rate_date_id);
+		EXCEPTION WHEN OTHERS THEN
+			UPDATE lab_entries
+			SET
+				samples = in_samples,
+				materials = in_materials,
+				ok2 = in_ok2,
+				time = in_time,
+				rate_date_id = in_rate_date_id
+			WHERE shipment_id=in_shipment_id;
+		END;
+	END IF;
+
+END;
+$BODY$;
+
+ALTER FUNCTION public.lab_entry_update(integer, text, text, text, text)
+    OWNER TO beton;
+
+
+
+-- ******************* update 28/10/2020 11:29:21 ******************
+-- FUNCTION: public.lab_entry_update(integer, text, text, text, text,int)
+
+-- DROP FUNCTION public.lab_entry_update(integer, text, text, text, text,int);
+
+CREATE OR REPLACE FUNCTION public.lab_entry_update(
+	in_shipment_id integer,
+	in_samples text,
+	in_materials text,
+	in_ok2 text,
+	in_time text,
+	in_rate_date_id int)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
+BEGIN
+	UPDATE lab_entries
+	SET
+		samples = in_samples,
+		materials = in_materials,
+		ok2 = in_ok2,
+		time = in_time,
+		rate_date_id = in_rate_date_id
+	WHERE shipment_id=in_shipment_id;
+	IF NOT FOUND THEN
+		BEGIN
+			INSERT INTO lab_entries
+				(shipment_id,samples,materials,ok2,time,rate_date_id)
+			VALUES (in_shipment_id,in_samples,in_materials,in_ok2,in_time,in_rate_date_id);
+		EXCEPTION WHEN OTHERS THEN
+			UPDATE lab_entries
+			SET
+				samples = in_samples,
+				materials = in_materials,
+				ok2 = in_ok2,
+				time = in_time,
+				rate_date_id = in_rate_date_id
+			WHERE shipment_id=in_shipment_id;
+		END;
+	END IF;
+
+END;
+$BODY$;
+
+ALTER FUNCTION public.lab_entry_update(integer, text, text, text, text,int)
+    OWNER TO beton;
+
+
+
+-- ******************* update 28/10/2020 11:31:38 ******************
+-- FUNCTION: public.lab_entry_update(integer, text, text, text, text,int)
+
+-- DROP FUNCTION public.lab_entry_update(integer, text, text, text, text,int);
+
+CREATE OR REPLACE FUNCTION public.lab_entry_update(
+	in_shipment_id integer,
+	in_samples text,
+	in_materials text,
+	in_ok2 text,
+	in_time text,
+	in_rate_date_id int)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
+BEGIN
+RAISE EXCEPTION 'in_rate_date_id=%',in_rate_date_id;
+	UPDATE lab_entries
+	SET
+		samples = in_samples,
+		materials = in_materials,
+		ok2 = in_ok2,
+		time = in_time,
+		rate_date_id = in_rate_date_id
+	WHERE shipment_id=in_shipment_id;
+	IF NOT FOUND THEN
+		BEGIN
+			INSERT INTO lab_entries
+				(shipment_id,samples,materials,ok2,time,rate_date_id)
+			VALUES (in_shipment_id,in_samples,in_materials,in_ok2,in_time,in_rate_date_id);
+		EXCEPTION WHEN OTHERS THEN
+			UPDATE lab_entries
+			SET
+				samples = in_samples,
+				materials = in_materials,
+				ok2 = in_ok2,
+				time = in_time,
+				rate_date_id = in_rate_date_id
+			WHERE shipment_id=in_shipment_id;
+		END;
+	END IF;
+
+END;
+$BODY$;
+
+ALTER FUNCTION public.lab_entry_update(integer, text, text, text, text,int)
+    OWNER TO beton;
+
+
+
+-- ******************* update 28/10/2020 11:32:13 ******************
+-- FUNCTION: public.lab_entry_update(integer, text, text, text, text,int)
+
+-- DROP FUNCTION public.lab_entry_update(integer, text, text, text, text,int);
+
+CREATE OR REPLACE FUNCTION public.lab_entry_update(
+	in_shipment_id integer,
+	in_samples text,
+	in_materials text,
+	in_ok2 text,
+	in_time text,
+	in_rate_date_id int)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
+BEGIN
+--RAISE EXCEPTION 'in_rate_date_id=%',in_rate_date_id;
+	UPDATE lab_entries
+	SET
+		samples = in_samples,
+		materials = in_materials,
+		ok2 = in_ok2,
+		time = in_time,
+		rate_date_id = in_rate_date_id
+	WHERE shipment_id=in_shipment_id;
+	IF NOT FOUND THEN
+		--BEGIN
+			INSERT INTO lab_entries
+				(shipment_id,samples,materials,ok2,time,rate_date_id)
+			VALUES (in_shipment_id,in_samples,in_materials,in_ok2,in_time,in_rate_date_id);
+		/*EXCEPTION WHEN OTHERS THEN
+			UPDATE lab_entries
+			SET
+				samples = in_samples,
+				materials = in_materials,
+				ok2 = in_ok2,
+				time = in_time,
+				rate_date_id = in_rate_date_id
+			WHERE shipment_id=in_shipment_id;
+		END;
+		*/
+	END IF;
+
+END;
+$BODY$;
+
+ALTER FUNCTION public.lab_entry_update(integer, text, text, text, text,int)
+    OWNER TO beton;
+
+
+
+-- ******************* update 28/10/2020 11:37:28 ******************
+-- Function: public.raw_material_cons_rate_dates_ref(raw_material_cons_rate_dates)
+
+-- DROP FUNCTION public.raw_material_cons_rate_dates_ref(raw_material_cons_rate_dates);
+
+CREATE OR REPLACE FUNCTION public.raw_material_cons_rate_dates_ref(raw_material_cons_rate_dates)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',
+			CASE
+				WHEN length(coalesce($1.code::text,''))>0 THEN
+					'№ ' || coalesce($1.code::text,'') || ' '
+				ELSE ''
+			END
+			|| 'от '||to_char($1.dt::date,'DD/MM/YY'),
+		'dataType','raw_material_cons_rate_dates'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.raw_material_cons_rate_dates_ref(raw_material_cons_rate_dates) OWNER TO beton;
+
+
+
+-- ******************* update 28/10/2020 11:53:30 ******************
+-- Function: public.material_fact_balance_corrections_process()
+
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+		
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+		
+		IF v_is_cement THEN
+			--ЦЕМЕНТ
+			RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+		ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+		ELSE 		
+			IF v_dif_store THEN
+				--different query
+				add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+			ELSE
+				add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time,ARRAY[NEW.material_id])),0);
+			END IF;
+			add_quant = add_quant - NEW.required_balance_quant;
+			
+			--RAISE EXCEPTION 'BALANCE=%',add_quant;
+			IF add_quant <> 0 THEN
+				--RAISE EXCEPTION 'add_quant=%',add_quant;
+				--register actions ra_material_facts		
+				reg_material_facts.date_time		= ra_date_time;
+				reg_material_facts.deb			= (add_quant<0);
+				reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+				reg_material_facts.doc_id  		= NEW.id;
+				reg_material_facts.material_id		= NEW.material_id;
+				reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+				reg_material_facts.quant		= abs(add_quant);
+				PERFORM ra_material_facts_add_act(reg_material_facts);	
+			END IF;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		
+		END IF;
+	
+		RETURN OLD;
+	END IF;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.material_fact_balance_corrections_process()
+  OWNER TO beton;

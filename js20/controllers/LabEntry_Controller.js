@@ -217,7 +217,7 @@ extend(LabEntry_Controller,ControllerObjServer);
 	pm.addField(new FieldText("time",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Подбор";
-	pm.addField(new FieldJSON("rate_dates_ref",f_opts));
+	pm.addField(new FieldJSON("raw_material_cons_rate_dates_ref",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("rate_date_id",f_opts));

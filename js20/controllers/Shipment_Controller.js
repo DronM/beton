@@ -873,7 +873,7 @@ extend(Shipment_Controller,ControllerObjServer);
 	Shipment_Controller.superclass.addComplete.call(this);
 	
 	var f_opts = {};
-	
+	f_opts.alias = "";
 	var pm = this.getComplete();
 	pm.addField(new FieldInt("id",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("id");	
