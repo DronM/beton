@@ -534,6 +534,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		//Lab list
 		$this->addNewModel('SELECT * FROM lab_entry_30days_2','LabEntry30DaysList_Model');
 
+		//material stores list
+		$this->addNewModel(
+			"SELECT * FROM material_store_for_order_list",
+			'MaterialStoreForOrderList_Model'
+		);
 		
 		//Assigning		
 		$this->addModel(Shipment_Controller::getAssigningModel($db_link));

@@ -80,6 +80,11 @@ function OrderMakeForLabList_View(id,options){
 			"noAutoRefresh":true
 		}));
 		
+		this.addElement(new MaterialStoreForOrderList_View(id+":material_stores",{
+			"model":options.models.MaterialStoreForOrderList_Model,
+			"listView":this
+		}));			
+		
 		//material totals
 		var model = options.models.MatTotals_Model;
 		this.addElement(new MaterialMakeOrderGrid(id+":mat_totals_grid",{
@@ -287,6 +292,8 @@ OrderMakeForLabList_View.prototype.refresh = function(callBack){
 				grid.getModel().setData(resp.getModelData("OrderMakeForLabList_Model"));
 				grid.onGetData();
 			}
+
+			self.getElement("material_stores").setData(resp.getModel("MaterialStoreForOrderList_Model"));
 
 			//materials
 			var grid = self.getElement("mat_totals_grid");

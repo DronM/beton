@@ -241,6 +241,7 @@ OrderMakeList_View.prototype.refresh = function(callBack){
 			
 			if(self.m_showProductionSites){
 				self.getElement("production_sites").setData(resp.getModel("CementSiloForOrderList_Model"));
+				self.getElement("material_stores").setData(resp.getModel("MaterialStoreForOrderList_Model"));
 			}
 			
 			//mat totals

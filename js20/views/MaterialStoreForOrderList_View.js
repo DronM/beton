@@ -17,6 +17,10 @@ function MaterialStoreForOrderList_View(id,options){
 	this.m_listView = options.listView;
 	this.setData(options.model);
 	options.templateOptions = this.getTemplateOptions();
+	options.templateOptions = options.templateOptions || {};
+	options.templateOptions.PIC_H = this.PIC_H;
+	options.templateOptions.CONT_H = this.CONT_H;
+	options.templateOptions.PIC_W = this.PIC_W;
 	
 	MaterialStoreForOrderList_View.superclass.constructor.call(this,id,"TEMPLATE",options);
 	
@@ -24,6 +28,10 @@ function MaterialStoreForOrderList_View(id,options){
 }
 //ViewObjectAjx,ViewAjxList
 extend(MaterialStoreForOrderList_View,Control);
+
+MaterialStoreForOrderList_View.prototype.PIC_H = 60;
+MaterialStoreForOrderList_View.prototype.PIC_W = 50;
+MaterialStoreForOrderList_View.prototype.CONT_H = 60;
 
 MaterialStoreForOrderList_View.prototype.setData = function(modelStores){
 	
@@ -151,8 +159,8 @@ MaterialStoreForOrderList_View.prototype.fillStores = function(){
 }
 
 MaterialStoreForOrderList_View.prototype.drawStore = function(storeNode,storeContNode,posLeft,posTop,fillPercent){
-	var store_height = 100;
-	var store_width = 100;
+	var store_height = this.PIC_H;//100
+	var store_width = this.PIC_W;//100
 	var fill_tolerance = 0;
 
 	var cx = storeNode.getContext("2d");		
@@ -182,6 +190,6 @@ MaterialStoreForOrderList_View.prototype.drawStore = function(storeNode,storeCon
 	
 	//text percent
 	DOMHelper.setText(storeContNode,fillPercent+"%");
-	storeContNode.style = "position:relative;top:-"+( (store_height)/2+35)+"px;left:"+( (store_width)/2-25)+"px";
+	storeContNode.style = "position:relative;top:-"+( (store_height)/2+100)+"px;left:5px";
 }
 
