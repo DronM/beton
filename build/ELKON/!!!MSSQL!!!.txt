@@ -1,4 +1,4 @@
-instance MSSQL10_50.GEOTEK
+п»їinstance MSSQL10_50.GEOTEK
 
 sqlcmd -S np:\\.\pipe\MSSQL$GEOTEK\sql\qury
 sqlcmd -S tcp:.\GEOTEK
@@ -13,7 +13,7 @@ go
 
 sqlcmd -S tcp:.\GEOTEK -U andreymikhalevich -P wimaf2020ii42 -d Santral
 
-Запустить службы
+Р—Р°РїСѓСЃС‚РёС‚СЊ СЃР»СѓР¶Р±С‹
 SQLServer
 SQLServerBrowser
 
@@ -25,20 +25,20 @@ TCPIP
 **************************************
 sqlcmd -S tcp:ZAVOD\SQLEXPRESS
 
-еще делал
+РµС‰Рµ РґРµР»Р°Р»
 ALTER LOGIN andreymikhalevich ENABLE
 go
 
-Поменял режим входа (authentication method)
-Реестр
-HKey_LOCAL_MACHINE\Software\MICROSOFTSQLServer\MSSQL.1\MSSQLServer\LoginMode было 1, сделал 2
-и MSSQL.2 тоже самое!
+РџРѕРјРµРЅСЏР» СЂРµР¶РёРј РІС…РѕРґР° (authentication method)
+Р РµРµСЃС‚СЂ
+HKey_LOCAL_MACHINE\Software\MICROSOFTSQLServer\MSSQL.1\MSSQLServer\LoginMode Р±С‹Р»Рѕ 1, СЃРґРµР»Р°Р» 2
+Рё MSSQL.2 С‚РѕР¶Рµ СЃР°РјРѕРµ!
 
-Для работы php5, подключение через mssql_connect
-ФАЙЛ /etc/freetds/freetds.conf
-Добавить строки в секцию global
+Р”Р»СЏ СЂР°Р±РѕС‚С‹ php5, РїРѕРґРєР»СЋС‡РµРЅРёРµ С‡РµСЂРµР· mssql_connect
+Р¤РђР™Р› /etc/freetds/freetds.conf
+Р”РѕР±Р°РІРёС‚СЊ СЃС‚СЂРѕРєРё РІ СЃРµРєС†РёСЋ global
         tds version = 7.0
         client charset = UTF8
 
-php7 sqlsrv_connect Подключение описано в настройке сервера install
+php7 sqlsrv_connect РџРѕРґРєР»СЋС‡РµРЅРёРµ РѕРїРёСЃР°РЅРѕ РІ РЅР°СЃС‚СЂРѕР№РєРµ СЃРµСЂРІРµСЂР° install
 

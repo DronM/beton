@@ -42,7 +42,7 @@ $q = "SELECT
 				Uretim.Olusturan AS user_descr
 			FROM Uretim
 			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
-			WHERE Uretim.Id=99043";
+			WHERE Uretim.Id=9904";
 //WHERE Uretim.Id=91918";
 
 //$q = "SELECT TOP 1 * FROM UretimSonuc";
