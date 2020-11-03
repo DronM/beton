@@ -60720,3 +60720,1975 @@ $BODY$
   COST 100;
 ALTER FUNCTION public.material_fact_balance_corrections_process()
   OWNER TO beton;
+
+
+
+-- ******************* update 29/10/2020 05:53:48 ******************
+-- VIEW: material_store_for_order_list
+
+--DROP VIEW material_store_for_order_list;
+
+CREATE OR REPLACE VIEW material_store_for_order_list AS
+	SELECT
+		t.production_site_id AS id,
+		mat.name AS name,
+		production_sites_ref(pst) AS production_sites_ref,
+		t.load_capacity,
+		bal.quant AS balance,
+		bal.material_id AS material_id
+		
+	FROM store_map_to_production_sites AS t	
+	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id	
+	LEFT JOIN rg_material_facts_balance(
+		'{}'::integer[],
+		(SELECT array_agg(id) FROM raw_materials WHERE dif_store)
+	) AS bal ON bal.production_site_id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=bal.material_id
+	WHERE t.load_capacity>0
+	ORDER BY pst.name,mat.name
+	;
+	
+ALTER VIEW material_store_for_order_list OWNER TO beton;
+
+
+-- ******************* update 30/10/2020 08:38:16 ******************
+-- VIEW: logins_list
+
+--DROP VIEW logins_list;
+
+CREATE OR REPLACE VIEW logins_list AS
+	SELECT
+		t.id,
+		t.date_time_in,
+		t.date_time_out,
+		t.ip,
+		t.user_id,
+		users_ref(u) AS users_ref,
+		t.pub_key,
+		t.set_date_time,
+		t.headers
+		
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	WHERE t.user_id IS NOT NULL
+	ORDER BY t.date_time_in DESC
+	;
+	
+ALTER VIEW logins_list OWNER TO beton;
+
+
+-- ******************* update 30/10/2020 09:29:07 ******************
+-- VIEW: logins_list
+
+--DROP VIEW logins_list;
+
+CREATE OR REPLACE VIEW logins_list AS
+	SELECT
+		t.id,
+		t.date_time_in,
+		t.date_time_out,
+		t.ip,
+		t.user_id,
+		users_ref(u) AS users_ref,
+		t.pub_key,
+		t.set_date_time,
+		t.headers,
+		sess.set_time AS session_set_time
+		
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	LEFT JOIN sessions AS sess ON sess.id=t.session_id
+	WHERE t.user_id IS NOT NULL
+	ORDER BY t.date_time_in DESC
+	;
+	
+ALTER VIEW logins_list OWNER TO beton;
+
+
+-- ******************* update 02/11/2020 11:21:19 ******************
+﻿-- Function: material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp)
+
+-- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp);
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'240 minutes'::interval AND in_production_dt_start+'240 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND sh.production_site_id = in_production_site_id
+		
+		/*AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+		*/
+	ORDER BY
+		-- the nearest shipment
+		CASE
+			WHEN in_production_dt_start>sh.date_time THEN in_production_dt_start - sh.date_time
+			ELSE sh.date_time-in_production_dt_start
+		END
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 12:20:23 ******************
+/*
+Function: material_fact_consumptions_find_vehicle(
+	in_production_site_id int,
+	in_production_vehicle_descr text,
+	in_production_dt_start timestamp,
+	in_production_concrete_type_id int,
+	in_production_concrete_quant numeric(19,4)
+)
+*/
+
+/*
+DROP FUNCTION material_fact_consumptions_find_vehicle(
+	in_production_site_id int,
+	in_production_vehicle_descr text,
+	in_production_dt_start timestamp,
+	in_production_concrete_type_id int,
+	in_production_concrete_quant numeric(19,4)
+ );
+*/
+
+CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(
+	in_production_site_id int,
+	in_production_vehicle_descr text,
+	in_production_dt_start timestamp,
+	in_production_concrete_type_id int,
+	in_production_concrete_quant numeric(19,4)
+)
+  RETURNS record AS
+$$
+	-- пытаемся определить авто по описанию элкон
+	-- выбираем из production_descr только числа
+	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
+
+	SELECT
+		vsch.vehicle_id AS vehicle_id,
+		vschs.id AS vehicle_schedule_state_id,
+		sh.id AS shipment_id
+	FROM shipments AS sh
+	LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+	LEFT JOIN orders AS o ON o.id=sh.order_id
+	
+	WHERE
+		sh.date_time BETWEEN in_production_dt_start-'240 minutes'::interval AND in_production_dt_start+'240 minutes'::interval
+		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
+		AND sh.production_site_id = in_production_site_id
+		
+		/*AND sh.quant-coalesce(
+			(SELECT sum(t.concrete_quant)
+			FROM productions t
+			WHERE t.shipment_id=sh.id
+			)
+		,0)>0
+		*/
+	ORDER BY
+		(o.concrete_type_id=in_production_concrete_type_id AND sh.quant::numeric(19,4)=in_production_concrete_quant) DESC
+		-- the nearest shipment
+		,CASE
+			WHEN in_production_dt_start>sh.date_time THEN in_production_dt_start - sh.date_time
+			ELSE sh.date_time-in_production_dt_start
+		END
+	LIMIT 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION material_fact_consumptions_find_vehicle(
+	in_production_site_id int,
+	in_production_vehicle_descr text,
+	in_production_dt_start timestamp,
+	in_production_concrete_type_id int,
+	in_production_concrete_quant numeric(19,4)
+) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 12:31:31 ******************
+-- VIEW: production_vehicle_corrections_list
+
+--DROP VIEW production_vehicle_corrections_list;
+
+CREATE OR REPLACE VIEW production_vehicle_corrections_list AS
+	SELECT
+		t.production_site_id
+		,production_sites_ref(p_st) AS production_sites_ref
+		,t.production_id
+		,t.vehicle_id
+		,vehicles_ref(v) AS vehicles_ref
+		,t.user_id
+		,users_ref(u) AS users_ref
+		,t.date_time
+		
+	FROM production_vehicle_corrections t
+	LEFT JOIN production_sites AS p_st ON p_st.id=t.production_site_id
+	LEFT JOIN vehicles AS v ON v.id=t.vehicle_id
+	LEFT JOIN users AS u ON u.id=t.user_id
+	ORDER BY date_time DESC
+	;
+	
+ALTER VIEW production_vehicle_corrections_list OWNER TO beton;
+
+
+-- ******************* update 02/11/2020 12:56:00 ******************
+-- Function: public.production_vehicle_corrections_process()
+
+-- DROP FUNCTION public.production_vehicle_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.production_vehicle_corrections_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_vehicle_schedule_state_id int;
+	v_shipment_id int;
+	v_production_dt_start timestamp;
+	v_production_vehicle_descr text;
+	v_vehicle_id int;
+BEGIN
+	
+	IF TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+		
+		SELECT
+			vschs.id AS vehicle_schedule_state_id,
+			sh.id AS shipment_id
+		INTO
+			v_vehicle_schedule_state_id,
+			v_shipment_id	
+		FROM shipments AS sh
+		LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+		LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+		LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+		LEFT JOIN productions AS prod ON prod.production_site_id =NEW.production_site_id AND  prod.production_id=NEW.production_id
+		WHERE
+			vsch.vehicle_id = NEW.vehicle_id
+			AND sh.date_time BETWEEN prod.production_dt_start-'240 minutes'::interval AND prod.production_dt_start+'240 minutes'::interval
+			AND sh.production_site_id = NEW.production_site_id
+		ORDER BY
+			-- the nearest shipment
+			CASE
+				WHEN prod.production_dt_start>sh.date_time THEN prod.production_dt_start - sh.date_time
+				ELSE sh.date_time-prod.production_dt_start
+			END
+		LIMIT 1;
+		
+		UPDATE productions
+		SET
+			shipment_id = v_shipment_id,
+			vehicle_schedule_state_id = v_vehicle_schedule_state_id,
+			vehicle_id = NEW.vehicle_id
+		WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id
+		;
+
+		UPDATE productions
+		SET
+			material_tolerance_violated = productions_get_mat_tolerance_violated(NEW.production_site_id,NEW.production_id)
+		WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id
+		;
+		
+		RETURN NEW;
+	
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
+		SELECT
+			production_dt_start,
+			production_vehicle_descr
+		INTO
+			v_production_dt_start,
+			v_production_vehicle_descr
+		FROM productions
+		WHERE production_site_id=OLD.production_site_id AND production_id=OLD.production_id;
+		
+		--Привязка по-умолчанию
+		SELECT *
+		INTO
+			v_vehicle_id,
+			v_vehicle_schedule_state_id,
+			v_shipment_id
+		FROM material_fact_consumptions_find_vehicle(
+			OLD.production_site_id
+			,v_production_vehicle_descr
+			,v_production_dt_start
+		) AS (
+			vehicle_id int,
+			vehicle_schedule_state_id int,
+			shipment_id int
+		);		
+		
+		
+		UPDATE productions
+		SET
+			shipment_id = v_shipment_id,
+			vehicle_schedule_state_id = v_vehicle_schedule_state_id,
+			vehicle_id=v_vehicle_id
+		WHERE production_site_id=OLD.production_site_id AND production_id=OLD.production_id
+		;
+		
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.production_vehicle_corrections_process() OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 13:30:21 ******************
+-- Function: public.mat_totals(date)
+
+DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		--SELECT * FROM rg_material_facts_balance('{}')
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			now()::timestamp,
+			$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 13:47:58 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		0::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		--SELECT * FROM rg_material_facts_balance('{}')
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			now()::timestamp,
+			$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:35:04 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		0::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			--now()::timestamp,
+			get_shift_start(now()::date+'1 day'::interval),
+			$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:35:52 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		0::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			now()::timestamp,
+			--get_shift_start(now()::date+'1 day'::interval),
+			$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:41:35 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	WITH
+	shift_time_from AS (SELECT $1+const_first_shift_start_time_val() AS v)
+	,shift_time_to AS (SELECT shift_time_from.v AS v FROM shift_time_from)
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		0::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()
+		FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN (SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+					--get_shift_start(now()::date+'1 day'::interval)
+				--AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			--now()::timestamp,
+			--get_shift_start(now()::date+'1 day'::interval),
+			--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+			(SELECT shift_time_from.v FROM shift_time_from)
+			,(SELECT shift_time_to.v FROM shift_time_to)
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:42:12 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	WITH
+	shift_time_from AS (SELECT $1+const_first_shift_start_time_val() AS v)
+	,shift_time_to AS (SELECT shift_time_from.v AS v FROM shift_time_from)
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		0::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()
+		FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN 
+			--(SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			--now()::timestamp,
+			--get_shift_start(now()::date+'1 day'::interval),
+			--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+			(SELECT shift_time_from.v FROM shift_time_from)
+			,(SELECT shift_time_to.v FROM shift_time_to)
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:43:35 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	WITH
+	shift_time_from AS (SELECT $1+const_first_shift_start_time_val() AS v)
+	,shift_time_to AS (SELECT get_shift_end(shift_time_from.v) AS v FROM shift_time_from)
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		0::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()
+		FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN 
+			--(SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+				get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			--now()::timestamp,
+			--get_shift_start(now()::date+'1 day'::interval),
+			--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+			(SELECT shift_time_from.v FROM shift_time_from)
+			,(SELECT shift_time_to.v FROM shift_time_to)
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:44:03 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	WITH
+	shift_time_from AS (SELECT $1+const_first_shift_start_time_val() AS v)
+	,shift_time_to AS (SELECT get_shift_end(shift_time_from.v) AS v FROM shift_time_from)
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		0::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()
+		FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN (SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+				--get_shift_start(now()::date+'1 day'::interval)
+				--AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			--now()::timestamp,
+			--get_shift_start(now()::date+'1 day'::interval),
+			--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
+			(SELECT shift_time_from.v FROM shift_time_from)
+			,(SELECT shift_time_to.v FROM shift_time_to)
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:45:22 ******************
+-- Function: public.mat_totals(date)
+
+-- DROP FUNCTION public.mat_totals(date);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
+  RETURNS TABLE(
+  	material_id integer,
+  	material_descr text,
+  	quant_ordered numeric,
+  	quant_procured numeric,
+  	quant_balance numeric,
+  	quant_fact_balance numeric,
+  	quant_morn_balance numeric,--depricated
+  	quant_morn_next_balance numeric,--use instead  	
+  	quant_morn_cur_balance numeric,
+  	quant_morn_fact_cur_balance numeric,
+  	balance_corrected_data json
+  ) AS
+$BODY$
+	WITH
+	shift_time_from AS (SELECT $1+const_first_shift_start_time_val() AS v)
+	,shift_time_to AS (SELECT get_shift_end(shift_time_from.v) AS v FROM shift_time_from)
+	SELECT
+		m.id AS material_id,
+		m.name::text AS material_descr,
+		
+		--заявки поставщикам на сегодня
+		0::numeric AS quant_ordered,
+		
+		--Поставки
+		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		
+		--остатки
+		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		
+		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		
+		--остатки на завтра на утро
+		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		
+		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		
+		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		
+		--Корректировки
+		(SELECT
+			json_agg(
+				json_build_object(
+					'date_time',cr.date_time,
+					'balance_date_time',cr.balance_date_time,
+					'users_ref',users_ref(cr_u),
+					'materials_ref',materials_ref(m),
+					'required_balance_quant',cr.required_balance_quant,
+					'comment_text',cr.comment_text
+				)
+			)
+		FROM material_fact_balance_corrections AS cr
+		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+		WHERE cr.material_id=m.id AND cr.balance_date_time=(SELECT shift_time_from.v FROM shift_time_from)
+		) AS balance_corrected_data
+		
+	FROM raw_materials AS m
+
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()
+		FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval,'{}')
+	) AS bal_morn ON bal_morn.material_id=m.id
+	LEFT JOIN (
+		SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from),'{}')
+	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+	
+	LEFT JOIN (
+		SELECT *
+		--$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval,
+		FROM rg_materials_balance('{}')
+	) AS bal ON bal.material_id=m.id
+	LEFT JOIN (
+		SELECT
+			material_id,
+			sum(quant) AS quant
+		FROM rg_material_facts_balance('{}'::int[],'{}'::int[])
+		GROUP BY material_id		
+	) AS bal_fact ON bal_fact.material_id=m.id
+	
+	LEFT JOIN (
+		SELECT
+			ra.material_id,
+			sum(ra.quant) AS quant
+		FROM ra_materials ra
+		WHERE ra.date_time BETWEEN (SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+				--get_shift_start(now()::date+'1 day'::interval)
+				--AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+			AND ra.deb
+			AND ra.doc_type='material_procurement'
+		GROUP BY ra.material_id
+	) AS proc ON proc.material_id=m.id
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			plan_proc.material_id,
+			plan_proc.balance_start AS quant
+		FROM mat_plan_procur(
+			get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+			now()::timestamp,
+			now()::timestamp,
+			NULL
+		) AS plan_proc
+	) AS plan_proc ON plan_proc.material_id=m.id
+	*/
+	
+	/*
+	LEFT JOIN (
+		SELECT
+			so.material_id,
+			SUM(so.quant) AS quant
+		FROM supplier_orders AS so
+		WHERE so.date=$1
+		GROUP BY so.material_id
+	) AS sup_ord ON sup_ord.material_id=m.id
+	*/
+	
+	LEFT JOIN (
+		SELECT *
+		FROM mat_virtual_consumption(
+			(SELECT shift_time_from.v FROM shift_time_from)
+			,(SELECT shift_time_to.v FROM shift_time_to)
+		)
+	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+	
+	WHERE m.concrete_part
+	ORDER BY m.ord;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_totals(date) OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:52:38 ******************
+-- Function: public.mat_virtual_consumption(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+-- DROP FUNCTION public.mat_virtual_consumption(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+CREATE OR REPLACE FUNCTION public.mat_virtual_consumption(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+RETURNS TABLE(
+	material_id integer,
+	quant numeric
+) AS
+$BODY$
+	SELECT
+		sub.material_id,
+		sum(sub.mat_cons) AS quant
+	FROM (
+		SELECT
+			mr.material_id,
+			(mr.rate::numeric * sum( COALESCE(o.quant, 0::numeric) -
+				COALESCE(
+					(SELECT sum(sh.quant) AS sum
+					FROM shipments sh
+					WHERE sh.order_id = o.id AND sh.shipped
+					)
+				, 0::numeric)
+				)
+			)::numeric AS mat_cons
+		FROM orders o
+		LEFT JOIN (
+			SELECT r.concrete_type_id,
+			r.material_id,
+			r.rate
+			FROM raw_material_cons_rates(0, now()::timestamp without time zone) r(concrete_type_id, material_id, rate)
+		) mr ON mr.concrete_type_id = o.concrete_type_id
+		
+		WHERE
+			o.date_time BETWEEN in_date_time_from AND in_date_time_to
+			
+		GROUP BY mr.rate, mr.material_id
+		
+		HAVING sum( COALESCE(o.quant, 0::numeric) -
+			COALESCE(
+				(SELECT sum(sh.quant) AS sum
+				FROM shipments sh
+				WHERE sh.order_id = o.id
+				)
+			, 0::numeric)
+			) > 0::numeric
+	) sub
+	GROUP BY sub.material_id;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_virtual_consumption(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+  OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 14:54:09 ******************
+-- Function: public.mat_virtual_consumption(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+-- DROP FUNCTION public.mat_virtual_consumption(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+
+CREATE OR REPLACE FUNCTION public.mat_virtual_consumption(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+RETURNS TABLE(
+	material_id integer,
+	quant numeric
+) AS
+$BODY$
+	SELECT
+		sub.material_id,
+		sum(sub.mat_cons) AS quant
+	FROM (
+		SELECT
+			mr.material_id,
+			(mr.rate::numeric *
+				sum(
+					COALESCE(o.quant, 0::numeric) -
+					COALESCE(
+						(SELECT sum(sh.quant) AS sum
+						FROM shipments sh
+						WHERE sh.order_id = o.id AND sh.shipped
+						)
+					, 0::numeric
+					)
+				)
+			)::numeric AS mat_cons
+		FROM orders o
+		LEFT JOIN (
+			SELECT r.concrete_type_id,
+			r.material_id,
+			r.rate
+			FROM raw_material_cons_rates(0, now()::timestamp without time zone) r(concrete_type_id, material_id, rate)
+		) mr ON mr.concrete_type_id = o.concrete_type_id
+		
+		WHERE
+			o.date_time BETWEEN in_date_time_from AND in_date_time_to
+			
+		GROUP BY mr.rate, mr.material_id
+		
+		/*HAVING sum( COALESCE(o.quant, 0::numeric) -
+			COALESCE(
+				(SELECT sum(sh.quant) AS sum
+				FROM shipments sh
+				WHERE sh.order_id = o.id
+				)
+			, 0::numeric)
+			) > 0::numeric
+		*/
+	) sub
+	WHERE sub.mat_cons>0
+	GROUP BY sub.material_id;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.mat_virtual_consumption(in_date_time_from timestamp without time zone,in_date_time_to timestamp without time zone)
+  OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 17:07:46 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+	
+		IF TG_OP='UPDATE' AND OLD.manual_correction=TRUE AND NEW.manual_correction=TRUE THEN
+			RETURN OLD;
+		END IF;	
+	
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN		
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_site_id,
+				coalesce(
+					(SELECT v.plate::text
+					FROM production_vehicle_corrections AS p
+					LEFT JOIN vehicles AS v ON v.id=p.vehicle_id
+					WHERE p.production_site_id=NEW.production_site_id AND p.production_id=NEW.production_id
+					)
+					,NEW.production_vehicle_descr
+				),
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF NEW.production_dt_end IS NOT NULL THEN
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+		END IF;
+				
+		/*
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
+				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);			
+		END IF;
+		*/
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
+		
+		IF coalesce(
+			(SELECT TRUE
+			FROM production_sites
+			WHERE id = NEW.production_site_id
+			AND NEW.production_id =ANY(missing_elkon_production_ids))
+			,FALSE
+		) THEN
+			UPDATE production_sites
+			SET
+				missing_elkon_production_ids = array_diff(missing_elkon_production_ids,ARRAY[NEW.production_id])
+			WHERE id = NEW.production_site_id
+			;
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		/*
+		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		*/
+		/* МЕНЯТЬ ТС ПРИ СМЕНЕ shipment_id*/
+		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
+		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
+		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
+		OR (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0))
+		OR (coalesce(NEW.concrete_quant,0)<>coalesce(OLD.concrete_quant,0))
+		THEN
+			--сменить shipment_id,vehicle_schedule_state_id
+			IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)) THEN
+				SELECT
+					vsch.vehicle_id
+					,vschst.id
+				INTO
+					NEW.vehicle_id
+					,NEW.vehicle_schedule_state_id	
+				FROM shipments AS sh
+				LEFT JOIN vehicle_schedules AS vsch ON vsch.id=sh.vehicle_schedule_id
+				LEFT JOIN vehicle_schedule_states AS vschst ON vschst.schedule_id=sh.vehicle_schedule_id AND vschst.shipment_id=sh.id
+				WHERE sh.id=NEW.shipment_id	
+				;
+			END IF;
+			
+			UPDATE material_fact_consumptions
+			SET
+				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id,
+				vehicle_id = NEW.vehicle_id,
+				concrete_type_id = NEW.concrete_type_id,
+				concrete_quant = NEW.concrete_quant
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_site_id = OLD.production_site_id AND production_id = OLD.production_id;
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO beton;
+
+
+
+-- ******************* update 02/11/2020 17:18:04 ******************
+-- VIEW: production_sites_for_edit_list
+
+--DROP VIEW production_sites_for_edit_list;
+
+CREATE OR REPLACE VIEW production_sites_for_edit_list AS
+	SELECT
+		*		 
+	FROM production_sites
+	ORDER BY name
+	;
+	
+ALTER VIEW production_sites_for_edit_list OWNER TO beton;

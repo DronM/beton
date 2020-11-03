@@ -14,13 +14,16 @@ $BODY$
 	FROM (
 		SELECT
 			mr.material_id,
-			(mr.rate::numeric * sum( COALESCE(o.quant, 0::numeric) -
-				COALESCE(
-					(SELECT sum(sh.quant) AS sum
-					FROM shipments sh
-					WHERE sh.order_id = o.id
+			(mr.rate::numeric *
+				sum(
+					COALESCE(o.quant, 0::numeric) -
+					COALESCE(
+						(SELECT sum(sh.quant) AS sum
+						FROM shipments sh
+						WHERE sh.order_id = o.id AND sh.shipped
+						)
+					, 0::numeric
 					)
-				, 0::numeric)
 				)
 			)::numeric AS mat_cons
 		FROM orders o
@@ -32,20 +35,22 @@ $BODY$
 		) mr ON mr.concrete_type_id = o.concrete_type_id
 		
 		WHERE
-			o.date_time >= in_date_time_from
-			AND o.date_time <= in_date_time_to
+			o.date_time BETWEEN in_date_time_from AND in_date_time_to
 			
 		GROUP BY mr.rate, mr.material_id
 		
-		HAVING sum( COALESCE(o.quant, 0::numeric) -
+		/*HAVING sum( COALESCE(o.quant, 0::numeric) -
 			COALESCE(
 				(SELECT sum(sh.quant) AS sum
 				FROM shipments sh
 				WHERE sh.order_id = o.id
 				)
 			, 0::numeric)
-			) > 0::numeric) sub
-		GROUP BY sub.material_id;
+			) > 0::numeric
+		*/
+	) sub
+	WHERE sub.mat_cons>0
+	GROUP BY sub.material_id;
 $BODY$
   LANGUAGE sql VOLATILE
   COST 100

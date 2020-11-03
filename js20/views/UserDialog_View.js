@@ -46,6 +46,9 @@ function UserDialog_View(id,options){
 		//mac grid
 		this.addElement(new UserMacAddressList_View(id+":mac_list"));
 
+		//Login grid
+		this.addElement(new LoginList_View(id+":login_list",{"detail":true}));
+
 		
 		if (adm){
 			this.addElement(new ButtonCmd(id+":cmdResetPwd",{
@@ -84,6 +87,12 @@ function UserDialog_View(id,options){
 	
 	this.addDetailDataSet({
 		"control":this.getElement("mac_list").getElement("grid"),
+		"controlFieldId":"user_id",
+		"field":this.m_model.getField("id")
+	});
+
+	this.addDetailDataSet({
+		"control":this.getElement("login_list").getElement("grid"),
 		"controlFieldId":"user_id",
 		"field":this.m_model.getField("id")
 	});

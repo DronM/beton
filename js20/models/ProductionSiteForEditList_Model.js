@@ -71,6 +71,15 @@ function ProductionSiteForEditList_Model(options){
 	
 	options.fields.last_elkon_production_id = new FieldInt("last_elkon_production_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.missing_elkon_production_ids = new FieldArray("missing_elkon_production_ids",filed_options);
+	
 		ProductionSiteForEditList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionSiteForEditList_Model,ModelXML);

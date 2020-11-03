@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-10-28 17:47:21</lastBuild></version>
+		<lastBuild>2020-11-03 05:41:01</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -96,6 +96,7 @@
 		<version dateOpen="2020-10-27 09:10:42" dateClose="2020-10-28 05:10:59">1.00190</version>
 		<version dateOpen="2020-10-28 10:10:33" dateClose="2020-10-28 12:10:02">1.00191</version>
 		<version dateOpen="2020-10-28 17:10:46" dateClose="2020-10-28 17:10:47">1.00192</version>
+		<version dateOpen="2020-11-02 17:11:16" dateClose="2020-11-03 05:11:41">1.00193</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -523,6 +524,7 @@
 			<field id="user_id" dataType="Int"/>
 			<field id="pub_key" dataType="String" length="15"/>
 			<field id="set_date_time" dataType="DateTimeTZ"/>
+			<field id="headers" dataType="Text"/>
 			<index id="logins_user_idx" unique="TRUE">
 				<field id="user_id"/>
 			</index>
@@ -535,7 +537,9 @@
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 			<field id="users_ref" dataType="JSON" alias="Пользователь"/>
 			<field id="pub_key" dataType="String" length="15" sysCol="TRUE"/>
-			<field id="set_date_time" dataType="DateTimeTZ" alias="Время последнего обращения"/>
+			<field id="set_date_time" dataType="DateTimeTZ" alias="Время создания сессии"/>
+			<field id="session_set_time" dataType="DateTimeTZ" alias="Время последнего обращения"/>
+			<field id="headers" dataType="Text"/>
 		</model>
 		<model id="Client" parent="ModelSQLBeton" dataTable="clients" virtual="FALSE" activityLog="TRUE" objRef="TRUE">
 			<defaultOrder>
@@ -1152,6 +1156,7 @@
 			<field id="elkon_connection" dataType="JSONB"/>
 			<field id="active" dataType="Bool" alias="Активен"/>
 			<field id="last_elkon_production_id" dataType="Int"/>
+			<field id="missing_elkon_production_ids" dataType="Array" arrayType="Int"/>
 		</model>
 		<model id="Shipment" parent="ModelSQLBeton" dataTable="shipments" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
@@ -4691,7 +4696,7 @@
 		<view id="20010" c="Shipment_Controller" t="ShipmentForVehOwnerList" f="get_list_for_veh_owner" section="Документы" descr="Отгрузки для владельцев ТС"/>
 		<view id="20011" c="Shipment_Controller" t="ShipmentPumpForVehOwnerList" f="get_pump_list_for_veh_owner" section="Документы" descr="Отгрузки (насосы) для владельцев ТС"/>
 		<view id="20012" c="Shipment_Controller" t="ShipmentForClientVehOwnerList" f="get_list_for_client_veh_owner" section="Документы" descr="Отгрузки по клиенту-владельцу ТС"/>
-		<view id="20013" c="Login_Controller" t="LoginList" f="get_list" section="Документы" descr="Лог активности"/>
+		<view id="20013" c="Login_Controller" t="LoginList" f="get_list" section="Документы" descr="Сессии пользователей"/>
 		<view id="20014" c="Production_Controller" t="ProductionList" f="get_list" section="Документы" descr="Производство ELKON"/>
 		<view id="20015" c="ELKONLog_Controller" t="ELKONLogList" f="get_list" section="Документы" descr="Журнал загрузки из ELKON"/>
 		<view id="20017" c="CementSiloBalanceReset_Controller" t="CementSiloBalanceResetList" f="get_list" section="Документы" descr="Обнуление остатков силосов"/>

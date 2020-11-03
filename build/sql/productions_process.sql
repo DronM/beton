@@ -20,7 +20,7 @@ BEGIN
 				OR OLD.production_dt_start!=NEW.production_dt_start
 			)
 			)
-		THEN
+		THEN		
 			SELECT *
 			INTO
 				NEW.vehicle_id,
@@ -80,7 +80,7 @@ BEGIN
 		) THEN
 			UPDATE production_sites
 			SET
-				missing_elkon_production_ids = array_diff(missing_elkon_production_ids,ARRAY[missing_elkon_production_ids])
+				missing_elkon_production_ids = array_diff(missing_elkon_production_ids,ARRAY[NEW.production_id])
 			WHERE id = NEW.production_site_id
 			;
 		END IF;

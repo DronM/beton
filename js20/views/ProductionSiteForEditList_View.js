@@ -76,6 +76,9 @@ function ProductionSiteForEditList_View(id,options){
 							"columns":[
 								new GridColumn({
 									"field":model.getField("elkon_connection"),
+									"ctrlOptions":{
+										"enabled":false
+									},
 									"formatFunction":function(fields){
 										var res = "";
 										var con = fields.elkon_connection.getValue();
@@ -89,6 +92,17 @@ function ProductionSiteForEditList_View(id,options){
 										}
 										return res;
 									}
+								})
+							]
+						})
+						,new GridCellHead(id+":grid:head:missing_elkon_production_ids",{
+							"value":"Пропущенные пр-ва",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("missing_elkon_production_ids"),
+									"ctrlOptions":{
+										"enabled":false
+									}	
 								})
 							]
 						})

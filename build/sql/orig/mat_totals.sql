@@ -17,15 +17,18 @@ CREATE OR REPLACE FUNCTION public.mat_totals(IN date)
   	balance_corrected_data json
   ) AS
 $BODY$
-	WITH
-	shift_time_from AS (SELECT $1+const_first_shift_start_time_val() AS v)
-	,shift_time_to AS (SELECT get_shift_end(shift_time_from.v) AS v FROM shift_time_from)
+	/*
+	WITH rates AS(
+	SELECT *
+	FROM raw_material_cons_rates(NULL,$1)	
+	)
+	*/
 	SELECT
 		m.id AS material_id,
 		m.name::text AS material_descr,
 		
 		--заявки поставщикам на сегодня
-		0::numeric AS quant_ordered,
+		COALESCE(sup_ord.quant,0)::numeric AS quant_ordered,
 		
 		--Поставки
 		COALESCE(proc.quant,0)::numeric AS quant_procured,
@@ -60,18 +63,17 @@ $BODY$
 			)
 		FROM material_fact_balance_corrections AS cr
 		LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
-		WHERE cr.material_id=m.id AND cr.balance_date_time=(SELECT shift_time_from.v FROM shift_time_from)
+		WHERE cr.material_id=m.id AND cr.balance_date_time=$1+const_first_shift_start_time_val()
 		) AS balance_corrected_data
 		
 	FROM raw_materials AS m
 
 	LEFT JOIN (
 		SELECT *
-		--$1+const_first_shift_start_time_val()
-		FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval,'{}')
+		FROM rg_materials_balance($1+const_first_shift_start_time_val()-'1 second'::interval,'{}')
 	) AS bal_morn ON bal_morn.material_id=m.id
 	LEFT JOIN (
-		SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from),'{}')
+		SELECT * FROM rg_material_facts_balance($1+const_first_shift_start_time_val(),'{}')
 	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
 
 	
@@ -81,6 +83,7 @@ $BODY$
 		FROM rg_materials_balance('{}')
 	) AS bal ON bal.material_id=m.id
 	LEFT JOIN (
+		--SELECT * FROM rg_material_facts_balance('{}')
 		SELECT
 			material_id,
 			sum(quant) AS quant
@@ -93,9 +96,9 @@ $BODY$
 			ra.material_id,
 			sum(ra.quant) AS quant
 		FROM ra_materials ra
-		WHERE ra.date_time BETWEEN (SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
-				--get_shift_start(now()::date+'1 day'::interval)
-				--AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
+		WHERE ra.date_time BETWEEN
+					get_shift_start(now()::date+'1 day'::interval)
+				AND get_shift_end(get_shift_start(now()::date+'1 day'::interval))
 			AND ra.deb
 			AND ra.doc_type='material_procurement'
 		GROUP BY ra.material_id
@@ -115,7 +118,6 @@ $BODY$
 	) AS plan_proc ON plan_proc.material_id=m.id
 	*/
 	
-	/*
 	LEFT JOIN (
 		SELECT
 			so.material_id,
@@ -124,13 +126,12 @@ $BODY$
 		WHERE so.date=$1
 		GROUP BY so.material_id
 	) AS sup_ord ON sup_ord.material_id=m.id
-	*/
 	
 	LEFT JOIN (
 		SELECT *
 		FROM mat_virtual_consumption(
-			(SELECT shift_time_from.v FROM shift_time_from)
-			,(SELECT shift_time_to.v FROM shift_time_to)
+			now()::timestamp,
+			$1+const_first_shift_start_time_val()+const_shift_length_time_val()::interval-'1 second'::interval
 		)
 	) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
 	

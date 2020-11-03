@@ -69,8 +69,14 @@ extend(Login_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldString("pub_key",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Время последнего обращения";
+	f_opts.alias = "Время создания сессии";
 	pm.addField(new FieldDateTimeTZ("set_date_time",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Время последнего обращения";
+	pm.addField(new FieldDateTimeTZ("session_set_time",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("headers",f_opts));
 }
 
 			Login_Controller.prototype.addGetObject = function(){

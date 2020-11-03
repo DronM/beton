@@ -6,43 +6,43 @@ CREATE OR REPLACE FUNCTION public.production_vehicle_corrections_process()
   RETURNS trigger AS
 $BODY$
 DECLARE
-	v_vehicle_id int;
 	v_vehicle_schedule_state_id int;
 	v_shipment_id int;
 	v_production_dt_start timestamp;
 	v_production_vehicle_descr text;
+	v_vehicle_id int;
 BEGIN
 	
 	IF TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
 		
-		SELECT *
+		SELECT
+			vschs.id AS vehicle_schedule_state_id,
+			sh.id AS shipment_id
 		INTO
-			v_vehicle_id,
 			v_vehicle_schedule_state_id,
-			v_shipment_id
-		FROM material_fact_consumptions_find_vehicle(
-			(SELECT v.plate::text FROM vehicles v WHERE v.id=NEW.vehicle_id)
-			,(SELECT production_dt_start::timestamp FROM productions WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id)
-		) AS (
-			vehicle_id int,
-			vehicle_schedule_state_id int,
-			shipment_id int
-		);
-/*				
-RAISE EXCEPTION '%, %, %',
-			(SELECT v.plate::text FROM vehicles v WHERE v.id=NEW.vehicle_id)
-			,(SELECT production_dt_start::timestamp FROM productions WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id)
-			,material_fact_consumptions_find_vehicle(
-			'1810'
-			,'2020-05-18 20:02:32'::timestamp
-		)
-		;
-*/		
+			v_shipment_id	
+		FROM shipments AS sh
+		LEFT JOIN vehicle_schedule_states AS vschs ON vschs.schedule_id = sh.vehicle_schedule_id AND vschs.state='assigned' AND vschs.shipment_id=sh.id
+		LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+		LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
+		LEFT JOIN productions AS prod ON prod.production_site_id =NEW.production_site_id AND  prod.production_id=NEW.production_id
+		WHERE
+			vsch.vehicle_id = NEW.vehicle_id
+			AND sh.date_time BETWEEN prod.production_dt_start-'240 minutes'::interval AND prod.production_dt_start+'240 minutes'::interval
+			AND sh.production_site_id = NEW.production_site_id
+		ORDER BY
+			-- the nearest shipment
+			CASE
+				WHEN prod.production_dt_start>sh.date_time THEN prod.production_dt_start - sh.date_time
+				ELSE sh.date_time-prod.production_dt_start
+			END
+		LIMIT 1;
+		
 		UPDATE productions
 		SET
 			shipment_id = v_shipment_id,
 			vehicle_schedule_state_id = v_vehicle_schedule_state_id,
-			vehicle_id = v_vehicle_id
+			vehicle_id = NEW.vehicle_id
 		WHERE production_site_id=NEW.production_site_id AND production_id=NEW.production_id
 		;
 
@@ -64,13 +64,15 @@ RAISE EXCEPTION '%, %, %',
 		FROM productions
 		WHERE production_site_id=OLD.production_site_id AND production_id=OLD.production_id;
 		
+		--Привязка по-умолчанию
 		SELECT *
 		INTO
 			v_vehicle_id,
 			v_vehicle_schedule_state_id,
 			v_shipment_id
 		FROM material_fact_consumptions_find_vehicle(
-			v_production_vehicle_descr
+			OLD.production_site_id
+			,v_production_vehicle_descr
 			,v_production_dt_start
 		) AS (
 			vehicle_id int,

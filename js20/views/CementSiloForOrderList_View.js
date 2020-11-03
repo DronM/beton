@@ -182,59 +182,60 @@ CementSiloForOrderList_View.prototype.drawSilo = function(siloNode,siloContNode,
 	cx.stroke(); 
 	
 	// filling
-	var extra_height = Math.floor( silo_cone_height * silo_cone_width * silo_cone_parts_one_side / silo_width );
-	var fill_main_h = Math.floor( (silo_height + silo_cone_height) * fillPercent / 100) + extra_height - fill_tolerance;
-	var fill_main_top = posTop + silo_height + silo_cone_height - fill_main_h;
-	/*
-	console.log("fill_main_h="+fill_main_h)
-	console.log("extra_height="+extra_height)
-	console.log("fill_main_top="+fill_main_top)
-	console.log("cone_part_end="+(posTop+silo_height-fill_tolerance*2))
-	*/
-	if(fill_main_top>posTop+silo_height+silo_cone_height-fill_tolerance*2){
-		//no filling
-		return;
+	if(fillPercent){
+		var extra_height = Math.floor( silo_cone_height * silo_cone_width * silo_cone_parts_one_side / silo_width );
+		var fill_main_h = Math.floor( (silo_height + silo_cone_height) * fillPercent / 100) + extra_height - fill_tolerance;
+		var fill_main_top = posTop + silo_height + silo_cone_height - fill_main_h;
+		/*
+		console.log("fill_main_h="+fill_main_h)
+		console.log("extra_height="+extra_height)
+		console.log("fill_main_top="+fill_main_top)
+		console.log("cone_part_end="+(posTop+silo_height-fill_tolerance*2))
+		*/
+		if(fill_main_top>posTop+silo_height+silo_cone_height-fill_tolerance*2){
+			//no filling
+			return;
+		}
+		
+		cx.fillStyle = fill_style;
+		cx.lineWidth = "0.5";
+		cx.beginPath();
+		var main_part = (fill_main_h>silo_cone_height);
+		if(main_part){
+			//main figure part
+			cx.moveTo(posLeft + fill_tolerance, fill_main_top + fill_tolerance);//posTop + fill_tolerance
+			cx.lineTo(posLeft + fill_tolerance, posTop + silo_height - fill_tolerance);
+		}
+		else{
+			//cone part
+			//y = mx + b
+			//where m - slope (y2-y1)/(x2-x1)
+			//and b - y-intercept
+			//x = (y-b)/m
+			var m = silo_cone_height / (silo_cone_width * silo_cone_parts_one_side);
+			var b = (posTop + silo_height + silo_cone_height) - (m * (posLeft  + silo_cone_width * silo_cone_parts_one_side) );
+			var cone_pos_y = fill_main_top + fill_tolerance;
+			var cone_pos_x = Math.floor( ( cone_pos_y - b) / m );			
+			cx.moveTo(cone_pos_x+fill_tolerance, cone_pos_y+fill_tolerance);
+			//console.log("TOP="+cone_pos_y+" LEFT="+cone_pos_x)
+		}		
+		cx.lineTo(posLeft  + silo_cone_width * silo_cone_parts_one_side, posTop + silo_height - fill_tolerance + silo_cone_height);
+		cx.lineTo(posLeft + silo_cone_width * (silo_cone_parts_one_side+1) , posTop + silo_height - fill_tolerance + silo_cone_height);		
+		
+		if(main_part){
+			cx.lineTo(posLeft - fill_tolerance + silo_cone_width * silo_cone_parts , posTop + silo_height-fill_tolerance);
+			cx.lineTo(posLeft - fill_tolerance + silo_cone_width * silo_cone_parts , fill_main_top + fill_tolerance*2);	
+			cx.lineTo(posLeft + fill_tolerance , fill_main_top + fill_tolerance*2);
+		}
+		else{
+			var n = (posLeft - fill_tolerance + silo_cone_width * silo_cone_parts_one_side) - cone_pos_x;
+			var n2 = posLeft + silo_cone_width * (silo_cone_parts_one_side+1) - fill_tolerance + n;
+			cx.lineTo( n2  , cone_pos_y+fill_tolerance);
+		}
+		
+		cx.fill();
+		//cx.stroke(); 
 	}
-	
-	cx.fillStyle = fill_style;
-	cx.lineWidth = "0.5";
-	cx.beginPath();
-	var main_part = (fill_main_h>silo_cone_height);
-	if(main_part){
-		//main figure part
-		cx.moveTo(posLeft + fill_tolerance, fill_main_top + fill_tolerance);//posTop + fill_tolerance
-		cx.lineTo(posLeft + fill_tolerance, posTop + silo_height - fill_tolerance);
-	}
-	else{
-		//cone part
-		//y = mx + b
-		//where m - slope (y2-y1)/(x2-x1)
-		//and b - y-intercept
-		//x = (y-b)/m
-		var m = silo_cone_height / (silo_cone_width * silo_cone_parts_one_side);
-		var b = (posTop + silo_height + silo_cone_height) - (m * (posLeft  + silo_cone_width * silo_cone_parts_one_side) );
-		var cone_pos_y = fill_main_top + fill_tolerance;
-		var cone_pos_x = Math.floor( ( cone_pos_y - b) / m );			
-		cx.moveTo(cone_pos_x+fill_tolerance, cone_pos_y+fill_tolerance);
-		//console.log("TOP="+cone_pos_y+" LEFT="+cone_pos_x)
-	}		
-	cx.lineTo(posLeft  + silo_cone_width * silo_cone_parts_one_side, posTop + silo_height - fill_tolerance + silo_cone_height);
-	cx.lineTo(posLeft + silo_cone_width * (silo_cone_parts_one_side+1) , posTop + silo_height - fill_tolerance + silo_cone_height);		
-	
-	if(main_part){
-		cx.lineTo(posLeft - fill_tolerance + silo_cone_width * silo_cone_parts , posTop + silo_height-fill_tolerance);
-		cx.lineTo(posLeft - fill_tolerance + silo_cone_width * silo_cone_parts , fill_main_top + fill_tolerance*2);	
-		cx.lineTo(posLeft + fill_tolerance , fill_main_top + fill_tolerance*2);
-	}
-	else{
-		var n = (posLeft - fill_tolerance + silo_cone_width * silo_cone_parts_one_side) - cone_pos_x;
-		var n2 = posLeft + silo_cone_width * (silo_cone_parts_one_side+1) - fill_tolerance + n;
-		cx.lineTo( n2  , cone_pos_y+fill_tolerance);
-	}
-	
-	cx.fill();
-	//cx.stroke(); 
-	
 	DOMHelper.delAllChildren(siloContNode);
 	
 	//text percent

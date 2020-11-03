@@ -1,11 +1,18 @@
-﻿-- Function: material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp)
+-- FUNCTION: public.material_fact_consumptions_find_vehicle(integer, text, timestamp without time zone)
 
--- DROP FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp);
+-- DROP FUNCTION public.material_fact_consumptions_find_vehicle(integer, text, timestamp without time zone);
 
-CREATE OR REPLACE FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp)
-  RETURNS record AS
-$$
-	-- пытаемся определить авто по описанию элкон
+CREATE OR REPLACE FUNCTION public.material_fact_consumptions_find_vehicle(
+	in_production_site_id integer,
+	in_production_vehicle_descr text,
+	in_production_dt_start timestamp without time zone)
+    RETURNS record
+    LANGUAGE 'sql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
+-- пытаемся определить авто по описанию элкон
 	-- выбираем из production_descr только числа
 	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
 
@@ -18,7 +25,7 @@ $$
 	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
 	LEFT JOIN vehicles AS vh ON vh.id=vsch.vehicle_id
 	WHERE
-		sh.date_time BETWEEN in_production_dt_start-'90 minutes'::interval AND in_production_dt_start+'90 minutes'::interval
+		sh.date_time BETWEEN in_production_dt_start-'240 minutes'::interval AND in_production_dt_start+'240 minutes'::interval
 		AND vh.plate LIKE '%'||regexp_replace(in_production_vehicle_descr, '\D','','g')||'%'
 		AND sh.production_site_id = in_production_site_id
 		
@@ -36,8 +43,8 @@ $$
 			ELSE sh.date_time-in_production_dt_start
 		END
 	LIMIT 1;
-$$
-  LANGUAGE sql VOLATILE
-  COST 100;
-ALTER FUNCTION material_fact_consumptions_find_vehicle(in_production_site_id int, in_production_vehicle_descr text,in_production_dt_start timestamp) OWNER TO ;
+$BODY$;
+
+ALTER FUNCTION public.material_fact_consumptions_find_vehicle(integer, text, timestamp without time zone)
+    OWNER TO beton;
 

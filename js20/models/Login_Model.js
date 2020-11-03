@@ -97,6 +97,15 @@ function Login_Model(options){
 	
 	options.fields.set_date_time = new FieldDateTimeTZ("set_date_time",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.headers = new FieldText("headers",filed_options);
+	
 			
 		Login_Model.superclass.constructor.call(this,id,options);
 }

@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
  
 class Login_Model extends ModelSQLBeton{
@@ -87,6 +88,14 @@ class Login_Model extends ModelSQLBeton{
 						
 		$f_set_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"set_date_time",$f_opts);
 		$this->addField($f_set_date_time);
+		//********************
+		
+		//*** Field headers ***
+		$f_opts = array();
+		$f_opts['id']="headers";
+						
+		$f_headers=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"headers",$f_opts);
+		$this->addField($f_headers);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

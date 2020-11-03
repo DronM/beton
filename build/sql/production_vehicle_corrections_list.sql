@@ -17,6 +17,7 @@ CREATE OR REPLACE VIEW production_vehicle_corrections_list AS
 	LEFT JOIN production_sites AS p_st ON p_st.id=t.production_site_id
 	LEFT JOIN vehicles AS v ON v.id=t.vehicle_id
 	LEFT JOIN users AS u ON u.id=t.user_id
+	ORDER BY date_time DESC
 	;
 	
 ALTER VIEW production_vehicle_corrections_list OWNER TO ;

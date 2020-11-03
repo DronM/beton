@@ -11,10 +11,13 @@ CREATE OR REPLACE VIEW logins_list AS
 		t.user_id,
 		users_ref(u) AS users_ref,
 		t.pub_key,
-		t.set_date_time
+		t.set_date_time,
+		t.headers,
+		sess.set_time AS session_set_time
 		
 	FROM logins AS t
 	LEFT JOIN users u ON u.id=t.user_id
+	LEFT JOIN sessions AS sess ON sess.id=t.session_id
 	WHERE t.user_id IS NOT NULL
 	ORDER BY t.date_time_in DESC
 	;

@@ -4,7 +4,7 @@
 
 CREATE OR REPLACE VIEW material_store_for_order_list AS
 	SELECT
-		t.id,
+		t.production_site_id AS id,
 		mat.name AS name,
 		production_sites_ref(pst) AS production_sites_ref,
 		t.load_capacity,

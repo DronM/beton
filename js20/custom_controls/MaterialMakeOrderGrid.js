@@ -49,7 +49,7 @@ function MaterialMakeOrderGrid(id,options){
 									new GridColumn({"field":model.getField("material_descr")})
 								]
 							})
-							,new GridCellHead(id+":head:quant_ordered",{
+							/*,new GridCellHead(id+":head:quant_ordered",{
 								"value":"Заявл.",
 								"colAttrs":{"align":"right"},
 								"columns":[
@@ -59,6 +59,7 @@ function MaterialMakeOrderGrid(id,options){
 									})
 								]
 							})
+							*/
 							,new GridCellHead(id+":head:quant_morn_fact_cur_balance",{
 								"value":"Ост.утро",
 								"colAttrs":{
