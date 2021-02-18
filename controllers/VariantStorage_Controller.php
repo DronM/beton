@@ -26,6 +26,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/VariantStorage.php');
 
+require_once(FRAME_WORK_PATH.'basic_classes/SessionVarManager.php');
+
 class VariantStorage_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);
@@ -57,6 +59,13 @@ class VariantStorage_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('VariantStorage.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('VariantStorage_Model');
@@ -220,7 +229,14 @@ class VariantStorage_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				]
+			];
+			$pm->addEvent('VariantStorage.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('VariantStorage_Model');
 
@@ -233,6 +249,16 @@ class VariantStorage_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('VariantStorage.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('VariantStorage_Model');
 
@@ -351,8 +377,13 @@ class VariantStorage_Controller extends ControllerSQL{
 		
 	}	
 	
-	public function insert($pm){
-		$pm->setParamValue("user_id",$_SESSION['user_id']);
+
+	private static function get_user_id(){
+		return isset($_SESSION['user_id'])? $_SESSION['user_id'] : SessionVarManager::getValue('user_id');
+	}
+	
+	public function insert($pm){		
+		$pm->setParamValue("user_id",self:: get_user_id());
 		parent::insert($pm);
 	}
 
@@ -362,14 +393,14 @@ class VariantStorage_Controller extends ControllerSQL{
 			FROM variant_storages
 			WHERE id=%d AND user_id=%d"
 			,$this->getExtDbVal($pm,'id')
-			,$_SESSION['user_id']
+			,self:: get_user_id()
 		));
 	
 		$this->getDbLinkMaster()->query(sprintf(
 			"DELETE FROM variant_storages
 			WHERE id=%d AND user_id=%d"
 			,$this->getExtDbVal($pm,'id')
-			,$_SESSION['user_id']
+			,self:: get_user_id()
 		));
 		
 		if(count($ar) && !is_null($ar['storage_name'])){
@@ -382,7 +413,7 @@ class VariantStorage_Controller extends ControllerSQL{
 		$this->getDbLinkMaster()->query(sprintf(
 		"SELECT variant_storages_upsert_%s(%d,%s,%s,%s,%s)",
 		$dataCol,
-		$_SESSION['user_id'],
+		self:: get_user_id(),
 		$this->getExtDbVal($pm,'storage_name'),
 		$this->getExtDbVal($pm,'variant_name'),
 		$dataColVal,
@@ -423,7 +454,7 @@ class VariantStorage_Controller extends ControllerSQL{
 			"SELECT *
 			FROM variant_storages_list
 			WHERE user_id=%d AND storage_name=%s",
-			$_SESSION['user_id'],
+			self:: get_user_id(),
 			$this->getExtDbVal($pm,'storage_name')
 			),
 		"VariantStorageList_Model"
@@ -443,7 +474,7 @@ class VariantStorage_Controller extends ControllerSQL{
 			FROM variant_storages
 			WHERE user_id=%d AND storage_name=%s AND variant_name=%s",
 			$dataCol,
-			$_SESSION['user_id'],
+			self::get_user_id(),
 			$this->getExtDbVal($pm,'storage_name'),
 			$this->getExtDbVal($pm,'variant_name')
 			),

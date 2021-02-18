@@ -39,6 +39,13 @@ class GPSTracker_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('GPSTracker.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('GPSTracker_Model');
@@ -67,7 +74,14 @@ class GPSTracker_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				]
+			];
+			$pm->addEvent('GPSTracker.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('GPSTracker_Model');
 
@@ -80,6 +94,16 @@ class GPSTracker_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('GPSTracker.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('GPSTracker_Model');
 

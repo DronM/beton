@@ -11,7 +11,7 @@
 <xsl:variable name="COLOR_PALETTE" select="/document/model[@id='Page_Model']/row[1]/DEFAULT_COLOR_PALETTE"/>
 <xsl:variable name="TOKEN">
 	<xsl:choose>
-		<xsl:when test="/document/model[@id='ModelVars']/row[1]/token and not(/document/model[@id='ModelVars']/row[1]/token='')"><xsl:value-of select="concat('&amp;token=',/document/model[@id='ModelVars']/row[1]/token)"/></xsl:when>
+		<xsl:when test="/document/model[@id='ModelVars']/row[1]/token and not(/document/model[@id='ModelVars']/row[1]/token='')"><xsl:value-of select="/document/model[@id='ModelVars']/row[1]/token"/></xsl:when>
 		<xsl:otherwise></xsl:otherwise>
 	</xsl:choose>
 </xsl:variable>
@@ -62,7 +62,7 @@
 						
 						<!-- Footer -->
 						<div class="footer text-muted text-center">
-							2013г - 2020г  <a href="#">Катрэн+</a>
+							2013г - 2021г  <a href="#">Катрэн+</a>
 						</div>
 						<!-- /footer -->
 
@@ -95,7 +95,7 @@
 
 	<!--ALL js modules -->
 	<xsl:apply-templates select="model[@id='ModelJavaScript']/row"/>
-	<!--<script src="http://localhost:1337/vorlon.js"></script>-->
+	
 	<script>
 		$("#waiting").hide();
 	</script>
@@ -126,7 +126,18 @@
 	});
 	
 	<xsl:call-template name="initAppWin"/>	
-		
+	
+	<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='')">	
+	//event server
+	application.initAppSrv({
+		"protocol":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_srv_protocol"/>'
+		,"host":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_srv_host"/>'
+		,"port":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_srv_port"/>'
+		,"appId":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_id"/>'
+		,"token":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/token"/>'
+		,"tokenExpires":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/tokenExpires"/>'
+	});	
+	</xsl:if>
 	<!-- [@default='FALSE']-->
 	<xsl:variable name="def_menu_item" select="//menuitem[@default='true']"/>
 	<xsl:if test="$def_menu_item">
@@ -137,12 +148,14 @@
 	</xsl:if>
 	
 	<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='')">
+	
 	if (document.getElementById("weather")){
 		application.m_weather = new Weather("weather",{"refreshInterval":600});
 		application.m_weather.toDOM();
-	}	
+	}
+					
 	<xsl:if test="count(/document/model[@id='AstCallCurrent_Model']/row) &gt;0">
-	console.log("WidthType="+window.getWidthType())
+	//console.log("WidthType="+window.getWidthType())
 	if(window.getWidthType()!="sm"){
 	//ВХОДЯЩИЙ ЗВОНОК!
 	var view_opts = {};
@@ -496,6 +509,7 @@ throw Error(CommonHelper.longString(function () {/*
 
 <!-- Javascript -->
 <xsl:template match="model[@id='ModelJavaScript']/row">
+	<!-- type="{type}" -->
 	<script src="{concat(href,'?',$VERSION)}"></script>
 </xsl:template>
 

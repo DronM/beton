@@ -104,6 +104,26 @@ function Destination_Model(options){
 	options.fields.price_for_driver = new FieldFloat("price_for_driver",filed_options);
 	options.fields.price_for_driver.getValidator().setMaxLength('15');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.near_road_lon = new FieldFloat("near_road_lon",filed_options);
+	options.fields.near_road_lon.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.near_road_lat = new FieldFloat("near_road_lat",filed_options);
+	options.fields.near_road_lat.getValidator().setMaxLength('15');
+	
 			
 		Destination_Model.superclass.constructor.call(this,id,options);
 }

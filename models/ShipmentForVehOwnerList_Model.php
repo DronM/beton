@@ -21,7 +21,8 @@ class ShipmentForVehOwnerList_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("shipments_for_veh_owner_list");
 			

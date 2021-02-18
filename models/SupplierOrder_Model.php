@@ -18,7 +18,8 @@ class SupplierOrder_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("supplier_orders");
 			

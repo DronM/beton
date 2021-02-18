@@ -184,6 +184,15 @@ function VehicleScheduleMakeOrderList_Model(options){
 	
 	options.fields.vehicle_schedules_ref = new FieldJSON("vehicle_schedules_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.tracker_id = new FieldText("tracker_id",filed_options);
+	
 		VehicleScheduleMakeOrderList_Model.superclass.constructor.call(this,id,options);
 }
 extend(VehicleScheduleMakeOrderList_Model,ModelXML);

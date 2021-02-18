@@ -132,7 +132,7 @@ MaterialStoreForOrderList_View.prototype.fillStores = function(){
 			
 			store_n.title = "Остаток:"+((this.m_stores[store_id].balance && !isNaN(this.m_stores[store_id].balance))? this.m_stores[store_id].balance:0);//+", двойной клик для обнуления."
 			//console.log("this.m_stores[store_id].material_id="+this.m_stores[store_id].material_id)
-			console.log("this.m_stores[store_id].id="+this.m_stores[store_id].id)
+			//console.log("this.m_stores[store_id].id="+this.m_stores[store_id].id)
 			if(this.m_stores[store_id].load_percent!=percent){
 				store_n.setAttribute("store_id",this.m_stores[store_id].id);				
 				this.m_stores[store_id].load_percent = percent;

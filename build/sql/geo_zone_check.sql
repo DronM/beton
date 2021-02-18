@@ -1,7 +1,8 @@
 -- Function: geo_zone_check()
 
 -- DROP FUNCTION geo_zone_check();
-
+/**
+ */
 CREATE OR REPLACE FUNCTION geo_zone_check()
   RETURNS trigger AS
 $BODY$
@@ -193,7 +194,29 @@ BEGIN
 	LEFT JOIN users AS us ON us.id=u.user_id
 	WHERE p.sms_type='vehicle_zone_violation' AND (SELECT zone_viol.body FROM zone_viol) IS NOT NULL
 	);
-	
+
+	IF NEW.gps_valid = 1 THEN
+		--returns vehicles_last_pos struc
+		PERFORM pg_notify(
+			'Vehicle.position.'||NEW.car_id
+			,json_build_object(
+				'params',json_build_object(
+					'tracker_id',NEW.car_id
+					,'lon',NEW.lon
+					,'lat',NEW.lat
+					,'heading',NEW.heading
+					,'speed',NEW.speed
+					,'period',NEW.period+age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'ns',NEW.ns
+					,'ew',NEW.ew
+					,'recieved_dt',NEW.recieved_dt + age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'odometer',NEW.odometer::text
+					,'voltage',round(NEW.voltage,0)					
+				)
+			)::text
+		);
+	END IF;
+		
 	RETURN NEW;
 END;
 $BODY$

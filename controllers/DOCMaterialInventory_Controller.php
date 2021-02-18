@@ -47,6 +47,13 @@ class DOCMaterialInventory_Controller extends ControllerSQLDOC{
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('DOCMaterialInventory.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('DOCMaterialInventory_Model');
@@ -85,7 +92,14 @@ class DOCMaterialInventory_Controller extends ControllerSQLDOC{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				]
+			];
+			$pm->addEvent('DOCMaterialInventory.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('DOCMaterialInventory_Model');
 
@@ -98,6 +112,16 @@ class DOCMaterialInventory_Controller extends ControllerSQLDOC{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('DOCMaterialInventory.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('DOCMaterialInventory_Model');
 

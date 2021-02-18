@@ -47,6 +47,13 @@ class RawMaterialMapToProduction_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('RawMaterialMapToProduction.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('RawMaterialMapToProduction_Model');
@@ -87,7 +94,14 @@ class RawMaterialMapToProduction_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				]
+			];
+			$pm->addEvent('RawMaterialMapToProduction.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('RawMaterialMapToProduction_Model');
 
@@ -100,6 +114,16 @@ class RawMaterialMapToProduction_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('RawMaterialMapToProduction.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('RawMaterialMapToProduction_Model');
 

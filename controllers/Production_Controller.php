@@ -107,7 +107,10 @@ class Production_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
-		
+				
+					
+				
+			
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('Production_Model');
 
@@ -203,7 +206,10 @@ class Production_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+				
+					
+				
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('Production_Model');
 
@@ -216,6 +222,12 @@ class Production_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+				
+					
+				
+			
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('Production_Model');
 

@@ -63,6 +63,16 @@ BEGIN
 			PERFORM ra_cement_add_act(reg_cement);	
 			 
 		END IF;
+		
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
 			
 		RETURN NEW;
 		
@@ -89,6 +99,17 @@ BEGIN
 			IF OLD.cement_silo_id IS NOT NULL THEN
 				PERFORM ra_cement_remove_acts('material_fact_consumption'::doc_types,OLD.id);		
 			END IF;
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);
+			
 		END IF;
 	
 		RETURN OLD;

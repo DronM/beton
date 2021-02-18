@@ -512,6 +512,82 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		));		
 	}
 
+	/**
+	 * Заявки,отгрузки,график
+	 */
+	public function get_make_orders_form_ord($pm){
+	
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		
+		$db_link = $this->getDbLink();
+		
+		//list
+		$this->addNewModel(sprintf(
+			"SELECT * FROM orders_make_list WHERE date_time BETWEEN '%s' AND '%s'",
+			date('Y-m-d H:i:s',$date_from),
+			date('Y-m-d H:i:s',$date_to)
+		),'OrderMakeList_Model'
+		);
+
+		//chart
+		$db_link_master = $this->getDbLinkMaster();
+		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		$this->addModel(Graph_Controller::getPlantLoadModel($db_link,$db_link_master,$date_from,$date_to));
+		
+	}
+
+	/**
+	 * статусы автомобилей
+	 */
+	public function get_make_orders_form_veh($pm){
+	
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		
+		$db_link = $this->getDbLink();
+		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		//Assigning		
+		$this->addModel(Shipment_Controller::getAssigningModel($db_link));
+		
+		//Vehicles		
+		$this->addModel(VehicleSchedule_Controller::getMakeListModel($db_link,$date_for_db));
+		
+		//features
+		$this->addModel(VehicleSchedule_Controller::getFeatureListModel($db_link,$date_for_db));
+	}
+
+	/**
+	 * материалы цемент
+	 */
+	public function get_make_orders_form_mat($pm){
+	
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		
+		$db_link = $this->getDbLink();
+		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		
+		//silos list
+		$this->addNewModel(
+			"SELECT * FROM cement_silos_for_order_list",
+			'CementSiloForOrderList_Model'
+		);
+		
+		//material stores list
+		$this->addNewModel(
+			"SELECT * FROM material_store_for_order_list",
+			'MaterialStoreForOrderList_Model'
+		);
+		
+		//mat_totals
+		$this->addModel(RawMaterial_Controller::getTotalsModel($db_link,$date_for_db));
+
+	}
+
 	public function get_make_orders_for_lab_form($pm){
 	
 		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
@@ -565,6 +641,71 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			)
 		));		
 	}
+
+	public function get_make_orders_for_lab_form_ord($pm){
+	
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		$date_to_for_db = "'".date('Y-m-d',$date_to)."'";
+		
+		$db_link = $this->getDbLink();
+		
+		//list
+		$this->addNewModel(sprintf(
+			"SELECT * FROM orders_make_for_lab_period_list
+			WHERE date_time BETWEEN '%s' AND '%s'",
+			date('Y-m-d H:i:s',$date_from),
+			date('Y-m-d H:i:s',$date_to)
+		),'OrderMakeForLabList_Model'
+		);
+		
+		//Lab list
+		$this->addNewModel('SELECT * FROM lab_entry_30days_2','LabEntry30DaysList_Model');
+
+		//OperatorList	
+		Shipment_Controller::addOperatorModels($this,$date_for_db,$date_to_for_db);	
+	}
+	
+	public function get_make_orders_for_lab_form_mat($pm){
+	
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		$date_to_for_db = "'".date('Y-m-d',$date_to)."'";
+		
+		$db_link = $this->getDbLink();
+		
+		//material stores list
+		$this->addNewModel(
+			"SELECT * FROM material_store_for_order_list",
+			'MaterialStoreForOrderList_Model'
+		);
+		
+		//mat_totals
+		$this->addModel(RawMaterial_Controller::getTotalsModel($db_link,$date_for_db));			
+	}
+	
+	public function get_make_orders_for_lab_form_veh($pm){
+	
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		$date_for_db = "'".date('Y-m-d',$date_from)."'";
+		$date_to_for_db = "'".date('Y-m-d',$date_to)."'";
+		
+		$db_link = $this->getDbLink();
+		
+		//Assigning		
+		$this->addModel(Shipment_Controller::getAssigningModel($db_link));
+		
+		//Vehicles		
+		$this->addModel(VehicleSchedule_Controller::getMakeListModel($db_link,$date_for_db));
+
+	}
+
 	
 	public function get_make_orders_for_lab_list($pm){
 		$this->addNewModel("SELECT * FROM lab_orders_list",'get_make_orders_for_lab_list');

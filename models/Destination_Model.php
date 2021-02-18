@@ -12,7 +12,8 @@ class Destination_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("destinations");
 			
@@ -95,6 +96,24 @@ class Destination_Model extends ModelSQLBeton{
 						
 		$f_price_for_driver=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"price_for_driver",$f_opts);
 		$this->addField($f_price_for_driver);
+		//********************
+		
+		//*** Field near_road_lon ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="near_road_lon";
+						
+		$f_near_road_lon=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"near_road_lon",$f_opts);
+		$this->addField($f_near_road_lon);
+		//********************
+		
+		//*** Field near_road_lat ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="near_road_lat";
+						
+		$f_near_road_lat=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"near_road_lat",$f_opts);
+		$this->addField($f_near_road_lat);
 		//********************
 	
 		$order = new ModelOrderSQL();		

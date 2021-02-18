@@ -21,7 +21,8 @@ CREATE OR REPLACE FUNCTION public.vehicle_last_states(IN in_date date)
 	no_tracker boolean,	
 	schedule_date date,
 	vehicle_schedules_ref json,
-	driver_tel text
+	driver_tel text,
+	tracker_id text
   ) AS
 $BODY$
 	--*****************************

@@ -1,0 +1,16 @@
+git clone https://libwebsockets.org/repo/libwebsockets
+https://libwebsockets.org/lws-api-doc-main/html/md_READMEs_README_8build.html
+
+
+https://stackoverflow.com/questions/34730392/how-to-connect-a-libwebsockets-c-client-to-a-wsrelay-server-node-js
+
+
+gcc -o route_watcher route_watcher.c json.c -I/usr/local/include -L/usr/local/lib -lwebsockets
+
+cmake . && make
+
+dpkg-config libwebsockets --libs --cflags
+
+
+/home/andrey/www/htdocs/beton_new/build/route_watcher
+/home/andrey/www/htdocs/app_srv

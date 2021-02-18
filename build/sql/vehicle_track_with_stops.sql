@@ -2,6 +2,8 @@
 
 -- DROP FUNCTION public.vehicle_track_with_stops(integer, timestamp without time zone, timestamp without time zone, interval);
 
+--Функция Устарела, использовать vehicles_get_track
+
 CREATE OR REPLACE FUNCTION public.vehicle_track_with_stops(
     IN in_vehicle_id integer,
     IN in_date_time_from timestamp without time zone,

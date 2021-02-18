@@ -57,6 +57,13 @@ class VehicleSchedule_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('VehicleSchedule.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('VehicleSchedule_Model');
@@ -99,7 +106,14 @@ class VehicleSchedule_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				]
+			];
+			$pm->addEvent('VehicleSchedule.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('VehicleSchedule_Model');
 
@@ -112,6 +126,16 @@ class VehicleSchedule_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('VehicleSchedule.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('VehicleSchedule_Model');
 

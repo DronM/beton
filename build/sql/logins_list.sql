@@ -12,7 +12,7 @@ CREATE OR REPLACE VIEW logins_list AS
 		users_ref(u) AS users_ref,
 		t.pub_key,
 		t.set_date_time,
-		t.headers,
+		headers_j->>'User-Agent' AS user_agent,
 		sess.set_time AS session_set_time
 		
 	FROM logins AS t

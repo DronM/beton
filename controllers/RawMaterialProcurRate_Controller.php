@@ -39,6 +39,14 @@ class RawMaterialProcurRate_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['material_id'
+			,'supplier_id'
+			]
+		];
+		$pm->addEvent('RawMaterialProcurRate.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('RawMaterialProcurRate_Model');
@@ -73,7 +81,15 @@ class RawMaterialProcurRate_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['material_id'
+				,'supplier_id'
+				]
+			];
+			$pm->addEvent('RawMaterialProcurRate.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('RawMaterialProcurRate_Model');
 
@@ -89,6 +105,17 @@ class RawMaterialProcurRate_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['material_id'
+			,'supplier_id'
+			]
+		];
+		$pm->addEvent('RawMaterialProcurRate.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('RawMaterialProcurRate_Model');
 

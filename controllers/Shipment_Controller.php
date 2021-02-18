@@ -134,6 +134,13 @@ class Shipment_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('Shipment.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('Shipment_Model');
@@ -260,7 +267,14 @@ class Shipment_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				]
+			];
+			$pm->addEvent('Shipment.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('Shipment_Model');
 
@@ -273,6 +287,16 @@ class Shipment_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('Shipment.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('Shipment_Model');
 
@@ -644,15 +668,18 @@ class Shipment_Controller extends ControllerSQL{
 		//
 		$this->addModel($model);		
 	}
+	
 	public function insert($pm){
 		$pm->setParamValue("user_id",$_SESSION['user_id']);
+		
 		parent::insert($pm);
 	}
 	
 	public function delete($pm){
 		Graph_Controller::clearCacheOnShipId($this->getDbLink(),$pm->getParamValue("id"));
-		parent::delete($pm);
+		parent::delete($pm);		
 	}
+	
 	public function shipment_invoice($pm){
 		$link = $this->getDbLink();
 		$model = new ModelSQL($link,array("id"=>"ShipmentInvoice_Model"));
@@ -872,7 +899,7 @@ class Shipment_Controller extends ControllerSQL{
 		);	
 	}
 	
-	public function addOperatorModels(&$controller,$dateFromForDb,$dateToForDb){
+	public static function addOperatorModels(&$controller,$dateFromForDb,$dateToForDb){
 	
 		$operator_cond_tot = '';
 		$q = self::get_operator_query($dateFromForDb,$dateToForDb,$operator_cond_tot);

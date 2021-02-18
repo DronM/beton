@@ -42,6 +42,15 @@ class VehicleOwnerConcretePrice_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['vehicle_owner_id'
+			,'client_id'
+			,'date'
+			]
+		];
+		$pm->addEvent('VehicleOwnerConcretePrice.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('VehicleOwnerConcretePrice_Model');
@@ -86,7 +95,16 @@ class VehicleOwnerConcretePrice_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['vehicle_owner_id'
+				,'client_id'
+				,'date'
+				]
+			];
+			$pm->addEvent('VehicleOwnerConcretePrice.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('VehicleOwnerConcretePrice_Model');
 
@@ -105,6 +123,18 @@ class VehicleOwnerConcretePrice_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['vehicle_owner_id'
+			,'client_id'
+			,'date'
+			]
+		];
+		$pm->addEvent('VehicleOwnerConcretePrice.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('VehicleOwnerConcretePrice_Model');
 

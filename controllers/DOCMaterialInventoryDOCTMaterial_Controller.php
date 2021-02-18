@@ -46,6 +46,14 @@ class DOCMaterialInventoryDOCTMaterial_Controller extends ControllerSQL{
 			));
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['login_id'
+			,'line_number'
+			]
+		];
+		$pm->addEvent('DOCMaterialInventoryDOCTMaterial.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('DOCMaterialInventoryDOCTMaterial_Model');
@@ -88,7 +96,15 @@ class DOCMaterialInventoryDOCTMaterial_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['login_id'
+				,'line_number'
+				]
+			];
+			$pm->addEvent('DOCMaterialInventoryDOCTMaterial.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('DOCMaterialInventoryDOCTMaterial_Model');
 
@@ -104,6 +120,17 @@ class DOCMaterialInventoryDOCTMaterial_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['login_id'
+			,'line_number'
+			]
+		];
+		$pm->addEvent('DOCMaterialInventoryDOCTMaterial.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('DOCMaterialInventoryDOCTMaterial_Model');
 

@@ -67,8 +67,6 @@ require_once('models/MainMenu_Model_client.php');
 		
 class ViewBase extends ViewHTMLXSLT {	
 
-	private $dbLink;
-
 	protected static function getMenuClass(){
 		//USER_MODELS_PATH
 		$menu_class = NULL;
@@ -94,8 +92,11 @@ class ViewBase extends ViewHTMLXSLT {
 			$menu_class = self::getMenuClass();
 			if (is_null($menu_class)){
 				//no menu exists yet
-				$this->initDbLink();
-				$contr = new MainMenuConstructor_Controller($this->dbLink);
+				if (!$GLOBALS['dbLink']){
+					throw new Exception('Db link for addMenu is not defined!');
+				}
+				
+				$contr = new MainMenuConstructor_Controller($GLOBALS['dbLink']);
 				$contr->genMenuForUser($_SESSION['user_id'], $_SESSION['role_id']);
 				$menu_class = self::getMenuClass();
 				if (is_null($menu_class)){
@@ -108,13 +109,14 @@ class ViewBase extends ViewHTMLXSLT {
 	
 	protected function addConstants(&$models){
 		if (isset($_SESSION['role_id'])){
-			$this->initDbLink();
-		
-			if ($this->dbLink){
-				$contr = new Constant_Controller($this->dbLink);
-				$list = array('doc_per_page_count','grid_refresh_interval','order_grid_refresh_interval','min_quant_for_ship_cost','def_lang');
-				$models['ConstantValueList_Model'] = $contr->getConstantValueModel($list);						
+
+			if (!$GLOBALS['dbLink']){
+				throw new Exception('Db link for addConstants is not defined!');
 			}
+		
+			$contr = new Constant_Controller($GLOBALS['dbLink']);
+			$list = array('doc_per_page_count','grid_refresh_interval','order_grid_refresh_interval','min_quant_for_ship_cost','def_lang');
+			$models['ConstantValueList_Model'] = $contr->getConstantValueModel($list);						
 		}	
 	}
 
@@ -158,6 +160,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/DragnDrop/DragObject.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/DragnDrop/DropTarget.js'));
 		
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/GooglePolylineEncode.js'));
+		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/extend.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/App.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/AppWin.js'));
@@ -169,8 +173,19 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/DbException.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/VersException.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ConstantManager.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/SessionVarManager.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/CookieManager.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ServConnector.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/AppSrv.js'));
+			
+	if (
+	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
+	||
+	(!isset($_SESSION['locale_id']) && DEF_LOCALE=='ru')
+	){
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/AppSrv.rs_ru.js'));
+	}
+
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/Response.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ResponseXML.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ResponseJSON.js'));
@@ -226,7 +241,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/FieldBytea.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/ModelFilter.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'core/RefType.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -240,7 +255,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/Command.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/CommandBinding.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/Control.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -250,7 +265,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ControlContainer.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -261,7 +276,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewAjx.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -272,7 +287,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewAjxList.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/Calculator.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -284,7 +299,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/Button.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonCtrl.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonEditCtrl.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -294,7 +309,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonCalc.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -304,7 +319,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonCalendar.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -314,7 +329,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonClear.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -326,7 +341,7 @@ class ViewBase extends ViewHTMLXSLT {
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ButtonCmd.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonExpToExcel.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -336,7 +351,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonExpToPDF.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -346,7 +361,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonOpen.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -356,7 +371,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonInsert.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -366,7 +381,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonPrint.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -376,7 +391,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonPrintList.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -386,7 +401,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonSelectRef.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -396,7 +411,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonSelectDataType.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -406,7 +421,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonMakeSelection.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -417,7 +432,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonToggle.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonCall.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -428,7 +443,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/Label.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/Edit.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -439,7 +454,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditRef.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditRefMultyType.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -464,7 +479,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditPassword.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditCheckBox.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditContainer.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -477,7 +492,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditRadio.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditSelect.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditSelectRef.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -489,7 +504,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditSelectOption.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditSelectOptionRef.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditRadioGroupRef.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -500,7 +515,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/PrintObj.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditModalDialog.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -515,7 +530,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditJSON.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/EditFile.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -525,7 +540,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditCompound.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -553,7 +568,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHead.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellFoot.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellPhone.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -563,7 +578,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellDetailToggle.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -577,7 +592,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridFoot.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridBody.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/Grid.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -587,7 +602,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridSearchInf.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -600,7 +615,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCommands.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmd.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdContainer.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -612,7 +627,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdContainerAjx.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdContainerObj.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdInsert.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -622,7 +637,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdEdit.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -632,7 +647,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdCopy.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -642,7 +657,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdDelete.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -652,7 +667,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdColManager.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -662,7 +677,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdPrint.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -672,7 +687,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdRefresh.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -683,7 +698,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdPrintObj.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdSearch.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -693,7 +708,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdExport.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -703,7 +718,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdExportExcelLocal.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -713,7 +728,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdAllCommands.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -723,7 +738,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdDOCUnprocess.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -733,7 +748,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdDOCShowActs.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -743,7 +758,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdRowUp.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -753,7 +768,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdRowDown.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -763,7 +778,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdFilter.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -773,7 +788,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdFilterView.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -783,7 +798,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdFilterSave.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -793,7 +808,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCmdFilterOpen.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -803,7 +818,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewGridColManager.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -813,7 +828,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewGridColParam.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -823,7 +838,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewGridColVisibility.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -833,7 +848,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewGridColOrder.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -843,7 +858,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/VariantStorageSaveView.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -853,7 +868,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/VariantStorageOpenView.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -863,7 +878,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridAjx.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -877,7 +892,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridAjxDOCT.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridAjxMaster.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCommandsAjx.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -887,7 +902,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCommandsDOC.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -897,7 +912,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridPagination.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -908,7 +923,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridFilterInfo.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridFilter.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -918,7 +933,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditPeriodDate.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -929,7 +944,7 @@ class ViewBase extends ViewHTMLXSLT {
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/EditPeriodDateTime.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonOK.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -939,7 +954,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonSave.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -949,7 +964,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonCancel.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -959,7 +974,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewObjectAjx.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -969,7 +984,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewGridEditInlineAjx.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -979,7 +994,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewDOC.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -989,7 +1004,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowPrint.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -999,7 +1014,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowQuestion.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1009,7 +1024,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowSearch.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1019,7 +1034,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowForm.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1029,7 +1044,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowFormObject.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1039,7 +1054,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowFormModalBS.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1055,7 +1070,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHeadDOCDate.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/GridCellHeadDOCNumber.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/actb.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1065,7 +1080,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/RepCommands.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1075,7 +1090,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ViewReport.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1087,7 +1102,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/PopUpMenu.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/PopOver.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/PeriodSelect.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1097,7 +1112,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/WindowAbout.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1107,7 +1122,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/MainMenuTree.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1117,7 +1132,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ButtonOrgSearch.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1127,7 +1142,7 @@ class ViewBase extends ViewHTMLXSLT {
 	}
 
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controls/ConstantGrid.js'));
-		
+			
 	if (
 	(isset($_SESSION['locale_id']) && $_SESSION['locale_id']=='ru')
 	||
@@ -1199,6 +1214,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MainMenuConstructorList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/MainMenuConstructor_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LoginList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/LoginDeviceList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserDialog_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/UserProfile_View.js'));
@@ -1393,6 +1409,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ConcreteTypeEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/DestinationEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/DestinationForClientEdit.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/DestinationForOrderEdit.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/DestinationSearchEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/ClientEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/PumpVehicleEdit.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/VehicleEdit.js'));
@@ -1451,6 +1469,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/rs_common_ru.js'));
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/OpenLayers/OpenLayers.js'));
+		
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'ext/chart.js-2.8.0/Chart.min.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/TrackConstants.js'));
@@ -1768,7 +1787,14 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/StoreMapToProductionSite_Controller.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/StoreMapToProductionSiteList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/MaterialStoreForOrderList_Model.js'));
-				
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/SessionVar_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/DestinationForOrderList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/VehicleRouteCashe_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/LoginDevice_Controller.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/LoginDeviceList_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/LoginDeviceBan_Model.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/LoginDeviceBan_Controller.js'));
+	$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/Event_Model.js'));			
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];
 			}
@@ -1783,6 +1809,13 @@ class ViewBase extends ViewHTMLXSLT {
 		
 		if (isset($_SESSION['role_id'])){
 			$this->getVarModel()->addField(new Field('tel_ext',DT_STRING));
+			
+			//app server
+			$this->getVarModel()->addField(new Field('app_srv_host',DT_STRING));
+			$this->getVarModel()->addField(new Field('app_srv_port',DT_STRING));
+			$this->getVarModel()->addField(new Field('app_srv_protocol',DT_STRING));								
+			
+			$this->getVarModel()->addField(new Field('app_id',DT_STRING));		
 			
 			if(isset($_SESSION['token'])){
 				$this->getVarModel()->addField(new Field('token',DT_STRING));
@@ -1824,6 +1857,11 @@ class ViewBase extends ViewHTMLXSLT {
 			$this->setVarValue('curDate',round(microtime(true) * 1000));
 			$this->setVarValue('tel_ext',$_SESSION['tel_ext']);
 			
+			$this->setVarValue('app_srv_host',APP_SERVER_HOST);
+			$this->setVarValue('app_srv_port',APP_SERVER_PORT);
+			$this->setVarValue('app_srv_protocol',APP_SERVER_SECURED? 'wss':'ws');
+			$this->setVarValue('app_id',APP_NAME);
+			
 			if(isset($_SESSION['token'])){
 				$this->setVarValue('token',$_SESSION['token']);
 				if(defined('SESSION_EXP_SEC') && intval(SESSION_EXP_SEC)){
@@ -1838,23 +1876,6 @@ class ViewBase extends ViewHTMLXSLT {
 		//Global Filters
 		
 	}
-	protected function initDbLink(){
-		if (!$this->dbLink){
-			$this->dbLink = new DB_Sql();
-			$this->dbLink->persistent=true;
-			$this->dbLink->appname = APP_NAME;
-			$this->dbLink->technicalemail = TECH_EMAIL;
-			$this->dbLink->reporterror = DEBUG;
-			$this->dbLink->database= DB_NAME;
-			try{			
-				$this->dbLink->connect(DB_SERVER,DB_USER,DB_PASSWORD,(defined('DB_PORT'))? DB_PORT:NULL);
-			}
-			catch (Exception $e){
-				//do nothing
-			}
-		}	
-	}
-	
 	public function write(ArrayObject &$models,$errorCode=NULL){
 		$this->addMenu($models);
 		

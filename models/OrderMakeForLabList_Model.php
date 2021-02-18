@@ -21,7 +21,8 @@ class OrderMakeForLabList_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("orders_make_for_lab_list");
 			

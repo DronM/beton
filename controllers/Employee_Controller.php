@@ -41,6 +41,13 @@ class Employee_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('Employee.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('Employee_Model');
@@ -69,7 +76,14 @@ class Employee_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				]
+			];
+			$pm->addEvent('Employee.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('Employee_Model');
 
@@ -82,6 +96,16 @@ class Employee_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('Employee.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('Employee_Model');
 
@@ -146,10 +170,10 @@ class Employee_Controller extends ControllerSQL{
 		$par = new ParamsSQL($pm,$this->getDbLink());				
 		$par->addAll();
 		$this->getDbLinkMaster()->query(sprintf(
-		"SELECT employee_work_time_sched_hour_set(%d,%s,%s)",
-		$par->getParamById('employee_id'),
-		$par->getParamById('day'),
-		$par->getParamById('hours')
+			"SELECT employee_work_time_sched_hour_set(%d,%s,%s)",
+			$par->getParamById('employee_id'),
+			$par->getParamById('day'),
+			$par->getParamById('hours')
 		));
 	}
 

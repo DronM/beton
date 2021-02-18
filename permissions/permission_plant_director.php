@@ -56,9 +56,15 @@ $permissions = array();
 				
 					$permissions['Destination_Controller_complete_dest']=TRUE;
 				
+					$permissions['Destination_Controller_complete_for_order']=TRUE;
+				
+					$permissions['Destination_Controller_get_data_for_new_address']=TRUE;
+				
 					$permissions['Destination_Controller_get_for_client_list']=TRUE;
 				
 					$permissions['Destination_Controller_get_coords_on_name']=TRUE;
+				
+					$permissions['Destination_Controller_get_route_to_zone']=TRUE;
 				
 					$permissions['Destination_Controller_at_dest_avg_time']=TRUE;
 				
@@ -108,7 +114,19 @@ $permissions = array();
 				
 					$permissions['Order_Controller_get_make_orders_form']=TRUE;
 				
+					$permissions['Order_Controller_get_make_orders_form_ord']=TRUE;
+				
+					$permissions['Order_Controller_get_make_orders_form_veh']=TRUE;
+				
+					$permissions['Order_Controller_get_make_orders_form_mat']=TRUE;
+				
 					$permissions['Order_Controller_get_make_orders_for_lab_form']=TRUE;
+				
+					$permissions['Order_Controller_get_make_orders_for_lab_form_ord']=TRUE;
+				
+					$permissions['Order_Controller_get_make_orders_for_lab_form_veh']=TRUE;
+				
+					$permissions['Order_Controller_get_make_orders_for_lab_form_mat']=TRUE;
 				
 					$permissions['Order_Controller_get_make_orders_list']=TRUE;
 				
@@ -330,6 +348,18 @@ $permissions = array();
 				
 					$permissions['Login_Controller_get_object']=TRUE;
 				
+					$permissions['LoginDevice_Controller_get_list']=TRUE;
+				
+					$permissions['LoginDevice_Controller_switch_banned']=TRUE;
+				
+					$permissions['LoginDeviceBan_Controller_insert']=TRUE;
+				
+					$permissions['LoginDeviceBan_Controller_delete']=TRUE;
+				
+					$permissions['LoginDeviceBan_Controller_get_list']=TRUE;
+				
+					$permissions['LoginDeviceBan_Controller_get_object']=TRUE;
+				
 					$permissions['User_Controller_insert']=TRUE;
 				
 					$permissions['User_Controller_update']=TRUE;
@@ -377,6 +407,10 @@ $permissions = array();
 					$permissions['Constant_Controller_get_object']=TRUE;
 				
 					$permissions['Constant_Controller_get_values']=TRUE;
+				
+					$permissions['SessionVar_Controller_set_value']=TRUE;
+				
+					$permissions['SessionVar_Controller_get_values']=TRUE;
 				
 					$permissions['Enum_Controller_get_enum_list']=TRUE;
 				

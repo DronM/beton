@@ -30,8 +30,33 @@ function OrderMakeGrid(id,options){
 
 	var elements,foot;
 	if(w=="sm"||w=="xs"){
+		//Small resolution
 		elements = [
-			new GridCellHead(id+":order_make_grid:head:date_time_time",{
+			new GridCellHead(id+":order_make_grid:head:quant_rest",{
+				"value":"Ост.",
+				"columns":[
+					new GridColumn({
+						"field":model.getField("quant_rest"),
+						"master":true,
+						"detailViewClass":ShipmentForOrderList_View,
+						"detailViewOptions":{
+							"listView":self.m_listView,
+							"detailFilters":{
+								"ShipmentForOrderList_Model":[
+									{
+									"masterFieldId":"id",
+									"field":"order_id",
+									"sign":"e",
+									"val":"0"
+									}	
+								]
+							}													
+						}
+					})
+				]
+			})
+		
+			,new GridCellHead(id+":order_make_grid:head:date_time_time",{
 				"value":"Время",
 				"colAttrs":{"align":"center"},
 				"columns":[

@@ -61,7 +61,18 @@ BEGIN
 			reg_cement.cement_silos_id	= NEW.cement_silos_id;
 			reg_cement.quant		= NEW.quant_net;
 			PERFORM ra_cement_add_act(reg_cement);	
+			
 		END IF;
+			
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
 				
 		RETURN NEW;
 		
@@ -76,6 +87,17 @@ BEGIN
 						
 		RETURN NEW;
 	ELSIF (TG_WHEN='AFTER' AND TG_OP='DELETE') THEN
+	
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',OLD.date_time::date
+				)
+			)::text
+		);
+	
 		RETURN OLD;
 	ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
 		--detail tables

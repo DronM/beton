@@ -19,7 +19,8 @@ class ProductionSite_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("production_sites");
 			
@@ -75,6 +76,16 @@ class ProductionSite_Model extends ModelSQLBeton{
 						
 		$f_missing_elkon_production_ids=new FieldSQLArray($this->getDbLink(),$this->getDbName(),$this->getTableName(),"missing_elkon_production_ids",$f_opts);
 		$this->addField($f_missing_elkon_production_ids);
+		//********************
+		
+		//*** Field destination_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Зона';
+		$f_opts['id']="destination_id";
+						
+		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
+		$this->addField($f_destination_id);
 		//********************
 	
 		$order = new ModelOrderSQL();		

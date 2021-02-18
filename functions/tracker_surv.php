@@ -6,7 +6,7 @@ require_once("common/SMSService.php");
 $dbLink = new DB_Sql();
 $dbLink->appname = APP_NAME;
 $dbLink->technicalemail = TECH_EMAIL;
-$dbLink->reporterror = DEBUG;
+$dbLink->detailedError = defined('DETAILED_ERROR')? DETAILED_ERROR:DEBUG;
 
 /*conneсtion*/
 $dbLink->server		= DB_SERVER_MASTER;

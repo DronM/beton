@@ -35,6 +35,11 @@ BEGIN
 			LIMIT 1;
 		END IF;
 		
+		--plate number for sorting
+		IF TG_OP='INSERT' OR NEW.plate<>OLD.plate THEN
+			NEW.plate_n = CASE WHEN regexp_replace(NEW.plate, '\D','','g')='' THEN 0 ELSE regexp_replace(NEW.plate, '\D','','g')::int END;
+		END IF;
+		
 		RETURN NEW;
 	END IF;
 END;

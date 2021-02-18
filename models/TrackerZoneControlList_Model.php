@@ -15,7 +15,8 @@ class TrackerZoneControlList_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("tracker_zone_controls_list");
 			

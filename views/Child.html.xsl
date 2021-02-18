@@ -19,6 +19,14 @@
 						}
 					}
 				}
+				//delete views
+				if(window["page_views"]){
+					for(var v_id in window["page_views"]){
+						window["page_views"][v_id].delDOM();
+						delete window["page_views"][v_id];
+					}
+					delete window["page_views"];
+				}
 				
 				if (window.onClose){					
 					window.onClose();

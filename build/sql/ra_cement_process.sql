@@ -42,6 +42,16 @@ $BODY$
 
 					PERFORM rg_cement_update_periods(NEW.date_time, NEW.cement_silos_id, v_delta_quant);
 
+					--Event support
+					/*PERFORM pg_notify(
+							'RACement.'||lower(TG_OP)
+						,json_build_object(
+							'params',json_build_object(
+								'id',NEW.id
+							)
+						)::text
+					);*/
+
 					RETURN NEW;					
 				ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
 					RETURN OLD;
@@ -57,6 +67,16 @@ $BODY$
 					END IF;
 
 					PERFORM rg_cement_update_periods(OLD.date_time, OLD.cement_silos_id,v_delta_quant);
+					
+					--Event support
+					/*PERFORM pg_notify(
+							'RACement.delete'
+						,json_build_object(
+							'params',json_build_object(
+								'id',OLD.id
+							)
+						)::text
+					);*/
 					
 					RETURN OLD;					
 				END IF;

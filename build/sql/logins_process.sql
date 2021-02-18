@@ -7,12 +7,20 @@ CREATE OR REPLACE FUNCTION logins_process()
 $BODY$
 BEGIN
 	IF (TG_WHEN='AFTER' AND TG_OP='UPDATE') THEN
-		IF NEW.date_time_out IS NOT NULL THEN
-			--DELETE FROM  WHERE login_id=NEW.id;
+		IF OLD.date_time_out IS NULL AND NEW.date_time_out IS NOT NULL THEN		
+			--event
+			--RAISE EXCEPTION 'pub_key=%',trim(NEW.pub_key);
+			PERFORM pg_notify(
+				'User.logout'
+				,json_build_object(
+					'params',json_build_object(
+						'pub_key',trim(NEW.pub_key)
+					)
+				)::text
+			);
+			
 		END IF;
 		
-		RETURN NEW;
-	ELSE 
 		RETURN NEW;
 	END IF;
 END;

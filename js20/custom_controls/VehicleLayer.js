@@ -40,12 +40,14 @@ VehicleLayer.prototype.flyToObjById = function(id,zoom){
 	if (this.m_vehicles[id]==undefined){
 		throw new Error('Object with id '+id+' not found!');
 	}
+//console.log("VehicleLayer.prototype.flyToObjById ID="+id+" moving map to LON="+this.m_vehicles[id].head.pos_data.lon+" LAT="+this.m_vehicles[id].head.pos_data.lat+" ZOOM="+zoom || this.map.getZoom())	
 	this.moveMapToCoords(
-		this.m_vehicles[id].head.lon,
-		this.m_vehicles[id].head.lat,
-		zoom || this.map.getZoom());
+		this.m_vehicles[id].head.pos_data.lon,
+		this.m_vehicles[id].head.pos_data.lat,
+		zoom || this.map.getZoom()
+	);
 	/*
-	var lonLat = this.getLonLatPoint(this.m_vehicles[id].head.lon,this.m_vehicles[id].head.lat);		
+	var lonLat = this.getLonLatPoint(this.m_vehicles[id].head.pos_data.lon,this.m_vehicles[id].head.pos_data.lat);		
 	if (lonLat!=undefined){
 		this.map.setCenter(lonLat, );
 	}
@@ -53,17 +55,19 @@ VehicleLayer.prototype.flyToObjById = function(id,zoom){
 }
 
 //public
-VehicleLayer.prototype.addVehicle = function(mapMarker,tailMarkers,
-									showPointer,current){	
+VehicleLayer.prototype.addVehicle = function(mapMarker,tailMarkers,showPointer,current){
+//console.log("VehicleLayer.prototype.addVehicle ID="+mapMarker.id)
 	var self = this;
-	this.m_vehicles[mapMarker.id] = {'head':mapMarker,
-								'tail':tailMarkers,
-								'pointerFeature':null,
-								'currentObjFeature':null};
+	this.m_vehicles[mapMarker.id] = {
+		'head':mapMarker,
+		'tail':tailMarkers,
+		'pointerFeature':null,
+		'currentObjFeature':null
+	};
 	var features = [];
 	//header
 	mapMarker.feature = new OpenLayers.Feature.Vector(
-			this.getMapPoint(mapMarker.lon,mapMarker.lat),
+			this.getMapPoint(mapMarker.pos_data.lon,mapMarker.pos_data.lat),
 			null, this.getCarStyle(mapMarker,current));
 			
 	//for use in select/unselect functions
@@ -73,8 +77,9 @@ VehicleLayer.prototype.addVehicle = function(mapMarker,tailMarkers,
 	//for pointer
 	if (showPointer){
 		this.m_vehicles[mapMarker.id].pointerFeature = new OpenLayers.Feature.Vector(
-			this.getMapPoint(mapMarker.lon, mapMarker.lat),
-			null, this.getPointerStyle(mapMarker.heading));
+			this.getMapPoint(mapMarker.pos_data.lon, mapMarker.pos_data.lat),
+			null, this.getPointerStyle(mapMarker.pos_data.heading)
+		);
 		features.push(this.m_vehicles[mapMarker.id].pointerFeature);
 	}
 	
@@ -217,6 +222,7 @@ VehicleLayer.prototype.getTailStyle = function(tailMarker){
 	return (style_mark);
 }
 VehicleLayer.prototype.setCurrentObj = function(id,zoom){
+//console.log("VehicleLayer.prototype.setCurrentObj ID="+id)
 	if (this.m_vehicles[id]!=undefined){
 		this.currentObj = id;
 		//flying

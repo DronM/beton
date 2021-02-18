@@ -1,0 +1,1 @@
+/home/andrey/www/includes/osbe/build/templates/build.proj-tmpl/sql.proj-tmpl/sess_enc_write.sql

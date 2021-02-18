@@ -20,7 +20,8 @@ class DOCMaterialProcurement_Model extends ModelSQLDOC{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("doc_material_procurements");
 			

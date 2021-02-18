@@ -14,9 +14,9 @@ function GeoZones(map,objDescr,points,doDraw){
 										*/
 		//dragging
 		this.m_dragControl = new OpenLayers.Control.DragFeature(this.layer,{
-		"onComplete":function(feature,pixel){
-			self.drawComplete(feature);
-		}
+			"onComplete":function(feature,pixel){
+				self.drawComplete(feature);
+			}
 		});
 		
 		this.map.addControl(this.m_drawControl);	

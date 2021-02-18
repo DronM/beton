@@ -3,6 +3,13 @@
  */
 function ClientList_View(id,options){	
 
+	/*options.srvEvents = [
+		{"id":"Client.delete"}
+		,{"id":"Client.update"}
+		,{"id":"Client.insert"}
+	];
+	*/
+	
 	ClientList_View.superclass.constructor.call(this,id,options);
 
 	var model = options.models.ClientList_Model;
@@ -13,11 +20,12 @@ function ClientList_View(id,options){
 	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
-	this.addElement(new GridAjxScroll(id+":grid",{
+	//GridAjxScroll
+	this.addElement(new GridAjx(id+":grid",{
 		"model":model,
 		"controller":contr,
 		"editInline":false,
-		"editWinClass":Client_Form,
+		"editWinClass":Client_Form,		
 		"commands":new GridCmdContainerAjx(id+":grid:cmd"),		
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
@@ -94,9 +102,7 @@ function ClientList_View(id,options){
 				})
 			]
 		}),
-		"pagination":new pagClass(id+"_page",
-			{"countPerPage":constants.doc_per_page_count.getValue()}),		
-		
+		"pagination":new pagClass(id+"_page",{"countPerPage":constants.doc_per_page_count.getValue()}),				
 		"autoRefresh":false,
 		//"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
@@ -105,3 +111,5 @@ function ClientList_View(id,options){
 	
 }
 extend(ClientList_View,ViewAjxList);
+
+

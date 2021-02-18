@@ -8,11 +8,12 @@ function DestinationDialog_View(id,options){
 	options.model = options.models.DestinationDialog_Model;
 	
 	var self = this;
+	
 	options.addElement = function(){
-		this.addElement(new EditString(id+":name",{
+		this.addElement(new DestinationSearchEdit(id+":name",{
 			"labelCaption":"Наименование:",
 			"required":true,
-			"maxLength":100
+			"value":(options.defDialogValues&&options.defDialogValues["name"])? options.defDialogValues["name"]:""
 		}));	
 	
 		this.addElement(new EditFloat(id+":distance",{
@@ -46,14 +47,32 @@ function DestinationDialog_View(id,options){
 		}));	
 		
 		this.addElement(new ButtonCmd(id+":cmdFindOnMap",{
-			"caption":"Найти на карте ",
+			"caption":" Найти по адресу ",
+			"title":"Построить зону, проложить маршрут по адресу",
 			"glyph":"glyphicon-search",
 			"onClick":function(){
 				self.findOnMap();
 			}
 		}));	
+
+		this.addElement(new ButtonCmd(id+":cmdMakeRoute",{
+			"caption":" Проложить маршрут ",
+			"title":"Проложить маршрут от производства до зоны объекта",
+			"glyph":"glyphicon-road",
+			"onClick":function(){
+				self.makeRouteToZone();
+			}
+		}));	
 	
-		this.addElement(new ZoneDrawingControl(id+":map_controls"));	
+	
+		this.addElement(new ZoneDrawingControl(id+":map_controls",{
+			"onDeleteZone":function(){
+				if(self.m_routeLayer){
+					self.m_map.removeLayer(self.m_routeLayer); 
+					delete self.m_routeLayer;
+				}
+			}
+		}));	
 	
 	}
 	
@@ -118,6 +137,139 @@ DestinationDialog_View.prototype.updateZone = function(zoneStr){
 	this.getController().getPublicMethod("insert").setFieldValue("zone",zoneStr);
 }
 
+DestinationDialog_View.prototype.makeRouteToZoneCont = function(model){
+		//bases && routes
+//http://localhost/beton_new/index.php?c=Destination_Controller&f=get_object&t=DestinationDialog&mode=insert&v=Child
+//http://localhost/beton_new/index.php?c=Destination_Controller&f=get_coords_on_name&v=ViewXML&name=%D0%A2%D1%8E%D0%BC%D0%B5%D0%BD%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C%2C%20%D0%B3%20%D0%A2%D1%8E%D0%BC%D0%B5%D0%BD%D1%8C%2C%20%D1%83%D0%BB%20%D0%A1%D0%B0%D0%BA%D0%BA%D0%BE%2C%20%D0%B4%2025		
+	var routes = CommonHelper.unserialize(model.getFieldValue("routes"));		
+	for(var id in routes){
+		var b_zone_points = routes[id].zone_str.split(" ").join(",").split(",");
+		this.m_zones.drawZoneOnCoords(b_zone_points);
+		console.log(routes[id].route)
+		if(!routes[id].route || routes[id].route.code!="Ok" || !routes[id].route.routes || !routes[id].route.routes.length){
+			throw new Error("Ошибка получения данных!");
+		}
+		
+		var route = routes[id].route;
+		this.getElement("distance").setValue(Math.round(route.routes[0].distance/1000));
+		
+		var route_descr = route.waypoints[0]["name"]+" - "+route.waypoints[1]["name"];
+					
+		var geom_str = route.routes[0].geometry.replace(/\\\\/g, "\\");
+		var points = decodeLine(geom_str);//ext function				
+		
+		if (this.m_routeLayer!=undefined){
+			this.m_map.removeLayer(this.m_routeLayer); 
+			delete this.m_routeLayer;
+		}
+		this.m_routeLayer = new OpenLayers.Layer.Vector(route_descr);
+		
+		var map_features = [];
+		
+		//route to dest, making line points
+		this.m_zones.addLineFromPoints(map_features,points,{
+			strokeColor: "#0074FF",
+			strokeWidth: 4,
+			pointRadius: 6,
+			pointerEvents: "visiblePainted"
+		});
+		
+		//base center markers
+		var center_pt = routes[id].zone_center_str.split(" ").join(",").split(",");
+		var style_mark = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+		style_mark.externalGraphic = "./img/marker-blue.png";
+		style_mark.graphicHeight = 25; 
+		style_mark.graphicWidth = 21;		
+		style_mark.graphicTitle = route.waypoints[0]["name"];//"Зона завода";
+		style_mark.fillOpacity = 1;			
+		style_mark.cursor = 'pointer';
+		style_mark.labelXOffset = 7;
+		style_mark.labelYOffset = 7;
+		style_mark.fontSize = '8px';
+		map_features.push(
+			new OpenLayers.Feature.Vector(
+				this.m_zones.getMapPoint(center_pt[0],center_pt[1])
+				,null
+				,style_mark
+			)
+		);
+
+		//client center markers
+		var style_mark = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+		style_mark.externalGraphic = "./img/marker-blue.png";
+		style_mark.graphicHeight = 25; 
+		style_mark.graphicWidth = 21;		
+		style_mark.graphicTitle = route.waypoints[1]["name"];//"Зона клиента";
+		style_mark.fillOpacity = 1;			
+		style_mark.cursor = 'pointer';
+		style_mark.labelXOffset = 7;
+		style_mark.labelYOffset = 7;
+		style_mark.fontSize = '8px';
+		
+		map_features.push(
+			new OpenLayers.Feature.Vector(
+				this.m_zones.getMapPoint(model.getFieldValue("road_lon_pos"),model.getFieldValue("road_lat_pos"))
+				,null
+				,style_mark
+			)
+		);
+		
+		
+		this.m_routeLayer.addFeatures(map_features);
+		this.m_map.addLayer(this.m_routeLayer); 
+		
+		window.showTempNote("Проложен маршрут до объекта",null,5000);
+	}
+	
+
+}
+
+DestinationDialog_View.prototype.makeRouteToZone = function(){
+
+	var zone_coords = this.getController().getPublicMethod("update").getFieldValue("zone");
+
+	if(!zone_coords || !zone_coords.length)return;
+	
+	var pm = (new Destination_Controller()).getPublicMethod("get_route_to_zone");
+	pm.setFieldValue("zone_coords",zone_coords);
+	var self = this;
+	pm.run({
+		"ok":function(resp){
+			var model = resp.getModel("Coords_Model");
+			if(model.getNextRow()){
+				self.makeRouteToZoneCont(resp.getModel("Coords_Model"));
+			}
+		}
+	})
+}
+
+DestinationDialog_View.prototype.findOnMapCont = function(model){
+	if(model.getNextRow()){
+		var lon_lower = model.getFieldValue("lon_lower");
+		var lat_lower = model.getFieldValue("lat_lower");
+		var lon_upper = model.getFieldValue("lon_upper");
+		var lat_upper = model.getFieldValue("lat_upper");
+		var zone_str = lon_lower+" "+lat_lower+","+
+			lon_lower+" "+lat_upper+","+
+			lon_upper+" "+lat_upper+","+
+			lon_upper+" "+lat_lower+","+
+			lon_lower+" "+lat_lower;							
+		this.updateZone(zone_str);
+		
+		zone_str = zone_str.split(" ").join(",");
+		var zone_points = zone_str.split(",");	
+		this.m_zones.drawZoneOnCoords(zone_points);
+		
+		this.makeRouteToZoneCont(model);
+		
+		var move_lon = lon_lower + (lon_upper - lon_lower)/2;
+		var move_lat = lat_lower + (lat_upper - lat_lower)/2;				
+		this.m_zones.moveMapToCoords(move_lon, move_lat,TRACK_CONSTANTS.FOUND_ZOOM);			
+		
+		window.showTempNote("Построена зона по адресу",null,5000);
+	}
+}
+
 DestinationDialog_View.prototype.findOnMap = function(){
 	var ctrl = this.getElement("name");
 	if(ctrl.isNull())return;
@@ -126,28 +278,7 @@ DestinationDialog_View.prototype.findOnMap = function(){
 	var self = this;
 	pm.run({
 		"ok":function(resp){
-			var m = resp.getModel("Coords_Model");
-			if(m.getNextRow()){
-				var lon_lower = m.getFieldValue("lon_lower");
-				var lat_lower = m.getFieldValue("lat_lower");
-				var lon_upper = m.getFieldValue("lon_upper");
-				var lat_upper = m.getFieldValue("lat_upper");
-				var zone_str = lon_lower+" "+lat_lower+","+
-					lon_lower+" "+lat_upper+","+
-					lon_upper+" "+lat_upper+","+
-					lon_upper+" "+lat_lower+","+
-					lon_lower+" "+lat_lower;							
-				self.updateZone(zone_str);
-				
-				zone_str = zone_str.split(" ").join(",");
-				var zone_points = zone_str.split(",");	
-				self.m_zones.drawZoneOnCoords(zone_points);
-				
-				var move_lon = lon_lower + (lon_upper - lon_lower)/2;
-				var move_lat = lat_lower + (lat_upper - lat_lower)/2;				
-				self.m_zones.moveMapToCoords(move_lon, move_lat,TRACK_CONSTANTS.FOUND_ZOOM);
-					
-			}
+			self.findOnMapCont(resp.getModel("Coords_Model"));
 		}
 	})
 }
@@ -201,6 +332,6 @@ DestinationDialog_View.prototype.toDOM = function(parent){
 }
 
 DestinationDialog_View.prototype.drawComplete = function(coordsStr){
-	console.log("DestinationDialog_View.prototype.drawComplete coordsStr="+coordsStr)
+	//console.log("DestinationDialog_View.prototype.drawComplete coordsStr="+coordsStr)
 	this.updateZone(coordsStr);
 }

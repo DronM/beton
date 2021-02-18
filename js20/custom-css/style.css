@@ -791,33 +791,28 @@ td.negativeNumber{
 }
 
 @media screen and (max-width: 765px) {
-	.smallWidthCardFormat > thead > tr > th{
-		border: none; !important;
-	}
-	.smallWidthCardFormat  thead{
-		display: none; !important;
-	}
+	.smallWidthCardFormat > table,	
+	.smallWidthCardFormat > tbody > tr > td,
+	.smallWidthCardFormat > tbody > tr > th,
+	.smallWidthCardFormat > tfoot > tr > td,
+	.smallWidthCardFormat > tfoot > tr > th,
+	.smallWidthCardFormat > thead > tr > td,
+	.smallWidthCardFormat > thead > tr > th {
+	    border: none;  !important;
+	}	
 	.smallWidthCardFormat tr{
 		margin-bottom: 20px;  !important;
 		display: block;  !important;
-		border-bottom: 2px solid #ddd;  !important;
 		box-shadow: 2px 2px 1px #dadada;  !important;
 	}
 	.smallWidthCardFormat td{
 		display: block;  !important;
-		text-align: right; !important;
 		font-size: 13px; !important;
-	}
-	.smallWidthCardFormat td:last-child{
-		border-bottom: 1px solid black;  !important;
-	}
-	.smallWidthCardFormat td:first-child{
-		border-top: 1px solid black; !important;
+		text-align:left;
 	}
 	
-	.smallWidthCardFormat td::before{
-		content: attr(data-label);
-		float: left;
+	.smallWidthCardFormat tbody td::before{
+		content: attr(data-label) ": ";
 		font-weight: bold;
 	}
 	
@@ -832,3 +827,7 @@ td.negativeNumber{
 	border-spacing: 0;
 }
 
+a[client_dest="true"].autoComplete{
+	background-color:yellow !important;
+	background-image: url('https://i.imgur.com/MJekAr4.gif');
+}

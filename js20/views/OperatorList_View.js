@@ -6,6 +6,59 @@ function OperatorList_View(id,options){
 	options.templateOptions = options.templateOptions || {};
 	options.templateOptions.showPeriod = (!options.fromLabList && CommonHelper.inArray(window.getApp().getServVar("role_id"),["operator","dispatcher"])==-1);
 	
+	//events
+	options.srvEvents = options.fromLabList? null:[
+		{"id": "Shipment.insert"}
+		,{"id": "Shipment.update"}
+		,{"id": "Shipment.delete"}
+		,{"id": "Production.insert"}
+		,{"id": "Production.update"}
+		,{"id": "Production.delete"}
+	];
+	options.srvEventsCallBack = options.fromLabList? null:function(json){
+		var do_refresh = true;
+		
+		var grid = self.getElement("grid");
+		//Shipment
+		if(json.controllerId=="Shipment"&& (json.methodId=="update"||json.methodId=="delete" ) ){
+			//look for id
+			
+			var keys = grid.getKeyIds();
+			var key_fields = {};
+			for(var i=0;i<keys.length;i++){
+				if(json.params[keys[i]]){
+					key_fields[keys[i]] = json.params[keys[i]];
+				}
+			}
+			try{
+				grid.m_model.recLocate(key_fields,true);
+			}
+			catch(e){
+				do_refresh = false;
+			}
+			
+		}
+		else if(json.controllerId=="Production"&& (json.methodId=="update"||json.methodId=="delete" )){
+			do_refresh = false;
+			grid.m_model.reset();
+			while(grid.m_model.getNextRow()){
+				var list = grid.m_model.getFieldValue("production_list");
+				if(list){
+					for(var i=0;i<list.length;i++){
+						if(list[i].id==json.params.id){
+							do_refresh = true;
+							break;	
+						}
+					}
+				}					
+			}
+		}
+		
+		if(do_refresh){
+			grid.onRefresh();
+		}				
+	};
+	
 	OperatorList_View.superclass.constructor.call(this,id,options);
 	
 	//Для оператора - только текущая смена, для все остальных - можно шагазть по сменам	
@@ -374,6 +427,8 @@ function OperatorList_View(id,options){
 		"cmdInsert":false,
 		"cmdEdit":false,
 		"cmdDelete":false,
+		
+		
 		"onEventSetRowOptions":function(opts){
 			opts.className = opts.className||"";
 			var m = this.getModel();

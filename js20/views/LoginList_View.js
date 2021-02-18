@@ -83,11 +83,11 @@ function LoginList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:headers",{
-							"value":"Заголовки",
+						,new GridCellHead(id+":grid:head:user_agent",{
+							"value":"Устройство",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("headers")
+									"field":model.getField("user_agent")
 								})
 							]
 						})

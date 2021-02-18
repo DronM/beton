@@ -36,6 +36,13 @@ class RawMaterialStoreUserData_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['material_id'
+			]
+		];
+		$pm->addEvent('RawMaterialStoreUserData.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('RawMaterialStoreUserData_Model');
@@ -60,7 +67,14 @@ class RawMaterialStoreUserData_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['material_id'
+				]
+			];
+			$pm->addEvent('RawMaterialStoreUserData.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('RawMaterialStoreUserData_Model');
 
@@ -73,6 +87,16 @@ class RawMaterialStoreUserData_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['material_id'
+			]
+		];
+		$pm->addEvent('RawMaterialStoreUserData.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('RawMaterialStoreUserData_Model');
 

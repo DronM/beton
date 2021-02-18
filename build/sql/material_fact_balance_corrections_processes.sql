@@ -67,6 +67,16 @@ BEGIN
 			END IF;
 		END IF;
 		
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+		
 		RETURN NEW;
 		
 	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
@@ -86,7 +96,16 @@ BEGIN
 
 			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
 			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
-		
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
 		END IF;
 	
 		RETURN OLD;

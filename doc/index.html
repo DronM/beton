@@ -48,6 +48,8 @@
 <li><a href="#LabEntryDetail_Controller">LabEntryDetail_Controller</a></li>
 <li><a href="#Lang_Controller">Lang_Controller</a></li>
 <li><a href="#Login_Controller">Login_Controller</a></li>
+<li><a href="#LoginDevice_Controller">LoginDevice_Controller</a></li>
+<li><a href="#LoginDeviceBan_Controller">LoginDeviceBan_Controller</a></li>
 <li><a href="#MainMenu_Controller">MainMenu_Controller</a></li>
 <li><a href="#MainMenuConstructor_Controller">MainMenuConstructor_Controller</a></li>
 <li><a href="#MainMenuContent_Controller">MainMenuContent_Controller</a></li>
@@ -81,6 +83,7 @@
 <li><a href="#SMSPattern_Controller">SMSPattern_Controller</a></li>
 <li><a href="#SMSPatternUserPhone_Controller">SMSPatternUserPhone_Controller</a></li>
 <li><a href="#SandQuarryVal_Controller">SandQuarryVal_Controller</a></li>
+<li><a href="#SessionVar_Controller">SessionVar_Controller</a></li>
 <li><a href="#Shift_Controller">Shift_Controller</a></li>
 <li><a href="#ShipQuantForCostGrade_Controller">ShipQuantForCostGrade_Controller</a></li>
 <li><a href="#Shipment_Controller">Shipment_Controller</a></li>
@@ -131,11 +134,14 @@
 <li><a href="#Session_Model">Session_Model</a></li>
 <li><a href="#Login_Model">Login_Model</a></li>
 <li><a href="#LoginList_Model">LoginList_Model</a></li>
+<li><a href="#LoginDeviceList_Model">LoginDeviceList_Model</a></li>
+<li><a href="#LoginDeviceBan_Model">LoginDeviceBan_Model</a></li>
 <li><a href="#Client_Model">Client_Model</a></li>
 <li><a href="#ClientList_Model">ClientList_Model</a></li>
 <li><a href="#ClientDialog_Model">ClientDialog_Model</a></li>
 <li><a href="#Destination_Model">Destination_Model</a></li>
 <li><a href="#DestinationList_Model">DestinationList_Model</a></li>
+<li><a href="#DestinationForOrderList_Model">DestinationForOrderList_Model</a></li>
 <li><a href="#DestinationDialog_Model">DestinationDialog_Model</a></li>
 <li><a href="#ConcreteType_Model">ConcreteType_Model</a></li>
 <li><a href="#ConcreteTypeList_Model">ConcreteTypeList_Model</a></li>
@@ -337,6 +343,8 @@
 <li><a href="#ClientLocalList_Model">ClientLocalList_Model</a></li>
 <li><a href="#StoreMapToProductionSite_Model">StoreMapToProductionSite_Model</a></li>
 <li><a href="#StoreMapToProductionSiteList_Model">StoreMapToProductionSiteList_Model</a></li>
+<li><a href="#VehicleRouteCashe_Model">VehicleRouteCashe_Model</a></li>
+<li><a href="#Event_Model">Event_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1025,9 +1033,32 @@
 <a href="#Destination_Model">Model: Destination_Model</a><h2>get_list</h2>
 <a href="#DestinationList_Model">Model: DestinationList_Model</a><h2>get_object</h2>
 <a href="#DestinationDialog_Model">Model: DestinationDialog_Model</a><h2>complete_dest</h2>
-<a href="#DestinationList_Model">Model: DestinationList_Model</a><h2>get_for_client_list</h2>
+<a href="#DestinationList_Model">Model: DestinationList_Model</a><h2>complete_for_order</h2>
+<a href="#DestinationForOrderList_Model">Model: DestinationForOrderList_Model</a><h2>get_data_for_new_address</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>address_str</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>get_for_client_list</h2>
 <a href="#DestinationList_Model">Model: DestinationList_Model</a><h2>get_coords_on_name</h2>
-<a href="#Destination_Model">Model: Destination_Model</a><h2>at_dest_avg_time</h2>
+<a href="#Destination_Model">Model: Destination_Model</a><h2>get_route_to_zone</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>zone_coords</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>at_dest_avg_time</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
 <h2>route_to_dest_avg_time</h2>
@@ -1376,6 +1407,52 @@
 <a href="#LoginList_Model">Model: LoginList_Model</a>
 </div>
 </div>
+<div id="LoginDevice_Controller" class="content_box">
+<h1>LoginDevice_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#LoginDeviceList_Model">Model: LoginDeviceList_Model</a><h2>switch_banned</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>banned</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Bool</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>hash</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+<p>Length:32</p>
+</div>
+<h3>user_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+</div>
+</div>
+<div id="LoginDeviceBan_Controller" class="content_box">
+<h1>LoginDeviceBan_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#LoginDeviceBan_Model">Model: LoginDeviceBan_Model</a><h2>delete</h2>
+<a href="#LoginDeviceBan_Model">Model: LoginDeviceBan_Model</a><h2>get_list</h2>
+<a href="#LoginDeviceBan_Model">Model: LoginDeviceBan_Model</a><h2>get_object</h2>
+<a href="#LoginDeviceBan_Model">Model: LoginDeviceBan_Model</a>
+</div>
+</div>
 <div id="MainMenu_Controller" class="content_box">
 <h1>MainMenu_Controller</h1>
 <div class="content_item">
@@ -1639,7 +1716,73 @@
 								Нет</p>
 </div>
 </div>
+<h2>get_make_orders_form_ord</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>date</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Date</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>get_make_orders_form_veh</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>date</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Date</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>get_make_orders_form_mat</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>date</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Date</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 <h2>get_make_orders_for_lab_form</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>date</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Date</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>get_make_orders_for_lab_form_ord</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>date</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Date</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>get_make_orders_for_lab_form_veh</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>date</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Date</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>get_make_orders_for_lab_form_mat</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>date</h3>
@@ -2280,6 +2423,50 @@
 <a href="#SandQuarryVal_Model">Model: SandQuarryVal_Model</a><h2>get_list</h2>
 <a href="#SandQuarryValList_Model">Model: SandQuarryValList_Model</a><h2>get_object</h2>
 <a href="#SandQuarryValList_Model">Model: SandQuarryValList_Model</a>
+</div>
+</div>
+<div id="SessionVar_Controller" class="content_box">
+<h1>SessionVar_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>set_value</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>val</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>get_values</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>id_list</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+<h3>field_sep</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+<p>Length:1</p>
+</div>
+</div>
 </div>
 </div>
 <div id="Shift_Controller" class="content_box">
@@ -5284,6 +5471,18 @@
 <div>Required:</div>
 <div>Length:15</div>
 <div>Precision:2</div>
+<h2>near_road_lon</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:12</div>
+<h2>near_road_lat</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:12</div>
 </div>
 </div>
 <div id="DestinationDialog_Model" class="content_box">
@@ -5339,6 +5538,54 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>special_price</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="DestinationForOrderList_Model" class="content_box">
+<h1>DestinationForOrderList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>distance</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>time_route</h2>
+<div>Type:Time</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>price</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_dest</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>is_address</h2>
 <div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -5664,6 +5911,24 @@
 <div>Precision:</div>
 <h2>hours</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="Event_Model" class="content_box">
+<h1>Event_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>params</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -6414,6 +6679,66 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="LoginDeviceBan_Model" class="content_box">
+<h1>LoginDeviceBan_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>hash</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:32</div>
+<div>Precision:</div>
+<h2>create_dt</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="LoginDeviceList_Model" class="content_box">
+<h1>LoginDeviceList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_agent</h2>
+<div>Type:Text</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time_in</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>banned</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="LoginList_Model" class="content_box">
 <h1>LoginList_Model</h1>
 <div class="content_item">
@@ -6472,7 +6797,13 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>headers</h2>
+<h2>user_agent</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>header_user_agent</h2>
 <div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -9703,6 +10034,12 @@
 <div>Precision:</div>
 <h2>missing_elkon_production_ids</h2>
 <div>Type:Array</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destination_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -14993,6 +15330,12 @@
 <div>Required:TRUE</div>
 <div>Length:6</div>
 <div>Precision:</div>
+<h2>plate_n</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>load_capacity</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
@@ -15373,6 +15716,42 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="VehicleRouteCashe_Model" class="content_box">
+<h1>VehicleRouteCashe_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>tracker_id</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:15</div>
+<div>Precision:</div>
+<h2>shipment_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_state</h2>
+<div>Type:Enum</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>update_dt</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>route</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="VehicleRun_Model" class="content_box">
 <h1>VehicleRun_Model</h1>
 <div class="content_item">
@@ -15667,6 +16046,12 @@
 <div>Precision:</div>
 <h2>vehicle_schedules_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>tracker_id</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

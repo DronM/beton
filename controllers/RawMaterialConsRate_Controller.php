@@ -238,7 +238,126 @@ class RawMaterialConsRate_Controller extends ControllerSQL{
 			,$f_params);
 		$pm->addParam($param);		
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['rate_date_id'
+				,'concrete_type_id'
+				]
+			];
+			$pm->addEvent('RawMaterialConsRate.update',$ev_opts);
+			
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat1_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat2_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat3_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat4_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat5_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat6_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat7_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat8_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat9_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtInt('mat10_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat1_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat2_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat3_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat4_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat5_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat6_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat7_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat8_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat9_rate',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;		
+		$pm->addParam(new FieldExtFloat('mat10_rate',$opts));
+	
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('RawMaterialConsRateList_Model');
 
@@ -257,6 +376,18 @@ class RawMaterialConsRate_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['rate_date_id'
+			,'concrete_type_id'
+			,'raw_material_id'
+			]
+		];
+		$pm->addEvent('RawMaterialConsRate.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('RawMaterialConsRate_Model');
 

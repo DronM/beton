@@ -48,6 +48,15 @@ class ProductionComment_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['production_site_id'
+			,'production_id'
+			,'material_id'
+			]
+		];
+		$pm->addEvent('ProductionComment.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('ProductionComment_Model');
@@ -100,7 +109,16 @@ class ProductionComment_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['production_site_id'
+				,'production_id'
+				,'material_id'
+				]
+			];
+			$pm->addEvent('ProductionComment.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('ProductionComment_Model');
 
@@ -119,6 +137,18 @@ class ProductionComment_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['production_site_id'
+			,'production_id'
+			,'material_id'
+			]
+		];
+		$pm->addEvent('ProductionComment.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('ProductionComment_Model');
 

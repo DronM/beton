@@ -1,6 +1,6 @@
 -- View: public.orders_make_for_lab_period_list
 
- DROP VIEW public.orders_make_for_lab_period_list;
+-- DROP VIEW public.orders_make_for_lab_period_list;
 
 CREATE OR REPLACE VIEW public.orders_make_for_lab_period_list AS 
  SELECT o.id,

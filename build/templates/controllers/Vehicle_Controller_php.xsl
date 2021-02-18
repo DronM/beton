@@ -17,9 +17,14 @@
 
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
+
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 require_once('common/SMSService.php');
+
+require_once(FUNC_PATH.'VehicleRoute.php');
+
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
+
 	public function __construct($dbLinkMaster=NULL){
 		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
 	}
@@ -84,9 +89,16 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function vehicles_with_trackers($pm){
 		$this->addNewModel(
 			sprintf(
-				"SELECT 0 AS id,'*** ВСЕ ***' AS plate
+				"SELECT
+					0 AS id
+					,'*** ВСЕ ***' AS plate
+					,'NULL' AS tracker_id
 				UNION ALL
-				(SELECT id,plate FROM vehicles
+				(SELECT
+					id
+					,plate
+					,tracker_id
+				FROM vehicles
 				WHERE tracker_id IS NOT NULL AND tracker_id &lt;&gt;''%s
 				ORDER BY plate)",
 				($_SESSION['role_id']=='vehicle_owner')? sprintf(' AND vehicles.vehicle_owner_id=%d',$_SESSION['global_vehicle_owner_id']):''
@@ -114,8 +126,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	}
 	
 	public function get_current_position($pm){
-		$params = new ParamsSQL($pm,$this->getDbLink());
-		$params->setValidated('id',DT_INT);	
 		
 		$vehicle_id = $this->getExtDbVal($pm,'id');
 		if($_SESSION['role_id']=='vehicle_owner'){
@@ -126,50 +136,29 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 		
 		//zones
-		$cond = ($_SESSION['role_id']=='vehicle_owner')? sprintf(' AND vs.vehicle_id IN (SELECT vv.id FROM vehicles vv WHERE vv.id=%d)',$_SESSION['global_vehicle_owner_id']):'';
 		$this->addNewModel(
-		vsprintf("SELECT 
-			(SELECT replace(replace(st_astext(d.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text)
-			FROM destinations AS d
-			WHERE d.id=constant_base_geo_zone_id()
-			) AS base,	
-			
-			CASE 		
-			WHEN st.state IN ('at_dest'::vehicle_states,'left_for_base'::vehicle_states) THEN
-			(SELECT replace(replace(st_astext(d.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text)
-				FROM destinations AS d
-				WHERE d.id=st.destination_id
-			)	
-			
-			WHEN st.state ='busy'::vehicle_states THEN
-			(SELECT replace(replace(st_astext(d.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text)
-				FROM destinations AS d
-				LEFT JOIN shipments AS sh ON sh.id=st.shipment_id
-				LEFT JOIN orders AS o ON o.id=sh.order_id
-				WHERE d.id=o.destination_id
-			)
-			ELSE null
-			END AS dest
-			
-			FROM vehicle_schedule_states AS st
-			LEFT JOIN vehicle_schedules AS vs ON vs.id=st.schedule_id
-			WHERE vs.vehicle_id=%d AND st.date_time &lt; now()".$cond."
-			ORDER BY st.date_time DESC
-			LIMIT 1",
-			$params->getArray()			
-		),
-		'zones'
+			VehicleRoute::getZoneListQuery($vehicle_id)
+			,'ZoneList_Model'
 		);
 		
 		//position
 		$this->addNewModel(
-			sprintf(
-				"SELECT * FROM vehicle_current_pos_all
-				WHERE id=%d",
-				$vehicle_id
-			),
-			'get_current_position'
+			VehicleRoute::getLastPosQuery($vehicle_id)
+			,'VehicleLastPos_Model'
 		);
+		
+		$route = VehicleRoute::getRoute($vehicle_id,$this->getDbLink());
+		
+		if($route){
+			$this->addModel(new ModelVars(
+				array('id'=>'Route_Model',
+					'values'=>array(
+						new Field('route',DT_STRING,
+							array('value'=>$route))
+					)
+				)
+			));
+		}
 	}
 	public function get_current_position_all($pm){
 		//zones
@@ -177,23 +166,23 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		"SELECT 
 			replace(
 				replace(st_astext(d.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text
-			) AS base
+			) AS base_zone
 		FROM destinations AS d
 		WHERE d.id=constant_base_geo_zone_id()",
-		'zones');
+		'ZoneList_Model');
 		
 		//position
 		if($_SESSION['role_id']=='vehicle_owner'){
 			$q = sprintf(
-				"SELECT * FROM vehicle_current_pos_all WHERE id IN (SELECT t.id FROM vehicles t WHERE t.vehicle_owner_id=%d)",
+				"SELECT * FROM vehicles_last_pos WHERE id IN (SELECT t.id FROM vehicles t WHERE t.vehicle_owner_id=%d)",
 				$_SESSION['global_vehicle_owner_id']
 			);
 		}
 		else{
-			$q = "SELECT * FROM vehicle_current_pos_all";
+			$q = "SELECT * FROM vehicles_last_pos";
 		}
 		
-		$this->addNewModel($q,'get_current_position');		
+		$this->addNewModel($q,'VehicleLastPos_Model');		
 	}
 	
 	public function get_track($pm){
@@ -206,20 +195,19 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			}
 		}
 		
-		$this->addNewModel(
-		sprintf(
-		"SELECT
-			(
-				SELECT
-				replace(replace(st_astext(zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS coords
-				FROM destinations
-				WHERE id=constant_base_geo_zone_id()
-			) AS base,
-			NULL AS dest
-		UNION ALL
-		SELECT
-			NULL AS base,
-			replace(replace(st_astext(zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS dest
+		$this->addNewModel(sprintf(
+			"SELECT
+				(
+					SELECT
+					replace(replace(st_astext(zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS coords
+					FROM destinations
+					WHERE id=constant_base_geo_zone_id()
+				) AS base_zone,
+				NULL AS dest_zone
+			UNION ALL
+			SELECT
+				NULL AS base_zone,
+				replace(replace(st_astext(zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS dest_zone
 			FROM vehicle_schedule_states AS st
 			LEFT JOIN vehicle_schedules AS vs ON vs.id=st.schedule_id
 			LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
@@ -227,21 +215,21 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			WHERE v.id=%d
 			AND st.date_time BETWEEN %s AND %s
 			AND st.state='busy'::vehicle_states",
-		$this->getExtDbVal($pm,'id'),
-		$this->getExtDbVal($pm,'dt_from'),
-		$this->getExtDbVal($pm,'dt_to')
-		),
-		'zones'
+			$this->getExtDbVal($pm,'id'),
+			$this->getExtDbVal($pm,'dt_from'),
+			$this->getExtDbVal($pm,'dt_to')
+			)
+			,'ZoneList_Model'
 		);
 		//track
 		$this->addNewModel(sprintf(
-			"SELECT * FROM vehicle_track_with_stops(%d,%s,%s,%s)",
+			"SELECT * FROM vehicles_get_track(%d,%s,%s,%s)",
 			$this->getExtDbVal($pm,'id'),
 			$this->getExtDbVal($pm,'dt_from'),
 			$this->getExtDbVal($pm,'dt_to'),
 			$this->getExtDbVal($pm,'stop_dur')
 			),
-			'track_data'
+			'TrackData_Model'
 		);				
 	}
 	public function get_tool_tip($pm){

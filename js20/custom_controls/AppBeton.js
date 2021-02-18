@@ -13,12 +13,13 @@ function AppBeton(options){
 	options.paginationClass = Pagination;
 	
 	this.setColorClass(options.servVars.color_palette || this.COLOR_CLASS);
-	
+
 	AppBeton.superclass.constructor.call(this,"AppBeton",options);
 	
 	if (this.storageGet(this.getSidebarId())=="xs"){
 		$('body').toggleClass('sidebar-xs');
 	}
+
 }
 extend(AppBeton,App);
 
@@ -283,3 +284,4 @@ AppBeton.prototype.getChartColors = function(){
 	}
 	return this.m_chartColors;
 }
+

@@ -35,6 +35,3 @@ CREATE OR REPLACE VIEW public.orders_make_for_lab_list AS
   WHERE o.date_time >= get_shift_start(now()::timestamp without time zone) AND o.date_time <= get_shift_end(get_shift_start(now()::timestamp without time zone))
   ORDER BY o.date_time;
 
-ALTER TABLE public.orders_make_for_lab_list
-  OWNER TO beton;
-

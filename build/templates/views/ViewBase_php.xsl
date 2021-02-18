@@ -17,8 +17,6 @@ require_once(USER_CONTROLLERS_PATH.'MainMenuConstructor_Controller.php');
 <xsl:apply-templates select="metadata/enums/enum[@id='role_types']"/>
 class ViewBase extends ViewHTMLXSLT {	
 
-	private $dbLink;
-
 	protected static function getMenuClass(){
 		//USER_MODELS_PATH
 		$menu_class = NULL;
@@ -44,8 +42,11 @@ class ViewBase extends ViewHTMLXSLT {
 			$menu_class = self::getMenuClass();
 			if (is_null($menu_class)){
 				//no menu exists yet
-				$this->initDbLink();
-				$contr = new MainMenuConstructor_Controller($this->dbLink);
+				if (!$GLOBALS['dbLink']){
+					throw new Exception('Db link for addMenu is not defined!');
+				}
+				
+				$contr = new MainMenuConstructor_Controller($GLOBALS['dbLink']);
 				$contr->genMenuForUser($_SESSION['user_id'], $_SESSION['role_id']);
 				$menu_class = self::getMenuClass();
 				if (is_null($menu_class)){
@@ -58,13 +59,14 @@ class ViewBase extends ViewHTMLXSLT {
 	
 	protected function addConstants(&amp;$models){
 		if (isset($_SESSION['role_id'])){
-			$this->initDbLink();
-		
-			if ($this->dbLink){
-				$contr = new Constant_Controller($this->dbLink);
-				$list = array(<xsl:apply-templates select="/metadata/constants/constant[@autoload='TRUE']"/>);
-				$models['ConstantValueList_Model'] = $contr->getConstantValueModel($list);						
+
+			if (!$GLOBALS['dbLink']){
+				throw new Exception('Db link for addConstants is not defined!');
 			}
+		
+			$contr = new Constant_Controller($GLOBALS['dbLink']);
+			$list = array(<xsl:apply-templates select="/metadata/constants/constant[@autoload='TRUE']"/>);
+			$models['ConstantValueList_Model'] = $contr->getConstantValueModel($list);						
 		}	
 	}
 
@@ -92,6 +94,13 @@ class ViewBase extends ViewHTMLXSLT {
 		
 		if (isset($_SESSION['role_id'])){
 			$this->getVarModel()->addField(new Field('tel_ext',DT_STRING));
+			
+			//app server
+			$this->getVarModel()->addField(new Field('app_srv_host',DT_STRING));
+			$this->getVarModel()->addField(new Field('app_srv_port',DT_STRING));
+			$this->getVarModel()->addField(new Field('app_srv_protocol',DT_STRING));								
+			
+			$this->getVarModel()->addField(new Field('app_id',DT_STRING));		
 			
 			if(isset($_SESSION['token'])){
 				$this->getVarModel()->addField(new Field('token',DT_STRING));
@@ -133,6 +142,11 @@ class ViewBase extends ViewHTMLXSLT {
 			$this->setVarValue('curDate',round(microtime(true) * 1000));
 			$this->setVarValue('tel_ext',$_SESSION['tel_ext']);
 			
+			$this->setVarValue('app_srv_host',APP_SERVER_HOST);
+			$this->setVarValue('app_srv_port',APP_SERVER_PORT);
+			$this->setVarValue('app_srv_protocol',APP_SERVER_SECURED? 'wss':'ws');
+			$this->setVarValue('app_id',APP_NAME);
+			
 			if(isset($_SESSION['token'])){
 				$this->setVarValue('token',$_SESSION['token']);
 				if(defined('SESSION_EXP_SEC') &amp;&amp; intval(SESSION_EXP_SEC)){
@@ -158,23 +172,6 @@ class ViewBase extends ViewHTMLXSLT {
 		</xsl:for-each>		
 		-->
 	}
-	protected function initDbLink(){
-		if (!$this->dbLink){
-			$this->dbLink = new DB_Sql();
-			$this->dbLink->persistent=true;
-			$this->dbLink->appname = APP_NAME;
-			$this->dbLink->technicalemail = TECH_EMAIL;
-			$this->dbLink->reporterror = DEBUG;
-			$this->dbLink->database= DB_NAME;
-			try{			
-				$this->dbLink->connect(DB_SERVER,DB_USER,DB_PASSWORD,(defined('DB_PORT'))? DB_PORT:NULL);
-			}
-			catch (Exception $e){
-				//do nothing
-			}
-		}	
-	}
-	
 	public function write(ArrayObject &amp;$models,$errorCode=NULL){
 		$this->addMenu($models);
 		
@@ -207,8 +204,18 @@ require_once('models/MainMenu_Model_<xsl:value-of select="@id"/>.php');
 }</xsl:template>
 
 <xsl:template match="jsScripts/jsScript">
+
+<!--
+<xsl:variable name="tp">
 <xsl:choose>
-<xsl:when test="@resource">
+<xsl:when test="@type"><xsl:value-of select="@type"/></xsl:when>
+<xsl:otherwise>text/javascript</xsl:otherwise>
+</xsl:choose>
+</xsl:variable>
+-->
+
+<xsl:choose>
+<xsl:when test="@resource">	
 	if (
 	(isset($_SESSION['locale_id']) &amp;&amp; $_SESSION['locale_id']=='<xsl:value-of select="@resource"/>')
 	||
@@ -219,6 +226,7 @@ require_once('models/MainMenu_Model_<xsl:value-of select="@id"/>.php');
 </xsl:when>
 <xsl:otherwise>$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'<xsl:value-of select="@file"/>'));</xsl:otherwise>
 </xsl:choose>
+
 </xsl:template>
 
 <xsl:template match="cssScripts/cssScript">$this->addCssModel(new ModelStyleSheet(USER_JS_PATH.'<xsl:value-of select="@file"/>'));</xsl:template>

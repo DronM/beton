@@ -73,6 +73,45 @@ BEGIN
 		WHERE shipment_id = OLD.shipment_id;
 		
 		RETURN OLD;
+	
+	ELSIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
+	
+		PERFORM pg_notify(
+				'VehicleScheduleState.insert'
+			,json_build_object(
+				'params',json_build_object(
+					'id',NEW.id
+				)
+			)::text
+		);
+	
+		RETURN NEW;
+
+	ELSIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+	
+		PERFORM pg_notify(
+				'VehicleScheduleState.update'
+			,json_build_object(
+				'params',json_build_object(
+					'id',NEW.id
+				)
+			)::text
+		);
+	
+		RETURN NEW;
+
+	ELSIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
+	
+		PERFORM pg_notify(
+				'VehicleScheduleState.delete'
+			,json_build_object(
+				'params',json_build_object(
+					'id',OLD.id
+				)
+			)::text
+		);
+	
+		RETURN OLD;
 	END IF;
 	
 	

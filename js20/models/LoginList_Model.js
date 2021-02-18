@@ -112,7 +112,16 @@ function LoginList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.headers = new FieldText("headers",filed_options);
+	options.fields.user_agent = new FieldText("user_agent",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.header_user_agent = new FieldText("header_user_agent",filed_options);
 	
 		LoginList_Model.superclass.constructor.call(this,id,options);
 }

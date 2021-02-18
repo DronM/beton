@@ -255,6 +255,20 @@ function OrderMakeForLabList_View(id,options){
 				
 	}
 	
+	//,"params":{"cond_date":cond_date}
+	options.srvEvents = [
+		{"id":"Graph.change"}
+		,{"id":"VehicleScheduleState.insert"}
+		,{"id":"VehicleScheduleState.update"}
+		,{"id":"VehicleScheduleState.delete"}
+		,{"id":"RAMaterialFact.change"}
+		,{"id":"LabEntry.insert"}
+		,{"id":"LabEntry.update"}
+		,{"id":"LabEntry.delete"}
+	];
+	options.srvEventsCallBack = function(json){
+		self.srvEventsCallBack(json);
+	};
 	
 	OrderMakeForLabList_View.superclass.constructor.call(this,id,options);
 		
@@ -277,71 +291,81 @@ OrderMakeForLabList_View.prototype.m_endShiftMS;
  * Все обновляется разом за один запрос из нескольких моделей
  */
 OrderMakeForLabList_View.prototype.refresh = function(callBack){
-//console.log("OrderMakeForLabList_View.prototype.refresh")
 	this.m_refreshMethod.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
 	var self = this;
 	
 	this.m_refreshMethod.run({
 		"ok":function(resp){					
-			
-			//orders
-			//do nothing if locked
-			var grid = self.getElement("order_make_grid");
-			if(!grid.getLocked()){
-				
-				grid.getModel().setData(resp.getModelData("OrderMakeForLabList_Model"));
-				grid.onGetData();
-			}
+			self.onRefreshResponse(resp);
+		}
+	})
+}
+ 
+OrderMakeForLabList_View.prototype.onRefreshResponse = function(resp){
 
-			self.getElement("material_stores").setData(resp.getModel("MaterialStoreForOrderList_Model"));
-
-			//materials
-			var grid = self.getElement("mat_totals_grid");
-			grid.getModel().setData(resp.getModelData("MatTotals_Model"));
+	if(resp.modelExists("OrderMakeForLabList_Model")){
+		var grid = this.getElement("order_make_grid");
+		if(!grid.getLocked()){		
+			grid.getModel().setData(resp.getModelData("OrderMakeForLabList_Model"));
 			grid.onGetData();
-			
-			//assigning
-			self.getElement("veh_assigning").setData(resp.getModelData("AssignedVehicleList_Model"));
-			
-			//vehicles
-			var grid = self.getElement("veh_schedule_grid");
-			grid.getModel().setData(resp.getModelData("VehicleScheduleMakeOrderList_Model"));
-			grid.onGetData();
+		}
+	}
+	
+	if(resp.modelExists("MaterialStoreForOrderList_Model")){
+		this.getElement("material_stores").setData(resp.getModel("MaterialStoreForOrderList_Model"));
+	}
+	
+	//materials
+	if(resp.modelExists("MatTotals_Model")){
+		var grid = this.getElement("mat_totals_grid");
+		grid.getModel().setData(resp.getModelData("MatTotals_Model"));
+		grid.onGetData();
+	}
+		
+	//assigning
+	if(resp.modelExists("AssignedVehicleList_Model")){
+		this.getElement("veh_assigning").setData(resp.getModelData("AssignedVehicleList_Model"));
+	}
+	
+	//vehicles
+	if(resp.modelExists("VehicleScheduleMakeOrderList_Model")){
+		var grid = this.getElement("veh_schedule_grid");
+		grid.getModel().setData(resp.getModelData("VehicleScheduleMakeOrderList_Model"));
+		grid.onGetData();
+	}
+	
+	//operator list
+	if(resp.modelExists("OperatorList_Model")){
+		this.getElement("OperatorList_View").getElement("grid").onGetData(resp);
+	}
 
-			//operator list
-			self.getElement("OperatorList_View").getElement("grid").onGetData(resp);
+}
 
-			if(callBack){
-				callBack();
-			}
+OrderMakeForLabList_View.prototype.runSpecificUpdateMethod = function(meth){
+	var pm = (new Order_Controller()).getPublicMethod(meth);
+	pm.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
+	var self = this;
+	pm.run({
+		"ok":function(resp){
+			self.onRefreshResponse(resp);
 		}
 	});
 }
 
-OrderMakeForLabList_View.prototype.enableRefreshing = function(v){
-	if(v){
-		var self = this;
-		this.m_timer = setInterval(function(){
-			self.refresh();
-		}, this.m_refreshInterval);
+OrderMakeForLabList_View.prototype.srvEventsCallBack = function(json){
+	if(json.methodId=="Graph.change"||json.controllerId=="LabEntry"){
+		//analyse cond_date!
+		this.runSpecificUpdateMethod("get_make_orders_for_lab_form");
 	}
-	else if(this.m_timer){
-		clearInterval(this.m_timer);
+	else if(json.controllerId=="VehicleScheduleState"){
+		this.runSpecificUpdateMethod("get_make_orders_for_lab_form_veh");
 	}
+	else if(json.controllerId=="RAMaterialFact"){
+		this.runSpecificUpdateMethod("get_make_orders_for_lab_form_mat");
+	}
+	
 }
 
-OrderMakeForLabList_View.prototype.toDOM = function(p){
-	OrderMakeForLabList_View.superclass.toDOM.call(this,p);
-	
-	this.enableRefreshing(true);
-}
-
-OrderMakeForLabList_View.prototype.delDOM = function(){
-	this.enableRefreshing(false);
-	
-	OrderMakeForLabList_View.superclass.delDOM.call(this);
-	
-}
 
 OrderMakeForLabList_View.prototype.openLabEntryForm = function(concreteTypeId){
 	var win_w = $( window ).width();

@@ -85,6 +85,15 @@ BEGIN
 			;
 		END IF;
 		
+		PERFORM pg_notify(
+			'Production.insert'
+			,json_build_object(
+				'params',json_build_object(
+					'id',NEW.id
+				)
+			)::text
+		);
+		
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
@@ -134,10 +143,33 @@ BEGIN
 		--AND NEW.production_dt_end IS NOT NULL
 		--AND NEW.shipment_id IS NOT NULL THEN
 		--END IF;
+		
+		PERFORM pg_notify(
+			'Production.update'
+			,json_build_object(
+				'params',json_build_object(
+					'id',NEW.id
+				)
+			)::text
+		);
+		
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
 		DELETE FROM material_fact_consumptions WHERE production_site_id = OLD.production_site_id AND production_id = OLD.production_id;
+		
+		RETURN OLD;
+
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
+		
+		PERFORM pg_notify(
+			'Production.delete'
+			,json_build_object(
+				'params',json_build_object(
+					'id',OLD.id
+				)
+			)::text
+		);
 		
 		RETURN OLD;
 				

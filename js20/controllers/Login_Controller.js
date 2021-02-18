@@ -76,7 +76,10 @@ extend(Login_Controller,ControllerObjServer);
 	pm.addField(new FieldDateTimeTZ("session_set_time",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldText("headers",f_opts));
+	pm.addField(new FieldText("user_agent",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("header_user_agent",f_opts));
 }
 
 			Login_Controller.prototype.addGetObject = function(){

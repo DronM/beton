@@ -44,7 +44,8 @@ VehicleScheduleGridCmdShowPosition.prototype.onCommand = function(){
 	var left = win_w/3;
 	var w = win_w/3*2;//left - 20;
 	
-	var href = "t=Map&v=Child";
+	var veh_key = veh_ref.getKey();
+	var href = "t=Map&v=Child&c=Vehicle_Controller&f=get_current_position&id="+veh_key;	
 	var conn = window.getApp().getServConnector();
 	if(conn.getAccessTokenParam){
 		href+= "&"+conn.getAccessTokenParam()+"="+conn.getAccessToken();
@@ -60,7 +61,8 @@ VehicleScheduleGridCmdShowPosition.prototype.onCommand = function(){
 		"name":"Map",
 		"params":{
 			"editViewOptions":{
-				"vehicle":new RefType({"keys":{"id":veh_ref.getKey()}})	
+				"vehicle":new RefType({"keys":{"id":veh_key}})	
+				,"tracker_id":this.m_grid.getModel().getFieldValue("tracker_id")
 			}
 		},
 		"onClose":function(){

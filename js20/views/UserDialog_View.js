@@ -49,6 +49,14 @@ function UserDialog_View(id,options){
 		//Login grid
 		this.addElement(new LoginList_View(id+":login_list",{"detail":true}));
 
+		//Login device grid
+		this.addElement(new LoginDeviceList_View(id+":login_device_list",{
+			"detail":true
+			,"onBanSession":function(){
+				//refresh session list
+				self.getElement("login_list").getElement("grid").onRefresh();
+			}
+		}));
 		
 		if (adm){
 			this.addElement(new ButtonCmd(id+":cmdResetPwd",{
@@ -93,6 +101,12 @@ function UserDialog_View(id,options){
 
 	this.addDetailDataSet({
 		"control":this.getElement("login_list").getElement("grid"),
+		"controlFieldId":"user_id",
+		"field":this.m_model.getField("id")
+	});
+
+	this.addDetailDataSet({
+		"control":this.getElement("login_device_list").getElement("grid"),
 		"controlFieldId":"user_id",
 		"field":this.m_model.getField("id")
 	});

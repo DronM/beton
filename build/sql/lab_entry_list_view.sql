@@ -49,7 +49,4 @@ CREATE OR REPLACE VIEW public.lab_entry_list_view
 ALTER TABLE public.lab_entry_list_view
     OWNER TO beton;
 
-GRANT ALL ON TABLE public.lab_entry_list_view TO beton;
-GRANT SELECT ON TABLE public.lab_entry_list_view TO premier;
-
 

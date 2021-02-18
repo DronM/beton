@@ -68,17 +68,17 @@ TrackLayer.prototype.addMarkers = function(markers){
 	var features = [];
 	this.points = markers;
 	
-   var line_style = {
-			strokeColor: "#0074FF",
-			strokeWidth: 2,
-			//strokeDashstyle: "dashdot",
-			pointRadius: 6,
-			pointerEvents: "visiblePainted"
-		};
+	var line_style = {
+		strokeColor: "#0074FF",
+		strokeWidth: 2,
+		//strokeDashstyle: "dashdot",
+		pointRadius: 6,
+		pointerEvents: "visiblePainted"
+	};
 	var pointList = [];
 	var point;
 	for (var i=0;i<this.points.length;i++){
-		point = this.getMapPoint(this.points[i].lon,this.points[i].lat);
+		point = this.getMapPoint(this.points[i].pos_data.lon,this.points[i].pos_data.lat);
 		this.points[i].feature =
 			new OpenLayers.Feature.Vector(
 			point,null, this.getPointStyle(this.points[i])
@@ -100,20 +100,20 @@ TrackLayer.prototype.addMarkers = function(markers){
 		
 	var onDataSelect = function(feature){
 		if (feature.repId!=undefined){
-            var popup = new OpenLayers.Popup.FramedCloud("repPointData", 
-                                     feature.geometry.getBounds().getCenterLonLat(),
-                                     null,
-                                     self.points[feature.repId].getCallOut(),
-                                     null, true);
-            feature.popup = popup;
-            self.map.addPopup(popup);
+		    var popup = new OpenLayers.Popup.FramedCloud("repPointData", 
+		                             feature.geometry.getBounds().getCenterLonLat(),
+		                             null,
+		                             self.points[feature.repId].getCallOut(),
+		                             null, true);
+		    feature.popup = popup;
+		    self.map.addPopup(popup);
 		}
 	};
 	var onDataUnSelect = function(feature){
 		if (feature.repId!=undefined){
-            self.map.removePopup(feature.popup);
-            feature.popup.destroy();
-            feature.popup = null;
+		    self.map.removePopup(feature.popup);
+		    feature.popup.destroy();
+		    feature.popup = null;
 		}
 	};
 	
@@ -132,7 +132,7 @@ TrackLayer.prototype.addMarkers = function(markers){
 }
 TrackLayer.prototype.flyToInd = function(ind){
 	if (this.points!=undefined && ind<this.points.length){
-		var lonLat = this.getLonLatPoint(this.points[ind].lon,this.points[ind].lat);
+		var lonLat = this.getLonLatPoint(this.points[ind].pos_data.lon,this.points[ind].pos_data.lat);
 		if (lonLat!=undefined){
 			this.map.setCenter (lonLat, this.map.getZoom());
 		}		

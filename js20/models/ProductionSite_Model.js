@@ -80,6 +80,15 @@ function ProductionSite_Model(options){
 	
 	options.fields.missing_elkon_production_ids = new FieldArray("missing_elkon_production_ids",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Зона';
+	filed_options.autoInc = false;	
+	
+	options.fields.destination_id = new FieldInt("destination_id",filed_options);
+	
 		ProductionSite_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionSite_Model,ModelXML);

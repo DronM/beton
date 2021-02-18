@@ -50,6 +50,15 @@ function Vehicle_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Номер число для сортировки';
+	filed_options.autoInc = false;	
+	
+	options.fields.plate_n = new FieldInt("plate_n",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Грузоподъемность';
 	filed_options.autoInc = false;	
 	
@@ -140,6 +149,7 @@ function Vehicle_Model(options){
 	
 	options.fields.vehicle_owners_ar = new FieldArray("vehicle_owners_ar",filed_options);
 	
+			
 			
 			
 			

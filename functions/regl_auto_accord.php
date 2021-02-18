@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'db_con.php');
+require_once('db_con.php');
 
 $dbLink->query(
 	"UPDATE shipments

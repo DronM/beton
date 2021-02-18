@@ -34,10 +34,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$par = new ParamsSQL($pm,$this->getDbLink());				
 		$par->addAll();
 		$this->getDbLinkMaster()->query(sprintf(
-		"SELECT employee_work_time_sched_hour_set(%d,%s,%s)",
-		$par->getParamById('employee_id'),
-		$par->getParamById('day'),
-		$par->getParamById('hours')
+			"SELECT employee_work_time_sched_hour_set(%d,%s,%s)",
+			$par->getParamById('employee_id'),
+			$par->getParamById('day'),
+			$par->getParamById('hours')
 		));
 	}
 </xsl:template>

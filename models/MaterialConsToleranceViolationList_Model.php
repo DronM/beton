@@ -17,7 +17,8 @@ class MaterialConsToleranceViolationList_Model extends {
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("material_cons_tolerance_violation_list");
 			

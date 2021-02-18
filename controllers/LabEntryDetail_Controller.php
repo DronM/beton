@@ -58,6 +58,13 @@ class LabEntryDetail_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id_key'
+			]
+		];
+		$pm->addEvent('LabEntryDetail.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('LabEntryDetail_Model');
@@ -112,7 +119,14 @@ class LabEntryDetail_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id_key'
+				]
+			];
+			$pm->addEvent('LabEntryDetail.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('LabEntryDetail_Model');
 
@@ -125,6 +139,16 @@ class LabEntryDetail_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id_key'
+			]
+		];
+		$pm->addEvent('LabEntryDetail.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('LabEntryDetail_Model');
 

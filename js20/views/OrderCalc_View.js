@@ -32,7 +32,7 @@ function OrderCalc_View(id,options){
 	options.addElement = function(){
 		var obj_bs_cl = ("control-label "+window.getBsCol(2));
 		
-		this.addElement(new DestinationEdit(id+":destination",{
+		this.addElement(new DestinationForOrderEdit(id+":destination",{//DestinationEdit
 			"labelClassName":obj_bs_cl,
 			"required":true,
 			"acMinLengthForQuery":0,
@@ -174,6 +174,8 @@ OrderCalc_View.prototype.m_shipQuantForCostGrade_Model;
 
 OrderCalc_View.prototype.onSelectDestination = function(f){
 	if(f){
+		console.log("OrderCalc_View.prototype.onSelectDestination")
+		console.log(f);
 		this.setDestinationPrice(f.price.getValue(),f.distance.getValue(),f.time_route.getValue());
 		this.recalcTotal();
 	}

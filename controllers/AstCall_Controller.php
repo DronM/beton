@@ -131,7 +131,45 @@ class AstCall_Controller extends ControllerSQL{
 			,$f_params);
 		$pm->addParam($param);		
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['unique_id'
+				]
+			];
+			$pm->addEvent('AstCall.update',$ev_opts);
+			
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('contact_name',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('client_name',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtEnum('client_kind',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('client_come_from_id',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('client_type_id',$opts));
+	
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtText('manager_comment',$opts));
+	
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('AstCall_Model');
 

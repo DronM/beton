@@ -19,7 +19,8 @@ class Vehicle_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("vehicles");
 			
@@ -43,6 +44,16 @@ class Vehicle_Model extends ModelSQLBeton{
 						
 		$f_plate=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"plate",$f_opts);
 		$this->addField($f_plate);
+		//********************
+		
+		//*** Field plate_n ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Номер число для сортировки';
+		$f_opts['id']="plate_n";
+						
+		$f_plate_n=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"plate_n",$f_opts);
+		$this->addField($f_plate_n);
 		//********************
 		
 		//*** Field load_capacity ***
@@ -148,7 +159,7 @@ class Vehicle_Model extends ModelSQLBeton{
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		
 		$direct = 'ASC';
-		$order->addField($f_plate,$direct);
+		$order->addField($f_plate_n,$direct);
 $this->setLimitConstant('doc_per_page_count');
 	}
 

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2020-11-03 13:16:36</lastBuild></version>
+		<lastBuild>2021-02-18 12:39:19</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -98,6 +98,7 @@
 		<version dateOpen="2020-10-28 17:10:46" dateClose="2020-10-28 17:10:47">1.00192</version>
 		<version dateOpen="2020-11-02 17:11:16" dateClose="2020-11-03 05:11:41">1.00193</version>
 		<version dateOpen="2020-11-03 13:11:14" dateClose="2020-11-03 13:11:16">1.00194</version>
+		<version dateOpen="2020-12-01 17:12:50" dateClose="2021-02-18 12:02:39">1.00195</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -540,7 +541,20 @@
 			<field id="pub_key" dataType="String" length="15" sysCol="TRUE"/>
 			<field id="set_date_time" dataType="DateTimeTZ" alias="Время создания сессии"/>
 			<field id="session_set_time" dataType="DateTimeTZ" alias="Время последнего обращения"/>
-			<field id="headers" dataType="Text"/>
+			<field id="user_agent" dataType="Text"/>
+			<field id="header_user_agent" dataType="Text"/>
+		</model>
+		<model id="LoginDeviceList" parent="ModelSQLBeton" dataTable="login_devices_list" virtual="TRUE">
+			<field id="user_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE"/>
+			<field id="user_agent" dataType="Text" primaryKey="TRUE"/>
+			<field id="user_descr" dataType="String" alias="Имя пользователя"/>
+			<field id="date_time_in" dataType="DateTimeTZ" alias="Дата входа"/>
+			<field id="banned" dataType="Bool" alias="Вход запрещен"/>
+		</model>
+		<model id="LoginDeviceBan" parent="ModelSQLBeton" dataTable="login_device_bans" virtual="FALSE">
+			<field id="user_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE"/>
+			<field id="hash" dataType="String" length="32" primaryKey="TRUE"/>
+			<field id="create_dt" dataType="DateTimeTZ" alias="Дата создания" defaultValue="CURRENT_TIMESTAMP"/>
 		</model>
 		<model id="Client" parent="ModelSQLBeton" dataTable="clients" virtual="FALSE" activityLog="TRUE" objRef="TRUE">
 			<defaultOrder>
@@ -611,6 +625,8 @@
 			<field id="zone" dataType="String"/>
 			<field id="special_price" dataType="Bool" defaultValue="FALSE"/>
 			<field id="price_for_driver" dataType="Float" length="15" precision="2" defaultValue="0"/>
+			<field id="near_road_lon" dataType="Float" length="15" precision="12"/>
+			<field id="near_road_lat" dataType="Float" length="15" precision="12"/>
 			<index id="destination_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -626,6 +642,15 @@
 			<field id="special_price" dataType="Bool"/>
 			<field id="price" dataType="String"/>
 			<field id="price_for_driver" dataType="Bool"/>
+		</model>
+		<model id="DestinationForOrderList" parent="ModelSQLBeton" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="name" dataType="String"/>
+			<field id="distance" dataType="String"/>
+			<field id="time_route" dataType="Time"/>
+			<field id="price" dataType="String"/>
+			<field id="client_dest" dataType="Bool"/>
+			<field id="is_address" dataType="Bool"/>
 		</model>
 		<model id="DestinationDialog" parent="ModelSQLBeton" dataTable="destinations_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -664,10 +689,11 @@
 		</model>
 		<model id="Vehicle" parent="ModelSQLBeton" dataTable="vehicles" virtual="FALSE">
 			<defaultOrder>
-				<field id="plate"/>
+				<field id="plate_n"/>
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE" sysCol="TRUE"/>
 			<field id="plate" dataType="String" required="TRUE" length="6" alias="Номер"/>
+			<field id="plate_n" dataType="Int" alias="Номер число для сортировки"/>
 			<field id="load_capacity" dataType="Float" required="TRUE" length="15" precision="2" alias="Грузоподъемность"/>
 			<field id="make" dataType="String" required="FALSE" length="20" alias="Марка"/>
 			<field id="driver_id" dataType="Int" required="FALSE" refTable="drivers" refField="id" sysCol="TRUE"/>
@@ -681,6 +707,7 @@
 			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
 			</index>
+			<index id="vehicles_plate_n_idx"/>
 			<index id="vehicles_feature_index">
 				<expression>lower(feature)</expression>
 			</index>
@@ -1140,6 +1167,7 @@
 			<field id="active" dataType="Bool" alias="Активен"/>
 			<field id="last_elkon_production_id" dataType="Int"/>
 			<field id="missing_elkon_production_ids" dataType="Array" arrayType="Int"/>
+			<field id="destination_id" dataType="Int" refTable="destinations" refField="id" alias="Зона"/>
 		</model>
 		<model id="ProductionSiteList" parent="ModelSQLBeton" dataTable="production_sites_list" virtual="FALSE">
 			<defaultOrder>
@@ -2636,6 +2664,7 @@
 			<field id="schedule_date" dataType="Date"/>
 			<field id="no_tracker" dataType="Bool"/>
 			<field id="vehicle_schedules_ref" dataType="JSON"/>
+			<field id="tracker_id" dataType="Text"/>
 		</model>
 		<model id="VehFeaturesOnDateList" virtual="TRUE" server="FALSE">
 			<field id="feature" dataType="String"/>
@@ -3356,6 +3385,18 @@
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 			<field id="load_capacity" dataType="Int" alias="Масса загружаемого материала,т."/>
 		</model>
+		<model id="VehicleRouteCashe" parent="ModelSQLBeton" dataTable="vehicle_route_cashe" virtual="FALSE">
+			<field id="tracker_id" dataType="String" length="15" alias="Трэкер" required="TRUE" primaryKey="TRUE"/>
+			<field id="shipment_id" dataType="Int" refTable="shipments" refField="id" required="TRUE" primaryKey="TRUE" alias="Отгрузка"/>
+			<field id="vehicle_state" dataType="Enum" enumId="vehicle_states" required="TRUE" primaryKey="TRUE" alias="Состояние ТС"/>
+			<field id="update_dt" dataType="DateTimeTZ" alias="Время последнего обновления"/>
+			<field id="route" dataType="JSONB" alias="Данные маршрута OSRM" required="TRUE"/>
+		</model>
+		<model id="Event" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="String" required="TRUE" primaryKey="TRUE" alias="Идентификатор"/>
+			<field id="params" dataType="JSON" alias="Параметры"/>
+		</model>
+		
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -3408,6 +3449,7 @@
 		<constant id="low_efficiency_tel_list" name="Список телефонов для сообщений о низком состоянии эффективности" descr="На какие телефоны отправлять сообщение о низком состоянии эффективности" dataType="JSON"/>
 		<constant id="material_closed_balance_date" name="Дата закрытого периода остатков" descr="Дата, раньше который период закрыт для редактирования" dataType="Date"/>
 		<constant id="cement_material" name="Материал цемент" descr="Материал цемент" dataType="Int" refTable="raw_materials" refField="id" defaultValue="5"/>
+		<constant id="deviation_for_reroute" name="Отклонение от маршрута для перестраивания" descr="Определяет параметры для перестраивания маршрута" dataType="JSON"/>
 	</constants>
 	<controllers>
 		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -3462,9 +3504,21 @@
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
 			</publicMethod>
+			<publicMethod id="complete_for_order" modelId="DestinationForOrderList">
+				<field id="name_pat" dataType="String"/>
+				<field id="client_id" dataType="Int"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="get_data_for_new_address">
+				<field id="address_str" dataType="String"/>
+			</publicMethod>
 			<publicMethod id="get_for_client_list" modelId="DestinationList"/>
 			<publicMethod id="get_coords_on_name" modelId="Destination">
 				<field id="name" dataType="String"/>
+			</publicMethod>
+			<publicMethod id="get_route_to_zone">
+				<field id="zone_coords" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="at_dest_avg_time" condFields="TRUE"/>
 			<publicMethod id="route_to_dest_avg_time" condFields="TRUE">
@@ -3519,7 +3573,25 @@
 			<publicMethod id="get_make_orders_form">
 				<field id="date" dataType="Date"/>
 			</publicMethod>
+			<publicMethod id="get_make_orders_form_ord">
+				<field id="date" dataType="Date"/>
+			</publicMethod>
+			<publicMethod id="get_make_orders_form_veh">
+				<field id="date" dataType="Date"/>
+			</publicMethod>
+			<publicMethod id="get_make_orders_form_mat">
+				<field id="date" dataType="Date"/>
+			</publicMethod>
 			<publicMethod id="get_make_orders_for_lab_form">
+				<field id="date" dataType="Date"/>
+			</publicMethod>
+			<publicMethod id="get_make_orders_for_lab_form_ord">
+				<field id="date" dataType="Date"/>
+			</publicMethod>
+			<publicMethod id="get_make_orders_for_lab_form_veh">
+				<field id="date" dataType="Date"/>
+			</publicMethod>
+			<publicMethod id="get_make_orders_for_lab_form_mat">
 				<field id="date" dataType="Date"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_list" modelId="OrderMakeList" cashable="TRUE">
@@ -3792,6 +3864,20 @@
 			<publicMethod id="get_list" modelId="LoginList"/>
 			<publicMethod id="get_object" modelId="LoginList"/>
 		</controller>
+		<controller id="LoginDevice" parentId="ControllerSQL" state="TRUE" noState="TRUE">
+			<publicMethod id="get_list" modelId="LoginDeviceList"/>
+			<publicMethod id="switch_banned">
+				<field id="banned" dataType="Bool" required="TRUE"/>
+				<field id="hash" dataType="String" length="32" required="TRUE"/>
+				<field id="user_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+		</controller>
+		<controller id="LoginDeviceBan" parentId="ControllerSQL" state="TRUE" noState="TRUE">
+			<publicMethod id="insert" modelId="LoginDeviceBan"/>
+			<publicMethod id="delete" modelId="LoginDeviceBan"/>
+			<publicMethod id="get_list" modelId="LoginDeviceBan"/>
+			<publicMethod id="get_object" modelId="LoginDeviceBan"/>
+		</controller>
 		<controller id="User" parentId="ControllerSQL" state="TRUE" noState="TRUE">
 			<publicMethod id="insert" modelId="User"/>
 			<publicMethod id="update" modelId="User"/>
@@ -3845,6 +3931,16 @@
 			</publicMethod>
 			<publicMethod id="get_list" modelId="ConstantList"/>
 			<publicMethod id="get_object" modelId="ConstantList"/>
+			<publicMethod id="get_values">
+				<field id="id_list" dataType="String"/>
+				<field id="field_sep" dataType="String" length="1"/>
+			</publicMethod>
+		</controller>
+		<controller id="SessionVar" parentId="ControllerSQL">
+			<publicMethod id="set_value">
+				<field id="id" dataType="String" required="TRUE"/>
+				<field id="val" dataType="String"/>
+			</publicMethod>
 			<publicMethod id="get_values">
 				<field id="id_list" dataType="String"/>
 				<field id="field_sep" dataType="String" length="1"/>
@@ -4516,9 +4612,21 @@
 			<publicMethod id="get_object" modelId="ELKONLogList"/>
 		</controller>
 		<controller id="Production" parentId="ControllerSQL" state="TRUE">
-			<publicMethod id="insert" modelId="Production"/>
-			<publicMethod id="update" modelId="Production"/>
-			<publicMethod id="delete" modelId="Production"/>
+			<publicMethod id="insert" modelId="Production">
+				<events>
+					<event id="Production.insert" dbTrigger="TRUE"/>
+				</events>
+			</publicMethod>
+			<publicMethod id="update" modelId="Production">
+				<events>
+					<event id="Production.update" dbTrigger="TRUE"/>
+				</events>
+			</publicMethod>
+			<publicMethod id="delete" modelId="Production">
+				<events>
+					<event id="Production.delete" dbTrigger="TRUE"/>
+				</events>
+			</publicMethod>
 			<publicMethod id="get_list" modelId="ProductionList"/>
 			<publicMethod id="get_object" modelId="ProductionList"/>
 			<publicMethod id="check_data"/>
@@ -4706,6 +4814,7 @@
 		<view id="20020" c="ProductionVehicleCorrection_Controller" t="ProductionVehicleCorrectionList" f="get_list" section="Документы" descr="Корректировка автообилей ELKON"/>
 		<view id="20021" c="Shipment_Controller" t="ShipmentForClientList" f="get_list_for_client" section="Документы" descr="Отгрузки для клиентов"/>
 		<view id="20022" c="Order_Controller" t="OrderForClientList" f="get_list_for_client" section="Документы" descr="Заявки для клиентов"/>
+		<view id="20023" c="LoginDevice_Controller" t="LoginDeviceList" f="get_list" section="Документы" descr="Устройства пользователей"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -4751,6 +4860,7 @@
 		<serverTemplate id="MainMenuConstructorList" class="list"/>
 		<serverTemplate id="ViewList" class="list"/>
 		<serverTemplate id="LoginList" class="list"/>
+		<serverTemplate id="LoginDeviceList" class="list"/>
 		<serverTemplate id="UserList" class="list"/>
 		<serverTemplate id="MailForSendingList" class="list"/>
 		<serverTemplate id="EmailTemplateList" class="list"/>
@@ -4905,6 +5015,8 @@
 		<jsScript file="ext/DragnDrop/DragMaster.js"/>
 		<jsScript file="ext/DragnDrop/DragObject.js"/>
 		<jsScript file="ext/DragnDrop/DropTarget.js"/>
+		<!-- -->
+		<jsScript file="ext/GooglePolylineEncode.js"/>
 		<!-- core -->
 		<jsScript file="core/extend.js"/>
 		<jsScript file="core/App.js"/>
@@ -4917,8 +5029,11 @@
 		<jsScript file="core/DbException.js"/>
 		<jsScript file="core/VersException.js"/>
 		<jsScript file="core/ConstantManager.js"/>
+		<jsScript file="core/SessionVarManager.js"/>
 		<jsScript file="core/CookieManager.js"/>
 		<jsScript file="core/ServConnector.js"/>
+		<jsScript file="core/AppSrv.js"/>
+		<jsScript file="core/AppSrv.rs_ru.js" resource="ru"/>
 		<jsScript file="core/Response.js"/>
 		<jsScript file="core/ResponseXML.js"/>
 		<jsScript file="core/ResponseJSON.js"/>
@@ -5288,6 +5403,7 @@
 		<jsScript file="views/MainMenuConstructorList_View.js"/>
 		<jsScript file="views/MainMenuConstructor_View.js"/>
 		<jsScript file="views/LoginList_View.js"/>
+		<jsScript file="views/LoginDeviceList_View.js"/>
 		<jsScript file="views/UserList_View.js"/>
 		<jsScript file="views/UserDialog_View.js"/>
 		<jsScript file="views/UserProfile_View.js"/>
@@ -5482,6 +5598,8 @@
 		<jsScript file="custom_controls/ConcreteTypeEdit.js"/>
 		<jsScript file="custom_controls/DestinationEdit.js"/>
 		<jsScript file="custom_controls/DestinationForClientEdit.js"/>
+		<jsScript file="custom_controls/DestinationForOrderEdit.js"/>
+		<jsScript file="custom_controls/DestinationSearchEdit.js"/>
 		<jsScript file="custom_controls/ClientEdit.js"/>
 		<jsScript file="custom_controls/PumpVehicleEdit.js"/>
 		<jsScript file="custom_controls/VehicleEdit.js"/>
@@ -5540,6 +5658,9 @@
 		<jsScript file="views/rs_common_ru.js"/>
 		<!--openLayers-->
 		<jsScript file="ext/OpenLayers/OpenLayers.js" compressed="TRUE" standalone="TRUE"/>
+		<!-- turf buffer function
+		<jsScript type="module" file="turf.js" compressed="TRUE" standalone="TRUE" />
+		 -->
 		<!--chartjs-->
 		<jsScript file="ext/chart.js-2.8.0/Chart.min.js" compressed="TRUE" standalone="TRUE"/>
 		<jsScript file="custom_controls/TrackConstants.js"/>
@@ -5857,7 +5978,14 @@
 		<jsScript file="controllers/StoreMapToProductionSite_Controller.js"/>
 		<jsScript file="models/StoreMapToProductionSiteList_Model.js"/>
 		<jsScript file="models/MaterialStoreForOrderList_Model.js"/>
-	</jsScripts>
+		<jsScript file="controllers/SessionVar_Controller.js"/>
+		<jsScript file="models/DestinationForOrderList_Model.js"/>
+		<jsScript file="models/VehicleRouteCashe_Model.js"/>
+		<jsScript file="controllers/LoginDevice_Controller.js"/>
+		<jsScript file="models/LoginDeviceList_Model.js"/>
+		<jsScript file="models/LoginDeviceBan_Model.js"/>
+		<jsScript file="controllers/LoginDeviceBan_Controller.js"/>
+	<jsScript file="models/Event_Model.js"/></jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>
 		<cssScript file="assets/css/bootstrap.css" compressed="FALSE" standalone="TRUE"/>

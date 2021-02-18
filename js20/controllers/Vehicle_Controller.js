@@ -62,6 +62,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Номер число для сортировки";
+	var field = new FieldInt("plate_n",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Грузоподъемность";options.required = true;
 	var field = new FieldFloat("load_capacity",options);
 	
@@ -142,6 +148,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Номер";
 	var field = new FieldString("plate",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Номер число для сортировки";
+	var field = new FieldInt("plate_n",options);
 	
 	pm.addField(field);
 	

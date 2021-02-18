@@ -1,17 +1,12 @@
-/* Copyright (c) 2010 
-	Andrey Mikhalevich, Katren ltd.
-*/
-/*
-*/
-
-/**
+/* Copyright (c) 2019
+ *	Andrey Mikhalevich, Katren ltd.
+ *
+ * @descr Converts NMEA string coords to degrees with decim part
+ *
  * @requires main.js
  * @requires OpenLayers.js 
-*/
-
-/*
-Converts NMEA string coords to degrees with decim part
-*/
+ * 
+ */
 function NMEAStrToDegree(str){
 	var DEGREE_DIGITS = 2;
 	var deg,min;
@@ -37,9 +32,9 @@ function NMEAStrToDegree(str){
 	}
 }
 
-/*
-	Base class for holding layers and objects
-*/
+/**
+ *	Base class for holding layers and objects
+ */
 function ObjMapLayer(map, descr){
 	this.layer = new OpenLayers.Layer.Vector(descr);		
 	this.map = map;
@@ -117,4 +112,40 @@ ObjMapLayer.prototype.moveMapToCoords = function(lon,lat,zoom){
 }
 ObjMapLayer.prototype.moveMapToStrCoords = function(lon,lat,zoom){
 	this.moveMapToCoords(NMEAStrToDegree(lon),NMEAStrToDegree(lat),zoom);
+}
+
+/**
+ * lineStyle
+ *	strokeColor: "#0074FF",
+ *	strokeWidth: 4,
+ *	//strokeDashstyle: "dashdot",
+ *	pointRadius: 6,
+ *	pointerEvents: "visiblePainted" 
+ */
+ObjMapLayer.prototype.addLineFromPoints = function(mapFeatures,points,lineStyle){
+	lineStyle = lineStyle || {
+		strokeColor: "#0074FF",
+		strokeWidth: 4,
+		pointRadius: 6,
+		pointerEvents: "visiblePainted"
+	}
+	var point_list = [];
+	for(var i=0; i<points.length; i++) {
+		point_list.push(
+			(new OpenLayers.Geometry.Point(points[i][1],points[i][0]))
+			.transform(
+				new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+				this.map.getProjectionObject() // to Spherical Mercator Projection
+	  		)	
+		);
+	}
+	
+	//adding line
+	mapFeatures.push(
+		new OpenLayers.Feature.Vector(
+			new OpenLayers.Geometry.LineString(point_list)
+			,null
+			,lineStyle
+		)		
+	);	
 }

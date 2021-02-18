@@ -15,7 +15,8 @@ class DOCMaterialInventoryDOCTMaterial_Model extends ModelSQLDOCT{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("doc_material_inventories_t_tmp_materials");
 			

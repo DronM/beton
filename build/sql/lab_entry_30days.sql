@@ -95,6 +95,3 @@ UNION ALL
 ALTER TABLE public.lab_entry_30days
     OWNER TO beton;
 
-GRANT ALL ON TABLE public.lab_entry_30days TO beton;
-
-

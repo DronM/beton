@@ -45,17 +45,26 @@ VehicleRunGridCmdShowMap.prototype.onCommand = function(){
 	var left = win_w/3;
 	var w = win_w/3*2;//left - 20;
 	
+	var veh_key = veh_ref.getKey();
+	var db_fm = "d/m/Y H:i:s";
+	
+	var href = "t=Map&v=Child&c=Vehicle_Controller&f=get_track&id="+veh_key+"&dt_from="+DateHelper.format(dt_from,db_fm)+"&dt_to="+DateHelper.format(dt_to,db_fm)+"&stop_dur=00:05";
+	var conn = window.getApp().getServConnector();
+	if(conn.getAccessTokenParam){
+		href+= "&"+conn.getAccessTokenParam()+"="+conn.getAccessToken();
+	}
+	alert("href="+href)
 	this.m_mapForm = new WindowForm({
 		"id":"MapForm",
 		"height":h,
 		"width":w,
 		"left":left,
 		"top":10,
-		"URLParams":"t=Map&v=Child",
+		"URLParams":href,
 		"name":"Map",
 		"params":{
 			"editViewOptions":{
-				"vehicle":new RefType({"keys":{"id":veh_ref.getKey()}}),
+				"vehicle":new RefType({"keys":{"id":veh_key}}),
 				"valueFrom":dt_from,
 				"valueTo":dt_to
 			}

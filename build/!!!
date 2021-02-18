@@ -1,3 +1,63 @@
+update destinations set zone_center=ST_Centroid(zone) where zone IS NOT NULL
+База lon=65,lat=57
+https://www.katren.org/nearest/v1/driving/65.3914348831315,57.148785767065
+Update destinations set near_road_lon=65.391466, near_road_lat=57.148727 where id=152
+
+
+http://dev.openlayers.org/releases/OpenLayers-2.13.1/doc/apidocs/files/OpenLayers/Geometry/Point-js.html
+
+circle buffer
+http://dev.openlayers.org/docs/files/OpenLayers/Geometry/Polygon-js.html#OpenLayers.Geometry.Polygon.createRegularPolygon
+
+https://stackoverflow.com/questions/53817431/how-to-detect-deviation-in-path-between-coordinates-set
+
+Убрал из ViewBase
+		var m_data = CommonHelper.longString(function () {/*
+				<xsl:copy-of select="/document/model[@id=$m_id]"/>
+			*/});		
+
+
+OpenLayers Release 2.13.1
+
+https://openstreetmap.be/en/projects/howto/openlayers.html
+
+Увеличить длину наименования зоны!!! Проверить индекс
+
+/*
+DROP VIEW public.lab_entry_list_view CASCADE;
+DROP VIEW lab_entry_30days_2;
+
+DROP VIEW public.lab_entry_30days;
+DROP VIEW public.lab_orders_list;
+DROP VIEW public.orders_make_for_lab_list;
+DROP VIEW public.orders_make_for_lab_period_list;
+DROP VIEW ast_calls_client_ship_hist_list;
+DROP VIEW destination_list_view;
+DROP VIEW destinations_dialog CASCADE;
+*/
+--DROP VIEW tracker_zone_controls_list;
+--DROP VIEW shipments_list_test;
+--DROP VIEW sms_pump_remind;
+--DROP VIEW sms_pump_order_upd;
+--DROP VIEW sms_pump_order_ins;
+--DROP VIEW sms_pump_order_del;
+--DROP VIEW public.sms_pump_order;
+--DROP VIEW shipment_pumps_list;
+--DROP VIEW shipments_pumps_list;
+ --DROP VIEW shipment_times_list;
+-- DROP VIEW public.shipment_time_list;
+--DROP VIEW public.shipment_report;
+--DROP VIEW public.shipment_list_view;
+--DROP VIEW public.shipment_dialog_view;
+--DROP VIEW public.shipment_date_list;
+--DROP VIEW public.orders_list_view;
+--DROP VIEW public.order_sms_remind;
+--DROP VIEW public.order_pumps_list;
+--DROP VIEW public.order_dialog_view;
+--DROP VIEW public.orders_make_list_view;
+DROP VIEW public.lab_data_list_view;
+--ALTER TABLE destinations ALTER COLUMN name TYPE varchar(250);
+
 ОЧИСТИТЬ МАТЕРИАЛЫ И ПРИХОДЫ
 select *
 from doc_material_procurements
@@ -28,3 +88,45 @@ WHERE material_id=4 AND coalesce(store,'')<>''
 SELECT count(*) FROM doc_material_procurements
 WHERE material_id=4 AND coalesce(store,'')<>''
 */
+
+
+
+
+
+--create type xxx as (k text, v text);
+--DROP type xxx
+update logins
+SET headers_j=sel.h
+FROM
+(
+SELECT
+	s2.id,
+	('{'||string_agg(s2.h,',')||'}')::jsonb as h
+FROM
+(
+SELECT
+			s1.id
+			,CASE WHEN position(':' in s1.h)>=1 THEN
+				'"'||substring(s1.h from 1 for position(':' in s1.h)-1 )||'":'||
+				'"'||substring(s1.h from position(':' in s1.h)+1 for length(s1.h))||'"'
+				/*json_build_object(
+				substring(s1.h from 1 for position(':' in s1.h)-1 )
+				,substring(s1.h from position(':' in s1.h)+1 for length(s1.h))				
+				)
+				*/
+			ELSE NULL
+			END AS h
+FROM (
+SELECT
+	sub.id,unnest(sub.h_ar) AS h
+FROM (
+
+SELECT
+	id,string_to_array(headers,E'\n') as h_ar
+from logins where headers is not null AND headers<>''
+) AS sub
+	) AS s1
+) AS s2	
+GROUP BY s2.id
+) AS sel
+WHERE sel.id=logins.id

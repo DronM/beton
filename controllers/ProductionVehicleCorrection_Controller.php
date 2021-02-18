@@ -45,6 +45,14 @@ class ProductionVehicleCorrection_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['production_site_id'
+			,'production_id'
+			]
+		];
+		$pm->addEvent('ProductionVehicleCorrection.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('ProductionVehicleCorrection_Model');
@@ -87,7 +95,15 @@ class ProductionVehicleCorrection_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['production_site_id'
+				,'production_id'
+				]
+			];
+			$pm->addEvent('ProductionVehicleCorrection.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('ProductionVehicleCorrection_Model');
 
@@ -103,6 +119,17 @@ class ProductionVehicleCorrection_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['production_site_id'
+			,'production_id'
+			]
+		];
+		$pm->addEvent('ProductionVehicleCorrection.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('ProductionVehicleCorrection_Model');
 

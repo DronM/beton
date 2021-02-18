@@ -36,6 +36,13 @@ class ShipmentForOwnerCostHeader_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['date'
+			]
+		];
+		$pm->addEvent('ShipmentForOwnerCostHeader.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('ShipmentForOwnerCostHeader_Model');
@@ -60,7 +67,14 @@ class ShipmentForOwnerCostHeader_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['date'
+				]
+			];
+			$pm->addEvent('ShipmentForOwnerCostHeader.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('ShipmentForOwnerCostHeader_Model');
 
@@ -73,6 +87,16 @@ class ShipmentForOwnerCostHeader_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['date'
+			]
+		];
+		$pm->addEvent('ShipmentForOwnerCostHeader.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('ShipmentForOwnerCostHeader_Model');
 

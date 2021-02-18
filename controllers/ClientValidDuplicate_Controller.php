@@ -37,6 +37,17 @@ class ClientValidDuplicate_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['client_id'
+			,'tel'
+			]
+		];
+		$pm->addEvent('ClientValidDuplicate.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('ClientValidDuplicate_Model');
 

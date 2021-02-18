@@ -43,25 +43,29 @@ function OrderMakeList_View(id,options){
 	
 	options.templateOptions = options.templateOptions || {};
 	options.templateOptions.workHours = from_h+"-"+to_h;
+
+	//date set
+	var init_dt,cond_date;
+	if(options.models&&options.models.InitDate&&options.models.InitDate.getNextRow()){			
+		var d_s = options.models.InitDate.getFieldValue("dt");
+		init_dt = DateHelper.strtotime(d_s);
+		//cond_date = d_s.substr(0,10);
+	}
 	
 	options.addElement = function(){
-	
+
 		//plant load control
 		if(!this.m_lowResDevice){
 			this.addElement(new PlantLoadGraphControl(id+":plant_load_graph",{
 				"model":options.models.Graph_Model
 			}));
 		}
-		//date set
-		var init_dt;
-		if(options.models&&options.models.InitDate&&options.models.InitDate.getNextRow()){			
-			init_dt = DateHelper.strtotime(options.models.InitDate.getFieldValue("dt"));
-		}
 		var per_select = new EditPeriodShift(id+":order_make_filter",{
 			"template":window.getApp().getTemplate( ((window.getWidthType()=="sm")? "EditPeriodShiftSM":"EditPeriodShift") ),
 			"dateFrom":init_dt,
 			"onChange":function(dateTime){
-				self.m_refreshMethod.setFieldValue("date",dateTime);
+				//self.m_refreshMethod.setFieldValue("date",dateTime);
+				
 				window.setGlobalWait(true);
 				self.refresh(function(){
 					window.setGlobalWait(false);
@@ -186,6 +190,17 @@ function OrderMakeList_View(id,options){
 		this.addElement(new Statistics_View(id+":statistics"));
 	}
 	
+	//,"params":{"cond_date":cond_date}
+	options.srvEvents = [
+		{"id":"Graph.change"}
+		,{"id":"VehicleScheduleState.insert"}
+		,{"id":"VehicleScheduleState.update"}
+		,{"id":"VehicleScheduleState.delete"}
+		,{"id":"RAMaterialFact.change"}
+	];
+	options.srvEventsCallBack = function(json){
+		self.srvEventsCallBack(json);
+	};
 	
 	OrderMakeList_View.superclass.constructor.call(this,id,options);
 		
@@ -217,82 +232,25 @@ OrderMakeList_View.prototype.m_endShiftMS;
  * Все обновляется разом за один запрос из нескольких моделей
  */
 OrderMakeList_View.prototype.refresh = function(callBack){
-//console.log("OrderMakeList_View.prototype.refresh")
 	this.m_refreshMethod.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
 	var self = this;
 	
 	this.m_refreshMethod.run({
 		"ok":function(resp){					
-			
-			//orders
-			//do nothing if locked
-			var grid = self.getElement("order_make_grid");
-			if(!grid.getLocked()){
-				self.resetTotals();
-				
-				grid.getModel().setData(resp.getModelData("OrderMakeList_Model"));
-				grid.onGetData();
-			}
-			
-			//chart
-			if(!self.m_lowResDevice){
-				self.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
-			}
-			
-			if(self.m_showProductionSites){
-				self.getElement("production_sites").setData(resp.getModel("CementSiloForOrderList_Model"));
-				self.getElement("material_stores").setData(resp.getModel("MaterialStoreForOrderList_Model"));
-			}
-			
-			//mat totals
-			var grid = self.getElement("mat_totals_grid");
-			grid.getModel().setData(resp.getModelData("MatTotals_Model"));
-			grid.onGetData();
-			
-			//assigning
-			self.getElement("veh_assigning").setData(resp.getModelData("AssignedVehicleList_Model"));
-			
-			//vehicles
-			var grid = self.getElement("veh_schedule_grid");
-			grid.getModel().setData(resp.getModelData("VehicleScheduleMakeOrderList_Model"));
-			grid.onGetData();
-
-			//features
-			var grid = self.getElement("features_grid");
-			grid.getModel().setData(resp.getModelData("VehFeaturesOnDateList_Model"));
-			grid.onGetData();
-			
-			//totals
-			self.showTotals();			
-			if(callBack){
-				callBack();
-			}
-			
+			self.onRefreshResponse(resp);
+			if(callBack)callBack();
 		}
 	})
 }
 
-OrderMakeList_View.prototype.enableRefreshing = function(v){
-	if(v){
-		var self = this;
-		this.m_timer = setInterval(function(){
-			self.refresh();
-		}, this.m_refreshInterval);
-	}
-	else if(this.m_timer){
-		clearInterval(this.m_timer);
-	}
-}
-
 OrderMakeList_View.prototype.toDOM = function(p){
+	
 	OrderMakeList_View.superclass.toDOM.call(this,p);
 	
 	this.showTotals();
-	this.enableRefreshing(true);
 }
 
 OrderMakeList_View.prototype.delDOM = function(){
-	this.enableRefreshing(false);
 	
 	OrderMakeList_View.superclass.delDOM.call(this);
 	
@@ -327,3 +285,85 @@ OrderMakeList_View.prototype.resetTotals = function(){
 	this.m_shippedBeforeNow = 0;
 	this.m_shippedDayBeforeNow = 0;
 }
+
+OrderMakeList_View.prototype.onRefreshResponse = function(resp){
+	//orders
+	//do nothing if locked
+	if(resp.modelExists("OrderMakeList_Model")){
+		var grid = this.getElement("order_make_grid");
+		if(!grid.getLocked()){
+			this.resetTotals();
+			
+			grid.getModel().setData(resp.getModelData("OrderMakeList_Model"));
+			grid.onGetData();
+		}
+	}	
+	//chart
+	if(resp.modelExists("Graph_Model") && !this.m_lowResDevice){
+		this.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
+	}
+	
+	if(this.m_showProductionSites && resp.modelExists("CementSiloForOrderList_Model")){
+		this.getElement("production_sites").setData(resp.getModel("CementSiloForOrderList_Model"));
+	}
+
+	if(this.m_showProductionSites && resp.modelExists("MaterialStoreForOrderList_Model")){
+		this.getElement("material_stores").setData(resp.getModel("MaterialStoreForOrderList_Model"));
+	}
+	
+	//mat totals
+	if(resp.modelExists("MatTotals_Model")){
+		var grid = this.getElement("mat_totals_grid");
+		grid.getModel().setData(resp.getModelData("MatTotals_Model"));
+		grid.onGetData();
+	}
+		
+	//assigning
+	if(resp.modelExists("AssignedVehicleList_Model")){
+		this.getElement("veh_assigning").setData(resp.getModelData("AssignedVehicleList_Model"));
+	}
+	
+	//vehicles
+	if(resp.modelExists("VehicleScheduleMakeOrderList_Model")){
+		var grid = this.getElement("veh_schedule_grid");
+		grid.getModel().setData(resp.getModelData("VehicleScheduleMakeOrderList_Model"));
+		grid.onGetData();
+	}
+	
+	//features
+	if(resp.modelExists("VehFeaturesOnDateList_Model")){
+		var grid = this.getElement("features_grid");
+		grid.getModel().setData(resp.getModelData("VehFeaturesOnDateList_Model"));
+		grid.onGetData();
+	}
+		
+	//totals
+	this.showTotals();			
+}
+
+OrderMakeList_View.prototype.runSpecificUpdateMethod = function(meth){
+	var pm = (new Order_Controller()).getPublicMethod(meth);
+	pm.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
+	var self = this;
+	pm.run({
+		"ok":function(resp){
+			self.onRefreshResponse(resp);
+		}
+	});
+}
+
+OrderMakeList_View.prototype.srvEventsCallBack = function(json){
+	if(json.methodId=="Graph.change"){
+		//analyse cond_date!
+		this.runSpecificUpdateMethod("get_make_orders_form_ord");
+	}
+	else if(json.controllerId=="VehicleScheduleState"){
+		this.runSpecificUpdateMethod("get_make_orders_form_veh");
+	}
+	else if(json.controllerId=="RAMaterialFact"){
+		this.runSpecificUpdateMethod("get_make_orders_form_mat");
+	}
+	
+}
+
+

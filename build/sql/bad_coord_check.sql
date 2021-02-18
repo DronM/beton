@@ -14,42 +14,7 @@ BEGIN
 	--traservd compiled incorrecr time dif 6 hours!
 	NEW.period = NEW.period - '1 hour'::interval;
 	
-	IF NEW.period - now() at time zone 'UTC'>='5 minutes'::interval THEN
-		IF NEW.gps_valid=1 THEN
-			NEW.gps_period = NEW.period;
-			NEW.period = NEW.recieved_dt;
-		ELSE
-			--skeep bad record
-			INSERT INTO car_tracking_skeeped VALUES (
-				NEW.car_id,
-				NEW.period,
-				NEW.longitude,
-				NEW.latitude,
-				NEW.speed,
-				NEW.ns,
-				NEW.ew,
-				NEW.magvar,
-				NEW.heading,
-				NEW.recieved_dt,
-				NEW.gps_valid,
-				NEW.from_memory,
-				NEW.odometer,
-				NEW.p1,
-				NEW.p2,
-				NEW.p3,
-				NEW.p4,
-				NEW.sensors_in,
-				NEW.voltage,
-				NEW.sensors_out,
-				NEW.engine_on,
-				NEW.lon,
-				NEW.lat,
-				NEW.gps_period					
-			)
-			ON CONFLICT (car_id,period) DO NOTHING;
-			RETURN NULL;
-		END IF;	
-	ELSIF EXTRACT(YEAR FROM NEW.period::date)<='2001' THEN
+	IF EXTRACT(YEAR FROM NEW.period::date)<='2001' THEN
 		NEW.gps_period = NEW.period;
 		NEW.period = NEW.period + '7168 days'::interval;
 
@@ -86,6 +51,18 @@ BEGIN
 		
 		-- '7167 days 23:00:00'::interval;
 		--NEW.recieved_dt;
+		
+	ELSIF
+		--future
+		(NEW.period - now() at time zone 'UTC'>='5 minutes'::interval)
+		OR (EXTRACT(YEAR FROM NEW.period::date)<='2018')
+	THEN
+		IF NEW.gps_valid=1 THEN
+			NEW.gps_period = NEW.period;
+			NEW.period = NEW.recieved_dt;
+		ELSE
+			RETURN NULL;
+		END IF;			
 	END IF;
 	
 	--Проверить скорость по расстоянию ТОЛЬКО если время между точками минимальное, меньше 1 минуты?

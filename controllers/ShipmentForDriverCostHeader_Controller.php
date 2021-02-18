@@ -36,6 +36,13 @@ class ShipmentForDriverCostHeader_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['date'
+			]
+		];
+		$pm->addEvent('ShipmentForDriverCostHeader.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('ShipmentForDriverCostHeader_Model');
@@ -60,7 +67,14 @@ class ShipmentForDriverCostHeader_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['date'
+				]
+			];
+			$pm->addEvent('ShipmentForDriverCostHeader.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('ShipmentForDriverCostHeader_Model');
 
@@ -73,6 +87,16 @@ class ShipmentForDriverCostHeader_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['date'
+			]
+		];
+		$pm->addEvent('ShipmentForDriverCostHeader.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('ShipmentForDriverCostHeader_Model');
 

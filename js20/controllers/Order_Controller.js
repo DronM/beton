@@ -30,7 +30,13 @@ function Order_Controller(options){
 	this.addGetList();
 	this.addGetObject();
 	this.add_get_make_orders_form();
+	this.add_get_make_orders_form_ord();
+	this.add_get_make_orders_form_veh();
+	this.add_get_make_orders_form_mat();
 	this.add_get_make_orders_for_lab_form();
+	this.add_get_make_orders_for_lab_form_ord();
+	this.add_get_make_orders_for_lab_form_veh();
+	this.add_get_make_orders_for_lab_form_mat();
 	this.add_get_make_orders_list();
 	this.add_get_make_orders_for_lab_list();
 	this.add_get_avail_spots();
@@ -470,9 +476,93 @@ extend(Order_Controller,ControllerObjServer);
 	this.addPublicMethod(pm);
 }
 
+			Order_Controller.prototype.add_get_make_orders_form_ord = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_make_orders_form_ord',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldDate("date",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.add_get_make_orders_form_veh = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_make_orders_form_veh',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldDate("date",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.add_get_make_orders_form_mat = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_make_orders_form_mat',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldDate("date",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
 			Order_Controller.prototype.add_get_make_orders_for_lab_form = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_make_orders_for_lab_form',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldDate("date",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.add_get_make_orders_for_lab_form_ord = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_make_orders_for_lab_form_ord',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldDate("date",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.add_get_make_orders_for_lab_form_veh = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_make_orders_for_lab_form_veh',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldDate("date",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.add_get_make_orders_for_lab_form_mat = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_make_orders_for_lab_form_mat',opts);
 	
 				
 	

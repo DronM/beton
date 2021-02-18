@@ -109,6 +109,17 @@ DECLARE
 						END;
 					END IF;
 					*/
+					
+					--Event support
+					/*PERFORM pg_notify(
+							'RAMaterialFact.'||lower(TG_OP)
+						,json_build_object(
+							'params',json_build_object(
+								'id',NEW.id
+							)
+						)::text
+					);*/
+					
 					RETURN NEW;					
 				ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
 					RETURN OLD;
@@ -190,6 +201,17 @@ DECLARE
 						END;
 					END IF;					
 					*/
+					
+					--Event support
+					/*PERFORM pg_notify(
+							'RAMaterialFact.'||lower(TG_OP)
+						,json_build_object(
+							'params',json_build_object(
+								'id',OLD.id
+							)
+						)::text
+					);*/
+					
 					RETURN OLD;					
 				END IF;
 			END;

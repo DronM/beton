@@ -30,8 +30,11 @@ function Destination_Controller(options){
 	this.addGetList();
 	this.addGetObject();
 	this.add_complete_dest();
+	this.add_complete_for_order();
+	this.add_get_data_for_new_address();
 	this.add_get_for_client_list();
 	this.add_get_coords_on_name();
+	this.add_get_route_to_zone();
 	this.add_at_dest_avg_time();
 	this.add_route_to_dest_avg_time();
 		
@@ -88,6 +91,18 @@ extend(Destination_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldFloat("price_for_driver",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("near_road_lon",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("near_road_lat",options);
 	
 	pm.addField(field);
 	
@@ -148,6 +163,18 @@ extend(Destination_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldFloat("price_for_driver",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("near_road_lon",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("near_road_lat",options);
 	
 	pm.addField(field);
 	
@@ -247,6 +274,52 @@ extend(Destination_Controller,ControllerObjServer);
 	this.addPublicMethod(pm);
 }
 
+			Destination_Controller.prototype.add_complete_for_order = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('complete_for_order',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("name_pat",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("client_id",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("ic",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("mid",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Destination_Controller.prototype.add_get_data_for_new_address = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_data_for_new_address',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("address_str",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
 			Destination_Controller.prototype.add_get_for_client_list = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_for_client_list',opts);
@@ -263,6 +336,20 @@ extend(Destination_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldString("name",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Destination_Controller.prototype.add_get_route_to_zone = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_route_to_zone',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("zone_coords",options));
 	
 			
 	this.addPublicMethod(pm);

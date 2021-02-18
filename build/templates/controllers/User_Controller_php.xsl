@@ -25,6 +25,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/GlobalFilter.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelWhereSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelVars.php');
+require_once(FRAME_WORK_PATH.'basic_classes/SessionVarManager.php');
 
 require_once('common/PwdGen.php');
 require_once('common/SMSService.php');
@@ -41,6 +42,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	const ER_EMAIL_TAKEN = "Есть такой адрес электронной почты.";
 
 	const ER_BANNED = "Доступ запрещен!@1005";
+	const ER_DEVICE_BANNED = "Доступ с данного устройства запрещен!@1006";
 	
 	const ER_AUTOREFRESH_NOT_ALLOWED = "Обновление сессии запрещено!@1010";
 
@@ -105,6 +107,34 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	
 	/* array with user inf*/
 	private function set_logged($ar,&amp;$pubKey){
+	
+		//check User-Agent header for restricted devices
+		$headers = '';			
+		if (!function_exists('getallheaders')){
+			function getallheaders(){
+				$headers = [];
+				foreach ($_SERVER as $name => $value){
+					if (substr($name, 0, 5) == 'HTTP_'){
+						$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+					}
+				}
+				return $headers;
+			}
+		} 
+		$headers = getallheaders();
+		//remove unnecessary headers
+		$skeep_hd = ['if-modified-since','cookie','referer','connection','accept-encoding','accept-language','accept','content-length','content-type'];		
+		foreach($skeep_hd as $skeep_k){
+			if(isset($headers[$skeep_k])){
+				unset($headers[$skeep_k]);
+			}
+		}
+		
+		if (isset($headers['User-Agent']) &amp;&amp; isset($ar['ban_hash']) &amp;&amp; strpos($ar['ban_hash'],md5($headers['User-Agent']))!==FALSE){
+			throw new Exception(self::ER_DEVICE_BANNED);
+		}
+		$headers_json = json_encode($headers);		
+	
 		$this->setLogged(TRUE);
 		
 		$_SESSION['user_id']		= $ar['id'];
@@ -119,6 +149,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		$_SESSION['first_shift_start_time'] = $ar['first_shift_start_time'];
 		$_SESSION['first_shift_end_time'] = $ar['first_shift_end_time'];
+		
+		//microservices
+		$_SESSION['ms_app_id']		= MS_APP_ID;
+		$_SESSION['ms_role_id']		= 'client';
+		
+		SessionVarManager::addVar('eventServerClientId','',TRUE);
+		SessionVarManager::addVar('testVar','1',TRUE);
 		
 		//global filters				
 		if ($ar['role_id']=='client'){
@@ -237,44 +274,33 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			</xsl:for-each>			
 			
 		}
-		
-		$log_ar = $this->getDbLinkMaster()->query_first(
-			sprintf("SELECT pub_key FROM logins
-			WHERE session_id='%s' AND user_id =%d AND date_time_out IS NULL",
-			session_id(),intval($ar['id']))
+				
+		$dif_sess_srv = (
+			(defined('SESS_SERVER_MASTER')&amp;&amp;defined('DB_SERVER_MASTER')&amp;&amp;SESS_SERVER_MASTER!=DB_SERVER_MASTER)
+			&amp;&amp; (isset($_SESSION['ms_app_id'])? $_SESSION['ms_app_id'] : ( defined('MS_APP_ID')? MS_APP_ID : 0))
 		);
+		
+		$sess_db_link = $GLOBALS['dbLinkSessMaster'];
+		$log_ar = $sess_db_link->query_first(sprintf(
+			"SELECT pub_key
+			FROM logins
+			WHERE session_id='%s' AND user_id =%d AND date_time_out IS NULL%s"
+			,session_id()
+			,intval($ar['id'])
+			,$dif_sess_srv? aprintf(' AND app_id=%d',MS_APP_ID):''
+		));
 		if (!$log_ar['pub_key']){
 			//no user login
 			
 			$pubKey = uniqid();
 			
-			$headers = '';
-			$skeep_hd = ['if-modified-since','cookie','referer','connection','accept-encoding','accept-language','accept','content-length','content-type'];
-			if (!function_exists('getallheaders')){
-				function getallheaders(){
-					$headers = [];
-					foreach ($_SERVER as $name => $value){
-						if (substr($name, 0, 5) == 'HTTP_'){
-							$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-						}
-					}
-					return $headers;
-				}
-			} 			
-			foreach(getallheaders() as $h_k=>$h_v){
-				if(in_array(strtolower($h_k),$skeep_hd)===FALSE){
-					$headers.= ($headers=='')? '':PHP_EOL;
-					$headers.= $h_k.':'.$h_v;
-				}
-			}
-			
-			$log_ar = $this->getDbLinkMaster()->query_first(
+			$log_ar = $sess_db_link->query_first(
 				sprintf("UPDATE logins SET 
 					user_id = %d,
 					pub_key = '%s',
 					date_time_in = now(),
 					set_date_time = now(),
-					headers='%s'
+					headers_j='%s'
 					FROM (
 						SELECT
 							l.id AS id
@@ -287,25 +313,39 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					RETURNING logins.id",
 					intval($ar['id']),
 					$pubKey,
-					$headers,
+					$headers_json,
 					session_id()
 				)
 			);				
 			if (!$log_ar['id']){
 				//нет вообще юзера
-				$log_ar = $this->getDbLinkMaster()->query_first(
-					sprintf(
+				if($dif_sess_srv){
+					$log_ar = $sess_db_link->query_first(sprintf(
+						"INSERT INTO logins
+						(date_time_in,ip,session_id,pub_key,user_id,headers,app_id)
+						VALUES(now(),'%s','%s','%s',%d,'%s',%d)
+						RETURNING id"
+						,$_SERVER["REMOTE_ADDR"]
+						,session_id()
+						,$pubKey
+						,$ar['id']
+						,$headers
+						,MS_APP_ID
+					));								
+				}
+				else{
+					$log_ar = $sess_db_link->query_first(sprintf(
 						"INSERT INTO logins
 						(date_time_in,ip,session_id,pub_key,user_id,headers)
 						VALUES(now(),'%s','%s','%s',%d,'%s')
-						RETURNING id",
-						$_SERVER["REMOTE_ADDR"],
-						session_id(),
-						$pubKey,
-						$ar['id'],
-						$headers
-					)
-				);								
+						RETURNING id"
+						,$_SERVER["REMOTE_ADDR"]
+						,session_id()
+						,$pubKey
+						,$ar['id']
+						,$headers
+					));								
+				}
 			}
 			$_SESSION['LOGIN_ID'] = $ar['id'];			
 		}
@@ -329,7 +369,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					ELSE
 						const_first_shift_start_time_val()::interval + 
 						const_shift_length_time_val()::interval-'1 second'::interval
-				END AS first_shift_end_time				
+				END AS first_shift_end_time,
+				(SELECT string_agg(bn.hash,',') FROM login_device_bans bn WHERE bn.user_id=u.id) AS ban_hash								
 			FROM users AS u
 			LEFT JOIN users_dialog AS ud ON ud.id=u.id
 			WHERE (u.name=%s OR u.email=%s) AND u.pwd=md5(%s)",
@@ -347,8 +388,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		else{
 			$this->set_logged($ar,$pubKey);
-			$_SESSION['width_type'] = $pm->getParamValue("width_type");
-			
+			$_SESSION['width_type'] = $pm->getParamValue("width_type");			
 		}
 	}
 	
@@ -378,22 +418,27 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		$refresh_hash = substr($refresh_token,$refresh_p+1);
 		
-		$ar = $this->getDbLink()->query_first(
-		"SELECT
-			l.id,
-			trim(l.session_id) session_id,
-			u.pwd u_pwd_hash
-		FROM logins l
-		LEFT JOIN users u ON u.id=l.user_id
-		WHERE l.date_time_out IS NULL AND l.pub_key=".$refresh_salt_db);
+		$sess_db_link = $GLOBALS['dbLinkSessMaster'];
+		$ar = $sess_db_link->query_first(sprintf(
+			"SELECT
+				l.id,
+				trim(l.session_id) session_id
+			FROM logins l
+			WHERE l.date_time_out IS NULL AND l.pub_key=%s AND l.user_id=%d"
+			,$refresh_salt_db
+			,$_SESSION['user_id']
+		));
 		
-		if (!$ar['session_id'] || $refresh_hash!=md5($refresh_salt.$_SESSION['user_id'].$ar['u_pwd_hash'])
+		$u_pwd_ar = $this->getDbLink()->query_first(sprintf(
+			"SELECT pwd AS u_pwd_hash FROM users WHERE id=%d"
+			,$_SESSION['user_id']
+		));
+		
+		if (!$ar['session_id'] || $refresh_hash!=md5($refresh_salt.$_SESSION['user_id'].$u_pwd_ar['u_pwd_hash'])
 		){
 			throw new Exception(ERR_AUTH);
 		}	
 				
-		$link = $this->getDbLinkMaster();
-		
 		try{
 			//session prolongation, new id assigning
 			$old_sess_id = session_id();
@@ -401,13 +446,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$new_sess_id = session_id();
 			$pub_key = uniqid();
 			
-			$link->query('BEGIN');									
-			$link->query(sprintf(
+			$sess_db_link->query('BEGIN');									
+			$sess_db_link->query(sprintf(
 			"UPDATE sessions
 				SET id='%s'
 			WHERE id='%s'",$new_sess_id,$old_sess_id));
 			
-			$link->query(sprintf(
+			$sess_db_link->query(sprintf(
 			"UPDATE logins
 			SET
 				set_date_time=now()::timestamp,
@@ -415,15 +460,15 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				pub_key='%s'
 			WHERE id=%d",$new_sess_id,$pub_key,$ar['id']));
 			
-			$link->query('COMMIT');
+			$sess_db_link->query('COMMIT');
 		}
 		catch(Exception $e){
-			$link->query('ROLLBACK');
+			$sess_db_link->query('ROLLBACK');
 			$this->setLogged(FALSE);
 			throw new Exception(ERR_AUTH);
 		}
 		
-		$this->add_auth_model($pub_key,$new_sess_id,$ar['u_pwd_hash'],$this->calc_session_expiration_time());
+		$this->add_auth_model($pub_key,$new_sess_id,$u_pwd_ar['u_pwd_hash'],$this->calc_session_expiration_time());
 	}
 
 	/**
@@ -454,6 +499,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 		
 		setcookie("token",$_SESSION['token'],$expiration,'/');
+		
+		SessionVarManager::setValue('eventServerClientId',$_SESSION['token'],FALSE);
 		
 		$this->addModel(new ModelVars(
 			array('name'=>'Vars',
@@ -780,6 +827,21 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$model = new UserOperatorList_Model($this->getDbLink());
 		$model->query("SELECT * FROM user_operator_list",TRUE);
 		$this->addModel($model);
+	}
+
+	public static function closeConnection($conn,$pubKey){
+		$conn->query(sprintf(
+			"SELECT pg_notify(
+			'User.logout'
+			,json_build_object(
+				'params',json_build_object(
+					'pub_key','%s'
+				)
+			)::text
+			)"
+			,$pubKey
+		));					
+	
 	}
 	
 </xsl:template>

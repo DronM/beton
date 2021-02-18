@@ -3,6 +3,9 @@ require_once(FRAME_WORK_PATH.'basic_classes/Controller.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelVars.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTime.php');
 
+require_once(FRAME_WORK_PATH.'basic_classes/SessionVarManager.php');
+require_once(FRAME_WORK_PATH.'basic_classes/EventSrv.php');
+
 include("common/pChart2.1.3/class/pData.class.php");
 include("common/pChart2.1.3/class/pDraw.class.php");
 include("common/pChart2.1.3/class/pImage.class.php");
@@ -51,6 +54,17 @@ class Graph_Controller extends Controller{
 		$link_master->query(sprintf(
 		"UPDATE plant_load_charts SET state=0 WHERE id='%s'",
 		date('Y-m-d',$date_from)));
+		
+		//event
+		if(defined('APP_NAME') && defined('APP_SERVER_HOST') && defined('APP_SERVER_PORT')
+		){
+			//change to all
+			//'emitterId'=>SessionVarManager::getValue('eventServerClientId')			
+			$event_par = [				
+				'cond_date'=>date('Y-m-d',$date_from)
+			];
+			EventSrv::publishAsync('Graph.change',$event_par,APP_NAME,APP_SERVER_HOST,APP_SERVER_PORT);
+		}		
 	}
 	private static function get_db_con(){
 		$dbLink = new DB_Sql;

@@ -47,9 +47,22 @@ class ProductionSite_Controller extends ControllerSQL{
 		$param = new FieldExtArray('missing_elkon_production_ids'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtInt('destination_id'
+				,array(
+				'alias'=>'Зона'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			,'name'
+			]
+		];
+		$pm->addEvent('ProductionSite.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('ProductionSite_Model');
@@ -89,6 +102,12 @@ class ProductionSite_Controller extends ControllerSQL{
 				,array(
 			));
 			$pm->addParam($param);
+		$param = new FieldExtInt('destination_id'
+				,array(
+			
+				'alias'=>'Зона'
+			));
+			$pm->addParam($param);
 		
 			$param = new FieldExtInt('id',array(
 			));
@@ -98,7 +117,15 @@ class ProductionSite_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				,'name'
+				]
+			];
+			$pm->addEvent('ProductionSite.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('ProductionSite_Model');
 
@@ -114,6 +141,17 @@ class ProductionSite_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			,'name'
+			]
+		];
+		$pm->addEvent('ProductionSite.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('ProductionSite_Model');
 

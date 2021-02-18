@@ -10,7 +10,14 @@
 function VehicleSelect(id,options){
 	options = options || {};
 	
-	options.model = options.addAll? new ModelXML("vehicles_with_trackers",{"fields":{"id":new FieldInt("id"),"plate":new FieldString("plate")}}) : new Vehicle_Model();
+	options.model = options.addAll?
+		new ModelXML("vehicles_with_trackers",
+			{"fields":{
+				"id":new FieldInt("id")
+				,"plate":new FieldString("plate")
+				,"tracker_id":new FieldString("tracker_id")
+			}})
+			: new Vehicle_Model();
 	
 	if (options.labelCaption!=""){
 		options.labelCaption = options.labelCaption || "ТС:";

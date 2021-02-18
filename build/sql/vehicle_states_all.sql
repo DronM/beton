@@ -106,6 +106,7 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 		vehicle_schedules_ref(vs,v,d) AS vehicle_schedules_ref,
 		
 		d.phone_cel AS driver_tel
+		,v.tracker_id
 		
 	FROM vehicle_schedules vs
 	

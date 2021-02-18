@@ -1,0 +1,22 @@
+GRANT ALL PRIVILEGES ON DATABASE ms TO ms;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO ms;
+GRANT SELECT ON ALL TABLES IN SCHEMA fias TO ms;
+GRANT USAGE ON SCHEMA fias TO ms;
+
+
+CREATE EXTENSION postgres_fdw;
+
+DROP SERVER ms;
+CREATE SERVER ms FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'localhost', dbname 'ms', port '5432');
+GRANT USAGE ON FOREIGN SERVER ms TO beton;
+!Создать сзхему в нашей базе!
+!Доступ юзеру в съему в нашей базе!
+GRANT SELECT ON ALL TABLES IN SCHEMA fias TO beton;
+GRANT USAGE, CREATE ON SCHEMA fias TO beton;
+
+
+
+#Под юзером beton
+CREATE USER MAPPING FOR beton SERVER ms OPTIONS (user 'ms', password '159753');
+
+IMPORT FOREIGN SCHEMA fias FROM SERVER ms INTO fias;

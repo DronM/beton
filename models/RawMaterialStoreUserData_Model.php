@@ -15,7 +15,8 @@ class RawMaterialStoreUserData_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("raw_materials_store_user_data");
 			

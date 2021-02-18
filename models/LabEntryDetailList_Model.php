@@ -18,7 +18,8 @@ class LabEntryDetailList_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("lab_entry_detail_list");
 			

@@ -10,14 +10,28 @@
 		<h3 class="panel-title">Карточка пользователя</h3>
 	</div>
 	
-	<ul class="nav nav-tabs" role="tablist">
-	    <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Профиль</a></li>
-	</ul>
+	<div class="tabbable">
+		<ul class="nav nav-tabs nav-tabs-highlight">
+			<li class="active">
+				<a href="#profile" data-toggle="tab" aria-expanded="true">Профиль</a>
+			</li>
+			<li>
+				<a href="#mac_list" data-toggle="tab" aria-expanded="false">Мак адреса</a>
+			</li>
+			<li>
+				<a href="#activity" data-toggle="tab" aria-expanded="false">Активность</a>
+			</li>
+		</ul>
+	</div>
 	
 	<!-- Tab panes -->
-	<div class="tab-content">	
-		<div role="tabpanel" class="tab-pane active" id="profile">
+	<div class="tab-content dialogForm">	
+		<div class="tab-pane fade in active" id="profile">
 			<div class="panel panel-body userDialogTab">
+				<div class="panel-heading">
+					<h4 class="panel-title">Данные пользователя</h4>
+				</div>
+			
 				<div id="UserDialog:name"/>
 				<div id="UserDialog:role"/>	
 				<div id="UserDialog:email"/>
@@ -26,22 +40,33 @@
 				<div id="UserDialog:production_sites_ref"/>
 				<div id="UserDialog:banned"/>
 				
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="mac_list">
+			<div class="panel panel-body userDialogTab">
 				<div class="panel">
 					<div class="panel-heading">
-						<h6 class="panel-title">MAC адреса</h6>		
+						<h4 class="panel-title">MAC адреса пользователя</h4>
 					</div>
 	
 					<div id="UserDialog:mac_list"/>
 				</div>
 				
-				<div class="panel">
-					<div class="panel-heading">
-						<h6 class="panel-title">Сессии</h6>		
-					</div>
-	
-					<div id="UserDialog:login_list"/>
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="activity">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel-heading">
+					<h4 class="panel-title">Активность пользователя</h4>		
 				</div>
 				
+				<h6 class="panel-title">Устройства входа</h6>
+				<div id="UserDialog:login_device_list"/>
+				
+				<h6 class="panel-title">Сессии</h6>
+				<div id="UserDialog:login_list"/>
 			</div>
 		</div>
 		

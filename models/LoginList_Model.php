@@ -18,7 +18,8 @@ class LoginList_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("logins_list");
 			
@@ -113,12 +114,20 @@ class LoginList_Model extends ModelSQLBeton{
 		$this->addField($f_session_set_time);
 		//********************
 		
-		//*** Field headers ***
+		//*** Field user_agent ***
 		$f_opts = array();
-		$f_opts['id']="headers";
+		$f_opts['id']="user_agent";
 						
-		$f_headers=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"headers",$f_opts);
-		$this->addField($f_headers);
+		$f_user_agent=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_agent",$f_opts);
+		$this->addField($f_user_agent);
+		//********************
+		
+		//*** Field header_user_agent ***
+		$f_opts = array();
+		$f_opts['id']="header_user_agent";
+						
+		$f_header_user_agent=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"header_user_agent",$f_opts);
+		$this->addField($f_header_user_agent);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

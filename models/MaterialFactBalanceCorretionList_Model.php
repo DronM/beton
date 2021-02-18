@@ -18,7 +18,8 @@ class MaterialFactBalanceCorretionList_Model extends ModelSQLBeton{
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("material_fact_balance_corrections_list");
 			

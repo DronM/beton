@@ -40,7 +40,8 @@ CREATE OR REPLACE VIEW public.lab_entry_30days_2 AS
                      LEFT JOIN orders o ON o.id = sh.order_id
                      LEFT JOIN concrete_types ct_1 ON ct_1.id = o.concrete_type_id
                      LEFT JOIN lab_entry_list_view lab ON lab.shipment_id = sh.id
-                  WHERE sh.ship_date_time >= (now()::timestamp without time zone - ((const_lab_days_for_avg_val() || ' days'::text)::interval)) AND sh.ship_date_time <= now()::timestamp without time zone AND ct_1.pres_norm > 0::numeric) det
+                  WHERE sh.ship_date_time >= (now()::timestamp without time zone - ((const_lab_days_for_avg_val() || ' days'::text)::interval)) AND sh.ship_date_time <= now()::timestamp without time zone AND ct_1.pres_norm > 0::numeric
+        ) det
              LEFT JOIN concrete_types ct ON ct.id = det.concrete_type_id
           GROUP BY det.concrete_type_id, ct.name
         ), sub2 AS (

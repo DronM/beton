@@ -36,6 +36,14 @@ class VehicleOwnerClient_Controller extends ControllerSQL{
 				,array('required'=>TRUE));
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['vehicle_owner_id'
+			,'client_id'
+			]
+		];
+		$pm->addEvent('VehicleOwnerClient.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('VehicleOwnerClient_Model');
@@ -66,7 +74,15 @@ class VehicleOwnerClient_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['vehicle_owner_id'
+				,'client_id'
+				]
+			];
+			$pm->addEvent('VehicleOwnerClient.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('VehicleOwnerClient_Model');
 
@@ -82,6 +98,17 @@ class VehicleOwnerClient_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['vehicle_owner_id'
+			,'client_id'
+			]
+		];
+		$pm->addEvent('VehicleOwnerClient.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('VehicleOwnerClient_Model');
 

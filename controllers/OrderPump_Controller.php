@@ -42,6 +42,13 @@ class OrderPump_Controller extends ControllerSQL{
 				,array());
 		$pm->addParam($param);
 		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['order_id'
+			]
+		];
+		$pm->addEvent('OrderPump.insert',$ev_opts);
 		
 		$this->addPublicMethod($pm);
 		$this->setInsertModelId('OrderPump_Model');
@@ -70,7 +77,14 @@ class OrderPump_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		
-		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['order_id'
+				]
+			];
+			$pm->addEvent('OrderPump.update',$ev_opts);
+			
 			$this->addPublicMethod($pm);
 			$this->setUpdateModelId('OrderPump_Model');
 
@@ -83,6 +97,16 @@ class OrderPump_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtInt('count'));
 		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['order_id'
+			]
+		];
+		$pm->addEvent('OrderPump.delete',$ev_opts);
+		
 		$this->addPublicMethod($pm);					
 		$this->setDeleteModelId('OrderPump_Model');
 

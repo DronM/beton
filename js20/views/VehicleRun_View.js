@@ -202,7 +202,8 @@ return;
 	var left = win_w/3;
 	var w = win_w/3*2;//left - 20;
 	
-	var href = "t=Map&v=Child";
+	var href = "t=Map&v=Child&c=Vehicle_Controller&f=get_track&id="+vehicleId+"&dt_from="+dateFrom+"&dt_to="+dateTo+"&stop_dur=00:05";
+	
 	var conn = window.getApp().getServConnector();
 	if(conn.getAccessTokenParam){
 		href+= "&"+conn.getAccessTokenParam()+"="+conn.getAccessToken();

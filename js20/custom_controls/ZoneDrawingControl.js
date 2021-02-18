@@ -1,15 +1,20 @@
 /** Copyright (c) 2019 
-	Andrey Mikhalevich, Katren ltd.
-*/
+ *  Andrey Mikhalevich, Katren ltd.
+ */
 
 function ZoneDrawingControl(id,options){
 	options = options || {};
+	
+	this.m_onDeleteZone = options.onDeleteZone;
 	
 	var self = this;
 	options.addElement = function(){
 		this.addElement(new ButtonCmd(id+":btn_delete",{
 			"onClick":function(){
 				self.m_zones.deleteZone.call(self.m_zones);
+				if(self.m_onDeleteZone){
+					self.m_onDeleteZone();
+				}
 			},
 			"caption":"Удалить",
 			"title":"Удалить зону с карты"

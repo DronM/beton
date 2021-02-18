@@ -19,7 +19,8 @@ class VehicleScheduleMakeOrderList_Model extends {
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
 		
-		$this->setDbName("public");
+		
+		$this->setDbName('public');
 		
 		$this->setTableName("");
 			
@@ -165,6 +166,14 @@ class VehicleScheduleMakeOrderList_Model extends {
 						
 		$f_vehicle_schedules_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_schedules_ref",$f_opts);
 		$this->addField($f_vehicle_schedules_ref);
+		//********************
+		
+		//*** Field tracker_id ***
+		$f_opts = array();
+		$f_opts['id']="tracker_id";
+						
+		$f_tracker_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tracker_id",$f_opts);
+		$this->addField($f_tracker_id);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

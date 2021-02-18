@@ -8,7 +8,7 @@ define('PHONES_FOR_BALANCE','79123971822,79044909590,79044900909');
 $dbLink = new DB_Sql();
 $dbLink->appname = APP_NAME;
 $dbLink->technicalemail = TECH_EMAIL;
-$dbLink->reporterror = DEBUG;
+$dbLink->detailedError = defined('DETAILED_ERROR')? DETAILED_ERROR:DEBUG;
 
 /*conneсtion*/
 $dbLink->server		= DB_SERVER_MASTER;
