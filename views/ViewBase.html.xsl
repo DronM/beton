@@ -128,10 +128,10 @@
 	<xsl:call-template name="initAppWin"/>	
 	
 	<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='')">	
+	<!-- "protocol":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_srv_protocol"/>' -->
 	//event server
-	application.initAppSrv({
-		"protocol":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_srv_protocol"/>'
-		,"host":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_srv_host"/>'
+	application.initAppSrv({		
+		"host":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_srv_host"/>'
 		,"port":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_srv_port"/>'
 		,"appId":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/app_id"/>'
 		,"token":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/token"/>'

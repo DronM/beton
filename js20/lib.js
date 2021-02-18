@@ -144,7 +144,7 @@ v_opts.variantStorage=this.m_storedTemplate.variantStorage;var view=eval(this.m_
 catch(e){window.onerror(e.message,"App.js",369,1);}
 return false;}
 App.prototype.showAbout=function(){window.setGlobalWait(true);var contr=new About_Controller(this);contr.run("get_object",{"t":"About","ok":function(resp){var v=new About_View("About_View",{"template":resp.getModelData("About-template").innerHTML,"models":{"About_Model":new About_Model({"data":resp.getModelData("About_Model")})}});window.setGlobalWait(false);WindowAbout.show(v);},"fail":function(){window.setGlobalWait(false);}})}
-App.prototype.initPage=function(){this.getServConnector().quit();if(this.m_openedWindows){for(var id in this.m_openedWindows){this.m_openedWindows[id].close();}}
+App.prototype.initPage=function(){this.getServConnector().quit();if(this.m_openedWindows){for(var id in this.m_openedWindows){if(this.m_openedWindows[id]){this.m_openedWindows[id].close();}}}
 window.location.href=this.getServVar("basePath");}
 App.prototype.quit=function(){var self=this;(new User_Controller()).run("logout",{"all":function(){self.initPage();}});window.setGlobalWait(true);return false;}
 App.prototype.getCurrentView=function(){return this.m_view;}
@@ -368,14 +368,14 @@ ServConnector.prototype.openHref=function(params,winParams){if(this.m_quit)retur
 ServConnector.prototype.quit=function(){this.m_quit=true;if(this.m_accessToken&&navigator.cookieEnabled){CookieManager.del("token");}}
 ServConnector.prototype.getAccessToken=function(){return this.m_accessToken;} 
 function AppSrv(options){options=options||{};window.WebSocket=window.WebSocket||window.MozWebSocket;if(!window.WebSocket){throw Error(this.NOT_SUPPOERTED);}
-this.m_protocol=options.protocol||this.DEF_PROTOCOL;this.m_host=options.host||this.DEF_HOST;this.m_port=options.port||this.DEF_PORT;this.m_appId=options.appId;this.m_token=options.token;this.m_tokenExpires=options.tokenExpires;}
-AppSrv.prototype.CON_TRY_WAIT_FACTOR=2000;AppSrv.prototype.CON_TRY_WAIT_MAX=60000;AppSrv.prototype.CHECK_INTERVAL=10000;AppSrv.prototype.MES_DEALY=5000;AppSrv.prototype.DEF_PROTOCOL="ws";AppSrv.prototype.DEF_HOST="127.0.0.1";AppSrv.prototype.DEF_PORT="1337";AppSrv.prototype.METH_STATUS={"end":0,"progress":1}
-AppSrv.prototype.m_conncetion;AppSrv.prototype.m_protocol;AppSrv.prototype.m_host;AppSrv.prototype.m_port;AppSrv.prototype.m_listenerCheckTimer;AppSrv.prototype.m_connectTimer;AppSrv.prototype.m_subscriptions;AppSrv.prototype.m_conTries;AppSrv.prototype.getState=function(){return this.m_connection.readyState;}
+this.m_host=options.host||this.DEF_HOST;this.m_port=options.port||this.DEF_PORT;this.m_appId=options.appId;this.m_token=options.token;this.m_tokenExpires=options.tokenExpires;}
+AppSrv.prototype.CON_TRY_WAIT_FACTOR=2000;AppSrv.prototype.CON_TRY_WAIT_MAX=60000;AppSrv.prototype.CHECK_INTERVAL=10000;AppSrv.prototype.MES_DEALY=5000;AppSrv.prototype.DEF_HOST="127.0.0.1";AppSrv.prototype.DEF_PORT="1337";AppSrv.prototype.METH_STATUS={"end":0,"progress":1}
+AppSrv.prototype.m_conncetion;AppSrv.prototype.m_host;AppSrv.prototype.m_port;AppSrv.prototype.m_listenerCheckTimer;AppSrv.prototype.m_connectTimer;AppSrv.prototype.m_subscriptions;AppSrv.prototype.m_conTries;AppSrv.prototype.getState=function(){return this.m_connection.readyState;}
 AppSrv.prototype.connActive=function(){return(this.m_connection.readyState==WebSocket.OPEN);}
 AppSrv.prototype.connect=function(){if(this.m_connectTimer){clearTimeout(this.m_connectTimer);}
 this.m_conTries=0;this.do_connect();}
 AppSrv.prototype.do_connect=function(){if(this.m_connection&&(this.m_connection.readyState===WebSocket.OPEN||this.m_connection.readyState===WebSocket.CONNECTING)){return;}
-this.m_connection=new WebSocket(this.m_protocol+"://"+this.m_host+":"+this.m_port+"/"+this.m_appId+"/"+this.m_token);var self=this;this.m_connection.onopen=function(){self.onOpen();};this.m_connection.onerror=function(error){if(window.showTempError)window.showTempError(self.ER_NOT_CONNECTED,null,self.MES_DEALY);};this.m_connection.onmessage=function(message){self.onMessage(message);};if(this.m_connection.readyState!==WebSocket.OPEN){this.m_conTries++;this.m_connectTimer=setTimeout(function(){self.do_connect();},Math.min(this.m_conTries*this.CON_TRY_WAIT_FACTOR,this.CON_TRY_WAIT_MAX));}}
+var protocol=(location.protocol!=="https:")?"ws":"wss";this.m_connection=new WebSocket(protocol+"://"+this.m_host+":"+this.m_port+"/"+this.m_appId+"/"+this.m_token);var self=this;this.m_connection.onopen=function(){self.onOpen();};this.m_connection.onerror=function(error){if(window.showTempError)window.showTempError(self.ER_NOT_CONNECTED,null,self.MES_DEALY);};this.m_connection.onmessage=function(message){self.onMessage(message);};if(this.m_connection.readyState!==WebSocket.OPEN){this.m_conTries++;this.m_connectTimer=setTimeout(function(){self.do_connect();},Math.min(this.m_conTries*this.CON_TRY_WAIT_FACTOR,this.CON_TRY_WAIT_MAX));}}
 AppSrv.prototype.subscribe=function(events,callBack,id){if(this.m_connection.readyState!==WebSocket.OPEN){this.m_subscribeEvents=this.m_subscribeEvents||[];this.m_subscribeEvents.push({"events":events,"callBack":callBack});console.log("subscribe postponed")
 return;}
 if(!id){id=CommonHelper.ID();}

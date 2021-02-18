@@ -108,6 +108,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	/* array with user inf*/
 	private function set_logged($ar,&amp;$pubKey){
 	
+		global $dbLinkSessMaster;
+		
 		//check User-Agent header for restricted devices
 		$headers = '';			
 		if (!function_exists('getallheaders')){
@@ -280,7 +282,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			&amp;&amp; (isset($_SESSION['ms_app_id'])? $_SESSION['ms_app_id'] : ( defined('MS_APP_ID')? MS_APP_ID : 0))
 		);
 		
-		$sess_db_link = $GLOBALS['dbLinkSessMaster'];
+		$sess_db_link = $dbLinkSessMaster;//$GLOBALS['dbLinkSessMaster'];
 		$log_ar = $sess_db_link->query_first(sprintf(
 			"SELECT pub_key
 			FROM logins
@@ -400,6 +402,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	}
 
 	public function login_refresh($pm){	
+	
+		global $dbLinkSessMaster;
+	
 		if(!defined('SESSION_EXP_SEC') || !intval(SESSION_EXP_SEC)){
 			throw new Exception(self::ER_AUTOREFRESH_NOT_ALLOWED);
 		}
@@ -418,7 +423,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		$refresh_hash = substr($refresh_token,$refresh_p+1);
 		
-		$sess_db_link = $GLOBALS['dbLinkSessMaster'];
+		$sess_db_link = $dbLinkSessMaster;//$GLOBALS['dbLinkSessMaster'];
 		$ar = $sess_db_link->query_first(sprintf(
 			"SELECT
 				l.id,

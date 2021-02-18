@@ -1813,7 +1813,7 @@ class ViewBase extends ViewHTMLXSLT {
 			//app server
 			$this->getVarModel()->addField(new Field('app_srv_host',DT_STRING));
 			$this->getVarModel()->addField(new Field('app_srv_port',DT_STRING));
-			$this->getVarModel()->addField(new Field('app_srv_protocol',DT_STRING));								
+			//$this->getVarModel()->addField(new Field('app_srv_protocol',DT_STRING));								
 			
 			$this->getVarModel()->addField(new Field('app_id',DT_STRING));		
 			
@@ -1859,7 +1859,7 @@ class ViewBase extends ViewHTMLXSLT {
 			
 			$this->setVarValue('app_srv_host',APP_SERVER_HOST);
 			$this->setVarValue('app_srv_port',APP_SERVER_PORT);
-			$this->setVarValue('app_srv_protocol',APP_SERVER_SECURED? 'wss':'ws');
+			//$this->setVarValue('app_srv_protocol',APP_SERVER_SECURED? 'wss':'ws');
 			$this->setVarValue('app_id',APP_NAME);
 			
 			if(isset($_SESSION['token'])){
