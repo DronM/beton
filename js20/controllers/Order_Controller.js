@@ -206,6 +206,12 @@ extend(Order_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Время создания";
+	var field = new FieldDateTimeTZ("create_date_time",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -367,6 +373,12 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Время последнего изменения";
 	var field = new FieldDateTimeTZ("last_modif_date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Время создания";
+	var field = new FieldDateTimeTZ("create_date_time",options);
 	
 	pm.addField(field);
 	

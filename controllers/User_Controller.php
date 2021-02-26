@@ -37,6 +37,41 @@ require_once('common/SMSService.php');
 
 require_once('functions/CustomEmailSender.php');
 
+//User Agent parser
+require_once 'common/matomo/device-detector/autoload.php';
+require_once 'common/matomo/device-detector/DeviceDetector.php';
+require_once 'common/matomo/device-detector/Parser/AbstractParser.php';
+require_once 'common/matomo/device-detector/Parser/AbstractBotParser.php';
+require_once 'common/matomo/device-detector/Parser/Bot.php';
+require_once 'common/matomo/device-detector/Parser/OperatingSystem.php';
+require_once 'common/matomo/device-detector/Yaml/ParserInterface.php';
+require_once 'common/matomo/device-detector/Yaml/Spyc.php';
+require_once 'common/matomo/device-detector/Cache/CacheInterface.php';
+require_once 'common/matomo/device-detector/Cache/StaticCache.php';
+
+require_once 'common/matomo/device-detector/Parser/VendorFragment.php';
+require_once 'common/matomo/device-detector/Parser/Client/AbstractClientParser.php';
+require_once 'common/matomo/device-detector/Parser/Client/FeedReader.php';
+require_once 'common/matomo/device-detector/Parser/Client/MobileApp.php';
+require_once 'common/matomo/device-detector/Parser/Client/MediaPlayer.php';
+require_once 'common/matomo/device-detector/Parser/Client/PIM.php';
+require_once 'common/matomo/device-detector/Parser/Client/Browser.php';
+require_once 'common/matomo/device-detector/Parser/Client/Browser/Engine/Version.php';
+require_once 'common/matomo/device-detector/Parser/Client/Library.php';
+require_once 'common/matomo/device-detector/Parser/Device/AbstractDeviceParser.php';
+require_once 'common/matomo/device-detector/Parser/Device/HbbTv.php';
+require_once 'common/matomo/device-detector/Parser/Device/Notebook.php';
+require_once 'common/matomo/device-detector/Parser/Device/Console.php';
+require_once 'common/matomo/device-detector/Parser/Device/CarBrowser.php';
+require_once 'common/matomo/device-detector/Parser/Device/Camera.php';
+require_once 'common/matomo/device-detector/Parser/Device/PortableMediaPlayer.php';
+require_once 'common/matomo/device-detector/Parser/Device/Mobile.php';
+
+
+use DeviceDetector\DeviceDetector;
+use DeviceDetector\Parser\Device\AbstractDeviceParser;
+AbstractDeviceParser::setVersionTruncation(AbstractDeviceParser::VERSION_TRUNCATION_NONE);
+
 class User_Controller extends ControllerSQL{
 
 	const PWD_LEN = 6;
@@ -479,7 +514,7 @@ class User_Controller extends ControllerSQL{
 	/* array with user inf*/
 	private function set_logged($ar,&$pubKey){
 	
-		global $dbLinkSessMaster;
+		//global $dbLinkSessMaster;
 		
 		//check User-Agent header for restricted devices
 		$headers = '';			
@@ -507,7 +542,23 @@ class User_Controller extends ControllerSQL{
 			throw new Exception(self::ER_DEVICE_BANNED);
 		}
 		$headers_json = json_encode($headers);		
-	
+		
+		if (isset($headers['User-Agent'])){
+			$userAgent = $headers['User-Agent'];//$_SERVER['HTTP_USER_AGENT'];
+			$dd = new DeviceDetector($userAgent);
+			$dd->skipBotDetection();
+			$dd->parse();
+			$header_user_agent = json_encode(array(
+				'clientInfo'	=> $dd->getClient()
+				,'osInfo'	=> $dd->getOs()
+				,'device'	=> $dd->getDeviceName()
+				,'brand'	=> $dd->getBrandName()
+				,'model'	=> $dd->getModel()
+			));
+		}
+		else{
+			$header_user_agent = 'NULL';
+		}
 		$this->setLogged(TRUE);
 		
 		$_SESSION['user_id']		= $ar['id'];
@@ -701,7 +752,7 @@ class User_Controller extends ControllerSQL{
 			&& (isset($_SESSION['ms_app_id'])? $_SESSION['ms_app_id'] : ( defined('MS_APP_ID')? MS_APP_ID : 0))
 		);
 		
-		$sess_db_link = $dbLinkSessMaster;//$GLOBALS['dbLinkSessMaster'];
+		$sess_db_link = $this->getDbLinkMaster();//$GLOBALS['dbLinkSessMaster'];
 		$log_ar = $sess_db_link->query_first(sprintf(
 			"SELECT pub_key
 			FROM logins
@@ -721,7 +772,8 @@ class User_Controller extends ControllerSQL{
 					pub_key = '%s',
 					date_time_in = now(),
 					set_date_time = now(),
-					headers_j='%s'
+					headers_j='%s',
+					user_agent='%s'
 					FROM (
 						SELECT
 							l.id AS id
@@ -735,6 +787,7 @@ class User_Controller extends ControllerSQL{
 					intval($ar['id']),
 					$pubKey,
 					$headers_json,
+					$header_user_agent,
 					session_id()
 				)
 			);				
@@ -822,8 +875,6 @@ class User_Controller extends ControllerSQL{
 
 	public function login_refresh($pm){	
 	
-		global $dbLinkSessMaster;
-	
 		if(!defined('SESSION_EXP_SEC') || !intval(SESSION_EXP_SEC)){
 			throw new Exception(self::ER_AUTOREFRESH_NOT_ALLOWED);
 		}
@@ -842,7 +893,7 @@ class User_Controller extends ControllerSQL{
 		
 		$refresh_hash = substr($refresh_token,$refresh_p+1);
 		
-		$sess_db_link = $dbLinkSessMaster;//$GLOBALS['dbLinkSessMaster'];
+		$sess_db_link = $this->getDbLinkMaster();//$GLOBALS['dbLinkSessMaster'];
 		$ar = $sess_db_link->query_first(sprintf(
 			"SELECT
 				l.id,
@@ -1183,6 +1234,18 @@ class User_Controller extends ControllerSQL{
 			),'session');
 			
 			$this->add_auth_model($pub_key,session_id(),$ar['pwd'],$this->calc_session_expiration_time());			
+			
+			//user inf
+			$this->addModel(new ModelVars(
+				array('name'=>'Vars',
+					'id'=>'UserInf_Model',
+					'values'=>array(
+						new Field('name',DT_STRING, array('value'=>$ar['name'])),
+						new Field('tel_ext',DT_STRING,array('value'=>$ar['tel_ext']))
+					)
+				)
+			));		
+			
 		}
 		else{
 			throw new Exception(ERR_AUTH);

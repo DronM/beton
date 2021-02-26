@@ -73,15 +73,15 @@ function LoginDeviceList_View(id,options){
 										var ctrl = new EditCheckBox(null,{
 											"value":m.getFieldValue("banned")
 											,"events":{
-												"change":(function(userAgent,userId){
+												"change":(function(banHash,userId){
 													return function(e){
 														self.switchBan(
-															userAgent
+															banHash
 															,userId
 															,this
 														);
 													}
-												})(m.getFieldValue("user_agent")
+												})(m.getFieldValue("ban_hash")
 													,m.getFieldValue("user_id")
 												)
 											}
@@ -110,14 +110,13 @@ function LoginDeviceList_View(id,options){
 }
 extend(LoginDeviceList_View,ViewAjxList);
 
-LoginDeviceList_View.prototype.switchBan = function(userAgent,userId,ctrl){
+LoginDeviceList_View.prototype.switchBan = function(banHash,userId,ctrl){
 	var banned = ctrl.getValue();
-	//console.log(userAgent,userId,banned)
 	
 	var pm = (new LoginDevice_Controller()).getPublicMethod("switch_banned");
 	pm.setFieldValue("banned",banned);
 	pm.setFieldValue("user_id",userId);
-	pm.setFieldValue("hash",CommonHelper.md5(userAgent).toLowerCase());
+	pm.setFieldValue("hash",banHash);
 	ctrl.setEnabled(false);
 	var self = this;
 	pm.run({

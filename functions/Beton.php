@@ -26,11 +26,18 @@ class Beton {
 	}
 
 	private static function timeStrToSec($timeStr){
-		list($h_s,$m_s,$s_s) = explode(':',$timeStr);
-		$h = intval(($h_s[0]=='0')? $h_s[1]:$h_s);
-		$m = intval(($m_s[0]=='0')? $m_s[1]:$m_s);
-		$s = intval(($s_s[0]=='0')? $s_s[1]:$s_s);	
-		
+		$h = 0;
+		$m = 0;
+		$s = 0;
+		$ar = explode(':',$timeStr);
+		if(count($ar)>=3){
+			list($h_s,$m_s,$s_s) = $ar;
+			if(strlen($h_s) && strlen($m_s) && strlen($s_s)){
+				$h = intval(($h_s[0]=='0')? $h_s[1]:$h_s);
+				$m = intval(($m_s[0]=='0')? $m_s[1]:$m_s);
+				$s = intval(($s_s[0]=='0')? $s_s[1]:$s_s);	
+			}		
+		}
 		return $h*60*60 + $m*60 + $s;
 	}
 

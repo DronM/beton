@@ -664,6 +664,9 @@ td.operatorNotShipped{
 .orderLastModif{
 	font-size:80%;
 }
+.orderCreate{
+	font-size:80%;
+}
 
 td.cost_edit{
 	background-color:yellow !important;

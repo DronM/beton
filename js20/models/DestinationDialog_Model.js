@@ -103,6 +103,15 @@ function DestinationDialog_Model(options){
 	
 	options.fields.special_price = new FieldBool("special_price",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.send_route_sms = new FieldBool("send_route_sms",filed_options);
+	
 		DestinationDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(DestinationDialog_Model,ModelXML);

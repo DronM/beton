@@ -74929,3 +74929,462 @@ CREATE TRIGGER logins_trigger_after
   ON public.logins
   FOR EACH ROW
   EXECUTE PROCEDURE public.logins_process();
+
+
+
+-- ******************* update 20/02/2021 12:24:53 ******************
+-- View: destinations_dialog
+
+-- DROP VIEW destinations_dialog;
+
+CREATE OR REPLACE VIEW destinations_dialog AS 
+	WITH
+	last_price AS
+		(SELECT
+			max(t.date) AS date,
+			t.distance_to
+		FROM shipment_for_owner_costs AS t
+		GROUP BY t.distance_to
+		ORDER BY t.distance_to
+		)
+	,act_price AS
+		(SELECT
+			t.distance_to,
+			t.price
+		FROM last_price
+		LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
+		ORDER BY t.distance_to
+		)
+
+	SELECT
+		destinations.id,
+		destinations.name,
+		destinations.distance,
+		destinations.time_route,
+		
+		CASE
+			WHEN coalesce(destinations.special_price,FALSE) = TRUE THEN coalesce(destinations.price,0)
+			ELSE
+				coalesce(
+					coalesce(
+						(SELECT act_price.price
+						FROM act_price
+						WHERE destinations.distance <= act_price.distance_to
+						LIMIT 1
+						)
+					,destinations.price)
+				,0)
+		END AS price,
+		
+		destinations.special_price,
+		
+		replace(replace(st_astext(destinations.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS zone_str,
+		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str,
+		
+		price_for_driver
+		
+	FROM destinations;
+
+ALTER TABLE destinations_dialog OWNER TO franch_1;
+
+
+
+-- ******************* update 25/02/2021 07:42:38 ******************
+
+		ALTER TABLE public.logins ADD COLUMN user_agent jsonb;
+
+
+
+-- ******************* update 25/02/2021 09:31:31 ******************
+-- VIEW: login_devices_list
+
+DROP VIEW login_devices_list;
+
+CREATE OR REPLACE VIEW login_devices_list AS
+	SELECT
+		t.user_id,
+		u.name AS user_descr,		
+		max(t.date_time_in) AS date_time_in,
+		--headers_j->>'User-Agent' AS user_agent,
+		t.user_agent,
+		CASE
+			WHEN bn.user_id IS NULL THEN FALSE
+			ELSE TRUE
+		END AS banned	
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	LEFT JOIN sessions AS sess ON sess.id=t.session_id
+	LEFT JOIN login_device_bans AS bn ON bn.user_id=u.id AND bn.hash=md5((headers_j->>'User-Agent')::text)
+	WHERE t.user_agent IS NOT NULL
+		--headers_j->>'User-Agent'<>'' t.user_id=80 AND 
+	GROUP BY t.user_id,t.user_agent,u.name,bn.user_id
+	ORDER BY max(t.date_time_in) DESC
+	;
+	
+ALTER VIEW login_devices_list OWNER TO beton;
+
+
+-- ******************* update 25/02/2021 09:47:31 ******************
+﻿-- Function: login_devices_ban_hash(user_agent jsonb)
+
+-- DROP FUNCTION login_devices_ban_hash(user_agent jsonb);
+
+CREATE OR REPLACE FUNCTION login_devices_ban_hash(user_agent jsonb)
+  RETURNS text AS
+$$
+	SELECT md5(user_agent->>'device'||(user_agent->'osInfo'->>'name'));
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION login_devices_ban_hash(user_agent jsonb) OWNER TO beton;
+
+
+-- ******************* update 25/02/2021 09:47:56 ******************
+-- VIEW: login_devices_list
+
+DROP VIEW login_devices_list;
+
+CREATE OR REPLACE VIEW login_devices_list AS
+	SELECT
+		t.user_id,
+		u.name AS user_descr,		
+		max(t.date_time_in) AS date_time_in,
+		--headers_j->>'User-Agent' AS user_agent,
+		t.user_agent,
+		CASE
+			WHEN bn.user_id IS NULL THEN FALSE
+			ELSE TRUE
+		END AS banned,
+		login_devices_ban_hash(t.user_agent) AS ban_hash
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	LEFT JOIN sessions AS sess ON sess.id=t.session_id
+	LEFT JOIN login_device_bans AS bn ON bn.user_id=u.id AND bn.hash=login_devices_ban_hash(t.user_agent)
+	WHERE t.user_agent IS NOT NULL
+	
+	GROUP BY t.user_id,t.user_agent,u.name,bn.user_id
+	ORDER BY max(t.date_time_in) DESC
+	;
+	
+ALTER VIEW login_devices_list OWNER TO beton;
+
+
+-- ******************* update 25/02/2021 09:52:04 ******************
+﻿-- Function: login_devices_uniq(user_agent jsonb)
+
+-- DROP FUNCTION login_devices_uniq(user_agent jsonb);
+
+CREATE OR REPLACE FUNCTION login_devices_uniq(user_agent jsonb)
+  RETURNS text AS
+$$
+	SELECT user_agent->>'device'||(user_agent->'osInfo'->>'name');
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION login_devices_uniq(user_agent jsonb) OWNER TO beton;
+
+
+
+-- ******************* update 25/02/2021 09:52:39 ******************
+﻿-- Function: login_devices_ban_hash(user_agent jsonb)
+
+-- DROP FUNCTION login_devices_ban_hash(user_agent jsonb);
+
+CREATE OR REPLACE FUNCTION login_devices_ban_hash(user_agent jsonb)
+  RETURNS text AS
+$$
+	SELECT md5(login_devices_uniq(user_agent));
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION login_devices_ban_hash(user_agent jsonb) OWNER TO beton;
+
+
+
+-- ******************* update 25/02/2021 09:52:42 ******************
+﻿-- Function: login_devices_uniq(user_agent jsonb)
+
+-- DROP FUNCTION login_devices_uniq(user_agent jsonb);
+
+CREATE OR REPLACE FUNCTION login_devices_uniq(user_agent jsonb)
+  RETURNS text AS
+$$
+	SELECT user_agent->>'device'||(user_agent->'osInfo'->>'name');
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION login_devices_uniq(user_agent jsonb) OWNER TO beton;
+
+
+
+-- ******************* update 25/02/2021 09:55:03 ******************
+﻿-- Function: login_devices_ban_hash(user_agent jsonb)
+
+ DROP FUNCTION login_devices_ban_hash(user_agent jsonb);
+/*
+CREATE OR REPLACE FUNCTION login_devices_ban_hash(user_agent jsonb)
+  RETURNS text AS
+$$
+	SELECT md5(login_devices_uniq(user_agent));
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION login_devices_ban_hash(user_agent jsonb) OWNER TO beton;
+*/
+
+
+-- ******************* update 25/02/2021 09:58:05 ******************
+﻿-- Function: login_devices_uniq(user_agent jsonb)
+
+-- DROP FUNCTION login_devices_uniq(user_agent jsonb);
+
+CREATE OR REPLACE FUNCTION login_devices_uniq(user_agent jsonb)
+  RETURNS text AS
+$$
+	SELECT 'Устройство:'||(user_agent->>'device')||', ОС:'||(user_agent->'osInfo'->>'name');
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION login_devices_uniq(user_agent jsonb) OWNER TO beton;
+
+
+
+-- ******************* update 25/02/2021 09:59:25 ******************
+-- VIEW: logins_list
+
+--DROP VIEW logins_list;
+
+CREATE OR REPLACE VIEW logins_list AS
+	SELECT
+		t.id,
+		t.date_time_in,
+		t.date_time_out,
+		t.ip,
+		t.user_id,
+		users_ref(u) AS users_ref,
+		t.pub_key,
+		t.set_date_time,
+		login_devices_uniq(t.user_agent) AS user_agent,
+		sess.set_time AS session_set_time
+		
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	LEFT JOIN sessions AS sess ON sess.id=t.session_id
+	WHERE t.user_id IS NOT NULL
+	ORDER BY t.date_time_in DESC
+	;
+	
+ALTER VIEW logins_list OWNER TO beton;
+
+
+-- ******************* update 25/02/2021 09:59:52 ******************
+﻿-- Function: login_devices_uniq(user_agent jsonb)
+
+-- DROP FUNCTION login_devices_uniq(user_agent jsonb);
+
+CREATE OR REPLACE FUNCTION login_devices_uniq(user_agent jsonb)
+  RETURNS text AS
+$$
+	SELECT 'Устройство: '||(user_agent->>'device')||', ОС: '||(user_agent->'osInfo'->>'name');
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION login_devices_uniq(user_agent jsonb) OWNER TO beton;
+
+
+
+-- ******************* update 25/02/2021 10:00:43 ******************
+-- VIEW: logins_list
+
+--DROP VIEW logins_list;
+
+CREATE OR REPLACE VIEW logins_list AS
+	SELECT
+		t.id,
+		t.date_time_in,
+		t.date_time_out,
+		t.ip,
+		t.user_id,
+		users_ref(u) AS users_ref,
+		t.pub_key,
+		t.set_date_time,
+		
+		'Устройство: '||(user_agent->>'device')||
+		', ОС: '||(user_agent->'osInfo'->>'name')||
+		', браузер: '||(user_agent->'clientInfo'->>'name')
+		AS user_agent,
+		
+		sess.set_time AS session_set_time
+		
+	FROM logins AS t
+	LEFT JOIN users u ON u.id=t.user_id
+	LEFT JOIN sessions AS sess ON sess.id=t.session_id
+	WHERE t.user_id IS NOT NULL
+	ORDER BY t.date_time_in DESC
+	;
+	
+ALTER VIEW logins_list OWNER TO beton;
+
+
+-- ******************* update 25/02/2021 10:24:00 ******************
+
+		ALTER TABLE public.orders ADD COLUMN create_user_id int REFERENCES users(id);
+
+
+
+-- ******************* update 25/02/2021 10:27:53 ******************
+
+		ALTER TABLE public.orders DROP COLUMN create_user_id
+
+
+
+-- ******************* update 25/02/2021 10:29:10 ******************
+-- View: public.orders_dialog
+
+-- DROP VIEW public.orders_dialog;
+
+CREATE OR REPLACE VIEW public.orders_dialog AS 
+	SELECT
+		o.id,
+		order_num(o.*) AS number,		
+		clients_ref(cl) AS clients_ref,		
+		
+		destinations_ref(d) AS destinations_ref,
+		o.destination_price AS destination_cost,		
+		--d.price AS destination_price,		
+		CASE
+			WHEN coalesce(d.special_price,FALSE) THEN coalesce(d.price,0)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=d.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(d.price,0))			
+		END  AS destination_price,
+		
+		d.time_route,
+		d.distance,
+		
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_price AS concrete_cost,		
+		--concr.price AS concrete_price,
+		coalesce(
+			(SELECT ct_p.price
+			FROM concrete_costs ct_p
+			WHERE ct_p.date<=o.date_time::date AND ct_p.concrete_type_id=o.concrete_type_id
+			ORDER BY ct_p.date DESC
+			LIMIT 1
+			),
+		coalesce(concr.price,0)) AS concrete_price,
+		
+		o.unload_type,
+		o.comment_text,
+		o.descr,
+		o.phone_cel,
+		o.unload_speed,
+		o.date_time,
+		o.time_to,		
+		o.quant,
+		langs_ref(l) AS langs_ref,
+		o.total,
+		o.total_edit,
+		o.pay_cash,
+		o.unload_price AS unload_cost,
+		o.payed,
+		o.under_control,
+		
+		pv.phone_cel AS pump_vehicle_phone_cel,
+		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		users_ref(u) AS users_ref,
+		
+		d.distance AS destination_distance,
+		
+		users_ref(lm_u) AS last_modif_users_ref,
+		o.last_modif_date_time,
+		
+		o.create_date_time
+		
+	FROM orders o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN langs l ON l.id = o.lang_id
+	LEFT JOIN pump_vehicles pv ON pv.id = o.pump_vehicle_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
+	ORDER BY o.date_time;
+
+ALTER TABLE public.orders_dialog OWNER TO beton;
+
+
+
+-- ******************* update 26/02/2021 09:01:40 ******************
+
+		ALTER TABLE public.destinations ADD COLUMN send_route_sms bool
+			DEFAULT TRUE;
+
+
+
+-- ******************* update 26/02/2021 09:02:10 ******************
+-- View: destinations_dialog
+
+-- DROP VIEW destinations_dialog;
+
+CREATE OR REPLACE VIEW destinations_dialog AS 
+	WITH
+	last_price AS
+		(SELECT
+			max(t.date) AS date,
+			t.distance_to
+		FROM shipment_for_owner_costs AS t
+		GROUP BY t.distance_to
+		ORDER BY t.distance_to
+		)
+	,act_price AS
+		(SELECT
+			t.distance_to,
+			t.price
+		FROM last_price
+		LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
+		ORDER BY t.distance_to
+		)
+
+	SELECT
+		destinations.id,
+		destinations.name,
+		destinations.distance,
+		destinations.time_route,
+		
+		CASE
+			WHEN coalesce(destinations.special_price,FALSE) = TRUE THEN coalesce(destinations.price,0)
+			ELSE
+				coalesce(
+					coalesce(
+						(SELECT act_price.price
+						FROM act_price
+						WHERE destinations.distance <= act_price.distance_to
+						LIMIT 1
+						)
+					,destinations.price)
+				,0)
+		END AS price,
+		
+		destinations.special_price,
+		
+		replace(replace(st_astext(destinations.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS zone_str,
+		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str,
+		
+		price_for_driver,
+		
+		send_route_sms
+		
+	FROM destinations;
+
+ALTER TABLE destinations_dialog OWNER TO beton;

@@ -61,6 +61,9 @@ extend(LoginDevice_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Вход запрещен";
 	pm.addField(new FieldBool("banned",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldString("ban_hash",f_opts));
 }
 
 			LoginDevice_Controller.prototype.add_switch_banned = function(){

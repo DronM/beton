@@ -64,7 +64,9 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 		d.distance AS destination_distance,
 		
 		users_ref(lm_u) AS last_modif_users_ref,
-		o.last_modif_date_time
+		o.last_modif_date_time,
+		
+		o.create_date_time
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id

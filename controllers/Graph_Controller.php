@@ -52,19 +52,21 @@ class Graph_Controller extends Controller{
 	private static function clearCache($date_from,$date_to,$on_slave=FALSE){
 		$link_master = Graph_Controller::get_db_con_master();
 		$link_master->query(sprintf(
-		"UPDATE plant_load_charts SET state=0 WHERE id='%s'",
-		date('Y-m-d',$date_from)));
+			"UPDATE plant_load_charts SET state=0 WHERE id='%s'",
+			date('Y-m-d',$date_from))
+		);
 		
 		//event
-		if(defined('APP_NAME') && defined('APP_SERVER_HOST') && defined('APP_SERVER_PORT')
+		/*if(defined('APP_NAME') && defined('APP_SERVER_HOST') && defined('APP_SERVER_PORT')
 		){
 			//change to all
 			//'emitterId'=>SessionVarManager::getValue('eventServerClientId')			
 			$event_par = [				
 				'cond_date'=>date('Y-m-d',$date_from)
+				,'emitterId' => SessionVarManager::getValue('eventServerClientId')
 			];
 			EventSrv::publishAsync('Graph.change',$event_par,APP_NAME,APP_SERVER_HOST,APP_SERVER_PORT);
-		}		
+		}*/		
 	}
 	private static function get_db_con(){
 		$dbLink = new DB_Sql;

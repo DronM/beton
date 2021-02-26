@@ -67,6 +67,15 @@ function LoginDeviceList_Model(options){
 	
 	options.fields.banned = new FieldBool("banned",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ban_hash = new FieldString("ban_hash",filed_options);
+	
 		LoginDeviceList_Model.superclass.constructor.call(this,id,options);
 }
 extend(LoginDeviceList_Model,ModelXML);

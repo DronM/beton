@@ -310,6 +310,15 @@ function OrderDialog_Model(options){
 	
 	options.fields.last_modif_date_time = new FieldDateTimeTZ("last_modif_date_time",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.create_date_time = new FieldDateTimeTZ("create_date_time",filed_options);
+	
 		OrderDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderDialog_Model,ModelXML);

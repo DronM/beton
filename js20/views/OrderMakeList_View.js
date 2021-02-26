@@ -28,8 +28,6 @@ function OrderMakeList_View(id,options){
 	};
 	window.getApp().getConstantManager().get(constants);
 
-	this.m_refreshInterval = constants.order_grid_refresh_interval.getValue()*1000;
-
 	var st_time = constants.first_shift_start_time.getValue();
 	var st_time_parts = st_time.split(":");
 	var from_h=0,to_h=0;
@@ -192,7 +190,9 @@ function OrderMakeList_View(id,options){
 	
 	//,"params":{"cond_date":cond_date}
 	options.srvEvents = [
-		{"id":"Graph.change"}
+		{"id":"Order.insert"}
+		,{"id":"Order.update"}
+		,{"id":"Order.delete"}
 		,{"id":"VehicleScheduleState.insert"}
 		,{"id":"VehicleScheduleState.update"}
 		,{"id":"VehicleScheduleState.delete"}
@@ -202,6 +202,9 @@ function OrderMakeList_View(id,options){
 		self.srvEventsCallBack(json);
 	};
 	
+	this.m_refreshInterval = window["AppSrv"]? 
+		this.FORCE_REFRESH_INTERVAL : constants.order_grid_refresh_interval.getValue()*1000;
+
 	OrderMakeList_View.superclass.constructor.call(this,id,options);
 		
 }
@@ -214,6 +217,7 @@ OrderMakeList_View.prototype.COL_DESCR_LEN = 15;
 OrderMakeList_View.prototype.COL_DRIVER_LEN = 10;
 OrderMakeList_View.prototype.COL_PUMP_VEH_LEN = 10;
 OrderMakeList_View.prototype.TABLE_CLASS = "table-bordered table-responsive table-striped table-make_order";
+OrderMakeList_View.prototype.FORCE_REFRESH_INTERVAL = 30*60*1000;
 
 OrderMakeList_View.prototype.m_orderedTotal;
 OrderMakeList_View.prototype.m_restTotal;
@@ -247,11 +251,21 @@ OrderMakeList_View.prototype.toDOM = function(p){
 	
 	OrderMakeList_View.superclass.toDOM.call(this,p);
 	
+	var self = this;
+	this.m_forceRefreshTimer = setInterval(
+		function(){
+			self.refresh();
+		}
+		,this.m_refreshInterval
+	);	
+	
 	this.showTotals();
 }
 
 OrderMakeList_View.prototype.delDOM = function(){
-	
+	if(this.m_forceRefreshTimer){
+		clearTimeout(this.m_forceRefreshTimer);
+	}
 	OrderMakeList_View.superclass.delDOM.call(this);
 	
 }
@@ -338,7 +352,8 @@ OrderMakeList_View.prototype.onRefreshResponse = function(resp){
 	}
 		
 	//totals
-	this.showTotals();			
+	this.showTotals();
+	
 }
 
 OrderMakeList_View.prototype.runSpecificUpdateMethod = function(meth){
@@ -353,7 +368,7 @@ OrderMakeList_View.prototype.runSpecificUpdateMethod = function(meth){
 }
 
 OrderMakeList_View.prototype.srvEventsCallBack = function(json){
-	if(json.methodId=="Graph.change"){
+	if(json.controllerId=="Order" || json.methodId=="Graph.change"){
 		//analyse cond_date!
 		this.runSpecificUpdateMethod("get_make_orders_form_ord");
 	}

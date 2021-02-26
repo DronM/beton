@@ -1,8 +1,8 @@
--- View: public.destinations_dialog
+-- View: destinations_dialog
 
--- DROP VIEW public.destinations_dialog;
+-- DROP VIEW destinations_dialog;
 
-CREATE OR REPLACE VIEW public.destinations_dialog AS 
+CREATE OR REPLACE VIEW destinations_dialog AS 
 	WITH
 	last_price AS
 		(SELECT
@@ -46,9 +46,11 @@ CREATE OR REPLACE VIEW public.destinations_dialog AS
 		replace(replace(st_astext(destinations.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS zone_str,
 		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str,
 		
-		price_for_driver
+		price_for_driver,
+		
+		send_route_sms
 		
 	FROM destinations;
 
-ALTER TABLE public.destinations_dialog OWNER TO ;
+ALTER TABLE destinations_dialog OWNER TO ;
 

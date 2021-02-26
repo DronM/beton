@@ -71,6 +71,14 @@ class LoginDeviceList_Model extends ModelSQLBeton{
 		$f_banned=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"banned",$f_opts);
 		$this->addField($f_banned);
 		//********************
+		
+		//*** Field ban_hash ***
+		$f_opts = array();
+		$f_opts['id']="ban_hash";
+						
+		$f_ban_hash=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ban_hash",$f_opts);
+		$this->addField($f_ban_hash);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

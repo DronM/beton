@@ -45,6 +45,12 @@ function DestinationDialog_View(id,options){
 				}
 			}
 		}));	
+
+		this.addElement(new EditCheckBox(id+":send_route_sms",{
+			"labelCaption":"Отправлять СМС с маршрутом:",
+			"labelClassName":"control-label "+window.getBsCol(3),
+			"value":true
+		}));	
 		
 		this.addElement(new ButtonCmd(id+":cmdFindOnMap",{
 			"caption":" Найти по адресу ",
@@ -87,6 +93,7 @@ function DestinationDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("time_route")})
 		,new DataBinding({"control":this.getElement("price")})
 		,new DataBinding({"control":this.getElement("special_price")})
+		,new DataBinding({"control":this.getElement("send_route_sms")})
 		,new DataBinding({"control":this.getElement("price_for_driver")})
 	];
 	this.setDataBindings(r_bd);
@@ -97,6 +104,7 @@ function DestinationDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("distance")})
 		,new CommandBinding({"control":this.getElement("time_route")})
 		,new CommandBinding({"control":this.getElement("price_for_driver")})
+		,new CommandBinding({"control":this.getElement("send_route_sms")})
 		,new CommandBinding({
 			"control":this.getElement("price"),
 			"func":function(pm){

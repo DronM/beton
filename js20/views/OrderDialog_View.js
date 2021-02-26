@@ -380,6 +380,18 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 		DOMHelper.setText(document.getElementById(id+":last_modif_user"), last_modif_users_ref.getDescr());
 		DOMHelper.setText(document.getElementById(id+":last_modif_date_time"), DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
 	}
+
+	//create
+	/*
+	var create_users_ref = m.getFieldValue("users_ref");	
+	if(create_users_ref&&!create_users_ref.isNull()){
+		var id =this.getId();
+		document.getElementById(id+":cmd-cont").style = "float:left;";
+		DOMHelper.setText(document.getElementById(id+":create_user"), create_users_ref.getDescr());
+		DOMHelper.setText(document.getElementById(id+":create_date_time"), DateHelper.format(m.getFieldValue("create_date_time"),"d/m/y H:i"));
+	}
+	*/
+	this.getElement("user").getErrorControl().setValue("Время создания: "+DateHelper.format(m.getFieldValue("create_date_time"),"d/m/y H:i"),"warn");	
 	
 	if(this.m_readOnly){
 		this.setEnabled(false);

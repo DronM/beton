@@ -106,6 +106,15 @@ function Login_Model(options){
 	
 	options.fields.headers = new FieldText("headers",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.user_agent = new FieldJSONB("user_agent",filed_options);
+	
 			
 		Login_Model.superclass.constructor.call(this,id,options);
 }

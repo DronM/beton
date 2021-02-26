@@ -106,6 +106,12 @@ extend(Destination_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Отправлять СМС с маршрутом";
+	var field = new FieldBool("send_route_sms",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -175,6 +181,12 @@ extend(Destination_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldFloat("near_road_lat",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Отправлять СМС с маршрутом";
+	var field = new FieldBool("send_route_sms",options);
 	
 	pm.addField(field);
 	

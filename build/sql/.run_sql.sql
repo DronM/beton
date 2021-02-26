@@ -1,32 +1,56 @@
--- Function: logins_process()
+-- View: destinations_dialog
 
--- DROP FUNCTION logins_process();
+-- DROP VIEW destinations_dialog;
 
-CREATE OR REPLACE FUNCTION logins_process()
-  RETURNS trigger AS
-$BODY$
-BEGIN
-	IF (TG_WHEN='AFTER' AND TG_OP='UPDATE') THEN
-		IF OLD.date_time_out IS NULL AND NEW.date_time_out IS NOT NULL THEN		
-			--event
-			--RAISE EXCEPTION 'pub_key=%',trim(NEW.pub_key);
-			PERFORM pg_notify(
-				'User.logout'
-				,json_build_object(
-					'params',json_build_object(
-						'pub_key',trim(NEW.pub_key)
-					)
-				)::text
-			);
-			
-		END IF;
+CREATE OR REPLACE VIEW destinations_dialog AS 
+	WITH
+	last_price AS
+		(SELECT
+			max(t.date) AS date,
+			t.distance_to
+		FROM shipment_for_owner_costs AS t
+		GROUP BY t.distance_to
+		ORDER BY t.distance_to
+		)
+	,act_price AS
+		(SELECT
+			t.distance_to,
+			t.price
+		FROM last_price
+		LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
+		ORDER BY t.distance_to
+		)
+
+	SELECT
+		destinations.id,
+		destinations.name,
+		destinations.distance,
+		destinations.time_route,
 		
-		RETURN NEW;
-	END IF;
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-ALTER FUNCTION logins_process()
-  OWNER TO beton;
+		CASE
+			WHEN coalesce(destinations.special_price,FALSE) = TRUE THEN coalesce(destinations.price,0)
+			ELSE
+				coalesce(
+					coalesce(
+						(SELECT act_price.price
+						FROM act_price
+						WHERE destinations.distance <= act_price.distance_to
+						LIMIT 1
+						)
+					,destinations.price)
+				,0)
+		END AS price,
+		
+		destinations.special_price,
+		
+		replace(replace(st_astext(destinations.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS zone_str,
+		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str,
+		
+		price_for_driver,
+		
+		send_route_sms
+		
+	FROM destinations;
+
+ALTER TABLE destinations_dialog OWNER TO beton;
 

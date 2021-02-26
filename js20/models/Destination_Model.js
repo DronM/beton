@@ -124,6 +124,16 @@ function Destination_Model(options){
 	options.fields.near_road_lat = new FieldFloat("near_road_lat",filed_options);
 	options.fields.near_road_lat.getValidator().setMaxLength('15');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.defValue = true;
+	filed_options.alias = 'Отправлять СМС с маршрутом';
+	filed_options.autoInc = false;	
+	
+	options.fields.send_route_sms = new FieldBool("send_route_sms",filed_options);
+	
 			
 		Destination_Model.superclass.constructor.call(this,id,options);
 }

@@ -115,6 +115,17 @@ class Destination_Model extends ModelSQLBeton{
 		$f_near_road_lat=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"near_road_lat",$f_opts);
 		$this->addField($f_near_road_lat);
 		//********************
+		
+		//*** Field send_route_sms ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Отправлять СМС с маршрутом';
+		$f_opts['defaultValue']='TRUE';
+		$f_opts['id']="send_route_sms";
+						
+		$f_send_route_sms=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"send_route_sms",$f_opts);
+		$this->addField($f_send_route_sms);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

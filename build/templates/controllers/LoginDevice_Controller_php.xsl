@@ -41,7 +41,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 						,pub_key
 					FROM logins
 					WHERE user_id=%d
-					AND md5(headers_j->>'User-Agent')=%s
+					AND md5(login_devices_uniq(user_agent))=%s
 					AND date_time_out IS NULL"
 					,$this->getExtDbVal($pm,'user_id')
 					,$this->getExtDbVal($pm,'hash')

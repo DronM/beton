@@ -151,8 +151,10 @@ AssignedVehicleList_View.prototype.toggleMenu = function(){
 AssignedVehicleList_View.prototype.setData = function(m){
 	for(i=1;i<=this.PROD_SITE_COUNT;i++){
 		var grid = this.getElement("prodSite"+i);
-		grid.getModel().setData(m);
-		grid.onGetData();
+		if(grid){
+			grid.getModel().setData(m);
+			grid.onGetData();
+		}
 	}	
 }
 

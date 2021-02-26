@@ -19,7 +19,7 @@ function OrderMakeForLabList_View(id,options){
 	};
 	window.getApp().getConstantManager().get(constants);
 
-	this.m_refreshInterval = constants.order_grid_refresh_interval.getValue()*1000;
+	//this.m_refreshInterval = constants.order_grid_refresh_interval.getValue()*1000;
 
 	var st_time = constants.first_shift_start_time.getValue();
 	var st_time_parts = st_time.split(":");
@@ -257,7 +257,10 @@ function OrderMakeForLabList_View(id,options){
 	
 	//,"params":{"cond_date":cond_date}
 	options.srvEvents = [
-		{"id":"Graph.change"}
+		//{"id":"Graph.change"}
+		{"id":"Order.insert"}
+		,{"id":"Order.update"}
+		,{"id":"Order.delete"}
 		,{"id":"VehicleScheduleState.insert"}
 		,{"id":"VehicleScheduleState.update"}
 		,{"id":"VehicleScheduleState.delete"}
@@ -269,6 +272,10 @@ function OrderMakeForLabList_View(id,options){
 	options.srvEventsCallBack = function(json){
 		self.srvEventsCallBack(json);
 	};
+	
+	this.m_refreshInterval = window["AppSrv"]? 
+		this.FORCE_REFRESH_INTERVAL : constants.order_grid_refresh_interval.getValue()*1000;
+		
 	
 	OrderMakeForLabList_View.superclass.constructor.call(this,id,options);
 		
@@ -282,6 +289,8 @@ OrderMakeForLabList_View.prototype.COL_COMMENT_LEN = 15;
 OrderMakeForLabList_View.prototype.COL_DESCR_LEN = 15;
 OrderMakeForLabList_View.prototype.COL_DRIVER_LEN = 10;
 OrderMakeForLabList_View.prototype.COL_PUMP_VEH_LEN = 10;
+
+OrderMakeForLabList_View.prototype.FORCE_REFRESH_INTERVAL = 30*60*1000;
 
 OrderMakeForLabList_View.prototype.m_startShiftMS;
 OrderMakeForLabList_View.prototype.m_endShiftMS;
@@ -299,6 +308,28 @@ OrderMakeForLabList_View.prototype.refresh = function(callBack){
 			self.onRefreshResponse(resp);
 		}
 	})
+}
+
+OrderMakeForLabList_View.prototype.toDOM = function(p){
+	
+	OrderMakeForLabList_View.superclass.toDOM.call(this,p);
+	
+	var self = this;
+	this.m_forceRefreshTimer = setInterval(
+		function(){
+			self.refresh();
+		}
+		,this.m_refreshInterval
+	);	
+	
+}
+
+OrderMakeForLabList_View.prototype.delDOM = function(){
+	if(this.m_forceRefreshTimer){
+		clearTimeout(this.m_forceRefreshTimer);
+	}
+	OrderMakeForLabList_View.superclass.delDOM.call(this);
+	
 }
  
 OrderMakeForLabList_View.prototype.onRefreshResponse = function(resp){
@@ -353,9 +384,9 @@ OrderMakeForLabList_View.prototype.runSpecificUpdateMethod = function(meth){
 }
 
 OrderMakeForLabList_View.prototype.srvEventsCallBack = function(json){
-	if(json.methodId=="Graph.change"||json.controllerId=="LabEntry"){
+	if(json.controllerId=="Order" || json.methodId=="Graph.change"){
 		//analyse cond_date!
-		this.runSpecificUpdateMethod("get_make_orders_for_lab_form");
+		this.runSpecificUpdateMethod("get_make_orders_form_ord");
 	}
 	else if(json.controllerId=="VehicleScheduleState"){
 		this.runSpecificUpdateMethod("get_make_orders_for_lab_form_veh");

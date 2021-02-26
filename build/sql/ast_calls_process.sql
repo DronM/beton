@@ -7,6 +7,10 @@ CREATE OR REPLACE FUNCTION ast_calls_process()
 $BODY$
 DECLARE
 	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
 BEGIN
 	IF (TG_OP='INSERT') THEN
 		NEW.dt = now()::timestamp;
@@ -28,16 +32,42 @@ BEGIN
 		IF (char_length(v_search)>3) THEN
 			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
 				
-			NEW.client_id = (
-				SELECT
-					client_tels.client_id
-				FROM client_tels
-				LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
-				WHERE client_tels.tel=v_search OR client_tels.tel=format_cel_phone(RIGHT(v_search,10))
-				ORDER BY ast_calls.dt DESC NULLS LAST
-				LIMIT 1			
-			);
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10))
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
 			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+						)
+					)::text
+				);
+			END IF;			
+			
 		END IF;
 		--********* Client ********************
 		
@@ -52,16 +82,37 @@ BEGIN
 				v_search = NEW.caller_id_num;
 				
 				IF (char_length(v_search)>3) THEN
-					--!!!v_search = format_cel_phone(RIGHT(v_search,10));
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10))
 				
-					NEW.client_id = (
-						SELECT
-							client_tels.client_id
-						FROM client_tels
-						LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
-						WHERE client_tels.tel=v_search OR client_tels.tel=format_cel_phone(RIGHT(v_search,10))
-						ORDER BY ast_calls.dt DESC NULLS LAST
-						LIMIT 1			
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					--In call for all notification
+					PERFORM pg_notify(
+						'AstCall.in_call'
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+							)
+						)::text
 					);
 				END IF;
 			END IF;

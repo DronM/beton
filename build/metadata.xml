@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2021-02-18 16:57:03</lastBuild></version>
+		<lastBuild>2021-02-26 09:08:37</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -99,7 +99,7 @@
 		<version dateOpen="2020-11-02 17:11:16" dateClose="2020-11-03 05:11:41">1.00193</version>
 		<version dateOpen="2020-11-03 13:11:14" dateClose="2020-11-03 13:11:16">1.00194</version>
 		<version dateOpen="2020-12-01 17:12:50" dateClose="2021-02-18 12:02:39">1.00195</version>
-	<version dateOpen="2021-02-18 14:02:48" dateClose="2021-02-18 16:02:57">1.00196</version></versions>
+	<version dateOpen="2021-02-18 14:02:48" dateClose="2021-02-18 16:02:57">1.00196</version><version dateOpen="2021-02-25 11:02:29" dateClose="2021-02-26 09:02:08">1.00197</version></versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
 		<field id="vehicle_owner_client_list"/>
@@ -527,6 +527,7 @@
 			<field id="pub_key" dataType="String" length="15"/>
 			<field id="set_date_time" dataType="DateTimeTZ"/>
 			<field id="headers" dataType="Text"/>
+			<field id="user_agent" dataType="JSONB"/>
 			<index id="logins_user_idx" unique="TRUE">
 				<field id="user_id"/>
 			</index>
@@ -550,6 +551,7 @@
 			<field id="user_descr" dataType="String" alias="Имя пользователя"/>
 			<field id="date_time_in" dataType="DateTimeTZ" alias="Дата входа"/>
 			<field id="banned" dataType="Bool" alias="Вход запрещен"/>
+			<field id="ban_hash" dataType="String"/>
 		</model>
 		<model id="LoginDeviceBan" parent="ModelSQLBeton" dataTable="login_device_bans" virtual="FALSE">
 			<field id="user_id" dataType="Int" sysCol="TRUE" primaryKey="TRUE"/>
@@ -627,6 +629,7 @@
 			<field id="price_for_driver" dataType="Float" length="15" precision="2" defaultValue="0"/>
 			<field id="near_road_lon" dataType="Float" length="15" precision="12"/>
 			<field id="near_road_lat" dataType="Float" length="15" precision="12"/>
+			<field id="send_route_sms" dataType="Bool" defaultValue="TRUE" alias="Отправлять СМС с маршрутом"/>
 			<index id="destination_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -662,6 +665,7 @@
 			<field id="zone_str" dataType="String"/>
 			<field id="zone_center_str" dataType="String"/>
 			<field id="special_price" dataType="Bool"/>
+			<field id="send_route_sms" dataType="Bool"/>
 		</model>
 		<model id="ConcreteType" parent="ModelSQLBeton" dataTable="concrete_types" virtual="FALSE">
 			<defaultOrder>
@@ -976,6 +980,7 @@
 			<field id="under_control" dataType="Bool" defaultValue="FALSE"/>
 			<field id="last_modif_user_id" dataType="Int" refTable="users" refField="id" alias="Кто последний вносил изменения"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
+			<field id="create_date_time" dataType="DateTimeTZ" alias="Время создания" defaultValue="CURRENT_TIMESTAMP"/>
 			<index id="date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -1128,6 +1133,7 @@
 			<field id="pump_vehicles_ref" dataType="JSON"/>
 			<field id="pump_prices_ref" dataType="JSON"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ"/>
+			<field id="create_date_time" dataType="DateTimeTZ"/>
 		</model>
 		<model id="OrderMakeForLabList" parent="ModelSQLBeton" dataTable="orders_make_for_lab_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -5009,6 +5015,10 @@
 		<jsScript file="ext/bootstrap-datepicker/bootstrap-datepicker.ru.min.js" compressed="TRUE" standalone="TRUE" version="1.0"/>
 		<!-- /theme JS files -->
 		<jsScript file="jquery.maskedinput.js" compressed="FALSE" standalone="FALSE" version="1.0"/>
+		
+		<jsScript file="ext/cleave/cleave.min.js" compressed="TRUE" standalone="TRUE" version="1.6"/>
+		<jsScript file="ext/cleave/cleave-phone.ru.js" compressed="TRUE" standalone="TRUE" version="1.6"/>
+		
 		<jsScript file="ext/mustache/mustache.min.js" compressed="TRUE" standalone="TRUE"/>
 		<jsScript file="ext/jshash-2.2/md5-min.js" compressed="TRUE" standalone="TRUE"/>
 		<!--Drag && Drop-->

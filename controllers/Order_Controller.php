@@ -160,6 +160,11 @@ class Order_Controller extends ControllerSQL{
 				'alias'=>'Время последнего изменения'
 			));
 		$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('create_date_time'
+				,array(
+				'alias'=>'Время создания'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -322,6 +327,12 @@ class Order_Controller extends ControllerSQL{
 				,array(
 			
 				'alias'=>'Время последнего изменения'
+			));
+			$pm->addParam($param);
+		$param = new FieldExtDateTimeTZ('create_date_time'
+				,array(
+			
+				'alias'=>'Время создания'
 			));
 			$pm->addParam($param);
 		

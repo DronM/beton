@@ -192,13 +192,17 @@ function ShipmentForOrderList_View(id,options){
 		var self = this;
 		this.m_origGridEdit = grid.edit
 		grid.edit = function(cmd,editOptions){
-			self.m_makeGridListView.enableRefreshing(false);
+			if(self.m_makeGridListView&&self.m_makeGridListView.enableRefreshing){
+				self.m_makeGridListView.enableRefreshing(false);
+			}
 			self.m_origGridEdit.call(self.getElement("grid"),cmd,editOptions);
 		}
 	
 		this.m_origGridCloseEditView = grid.closeEditView;
 		grid.closeEditView = function(res){
-			self.m_makeGridListView.enableRefreshing(true);
+			if(self.m_makeGridListView&&self.m_makeGridListView.enableRefreshing){
+				self.m_makeGridListView.enableRefreshing(true);
+			}
 			self.m_origGridCloseEditView.call(self.getElement("grid"),res);
 		}
 	}

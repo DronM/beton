@@ -283,6 +283,14 @@ class OrderDialog_Model extends ModelSQLBeton{
 		$f_last_modif_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_date_time",$f_opts);
 		$this->addField($f_last_modif_date_time);
 		//********************
+		
+		//*** Field create_date_time ***
+		$f_opts = array();
+		$f_opts['id']="create_date_time";
+						
+		$f_create_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"create_date_time",$f_opts);
+		$this->addField($f_create_date_time);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

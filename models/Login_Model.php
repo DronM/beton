@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class Login_Model extends ModelSQLBeton{
 	
@@ -97,6 +98,14 @@ class Login_Model extends ModelSQLBeton{
 						
 		$f_headers=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"headers",$f_opts);
 		$this->addField($f_headers);
+		//********************
+		
+		//*** Field user_agent ***
+		$f_opts = array();
+		$f_opts['id']="user_agent";
+						
+		$f_user_agent=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_agent",$f_opts);
+		$this->addField($f_user_agent);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

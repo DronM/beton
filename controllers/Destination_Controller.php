@@ -77,6 +77,11 @@ class Destination_Controller extends ControllerSQL{
 		$param = new FieldExtFloat('near_road_lat'
 				,array());
 		$pm->addParam($param);
+		$param = new FieldExtBool('send_route_sms'
+				,array(
+				'alias'=>'Отправлять СМС с маршрутом'
+			));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -146,6 +151,12 @@ class Destination_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		$param = new FieldExtFloat('near_road_lat'
 				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtBool('send_route_sms'
+				,array(
+			
+				'alias'=>'Отправлять СМС с маршрутом'
 			));
 			$pm->addParam($param);
 		

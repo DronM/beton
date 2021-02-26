@@ -94,6 +94,14 @@ class DestinationDialog_Model extends ModelSQLBeton{
 		$f_special_price=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"special_price",$f_opts);
 		$this->addField($f_special_price);
 		//********************
+		
+		//*** Field send_route_sms ***
+		$f_opts = array();
+		$f_opts['id']="send_route_sms";
+						
+		$f_send_route_sms=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"send_route_sms",$f_opts);
+		$this->addField($f_send_route_sms);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 
