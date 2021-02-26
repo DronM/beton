@@ -370,13 +370,20 @@ ServConnector.prototype.getAccessToken=function(){return this.m_accessToken;}
 ServConnector.prototype.getPublicKey=function(){var p=this.m_accessToken.indexOf(":");if(p>=0){return this.m_accessToken.substring(0,p);}} 
 function AppSrv(options){options=options||{};window.WebSocket=window.WebSocket||window.MozWebSocket;if(!window.WebSocket){throw Error(this.NOT_SUPPOERTED);}
 this.m_host=options.host||this.DEF_HOST;this.m_port=options.port||this.DEF_PORT;this.m_appId=options.appId;this.m_token=options.token;this.m_tokenExpires=options.tokenExpires;}
-AppSrv.prototype.CON_TRY_WAIT_FACTOR=2000;AppSrv.prototype.CON_TRY_WAIT_MAX=60000;AppSrv.prototype.CHECK_INTERVAL=10000;AppSrv.prototype.MES_DEALY=5000;AppSrv.prototype.DEF_HOST="127.0.0.1";AppSrv.prototype.DEF_PORT="1337";AppSrv.prototype.METH_STATUS={"end":0,"progress":1}
+AppSrv.prototype.CON_TRY_WAIT_FACTOR=2000;AppSrv.prototype.CON_TRY_WAIT_MAX=60000;AppSrv.prototype.MES_DEALY=5000;AppSrv.prototype.CON_ER_SHOW_FREQ=5000;AppSrv.prototype.DEF_HOST="127.0.0.1";AppSrv.prototype.DEF_PORT="1337";AppSrv.prototype.METH_STATUS={"end":0,"progress":1}
 AppSrv.prototype.m_conncetion;AppSrv.prototype.m_host;AppSrv.prototype.m_port;AppSrv.prototype.m_listenerCheckTimer;AppSrv.prototype.m_connectTimer;AppSrv.prototype.m_subscriptions;AppSrv.prototype.m_conTries;AppSrv.prototype.getState=function(){return this.m_connection.readyState;}
-AppSrv.prototype.connActive=function(){return(this.m_connection.readyState==WebSocket.OPEN);}
-AppSrv.prototype.connect=function(){if(this.m_connectTimer){clearTimeout(this.m_connectTimer);}
-this.m_conTries=0;this.do_connect();}
-AppSrv.prototype.do_connect=function(){if(this.m_connection&&(this.m_connection.readyState===WebSocket.OPEN||this.m_connection.readyState===WebSocket.CONNECTING)){return;}
-var protocol=(location.protocol!=="https:")?"ws":"wss";this.m_connection=new WebSocket(protocol+"://"+this.m_host+":"+this.m_port+"/"+this.m_appId+"/"+this.m_token);var self=this;this.m_connection.onopen=function(){self.onOpen();};this.m_connection.onerror=function(error){if(window.showTempError)window.showTempError(self.ER_NOT_CONNECTED,null,self.MES_DEALY);};this.m_connection.onmessage=function(message){self.onMessage(message);};if(this.m_connection.readyState!==WebSocket.OPEN){this.m_conTries++;this.m_connectTimer=setTimeout(function(){self.do_connect();},Math.min(this.m_conTries*this.CON_TRY_WAIT_FACTOR,this.CON_TRY_WAIT_MAX));}}
+AppSrv.prototype.connActive=function(){return(this.m_connection&&this.m_connection.readyState==WebSocket.OPEN);}
+AppSrv.prototype.connect=function(){this.m_conTries=0;this.m_lastConnErrTime=undefined;this.do_connect();}
+AppSrv.prototype.do_connect=function(){console.log("AppSrv.prototype.do_connect")
+if(this.m_connection&&(this.m_connection.readyState===WebSocket.OPEN||this.m_connection.readyState===WebSocket.CONNECTING)){return;}
+var protocol=(location.protocol!=="https:")?"ws":"wss";var self=this;this.m_connection=new WebSocket(protocol+"://"+this.m_host+":"+this.m_port+"/"+this.m_appId+"/"+this.m_token);this.m_connection.onopen=function(){self.onOpen();};this.m_connection.onerror=function(error){console.log("WSConn.onerror error=")
+console.log(error)
+if(window.showTempError&&self.m_connection.readyState===WebSocket.OPEN){window.showTempError(self.ER_NOT_CONNECTED,null,self.MES_DEALY);}};this.m_connection.onmessage=function(message){self.onMessage(message);};this.m_connection.onclose=function(message){console.log("onclose message=")
+console.log(message)
+if(message.code!=undefined&&message.code>1000){var tm=(new Date()).getTime();if(window.showTempError&&(!self.m_lastConnErrTime||(tm-self.m_lastConnErrTime)>self.CON_ER_SHOW_FREQ)){console.log("Show error window")
+window.showTempError(self.ER_NOT_CONNECTED,null,self.MES_DEALY);}
+console.log("Dif="+(tm-self.m_lastConnErrTime))
+self.m_lastConnErrTime=tm;self.do_connect();}};}
 AppSrv.prototype.subscribe=function(events,callBack,id){if(this.m_connection.readyState!==WebSocket.OPEN){this.m_subscribeEvents=this.m_subscribeEvents||[];this.m_subscribeEvents.push({"events":events,"callBack":callBack});console.log("subscribe postponed")
 return;}
 if(!id){id=CommonHelper.ID();}
@@ -393,10 +400,7 @@ console.log("AppSrv.prototype.unsubscribe")
 if(this.m_subscriptions){var events_srv=[];for(var ev_id in this.m_subscriptions){if(this.m_subscriptions[ev_id].groups[id]){this.m_subscriptions[ev_id].groups[id]=undefined;delete this.m_subscriptions[ev_id].groups[id];this.m_subscriptions[ev_id].cnt--;if(!this.m_subscriptions[ev_id].cnt){events_srv.push({"id":ev_id});this.m_subscriptions[ev_id]=undefined;delete this.m_subscriptions[ev_id];}}}
 if(events_srv.length){this.send("Event.unsubscribe",{"events":events_srv});}}}
 AppSrv.prototype.onOpen=function(){console.log("AppSrv.prototype.onOpen")
-if(this.m_connectTimer){clearTimeout(this.m_connectTimer);}
-if(window.showTempNote)window.showTempNote(this.MES_CONNECTED,null,this.MES_DEALY);var self=this;this.m_listenerCheckTimer=setInterval(function(){if(self.m_connection.readyState!==WebSocket.OPEN){console.log("Connection NOT active... reconnecting")
-clearInterval(self.m_listenerCheckTimer);self.connect();}
-else{console.log("Connection OK")}},this.CHECK_INTERVAL);if(this.m_subscriptions){console.log("Reregestering events!")
+if(window.showTempNote)window.showTempNote(this.MES_CONNECTED,null,this.MES_DEALY);this.m_conTries=0;this.m_lastConnErrTime=undefined;if(this.m_subscriptions){console.log("Reregestering events!")
 var groups={};var cnt=0;for(var ev_id in this.m_subscriptions){for(gr_id in this.m_subscriptions[ev_id].groups){groups[gr_id]=groups[gr_id]||{"events":[],"callBack":this.m_subscriptions[ev_id].groups[gr_id]};groups[gr_id].events.push({"id":ev_id});}
 cnt++;}
 if(cnt){this.m_subscriptions={};for(var gr_id in groups){this.subscribe(groups[gr_id].events,groups[gr_id].callBack,gr_id);}}}
