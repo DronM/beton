@@ -1,56 +1,31 @@
--- View: destinations_dialog
+--DROP FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone)
+RETURNS int as $$
+DECLARE
+	v_raw_material_id int;
+BEGIN
+	v_raw_material_id = NULL;
+	
+	--Берется соответствие с большей датой или по конкретному заводу или по пустому
+	SELECT raw_material_id INTO v_raw_material_id
+	FROM raw_material_map_to_production
+	WHERE	(production_site_id=in_production_site_id OR production_site_id IS NULL)
+		AND production_descr = in_material_descr AND date_time<=in_date_time
+	ORDER BY date_time DESC
+	LIMIT 1;
+	
+	IF NOT FOUND AND coalesce(in_material_descr,'')<>'' THEN
+		SELECT id FROM raw_materials INTO v_raw_material_id WHERE name=in_material_descr;
+	
+		INSERT INTO raw_material_map_to_production
+		(date_time,production_descr,raw_material_id)
+		VALUES
+		(now(),in_material_descr,v_raw_material_id)
+		;
+	END IF;
+	
+	RETURN v_raw_material_id;
+END;
+$$ language plpgsql;
 
--- DROP VIEW destinations_dialog;
-
-CREATE OR REPLACE VIEW destinations_dialog AS 
-	WITH
-	last_price AS
-		(SELECT
-			max(t.date) AS date,
-			t.distance_to
-		FROM shipment_for_owner_costs AS t
-		GROUP BY t.distance_to
-		ORDER BY t.distance_to
-		)
-	,act_price AS
-		(SELECT
-			t.distance_to,
-			t.price
-		FROM last_price
-		LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
-		ORDER BY t.distance_to
-		)
-
-	SELECT
-		destinations.id,
-		destinations.name,
-		destinations.distance,
-		destinations.time_route,
-		
-		CASE
-			WHEN coalesce(destinations.special_price,FALSE) = TRUE THEN coalesce(destinations.price,0)
-			ELSE
-				coalesce(
-					coalesce(
-						(SELECT act_price.price
-						FROM act_price
-						WHERE destinations.distance <= act_price.distance_to
-						LIMIT 1
-						)
-					,destinations.price)
-				,0)
-		END AS price,
-		
-		destinations.special_price,
-		
-		replace(replace(st_astext(destinations.zone), 'POLYGON(('::text, ''::text), '))'::text, ''::text) AS zone_str,
-		replace(replace(st_astext(st_centroid(destinations.zone)), 'POINT('::text, ''::text), ')'::text, ''::text) AS zone_center_str,
-		
-		price_for_driver,
-		
-		send_route_sms
-		
-	FROM destinations;
-
-ALTER TABLE destinations_dialog OWNER TO beton;
-
+ALTER FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone) OWNER TO beton;

@@ -14,13 +14,13 @@ BEGIN
 	ORDER BY date_time DESC
 	LIMIT 1;
 	
-	IF NOT FOUND THEN
-		SELECT id FROM raw_materials INTO v_raw_material_id WHERE name=$1;
+	IF NOT FOUND AND coalesce(in_material_descr,'')<>'' THEN
+		SELECT id FROM raw_materials INTO v_raw_material_id WHERE name=in_material_descr;
 	
 		INSERT INTO raw_material_map_to_production
 		(date_time,production_descr,raw_material_id)
 		VALUES
-		(now(),$1,v_raw_material_id)
+		(now(),in_material_descr,v_raw_material_id)
 		;
 	END IF;
 	

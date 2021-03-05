@@ -46,6 +46,15 @@ class UserMacAddress_Model extends ModelSQLBeton{
 		$f_mac_address=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mac_address",$f_opts);
 		$this->addField($f_mac_address);
 		//********************
+		
+		//*** Field mac_address_hash ***
+		$f_opts = array();
+		$f_opts['length']=32;
+		$f_opts['id']="mac_address_hash";
+						
+		$f_mac_address_hash=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mac_address_hash",$f_opts);
+		$this->addField($f_mac_address_hash);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

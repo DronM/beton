@@ -2,7 +2,7 @@
 //echo date('d/m/Y',strtotime('Jun 10 2019 10:54:10:000AM'));
 //exit;
 
-$USE_SQLSRV = FALSE;
+$USE_SQLSRV = TRUE;
 
 //"192.168.1.12:59900"
 $serverName = "86.109.193.160";
@@ -35,14 +35,11 @@ if (!$USE_SQLSRV){
 
 
 $q = "SELECT
-				Uretim.Id AS id,
-				Uretim.BasTarih AS dt_start,
-				Recete.ReceteAdi AS concrete_type_descr,
-				Uretim.AracPlaka AS vehicle_descr,
-				Uretim.Olusturan AS user_descr
-			FROM Uretim
-			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
-			WHERE Uretim.Id=9904";
+	UretimSonuc.BitisTarihi AS production_dt_end,
+	UretimSonuc.Miktar AS concrete_quant
+FROM Uretim
+LEFT JOIN UretimSonuc ON UretimSonuc.UretimId=Uretim.id
+WHERE Uretim.Id=9700";
 //WHERE Uretim.Id=91918";
 
 //$q = "SELECT TOP 1 * FROM UretimSonuc";

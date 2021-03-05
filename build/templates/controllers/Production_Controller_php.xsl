@@ -75,11 +75,10 @@ UPDATE public.production_sites
 			FieldSQLString::formatForDb($this->getDbLink(),$mes,$mes_db);
 			
 			 $this->getDbLinkMaster()->query(sprintf(
-			 	"INSERT INTO elkon_log (production_site_id,level,message) VALUES
-			 	(%d,%d,%s)",
+			 	"SELECT elkon_log_upsert((NULL,now(),%d,%s,%d)::elkon_log)",
 			 	$prodSiteId,
-			 	$mesLevel,
-			 	$mes_db
+			 	$mes_db,
+			 	$mesLevel
 			 ));
 		}
 	}
@@ -695,18 +694,18 @@ UPDATE public.production_sites
 									}
 									//******* Материал идентификатор **********
 									$mat_id = 'NULL';
-									if(!isset($materials[$mat_descr.'_'.$serv['id']])){
+									if(!isset($materials[$mat_descr.'_'.$serv['id'].$production_dt_end])){
 										$ar = $this->getDbLink()->query_first(sprintf(
 											"SELECT material_fact_consumptions_add_material(%d,%s,%s) AS material_id",
 											$serv['id'],
 											$mat_descr_db,
 											$production_dt_end_db
-										));
+										));										
 										$mat_id = is_null($ar['material_id'])? 'NULL':$ar['material_id'];
-										$materials[$mat_descr.'_'.$serv['id']] = $mat_id;
+										$materials[$mat_descr.'_'.$serv['id'].$production_dt_end] = $mat_id;
 									}
 									else{
-										$mat_id = $materials[$mat_descr.'_'.$serv['id']];
+										$mat_id = $materials[$mat_descr.'_'.$serv['id'].$production_dt_end];
 									}
 								
 									//******* ТС представление **********

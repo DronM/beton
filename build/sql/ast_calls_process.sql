@@ -32,7 +32,7 @@ BEGIN
 		IF (char_length(v_search)>3) THEN
 			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
 				
-			v_tel_formatted = format_cel_phone(RIGHT(v_search,10))
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
 			SELECT
 				client_tels.client_id,
 				client_tels.name,
@@ -53,7 +53,9 @@ BEGIN
 			NEW.client_tel = v_search;
 			
 			--In call for all notification
-			IF NEW.call_type='in'::call_types THEN
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
 				PERFORM pg_notify(
 					'AstCall.in_call'
 					,json_build_object(
@@ -63,9 +65,19 @@ BEGIN
 							,'tel',v_tel_formatted
 							,'client_repres_name',v_client_repres_name
 							,'client_repres_post',v_client_repres_post
+							,'oper','insert'
+							,'unique_id',NEW.unique_id
 						)
 					)::text
 				);
+					
+				IF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					PERFORM pg_notify(
+						'AstCall.in_call.'||NEW.ext
+						,NULL
+					);
+				END IF;	
 			END IF;			
 			
 		END IF;
@@ -82,7 +94,7 @@ BEGIN
 				v_search = NEW.caller_id_num;
 				
 				IF (char_length(v_search)>3) THEN
-					v_tel_formatted = format_cel_phone(RIGHT(v_search,10))
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
 				
 					SELECT
 						client_tels.client_id,
@@ -101,7 +113,6 @@ BEGIN
 					ORDER BY ast_calls.dt DESC NULLS LAST
 					LIMIT 1;
 					
-					--In call for all notification
 					PERFORM pg_notify(
 						'AstCall.in_call'
 						,json_build_object(
@@ -111,22 +122,51 @@ BEGIN
 								,'tel',v_tel_formatted
 								,'client_repres_name',v_client_repres_name
 								,'client_repres_post',v_client_repres_post
+								,'oper','update'
+								,'unique_id',NEW.unique_id
 							)
 						)::text
 					);
+					
 				END IF;
+				
 			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NULL AND coalesce(OLD.ext,'')<>coalesce(NEW.ext,'') THEN	
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
 		
 			v_search = NEW.ext;
 		ELSE		
 			v_search = NEW.caller_id_num;
 		END IF;
 
-		NEW.user_id = (SELECT id
-				FROM users
-			WHERE tel_ext=v_search
-			LIMIT 1
-		);
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
 		
 		
 		--************ USER TO ***************

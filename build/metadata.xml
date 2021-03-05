@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2021-02-26 17:27:31</lastBuild></version>
+		<lastBuild>2021-03-05 08:55:29</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -99,7 +99,7 @@
 		<version dateOpen="2020-11-02 17:11:16" dateClose="2020-11-03 05:11:41">1.00193</version>
 		<version dateOpen="2020-11-03 13:11:14" dateClose="2020-11-03 13:11:16">1.00194</version>
 		<version dateOpen="2020-12-01 17:12:50" dateClose="2021-02-18 12:02:39">1.00195</version>
-	<version dateOpen="2021-02-18 14:02:48" dateClose="2021-02-18 16:02:57">1.00196</version><version dateOpen="2021-02-25 11:02:29" dateClose="2021-02-26 09:02:08">1.00197</version><version dateOpen="2021-02-26 17:02:26" dateClose="2021-02-26 17:02:27">1.00198</version></versions>
+	<version dateOpen="2021-02-18 14:02:48" dateClose="2021-02-18 16:02:57">1.00196</version><version dateOpen="2021-02-25 11:02:29" dateClose="2021-02-26 09:02:08">1.00197</version><version dateOpen="2021-02-26 17:02:26" dateClose="2021-02-26 17:02:27">1.00198</version><version dateOpen="2021-03-05 08:03:54" dateClose="2021-03-05 08:03:55">1.00199</version></versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
 		<field id="vehicle_owner_client_list"/>
@@ -2300,12 +2300,17 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
 			<field id="mac_address" dataType="String" length="17" required="TRUE"/>
+			<field id="mac_address_hash" dataType="String" length="32" required="TRUE"/>
 			<index id="user_mac_addresses_user_index">
 				<field id="user_id"/>
 			</index>
 			<index id="user_mac_addresses_mac_address_index" unique="TRUE">
 				<field id="mac_address"/>
 			</index>
+			<index id="user_mac_addresses_hash_idx" unique="TRUE">
+				<field id="mac_address_hash"/>
+			</index>
+			
 		</model>
 		<model id="UserMacAddressList" parent="ModelSQLBeton" dataTable="user_mac_addresses_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -3909,7 +3914,7 @@
 				<field id="refresh_token" dataType="String" required="true" length="50"/>
 			</publicMethod>
 			<publicMethod id="login_k">
-				<field id="k" dataType="String" length="20"/>
+				<field id="k" dataType="String" length="50"/>
 			</publicMethod>
 			<publicMethod id="logout"/>
 			<publicMethod id="logout_html"/>

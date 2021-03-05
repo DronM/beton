@@ -51,6 +51,19 @@ function UserMacAddress_Model(options){
 	options.fields.mac_address.getValidator().setRequired(true);
 	options.fields.mac_address.getValidator().setMaxLength('17');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.mac_address_hash = new FieldString("mac_address_hash",filed_options);
+	options.fields.mac_address_hash.getValidator().setRequired(true);
+	options.fields.mac_address_hash.getValidator().setMaxLength('32');
+	
+			
+			
 			
 			
 		UserMacAddress_Model.superclass.constructor.call(this,id,options);

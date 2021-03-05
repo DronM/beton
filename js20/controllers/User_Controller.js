@@ -384,7 +384,7 @@ extend(User_Controller,ControllerObjServer);
 	
 	var options = {};
 	
-		options.maxlength = "20";
+		options.maxlength = "50";
 	
 		pm.addField(new FieldString("k",options));
 	

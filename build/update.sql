@@ -75391,3 +75391,1749 @@ CREATE OR REPLACE VIEW destinations_dialog AS
 ALTER TABLE destinations_dialog OWNER TO beton;
 
 
+
+-- ******************* update 01/03/2021 16:06:44 ******************
+﻿-- Function: elkon_log_upsert(in_elkon_log elkon_log)
+
+-- DROP FUNCTION elkon_log_upsert(in_elkon_log elkon_log);
+
+CREATE OR REPLACE FUNCTION elkon_log_upsert(in_elkon_log elkon_log)
+  RETURNS void AS
+$$
+DECLARE
+	v_message text;
+	v_id int;
+BEGIN
+	SELECT
+		id,
+		message
+	INTO
+		v_id,
+		v_message
+	FROM elkon_log	
+	WHERE production_site_id=in_elkon_log.production_id
+	ORDER BY date_time desc
+	LIMIT 1;
+	
+	IF v_id IS NOT NULL AND v_message = in_elkon_log.message THEN
+		UPDATE elkon_log
+		SET date_time = now()
+		WHERE id = v_id;
+	ELSE
+		INSERT INTO elkon_log (production_site_id,message,level,message)
+		values (in_elkon_log.production_site_id,in_elkon_log.message,in_elkon_log.level,in_elkon_log.message);
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION elkon_log_upsert(in_elkon_log elkon_log) OWNER TO beton;
+
+
+-- ******************* update 01/03/2021 16:08:27 ******************
+﻿-- Function: elkon_log_upsert(in_elkon_log elkon_log)
+
+-- DROP FUNCTION elkon_log_upsert(in_elkon_log elkon_log);
+
+CREATE OR REPLACE FUNCTION elkon_log_upsert(in_elkon_log elkon_log)
+  RETURNS void AS
+$$
+DECLARE
+	v_message text;
+	v_id int;
+BEGIN
+	SELECT
+		id,
+		message
+	INTO
+		v_id,
+		v_message
+	FROM elkon_log	
+	WHERE production_site_id=in_elkon_log.production_site_id
+	ORDER BY date_time desc
+	LIMIT 1;
+	
+	IF v_id IS NOT NULL AND v_message = in_elkon_log.message THEN
+		UPDATE elkon_log
+		SET date_time = now()
+		WHERE id = v_id;
+	ELSE
+		INSERT INTO elkon_log (production_site_id,message,level,message)
+		values (in_elkon_log.production_site_id,in_elkon_log.message,in_elkon_log.level,in_elkon_log.message);
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION elkon_log_upsert(in_elkon_log elkon_log) OWNER TO beton;
+
+
+-- ******************* update 01/03/2021 16:09:00 ******************
+﻿-- Function: elkon_log_upsert(in_elkon_log elkon_log)
+
+-- DROP FUNCTION elkon_log_upsert(in_elkon_log elkon_log);
+
+CREATE OR REPLACE FUNCTION elkon_log_upsert(in_elkon_log elkon_log)
+  RETURNS void AS
+$$
+DECLARE
+	v_message text;
+	v_id int;
+BEGIN
+	SELECT
+		id,
+		message
+	INTO
+		v_id,
+		v_message
+	FROM elkon_log	
+	WHERE production_site_id=in_elkon_log.production_site_id
+	ORDER BY date_time desc
+	LIMIT 1;
+	
+	IF v_id IS NOT NULL AND v_message = in_elkon_log.message THEN
+		UPDATE elkon_log
+		SET date_time = now()
+		WHERE id = v_id;
+	ELSE
+		INSERT INTO elkon_log (production_site_id, level, message)
+		values (in_elkon_log.production_site_id, in_elkon_log.level, in_elkon_log.message);
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION elkon_log_upsert(in_elkon_log elkon_log) OWNER TO beton;
+
+
+-- ******************* update 02/03/2021 10:28:29 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			AND NEW.ext IS NULL
+			THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+						)
+					)::text
+				);
+			ELSIF NEW.call_type='in'::call_types AND NEW.end_time IS NULL THEN
+				--extension exists!
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+						)
+					)::text
+				);
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					IF NEW.end_time IS NULL AND NEW.ext IS NULL
+					THEN
+						--In call for all notification
+						PERFORM pg_notify(
+							'AstCall.in_call'
+							,json_build_object(
+								'params',json_build_object(
+									'client_id',NEW.client_id
+									,'client_name',v_client_name
+									,'tel',v_tel_formatted
+									,'client_repres_name',v_client_repres_name
+									,'client_repres_post',v_client_repres_post
+								)
+							)::text
+						);
+						
+					ELSIF NEW.end_time IS NULL THEN
+						--extension exists!
+						PERFORM pg_notify(
+							'AstCall.in_call.'||NEW.ext
+							,json_build_object(
+								'params',json_build_object(
+									'client_id',NEW.client_id
+									,'client_name',v_client_name
+									,'tel',v_tel_formatted
+									,'client_repres_name',v_client_repres_name
+									,'client_repres_post',v_client_repres_post
+								)
+							)::text
+						);
+					END IF;
+				END IF;
+			END IF;
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		NEW.user_id = (SELECT id
+				FROM users
+			WHERE tel_ext=v_search
+			LIMIT 1
+		);
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 02/03/2021 10:45:50 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+						)
+					)::text
+				);
+					
+				IF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					PERFORM pg_notify(
+						'AstCall.in_call.'||NEW.ext
+						,NULL
+					);
+				END IF;	
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					PERFORM pg_notify(
+						'AstCall.in_call'
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+							)
+						)::text
+					);
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NOT NULL AND OLD.ext IS NULL AND NEW.ext IS NOT NULL THEN	
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		NEW.user_id = (SELECT id
+				FROM users
+			WHERE tel_ext=v_search
+			LIMIT 1
+		);
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 02/03/2021 14:46:09 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+						)
+					)::text
+				);
+					
+				IF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					PERFORM pg_notify(
+						'AstCall.in_call.'||NEW.ext
+						,NULL
+					);
+				END IF;	
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					PERFORM pg_notify(
+						'AstCall.in_call'
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+							)
+						)::text
+					);
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NOT NULL AND OLD.ext IS NOT NULL AND NEW.ext IS NOT NULL AND OLD.ext<>NEW.ext THEN	
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		NEW.user_id = (SELECT id
+				FROM users
+			WHERE tel_ext=v_search
+			LIMIT 1
+		);
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 02/03/2021 17:42:18 ******************
+--DROP FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone)
+RETURNS int as $$
+DECLARE
+	v_raw_material_id int;
+BEGIN
+	v_raw_material_id = NULL;
+	
+	--Берется соответствие с большей датой или по конкретному заводу или по пустому
+	SELECT raw_material_id INTO v_raw_material_id
+	FROM raw_material_map_to_production
+	WHERE	(production_site_id=in_production_site_id OR production_site_id IS NULL)
+		AND production_descr = in_material_descr AND date_time<=in_date_time
+	ORDER BY date_time DESC
+	LIMIT 1;
+	
+	IF NOT FOUND THEN
+		SELECT id FROM raw_materials INTO v_raw_material_id WHERE name=in_material_descr;
+	
+		INSERT INTO raw_material_map_to_production
+		(date_time,production_descr,raw_material_id)
+		VALUES
+		(now(),in_material_descr,v_raw_material_id)
+		;
+	END IF;
+	
+	RETURN v_raw_material_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone) OWNER TO beton;
+
+
+-- ******************* update 03/03/2021 09:41:37 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+						)
+					)::text
+				);
+					
+				IF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					PERFORM pg_notify(
+						'AstCall.in_call.'||NEW.ext
+						,NULL
+					);
+				END IF;	
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					PERFORM pg_notify(
+						'AstCall.in_call'
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+							)
+						)::text
+					);
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NOT NULL AND OLD.ext IS NOT NULL AND NEW.ext IS NOT NULL AND OLD.ext<>NEW.ext THEN	
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 03/03/2021 10:03:21 ******************
+-- Function: user_mac_addresses_process()
+
+-- DROP FUNCTION user_mac_addresses_process();
+
+CREATE OR REPLACE FUNCTION user_mac_addresses_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF 
+		(TG_OP='UPDATE' AND OLD.mac_address<>NEW.mac_address)
+		OR (TG_OP='INSERT')
+	THEN
+		NEW.mac_address_hash = md5(NEW.mac_address);
+				
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION user_mac_addresses_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 03/03/2021 10:03:33 ******************
+-- Trigger: user_mac_addresses_trigger_before on public.user_mac_addresses
+
+-- DROP TRIGGER user_mac_addresses_trigger_before ON public.user_mac_addresses;
+
+
+CREATE TRIGGER user_mac_addresses_trigger_before
+  BEFORE UPDATE OR INSERT
+  ON public.user_mac_addresses
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.user_mac_addresses_process();
+
+
+
+-- ******************* update 03/03/2021 10:31:45 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+						)
+					)::text
+				);
+					
+				IF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					PERFORM pg_notify(
+						'AstCall.in_call.'||NEW.ext
+						,NULL
+					);
+				END IF;	
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					PERFORM pg_notify(
+						'AstCall.in_call'
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+							)
+						)::text
+					);
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NOT NULL AND coalesce(OLD.ext,'')<>coalesce(NEW.ext,'') THEN	
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 03/03/2021 12:22:50 ******************
+--DROP FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone)
+CREATE OR REPLACE FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone)
+RETURNS int as $$
+DECLARE
+	v_raw_material_id int;
+BEGIN
+	v_raw_material_id = NULL;
+	
+	--Берется соответствие с большей датой или по конкретному заводу или по пустому
+	SELECT raw_material_id INTO v_raw_material_id
+	FROM raw_material_map_to_production
+	WHERE	(production_site_id=in_production_site_id OR production_site_id IS NULL)
+		AND production_descr = in_material_descr AND date_time<=in_date_time
+	ORDER BY date_time DESC
+	LIMIT 1;
+	
+	IF NOT FOUND AND coalesce(in_material_descr,'')<>'' THEN
+		SELECT id FROM raw_materials INTO v_raw_material_id WHERE name=in_material_descr;
+	
+		INSERT INTO raw_material_map_to_production
+		(date_time,production_descr,raw_material_id)
+		VALUES
+		(now(),in_material_descr,v_raw_material_id)
+		;
+	END IF;
+	
+	RETURN v_raw_material_id;
+END;
+$$ language plpgsql;
+
+ALTER FUNCTION material_fact_consumptions_add_material(in_production_site_id int, in_material_descr text, in_date_time timestamp without time zone) OWNER TO beton;
+
+
+-- ******************* update 03/03/2021 12:34:07 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+						)
+					)::text
+				);
+					
+				IF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					PERFORM pg_notify(
+						'AstCall.in_call.'||NEW.ext
+						,NULL
+					);
+				END IF;	
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					PERFORM pg_notify(
+						'AstCall.in_call'
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+							)
+						)::text
+					);
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NOT NULL AND coalesce(OLD.ext,'')<>coalesce(NEW.ext,'') THEN	
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 03/03/2021 14:20:58 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+							,'oper','insert'
+						)
+					)::text
+				);
+					
+				IF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					PERFORM pg_notify(
+						'AstCall.in_call.'||NEW.ext
+						,NULL
+					);
+				END IF;	
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					PERFORM pg_notify(
+						'AstCall.in_call'
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+								,'oper','update'
+							)
+						)::text
+					);
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NULL AND coalesce(OLD.ext,'')<>coalesce(NEW.ext,'') THEN	
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 03/03/2021 14:48:18 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				PERFORM pg_notify(
+					'AstCall.in_call'
+					,json_build_object(
+						'params',json_build_object(
+							'client_id',NEW.client_id
+							,'client_name',v_client_name
+							,'tel',v_tel_formatted
+							,'client_repres_name',v_client_repres_name
+							,'client_repres_post',v_client_repres_post
+							,'oper','insert'
+							,'unique_id',NEW.unique_id
+						)
+					)::text
+				);
+					
+				IF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					PERFORM pg_notify(
+						'AstCall.in_call.'||NEW.ext
+						,NULL
+					);
+				END IF;	
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					PERFORM pg_notify(
+						'AstCall.in_call'
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+								,'oper','update'
+								,'unique_id',NEW.unique_id
+							)
+						)::text
+					);
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NULL AND coalesce(OLD.ext,'')<>coalesce(NEW.ext,'') THEN	
+				PERFORM pg_notify(
+					'AstCall.in_call.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+

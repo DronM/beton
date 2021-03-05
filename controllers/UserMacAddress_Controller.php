@@ -35,6 +35,9 @@ class UserMacAddress_Controller extends ControllerSQL{
 		$param = new FieldExtString('mac_address'
 				,array('required'=>TRUE));
 		$pm->addParam($param);
+		$param = new FieldExtString('mac_address_hash'
+				,array('required'=>TRUE));
+		$pm->addParam($param);
 		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
@@ -65,6 +68,10 @@ class UserMacAddress_Controller extends ControllerSQL{
 			));
 			$pm->addParam($param);
 		$param = new FieldExtString('mac_address'
+				,array(
+			));
+			$pm->addParam($param);
+		$param = new FieldExtString('mac_address_hash'
 				,array(
 			));
 			$pm->addParam($param);

@@ -348,7 +348,7 @@ class User_Controller extends ControllerSQL{
 				
 	$opts=array();
 	
-		$opts['length']=20;				
+		$opts['length']=50;				
 		$pm->addParam(new FieldExtString('k',$opts));
 	
 			
@@ -1221,7 +1221,7 @@ class User_Controller extends ControllerSQL{
 			FROM user_mac_addresses AS ma
 			LEFT JOIN users_dialog AS u ON u.id=ma.user_id
 			LEFT JOIN users AS usr ON usr.id=ma.user_id
-			WHERE ma.mac_address=%s",
+			WHERE ma.mac_address_hash=%s",
 			$k));
 			
 		if ($ar){

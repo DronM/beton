@@ -31,7 +31,20 @@ function UserMacAddressList_View(id,options){
 						new GridCellHead(id+":grid:head:mac_address",{
 							"value":"MAC адрес",
 							"columns":[
-								new GridColumn({"field":mac_model.getField("mac_address")})
+								new GridColumn({
+									"field":mac_model.getField("mac_address"),
+									"ctrlClass":EditString,
+									"ctrlOptions":{
+										"maxLength":"17",
+										"placeholder":"A0-B1-C2-D4-E5-F6",
+										"regExpression":/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/,
+										"formatterOptions":{
+											"delimiter": "-",
+											"blocks": [2, 2, 2, 2, 2, 2],
+											"uppercase": true										
+										}
+									}
+								})
 							]
 						})
 					]

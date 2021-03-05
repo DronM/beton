@@ -56,6 +56,12 @@ extend(UserMacAddress_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.required = true;
+	var field = new FieldString("mac_address_hash",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -83,6 +89,12 @@ extend(UserMacAddress_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldString("mac_address",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldString("mac_address_hash",options);
 	
 	pm.addField(field);
 	
