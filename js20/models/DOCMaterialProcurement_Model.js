@@ -42,7 +42,6 @@ function DOCMaterialProcurement_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.date_time = new FieldDateTime("date_time",filed_options);
-	options.fields.date_time.getValidator().setRequired(true);
 	
 				
 	
@@ -170,6 +169,10 @@ function DOCMaterialProcurement_Model(options){
 	
 	options.fields.store = new FieldText("store",filed_options);
 	
+			
+			
+			
+			
 			
 			
 			

@@ -643,7 +643,8 @@ class Destination_Controller extends ControllerSQL{
 			
 			if($limit_cnt){				
 				//new addresses to model
-				$name_pat_w = str_word_count($this->getExtVal($pm,'name_pat'),1,"АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя");
+				//$name_pat_w = str_word_count($this->getExtVal($pm,'name_pat'),1,"АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя");
+				$name_pat_w = explode(' ',$this->getExtVal($pm,'name_pat'));
 				$name_pat = '%'.implode('%',$name_pat_w).'%';
 				$q_id = $this->getDbLink()->query(
 					"SELECT search_name FROM fias.find_address("."'".$name_pat."'".",".$limit_cnt.")"

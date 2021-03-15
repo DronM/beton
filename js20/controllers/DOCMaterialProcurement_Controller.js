@@ -34,6 +34,9 @@ function DOCMaterialProcurement_Controller(options){
 	this.add_get_print();
 	this.add_get_material_list();
 	this.add_get_shift_list();
+	this.add_complete_driver();
+	this.add_complete_vehicle_plate();
+	this.add_complete_store();
 		
 }
 extend(DOCMaterialProcurement_Controller,ControllerObjServer);
@@ -50,7 +53,7 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Дата";options.required = true;
+	options.alias = "Дата";
 	var field = new FieldDateTime("date_time",options);
 	
 	pm.addField(field);
@@ -264,56 +267,50 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
 
 	var f_opts = {};
-	f_opts.alias = "Идентификатор";
+	
 	pm.addField(new FieldInt("id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Дата";
 	pm.addField(new FieldDateTime("date_time",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Номер 1с";
+	f_opts.alias = "Номер";
 	pm.addField(new FieldString("number",f_opts));
 	var f_opts = {};
 	
-	pm.addField(new FieldString("processed",f_opts));
+	pm.addField(new FieldString("doc_ref",f_opts));
 	var f_opts = {};
-	
-	pm.addField(new FieldInt("supplier_id",f_opts));
+	f_opts.alias = "Проведен";
+	pm.addField(new FieldBool("processed",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Автор";
+	pm.addField(new FieldInt("user_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Поставщик";
-	pm.addField(new FieldJSON("suppliers_ref",f_opts));
-	var f_opts = {};
-	
-	pm.addField(new FieldInt("carrier_id",f_opts));
+	pm.addField(new FieldInt("supplier_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Перевозчик";
-	pm.addField(new FieldJSON("carriers_ref",f_opts));
+	pm.addField(new FieldInt("carrier_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Водитель";
 	pm.addField(new FieldString("driver",f_opts));
 	var f_opts = {};
-	f_opts.alias = "ТС";
+	f_opts.alias = "гос.номер";
 	pm.addField(new FieldString("vehicle_plate",f_opts));
 	var f_opts = {};
-	
+	f_opts.alias = "Материал";
 	pm.addField(new FieldInt("material_id",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Материал";
-	pm.addField(new FieldJSON("materials_ref",f_opts));
-	var f_opts = {};
-	
+	f_opts.alias = "Силос";
 	pm.addField(new FieldInt("cement_silos_id",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Силос";
-	pm.addField(new FieldJSON("cement_silos_ref",f_opts));
-	var f_opts = {};
-	f_opts.alias = "Вес";
+	f_opts.alias = "Брутто";
 	pm.addField(new FieldFloat("quant_gross",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Вес чистый";
+	f_opts.alias = "Нетто";
 	pm.addField(new FieldFloat("quant_net",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Склад";
-	pm.addField(new FieldString("store",f_opts));
+	
+	pm.addField(new FieldText("store",f_opts));
 }
 
 			DOCMaterialProcurement_Controller.prototype.addGetObject = function(){
@@ -321,7 +318,7 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	
 	var pm = this.getGetObject();
 	var f_opts = {};
-	f_opts.alias = "Идентификатор";	
+		
 	pm.addField(new FieldInt("id",f_opts));
 	
 	pm.addField(new FieldString("mode"));
@@ -403,4 +400,89 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	this.addPublicMethod(pm);
 }
 
+			DOCMaterialProcurement_Controller.prototype.add_complete_driver = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('complete_driver',opts);
+	
+				
+	
+	var options = {};
+	
+		options.maxlength = "300";
+	
+		pm.addField(new FieldString("driver",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("ic",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("mid",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			DOCMaterialProcurement_Controller.prototype.add_complete_vehicle_plate = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('complete_vehicle_plate',opts);
+	
+				
+	
+	var options = {};
+	
+		options.maxlength = "300";
+	
+		pm.addField(new FieldString("vehicle_plate",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("ic",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("mid",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			DOCMaterialProcurement_Controller.prototype.add_complete_store = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('complete_store',opts);
+	
+				
+	
+	var options = {};
+	
+		options.maxlength = "300";
+	
+		pm.addField(new FieldString("store",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("ic",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("mid",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			
 		

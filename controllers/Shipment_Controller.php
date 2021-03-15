@@ -988,7 +988,8 @@ class Shipment_Controller extends ControllerSQL{
 				$text = str_replace('[quant]',$ar['quant'],$text);
 				$text = str_replace('[concrete]',$ar['concrete'],$text);
 				$text = str_replace('[car]',$ar['v_plate'],$text);
-				$text = str_replace('[quant_shipped]',$quantShipped? $quantShipped:$ar['quant_shipped'],$text);
+				//$quantShipped? $quantShipped:$ar['quant_shipped']
+				$text = str_replace('[quant_shipped]',$ar['quant_shipped'],$text);
 				$text = str_replace('[quant_ordered]',$ar['quant_ordered'],$text);
 				
 				$driver = $ar['d_name'];
@@ -1049,7 +1050,8 @@ class Shipment_Controller extends ControllerSQL{
 			
 			$dbLinkMaster->query(
 				sprintf(
-				"UPDATE shipments SET
+				"UPDATE shipments
+				SET
 					shipped=TRUE,
 					operator_user_id=%d
 				WHERE id=%d",

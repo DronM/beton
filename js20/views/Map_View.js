@@ -281,37 +281,61 @@ Map_View.prototype.setFollowVehicle = function(v){
 		if(window.getApp().getAppSrv()){
 			//event server
 			console.log("setFollowVehicle to "+this.m_curTrackerId)
-			this.subscribeToSrvEvents(
-				[
+			this.subscribeToSrvEvents({
+				"events":[
 					{"id":"Vehicle.position."+this.m_curTrackerId}
+					,{"id":"Vehicle.route_redraw."+this.m_curTrackerId}
 				]
-				,function(json){
-					self.updateVehiclePosition({
-						'id':self.m_curVehicleId
-						,'pos_data':json.params
-					});
-					self.m_vehicles.setCurrentObj(self.m_curTrackerId);//,TRACK_CONSTANTS.FOUND_ZOOM
-					//self.m_track.zoomToCenter(json.params.lon,json.params.lon,json.params.lat,json.params.lat);
-					/*
-					self.m_vehicles.moveMapToCoords(
-						json.params.lon
-						,json.params.lat
-						//,TRACK_CONSTANTS.FOUND_ZOOM - same zoom as before
-					);
-					*/
+				,"onEvent":function(json){
+					console.log("json=")
+					console.log(json)
+					if(json.methodId && json.methodId=="Vehicle.route_redraw."+this.m_curTrackerId){
+					
+						pm = self.m_controller.getPublicMethod("get_route");
+						pm.setFieldValue("tracker_id",this.m_curTrackerId);
+						/*
+						pm.setFieldValue("shipment_id",);
+						pm.setFieldValue("tracker_id",);
+						
+						pm.run({
+							"ok":function(resp){
+								self.onGetPosData(resp,callBack);
+							}
+						});
+						*/
+					
+					}else{
+						self.updateVehiclePosition({
+							'id':self.m_curVehicleId
+							,'pos_data':json.params
+						});
+						if(self.getElement("cmdFollowVehicle").getValue()){
+							//self.m_curTrackerId
+							self.m_vehicles.setCurrentObj(self.m_curVehicleId,TRACK_CONSTANTS.FOUND_ZOOM);//,TRACK_CONSTANTS.FOUND_ZOOM
+						}
+						//self.m_track.zoomToCenter(json.params.lon,json.params.lon,json.params.lat,json.params.lat);
+						/*
+						self.m_vehicles.moveMapToCoords(
+							json.params.lon
+							,json.params.lat
+							//,TRACK_CONSTANTS.FOUND_ZOOM - same zoom as before
+						);
+						*/
+					}
 				}
-			);
+				,"onSubscribed": function(){
+					if(self.m_interval){
+						clearInterval(self.m_interval);
+					}
+				}
+				,"onClose": function(message){
+					self.startUpdateTimer();
+				}						
+			});
 		}
 		else{
 			//constant query on timer
-			this.m_interval = setInterval(
-				function(){
-					self.refreshCurPosition(function(){
-						self.m_vehicles.setCurrentObj(self.m_curTrackerId);
-					});
-				},
-				self.m_updateInterval
-			);
+			this.startUpdateTimer();
 		}				
 	}
 	else if(window.getApp().getAppSrv()){
@@ -321,6 +345,21 @@ Map_View.prototype.setFollowVehicle = function(v){
 		clearInterval(this.m_interval);
 		this.m_interval = null;
 	}		
+}
+
+Map_View.prototype.startUpdateTimer = function(){
+	if(this.m_interval){
+		clearInterval(this.m_interval);
+	}
+	var self = this;
+	this.m_interval = setInterval(
+		function(){
+			self.refreshCurPosition(function(){
+				self.m_vehicles.setCurrentObj(self.m_curTrackerId);
+			});
+		},
+		self.m_updateInterval
+	);
 }
 
 Map_View.prototype.deleteReport = function(){

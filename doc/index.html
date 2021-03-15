@@ -207,6 +207,9 @@
 <li><a href="#SupplierList_Model">SupplierList_Model</a></li>
 <li><a href="#DOCMaterialProcurement_Model">DOCMaterialProcurement_Model</a></li>
 <li><a href="#DOCMaterialProcurementList_Model">DOCMaterialProcurementList_Model</a></li>
+<li><a href="#DOCMaterialProcurementDriverList_Model">DOCMaterialProcurementDriverList_Model</a></li>
+<li><a href="#DOCMaterialProcurementVehicleList_Model">DOCMaterialProcurementVehicleList_Model</a></li>
+<li><a href="#DOCMaterialProcurementStoreList_Model">DOCMaterialProcurementStoreList_Model</a></li>
 <li><a href="#DOCMaterialProcurementShiftList_Model">DOCMaterialProcurementShiftList_Model</a></li>
 <li><a href="#DOCMaterialInventory_Model">DOCMaterialInventory_Model</a></li>
 <li><a href="#DOCMaterialInventoryList_Model">DOCMaterialInventoryList_Model</a></li>
@@ -1019,7 +1022,10 @@
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
 <h2>get_shift_list</h2>
-<a href="#DOCMaterialProcurementShiftList_Model">Model: DOCMaterialProcurementShiftList_Model</a>
+<a href="#DOCMaterialProcurementShiftList_Model">Model: DOCMaterialProcurementShiftList_Model</a><h2>complete_driver</h2>
+<a href="#DOCMaterialProcurementDriverList_Model">Model: DOCMaterialProcurementDriverList_Model</a><h2>complete_vehicle_plate</h2>
+<a href="#DOCMaterialProcurementVehicleList_Model">Model: DOCMaterialProcurementVehicleList_Model</a><h2>complete_store</h2>
+<a href="#DOCMaterialProcurementStoreList_Model">Model: DOCMaterialProcurementStoreList_Model</a>
 </div>
 </div>
 <div id="Destination_Controller" class="content_box">
@@ -3092,6 +3098,32 @@
 <h2>get_current_position_all</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
+<h2>get_route</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>shipment_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>tracker_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+<p>Length:20</p>
+</div>
+<h3>vehicle_state</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Enum</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
 <h2>get_track</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
@@ -5192,7 +5224,7 @@
 <h2>date_time</h2>
 <div>Type:DateTime</div>
 <div>Primary key:</div>
-<div>Required:TRUE</div>
+<div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
 <h2>number</h2>
@@ -5270,6 +5302,18 @@
 <h2>store</h2>
 <div>Type:Text</div>
 <div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="DOCMaterialProcurementDriverList_Model" class="content_box">
+<h1>DOCMaterialProcurementDriverList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>driver</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -5414,6 +5458,30 @@
 <h2>quant</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="DOCMaterialProcurementStoreList_Model" class="content_box">
+<h1>DOCMaterialProcurementStoreList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>store</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="DOCMaterialProcurementVehicleList_Model" class="content_box">
+<h1>DOCMaterialProcurementVehicleList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>vehicle_plate</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>

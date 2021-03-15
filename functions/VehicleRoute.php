@@ -60,6 +60,90 @@ class VehicleRoute {
 		);
 	}
 	
+	public static function rebuildRoute($trackerId,$shipmentId,$vehicleState,$dbLink){
+		$osrm = new OSRMV5(OSRM_PROTOCOLE,OSRM_HOST,OSRM_PORT);
+		
+		if($vehicleState=='busy'||$vehicleState=='left_for_dest'){
+			$dest_q = sprintf(
+				"(SELECT o.destination_id
+				FROM shipments AS sh
+				LEFT JOIN orders AS o ON o.id=sh.order_id
+				WHERE sh.id = %d)"
+			,$shipmentId);
+			
+		}else{
+			$dest_q = "(SELECT const_base_geo_zone_id_val())";
+		}
+		
+		$cashe_ar = $dbLink->query_first(sprintf(
+			"WITH
+			zone_data AS (
+				SELECT
+					dest.near_road_lon
+					,dest.near_road_lat
+				FROM destinations AS dest
+				WHERE dest.id=".$dest_q."					
+			)			
+			,veh_last_points AS (
+				SELECT
+					json_agg(
+						json_build_object(
+							'lon',tr.lon
+							,'lat',tr.lat
+						)
+					) AS pos					
+				FROM car_tracking AS tr
+				WHERE tr.car_id = '%s' AND tr.gps_valid = 1
+				ORDER BY tr.period DESC
+				LIMIT (const_deviation_for_reroute_val()->>'points_cnt')::int
+			)
+			SELECT
+				(SELECT near_road_lon FROM zone_data) AS zone_near_road_lon
+				,(SELECT near_road_lat FROM zone_data) AS zone_near_road_lat
+				,(SELECT pos FROM veh_last_points) AS cur_pos
+			
+			"
+			,$trackerId)
+		);
+		
+		$cur_pos = json_decode($cashe_ar['cur_pos']);
+		if(is_array($cur_pos) && count($cur_pos)
+		 &&isset($cashe_ar['zone_near_road_lon'])  && isset($cashe_ar['zone_near_road_lat'])
+		){
+			//routing
+			$osrm_route = $osrm->getRoute(
+				array(
+					$cur_pos[0]->lon.','.$cur_pos[0]->lat
+					,$cashe_ar['zone_near_road_lon'].','.$cashe_ar['zone_near_road_lat']					
+				)
+				,'json'
+				,NULL
+				,array("geometries=polyline")									
+			);
+			if (!$osrm_route->routes || !count($osrm_route->routes) || !$osrm_route->routes[0]->geometry){
+				throw new Exception(self::ER_OSRM_ROUTE_QUERY);
+			}
+			
+			$route = $osrm_route->routes[0]->geometry;
+			$route_for_db = "'".json_encode($osrm_route)."'";
+			
+			//rebuild route in cashe
+			$dbLink->query(sprintf(
+				"UPDATE vehicle_route_cashe
+				SET
+					update_dt = now()
+					,route = %s
+				WHERE tracker_id = '%s'
+					AND shipment_id = %d
+					AND vehicle_state = '%s'::vehicle_states"
+				,$route_for_db
+				,$trackerId
+				,$shipmentId
+				,($vehicleState=='at_dest'||$vehicleState=='left_for_base')? 'left_for_base':'left_for_dest'
+			));
+		}		
+	}
+	
 	public static function getRoute($vehicleId,$dbLink){
 		/** Если текущий статус assigned/busy/left_for_dest - нужно вернуть предполагаемый маршрут до объекта
 		 * Если текущий статус at_dest/left_for_base - нужно вернуть предполагаемый маршрут до базы
@@ -239,15 +323,6 @@ class VehicleRoute {
 					throw new Exception(self::ER_OSRM_ROUTE_QUERY);
 				}
 				
-				//Convert to db geometry
-				/*
-				$q_points = '';
-				$points = decodePolylineToArray($osrm_route->routes[0]->geometry);
-				foreach($points as $p){
-					$q_points.=($q_points=='')? '':',';
-					$q_points.=sprintf("ST_PointFromText('POINT(%s %s)',4326)",$p[1],$p[0]);
-				}
-				*/
 				$route = $osrm_route->routes[0]->geometry;
 				$route_for_db = "'".json_encode($osrm_route)."'";
 				

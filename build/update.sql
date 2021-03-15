@@ -77137,3 +77137,1899 @@ ALTER FUNCTION ast_calls_process()
   OWNER TO beton;
 
 
+
+-- ******************* update 05/03/2021 09:28:47 ******************
+-- VIEW: doc_material_procurements_driver_list
+
+--DROP VIEW doc_material_procurements_driver_list;
+
+CREATE OR REPLACE VIEW doc_material_procurements_driver_list AS
+	SELECT
+		DISTINCT upper(driver) AS driver_search,
+		driver
+	FROM doc_material_procurements
+	;
+	
+ALTER VIEW doc_material_procurements_driver_list OWNER TO beton;
+
+
+-- ******************* update 05/03/2021 09:32:41 ******************
+	CREATE INDEX doc_material_procurements_driver_idx
+	ON doc_material_procurements(driver);
+	CREATE INDEX doc_material_procurements_vehicle_plate_idx
+	ON doc_material_procurements(vehicle_plate);
+
+
+
+-- ******************* update 05/03/2021 09:33:51 ******************
+-- VIEW: doc_material_procurements_driver_list
+
+--DROP VIEW doc_material_procurements_driver_list;
+
+CREATE OR REPLACE VIEW doc_material_procurements_driver_list AS
+	SELECT
+		DISTINCT upper(driver) AS driver_search,
+		driver
+	FROM doc_material_procurements
+	WHERE coalesce(driver,'')<>''
+	;
+	
+ALTER VIEW doc_material_procurements_driver_list OWNER TO beton;
+
+
+-- ******************* update 05/03/2021 09:35:35 ******************
+-- VIEW: doc_material_procurements_vehicle_list
+
+--DROP VIEW doc_material_procurements_vehicle_list;
+
+CREATE OR REPLACE VIEW doc_material_procurements_vehicle_list AS
+	SELECT
+		DISTINCT upper(vehicle_plate) AS vehicle_plate_search,
+		vehicle_plate
+	FROM doc_material_procurements
+	WHERE coalesce(vehicle_plate,'')<>''
+	;
+	
+ALTER VIEW doc_material_procurements_vehicle_list OWNER TO beton;
+
+
+-- ******************* update 05/03/2021 09:36:12 ******************
+-- VIEW: doc_material_procurements_driver_list
+
+--DROP VIEW doc_material_procurements_driver_list;
+
+CREATE OR REPLACE VIEW doc_material_procurements_driver_list AS
+	SELECT
+		DISTINCT upper(driver) AS driver_search,
+		driver
+	FROM doc_material_procurements
+	WHERE coalesce(driver,'')<>''
+	ORDER BY driver
+	;
+	
+ALTER VIEW doc_material_procurements_driver_list OWNER TO beton;
+
+
+-- ******************* update 05/03/2021 09:36:21 ******************
+-- VIEW: doc_material_procurements_vehicle_list
+
+--DROP VIEW doc_material_procurements_vehicle_list;
+
+CREATE OR REPLACE VIEW doc_material_procurements_vehicle_list AS
+	SELECT
+		DISTINCT upper(vehicle_plate) AS vehicle_plate_search,
+		vehicle_plate
+	FROM doc_material_procurements
+	WHERE coalesce(vehicle_plate,'')<>''
+	ORDER BY vehicle_plate
+	;
+	
+ALTER VIEW doc_material_procurements_vehicle_list OWNER TO beton;
+
+
+-- ******************* update 05/03/2021 09:39:45 ******************
+-- VIEW: doc_material_procurements_vehicle_list
+
+DROP VIEW doc_material_procurements_vehicle_list;
+
+CREATE OR REPLACE VIEW doc_material_procurements_vehicle_list AS
+	SELECT
+		DISTINCT vehicle_plate
+		
+	FROM doc_material_procurements
+	WHERE coalesce(vehicle_plate,'')<>''
+	ORDER BY vehicle_plate
+	;
+	
+ALTER VIEW doc_material_procurements_vehicle_list OWNER TO beton;
+
+
+-- ******************* update 05/03/2021 09:40:01 ******************
+-- VIEW: doc_material_procurements_driver_list
+
+DROP VIEW doc_material_procurements_driver_list;
+
+CREATE OR REPLACE VIEW doc_material_procurements_driver_list AS
+	SELECT
+		DISTINCT driver
+		
+	FROM doc_material_procurements
+	WHERE coalesce(driver,'')<>''
+	ORDER BY driver
+	;
+	
+ALTER VIEW doc_material_procurements_driver_list OWNER TO beton;
+
+
+-- ******************* update 05/03/2021 10:45:26 ******************
+
+	CREATE INDEX doc_material_procurements_store_idx
+	ON doc_material_procurements(store);
+
+
+
+-- ******************* update 05/03/2021 14:46:21 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+	v_event_id text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+					v_event_id = 'AstCall.in_call';
+				ELSIF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					v_event_id = 'AstCall.in_call.'||NEW.ext;
+				END IF;	
+				
+				IF v_event_id IS NOT NULL THEN
+					PERFORM pg_notify(
+						v_event_id
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+								'ext',NEW.ext
+								,'unique_id',NEW.unique_id
+							)
+						)::text
+					);
+				END IF;
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+						v_event_id = 'AstCall.in_call';
+					ELSIF NEW.ext IS NOT NULL THEN
+						--extension exists!
+						v_event_id = 'AstCall.in_call.'||NEW.ext;
+					END IF;	
+					
+					IF v_event_id IS NOT NULL THEN
+						PERFORM pg_notify(
+							v_event_id
+							,json_build_object(
+								'params',json_build_object(
+									'client_id',NEW.client_id
+									,'client_name',v_client_name
+									,'tel',v_tel_formatted
+									,'client_repres_name',v_client_repres_name
+									,'client_repres_post',v_client_repres_post
+									'ext',NEW.ext
+									,'unique_id',NEW.unique_id
+								)
+							)::text
+						);
+					END IF;
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NULL AND OLD.start_time IS NULL AND NEW.start_time IS NOT NULL
+			 AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
+				PERFORM pg_notify(
+					'AstCall.pickup.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 05/03/2021 15:40:29 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+	v_event_id text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+					v_event_id = 'AstCall.in_call';
+				ELSIF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					v_event_id = 'AstCall.in_call.'||NEW.ext;
+				END IF;	
+				
+				IF v_event_id IS NOT NULL THEN
+					PERFORM pg_notify(
+						v_event_id
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+								,'ext',NEW.ext
+								,'unique_id',NEW.unique_id
+							)
+						)::text
+					);
+				END IF;
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+						v_event_id = 'AstCall.in_call';
+					ELSIF NEW.ext IS NOT NULL THEN
+						--extension exists!
+						v_event_id = 'AstCall.in_call.'||NEW.ext;
+					END IF;	
+					
+					IF v_event_id IS NOT NULL THEN
+						PERFORM pg_notify(
+							v_event_id
+							,json_build_object(
+								'params',json_build_object(
+									'client_id',NEW.client_id
+									,'client_name',v_client_name
+									,'tel',v_tel_formatted
+									,'client_repres_name',v_client_repres_name
+									,'client_repres_post',v_client_repres_post
+									,'ext',NEW.ext
+									,'unique_id',NEW.unique_id
+								)
+							)::text
+						);
+					END IF;
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NULL AND OLD.start_time IS NULL AND NEW.start_time IS NOT NULL
+			 AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
+				PERFORM pg_notify(
+					'AstCall.pickup.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 06/03/2021 08:51:55 ******************
+update const_base_geo_zone set val_type='JSON'
+
+
+-- ******************* update 06/03/2021 08:52:56 ******************
+update const_vehicle_unload_time set val_type='Time';
+
+
+-- ******************* update 06/03/2021 08:55:28 ******************
+update const_vehicle_unload_time set val_type='Time';
+update const_first_shift_start_time set val_type='Time';
+update const_ord_mark_if_no_ship_time set val_type='Time';
+update const_material_closed_balance_date set val_type='Date';
+update const_shift_for_orders_length_time set val_type='Time';
+update const_shift_length_time set val_type='Time';
+
+
+-- ******************* update 06/03/2021 09:08:15 ******************
+update const_vehicle_unload_time set val_type='Time';
+update const_first_shift_start_time set val_type='Time';
+update const_ord_mark_if_no_ship_time set val_type='Time';
+update const_material_closed_balance_date set val_type='Date';
+update const_shift_for_orders_length_time set val_type='Time';
+update const_shift_length_time set val_type='Time';
+update const_map_default_lon set val_type='String', ctrl_options='{"length":10,"formatterOptions":{"delimiter": ".","blocks": [5, 4]}}';
+update const_map_default_lat set val_type='String', ctrl_options='{"length":10,"formatterOptions":{"delimiter": ".","blocks": [5, 4]}}';
+update const_own_vehicles_feature set val_type='String', ctrl_options='{"length":10}';
+update const_efficiency_warn_k set val_type='Int';
+update const_day_shift_length set val_type='Time';
+update const_no_tracker_signal_warn_interval set val_type='Time';
+update const_no_tracker_signal_warn_interval set val_type='Time';
+update const_base_geo_zone_id set descr = 'Код зоны завода (не используется)';
+update const_self_ship_dest_id set descr = 'Код объекта самовывоз (не используется)';
+update const_self_ship_dest set val_type='JSON';
+update const_lab_days_for_avg set val_type='Int';
+update const_days_for_plan_procur set val_type='Int';
+update const_doc_per_page_count set val_type='Int';
+update const_doc_per_page_count set val_type='Int';
+update const_avg_mat_cons_dev_day_count set  val_type='Int', descr='Количество дней для расчета среднего отлонения расхода материалов от нормы';
+update const_call_history_count set val_type='Int';
+update const_geo_zone_check_points_count set val_type='Int';
+update const_max_hour_load set val_type='Int';
+update const_cement_material set val_type='JSON';
+
+
+-- ******************* update 06/03/2021 09:11:10 ******************
+update const_vehicle_unload_time set val_type='Time';
+update const_first_shift_start_time set val_type='Time';
+update const_ord_mark_if_no_ship_time set val_type='Time';
+update const_material_closed_balance_date set val_type='Date';
+update const_shift_for_orders_length_time set val_type='Time';
+update const_shift_length_time set val_type='Time';
+update const_map_default_lon set val_type='String', ctrl_options='{"length":10,"formatterOptions":{"delimiter": ".","blocks": [5, 4]}}';
+update const_map_default_lat set val_type='String', ctrl_options='{"length":10,"formatterOptions":{"delimiter": ".","blocks": [5, 4]}}';
+update const_own_vehicles_feature set val_type='String', ctrl_options='{"length":10}';
+update const_efficiency_warn_k set val_type='Int';
+update const_day_shift_length set val_type='Time';
+update const_no_tracker_signal_warn_interval set val_type='Time';
+update const_no_tracker_signal_warn_interval set val_type='Time';
+update const_base_geo_zone_id set descr = 'Код зоны завода (не используется)';
+update const_self_ship_dest_id set descr = 'Код объекта самовывоз (не используется)';
+update const_self_ship_dest set val_type='JSON';
+update const_lab_days_for_avg set val_type='Int';
+update const_days_for_plan_procur set val_type='Int';
+update const_doc_per_page_count set val_type='Int';
+update const_doc_per_page_count set val_type='Int';
+update const_avg_mat_cons_dev_day_count set  val_type='Int', descr='Количество дней для расчета среднего отлонения расхода материалов от нормы';
+update const_call_history_count set val_type='Int';
+update const_geo_zone_check_points_count set val_type='Int';
+update const_max_hour_load set val_type='Int';
+update const_cement_material set val_type='JSON';
+update const_min_demurrage_time set val_type='Time';
+update const_lab_min_sample_count set val_type='Int';
+update const_min_quant_for_ship_cost set val_type='Int';
+update const_vehicle_owner_accord_from_day set val_type='Int';
+update const_vehicle_owner_accord_to_day set val_type='Int';
+update const_show_time_for_shipped_vehicles set val_type='Interval';
+update const_tracker_malfunction_tel_list set val_type='JSON';
+update const_low_efficiency_tel_list set val_type='JSON';
+update const_material_closed_balance_date set val_type='Date';
+update const_deviation_for_reroute set val_type='JSON';
+
+
+-- ******************* update 06/03/2021 09:13:18 ******************
+update const_vehicle_unload_time set val_type='Time';
+update const_first_shift_start_time set val_type='Time';
+update const_ord_mark_if_no_ship_time set val_type='Time';
+update const_material_closed_balance_date set val_type='Date';
+update const_shift_for_orders_length_time set val_type='Time';
+update const_shift_length_time set val_type='Time';
+update const_map_default_lon set val_type='String', ctrl_options='{"length":10,"formatterOptions":{"delimiter": ".","blocks": [5, 4]}}';
+update const_map_default_lat set val_type='String', ctrl_options='{"length":10,"formatterOptions":{"delimiter": ".","blocks": [5, 4]}}';
+update const_own_vehicles_feature set val_type='String', ctrl_options='{"length":10}';
+update const_efficiency_warn_k set val_type='Int';
+update const_day_shift_length set val_type='Time';
+update const_no_tracker_signal_warn_interval set val_type='Time';
+update const_no_tracker_signal_warn_interval set val_type='Time';
+update const_base_geo_zone_id set descr = 'Код зоны завода (не используется)';
+update const_self_ship_dest_id set descr = 'Код объекта самовывоз (не используется)';
+update const_self_ship_dest set val_type='JSON';
+update const_lab_days_for_avg set val_type='Int';
+update const_days_for_plan_procur set val_type='Int';
+update const_doc_per_page_count set val_type='Int';
+update const_doc_per_page_count set val_type='Int';
+update const_avg_mat_cons_dev_day_count set  val_type='Int', descr='Количество дней для расчета среднего отлонения расхода материалов от нормы';
+update const_call_history_count set val_type='Int';
+update const_geo_zone_check_points_count set val_type='Int';
+update const_max_hour_load set val_type='Int';
+update const_cement_material set val_type='JSON';
+update const_min_demurrage_time set val_type='Time';
+update const_lab_min_sample_count set val_type='Int';
+update const_min_quant_for_ship_cost set val_type='Int';
+update const_vehicle_owner_accord_from_day set val_type='Int';
+update const_vehicle_owner_accord_to_day set val_type='Int';
+update const_show_time_for_shipped_vehicles set val_type='Interval';
+update const_tracker_malfunction_tel_list set val_type='JSON';
+update const_low_efficiency_tel_list set val_type='JSON';
+update const_material_closed_balance_date set val_type='Date';
+update const_deviation_for_reroute set val_type='JSON';
+update const_speed_change_for_order_autolocate set val_type='Int';
+update const_chart_step_min set val_type='Int';
+update const_order_step_min set val_type='Int';
+
+
+
+-- ******************* update 06/03/2021 09:14:12 ******************
+
+update const_ship_coast_for_self_ship_destination set val_type='Float', ctrl_options='{"length":19,"precision":"2"}';
+
+
+-- ******************* update 06/03/2021 09:26:27 ******************
+update const_def_lang set ctrl_class='LangEditRef';
+
+
+-- ******************* update 06/03/2021 09:28:15 ******************
+update const_cement_material set ctrl_class='MaterialSelect';
+
+
+-- ******************* update 06/03/2021 09:30:45 ******************
+update const_low_efficiency_tel_list set ctrl_class='TelListGrid';
+
+
+-- ******************* update 06/03/2021 09:31:46 ******************
+update const_tracker_malfunction_tel_list set ctrl_class='TelListGrid';
+
+
+-- ******************* update 07/03/2021 08:32:31 ******************
+update const_show_time_for_shipped_vehicles set val_type='Interval';
+
+
+-- ******************* update 10/03/2021 16:23:31 ******************
+-- Function: geo_zone_check()
+
+-- DROP FUNCTION geo_zone_check();
+/**
+ */
+CREATE OR REPLACE FUNCTION geo_zone_check()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_tracker_date date;
+	v_cur_state vehicle_states;
+	v_shipment_id int;
+	v_schedule_id int;
+	v_destination_id int;
+	v_zone geometry;
+	
+	v_lon_min float;
+	v_lon_max float;
+	v_lat_min float;
+	v_lat_max float;
+	
+	v_car_rec RECORD;	
+	v_true_point boolean;
+	v_control_in boolean;
+	v_new_state vehicle_states;
+	v_point_in_zone boolean;
+
+	v_route_geom geometry;
+	v_veh_on_route bool;
+
+	V_SRID int;
+BEGIN
+	--RETURN NEW;
+	V_SRID = 0;
+	SELECT d1::date INTO v_tracker_date FROM get_shift_bounds(NEW.recieved_dt+age(now(), now() at time zone 'UTC')) AS (d1 timestamp,d2 timestamp);
+
+	--get last state
+	SELECT st.state,st.shipment_id,st.schedule_id,st.destination_id INTO v_cur_state,v_shipment_id,v_schedule_id,v_destination_id
+	FROM vehicle_schedule_states AS st
+	WHERE st.tracker_id=NEW.car_id AND st.date_time::date = v_tracker_date
+	ORDER BY st.date_time DESC LIMIT 1;
+
+	--controled states only
+	IF (v_cur_state='busy'::vehicle_states)
+	OR (v_cur_state='at_dest'::vehicle_states)
+	OR (v_cur_state='left_for_base'::vehicle_states)
+	THEN
+		-- direction to controle
+		IF (v_cur_state='busy'::vehicle_states)
+		OR (v_cur_state='left_for_base'::vehicle_states) THEN
+			v_control_in = true;
+		ELSE
+			v_control_in = false;--controling out
+		END IF;
+		
+		--coords to control
+		IF (v_cur_state='busy'::vehicle_states) THEN
+			--clients zone on shipment
+			SELECT destinations.id,
+				destinations.lon_min, destinations.lon_max,
+				destinations.lat_min, destinations.lat_max,
+				destinations.zone
+			INTO v_destination_id,v_lon_min,v_lon_max,v_lat_min,v_lat_max,v_zone
+			FROM shipments
+			LEFT JOIN orders ON orders.id=shipments.order_id
+			LEFT JOIN destinations ON destinations.id=orders.destination_id
+			WHERE shipments.id = v_shipment_id;
+
+		ELSE
+			-- base zone OR clients zone from state
+			SELECT destinations.lon_min, destinations.lon_max,
+				destinations.lat_min, destinations.lat_max,
+				destinations.zone
+			INTO v_lon_min,v_lon_max,v_lat_min,v_lat_max,v_zone
+			FROM destinations
+			WHERE destinations.id =
+				CASE v_cur_state
+					WHEN 'at_dest'::vehicle_states THEN v_destination_id
+					ELSE constant_base_geo_zone_id()
+				END;
+		END IF;		
+
+		
+		--v_point_in_zone = (NEW.lon>=v_lon_min) AND (NEW.lon<=v_lon_max) AND (NEW.lat>=v_lat_min) AND (NEW.lat<=v_lat_max);
+		--4326
+		v_point_in_zone = st_contains(v_zone, ST_GeomFromText('POINT('||NEW.lon::text||' '||NEW.lat::text||')', V_SRID));
+		
+		IF (v_control_in AND v_point_in_zone)
+		OR (v_control_in=false AND v_point_in_zone=false) THEN
+			v_true_point = true;
+		ELSE
+			v_true_point = false;
+		END IF;
+		IF v_true_point THEN
+			--check last X points to be sure
+			v_true_point = false;
+			FOR v_car_rec IN SELECT lon,lat FROM car_tracking AS t
+					WHERE t.car_id = NEW.car_id AND t.gps_valid=1
+					ORDER BY t.period DESC
+					LIMIT constant_geo_zone_check_points_count()-1 OFFSET 1
+			LOOP	
+				--RAISE EXCEPTION 'v_lon_min=%,v_lon_max=%,v_lat_min=%,v_lat_max=%',v_lon_min,v_lon_max,v_lat_min,v_lat_max;
+				--RAISE EXCEPTION 'v_car_rec.lon=%,v_car_rec.lat=%',v_car_rec.lon,v_car_rec.lat;
+				
+				--v_point_in_zone = (v_car_rec.lon>=v_lon_min) AND (v_car_rec.lon<=v_lon_max) AND (v_car_rec.lat>=v_lat_min) AND (v_car_rec.lat<=v_lat_max);
+				--4326
+				v_point_in_zone = st_contains(v_zone, ST_GeomFromText('POINT('||v_car_rec.lon::text||' '||v_car_rec.lat::text||')', V_SRID));
+				
+				v_true_point = (v_control_in AND v_point_in_zone)
+					OR (v_control_in=false AND v_point_in_zone=false);
+				--RAISE EXCEPTION 'v_point_in_zone=%',v_point_in_zone;
+				IF v_true_point = false THEN
+					EXIT;
+				END IF;
+			END LOOP;
+
+			IF v_true_point THEN
+				--current position is inside/outside zone
+				IF (v_cur_state='busy'::vehicle_states) THEN
+					v_new_state = 'at_dest'::vehicle_states;
+				ELSEIF (v_cur_state='at_dest'::vehicle_states) THEN
+					v_new_state = 'left_for_base'::vehicle_states;
+				ELSEIF (v_cur_state='left_for_base'::vehicle_states) THEN
+					v_new_state = 'free'::vehicle_states;			
+				END IF;
+
+				--change position
+				INSERT INTO vehicle_schedule_states (date_time, schedule_id, state, tracker_id,destination_id,shipment_id)
+				VALUES (CURRENT_TIMESTAMP,v_schedule_id,v_new_state,NEW.car_id,v_destination_id,v_shipment_id);
+			END IF;
+		END IF;
+	END IF;
+	
+	--*** КОНТРОЛЬ ЗАПРЕЩЕННЫХ ЗОН!!! ****
+	INSERT INTO sms_for_sending
+		(tel, body, sms_type,event_key)
+	(WITH
+	zone_viol AS (
+		SELECT
+			string_agg(sms_text.body,',') AS body
+		FROM
+		(
+		SELECT
+			sms_templates_text(
+				ARRAY[
+					ROW('plate',(SELECT plate::text FROM vehicles WHERE tracker_id=NEW.car_id))::template_value,
+					ROW('zone',dest.name::text)::template_value,
+					ROW('date_time',to_char(now(),'DD/MM/YY HH24:MI'))::template_value
+				],
+				(SELECT pattern FROM sms_patterns WHERE sms_type='vehicle_zone_violation')
+			) AS body	
+		FROM
+		(	SELECT
+				zone_contains.zone_id,
+				bool_and(zone_contains.inside_zone) AS inside_zone
+			FROM
+			(SELECT
+				destinations.id AS zone_id,
+				st_contains(
+					destinations.zone,
+					ST_GeomFromText('POINT('||last_pos.lon::text||' '||last_pos.lat::text||')', 0)
+				) AS inside_zone
+		
+			FROM tracker_zone_controls
+			LEFT JOIN destinations ON destinations.id=tracker_zone_controls.destination_id
+			CROSS JOIN (
+				SELECT
+					tr.lon,tr.lat
+				FROM car_tracking AS tr
+				WHERE tr.car_id = NEW.car_id AND tr.gps_valid=1 --16/09/20!!!
+				--(SELECT tracker_id FROM vehicles WHERE plate='864')
+				ORDER BY tr.period DESC
+				LIMIT const_geo_zone_check_points_count_val()	
+			) AS last_pos
+			) AS zone_contains	
+			GROUP BY zone_contains.zone_id
+		) AS zone_check	
+		LEFT JOIN destinations AS dest ON dest.id=zone_check.zone_id
+		WHERE zone_check.inside_zone
+		) AS sms_text
+		WHERE NOT exists (
+			SELECT sms.id
+			FROM sms_for_sending sms
+			WHERE sms.event_key=NEW.car_id
+				AND (now()::timestamp-sms.date_time)<=const_zone_violation_alarm_interval_val()
+				AND sms.sms_type='vehicle_zone_violation'
+			)
+	)
+	SELECT 
+		us.phone_cel,
+		(SELECT zone_viol.body FROM zone_viol) AS body,
+		'vehicle_zone_violation',
+		NEW.car_id
+
+	FROM sms_pattern_user_phones AS u
+	LEFT JOIN sms_patterns AS p ON p.id=u.sms_pattern_id
+	LEFT JOIN users AS us ON us.id=u.user_id
+	WHERE p.sms_type='vehicle_zone_violation' AND (SELECT zone_viol.body FROM zone_viol) IS NOT NULL
+	);
+
+	IF NEW.gps_valid = 1 THEN
+	
+		IF v_shipment_id IS NOT NULL
+		AND ( (v_cur_state='left_for_dest'::vehicle_states)
+			OR (v_cur_state='left_for_base'::vehicle_states)
+			OR (v_cur_state='busy'::vehicle_states)
+		) THEN
+			SELECT
+				CASE
+					WHEN route->'routes' IS NOT NULL AND jsonb_array_length(route->'routes')>=1 THEN route->'routes'->0->>'geometry'
+					ELSE NULL
+				END AS route_geom
+			INTO
+				v_route_geom
+			FROM vehicle_route_cashe AS t
+			WHERE
+				t.shipment_id = v_shipment_id
+				AND t.vehicle_state = v_cur_state
+				AND t.tracker_id = NEW.car_id
+			;
+			
+			IF v_route_geom IS NOT NULL THEN
+				--route exists, check if rebuild is needed
+				SELECT
+					bool_and(sub.pt_on_route) AS veh_on_route
+				INTO v_veh_on_route
+				FROM (
+					SELECT 
+						st_contains(
+							ST_LineFromEncodedPolyline((SELECT route_geom FROM cashe_data))
+							,ST_Buffer(
+								ST_GeomFromText('POINT('||tr.lon::text||' '||tr.lat::text||')', 4326)
+								,(SELECT (const_deviation_for_reroute_val()->>'distance_m')::int)
+							)
+						) AS pt_on_route
+					FROM car_tracking AS tr
+					WHERE tr.car_id = '5021511245' AND tr.gps_valid = 1
+					ORDER BY tr.period DESC
+					LIMIT (const_deviation_for_reroute_val()->>'points_cnt')::int
+				) AS sub;
+				
+				IF v_veh_on_route = FALSE THEN
+					--rebuild!
+					PERFORM pg_notify(
+						'Vehicle.rebuild_route'
+						,json_build_object(
+							'params',json_build_object(								
+								'tracker_id',NEW.car_id
+								,'shipment_id',v_shipment_id
+								,'vehicle_state', v_cur_state
+							)
+						)::text
+					);					
+				END IF;
+				
+			END IF;
+		END IF;
+			
+		--returns vehicles_last_pos struc
+		PERFORM pg_notify(
+			'Vehicle.position.'||NEW.car_id
+			,json_build_object(
+				'params',json_build_object(
+					'tracker_id',NEW.car_id
+					,'lon',NEW.lon
+					,'lat',NEW.lat
+					,'heading',NEW.heading
+					,'speed',NEW.speed
+					,'period',NEW.period+age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'ns',NEW.ns
+					,'ew',NEW.ew
+					,'recieved_dt',NEW.recieved_dt + age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'odometer',NEW.odometer::text
+					,'voltage',round(NEW.voltage,0)					
+				)
+			)::text
+		);
+	END IF;
+		
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION geo_zone_check()
+  OWNER TO beton;
+
+
+
+-- ******************* update 10/03/2021 16:50:14 ******************
+-- Function: geo_zone_check()
+
+-- DROP FUNCTION geo_zone_check();
+/**
+ */
+CREATE OR REPLACE FUNCTION geo_zone_check()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_tracker_date date;
+	v_cur_state vehicle_states;
+	v_shipment_id int;
+	v_schedule_id int;
+	v_destination_id int;
+	v_zone geometry;
+	
+	v_lon_min float;
+	v_lon_max float;
+	v_lat_min float;
+	v_lat_max float;
+	
+	v_car_rec RECORD;	
+	v_true_point boolean;
+	v_control_in boolean;
+	v_new_state vehicle_states;
+	v_point_in_zone boolean;
+
+	v_route_geom geometry;
+	v_veh_on_route bool;
+
+	V_SRID int;
+BEGIN
+	--RETURN NEW;
+	V_SRID = 0;
+	SELECT d1::date INTO v_tracker_date FROM get_shift_bounds(NEW.recieved_dt+age(now(), now() at time zone 'UTC')) AS (d1 timestamp,d2 timestamp);
+
+	--get last state
+	SELECT st.state,st.shipment_id,st.schedule_id,st.destination_id INTO v_cur_state,v_shipment_id,v_schedule_id,v_destination_id
+	FROM vehicle_schedule_states AS st
+	WHERE st.tracker_id=NEW.car_id AND st.date_time::date = v_tracker_date
+	ORDER BY st.date_time DESC LIMIT 1;
+
+	--controled states only
+	IF (v_cur_state='busy'::vehicle_states)
+	OR (v_cur_state='at_dest'::vehicle_states)
+	OR (v_cur_state='left_for_base'::vehicle_states)
+	THEN
+		-- direction to controle
+		IF (v_cur_state='busy'::vehicle_states)
+		OR (v_cur_state='left_for_base'::vehicle_states) THEN
+			v_control_in = true;
+		ELSE
+			v_control_in = false;--controling out
+		END IF;
+		
+		--coords to control
+		IF (v_cur_state='busy'::vehicle_states) THEN
+			--clients zone on shipment
+			SELECT destinations.id,
+				destinations.lon_min, destinations.lon_max,
+				destinations.lat_min, destinations.lat_max,
+				destinations.zone
+			INTO v_destination_id,v_lon_min,v_lon_max,v_lat_min,v_lat_max,v_zone
+			FROM shipments
+			LEFT JOIN orders ON orders.id=shipments.order_id
+			LEFT JOIN destinations ON destinations.id=orders.destination_id
+			WHERE shipments.id = v_shipment_id;
+
+		ELSE
+			-- base zone OR clients zone from state
+			SELECT destinations.lon_min, destinations.lon_max,
+				destinations.lat_min, destinations.lat_max,
+				destinations.zone
+			INTO v_lon_min,v_lon_max,v_lat_min,v_lat_max,v_zone
+			FROM destinations
+			WHERE destinations.id =
+				CASE v_cur_state
+					WHEN 'at_dest'::vehicle_states THEN v_destination_id
+					ELSE constant_base_geo_zone_id()
+				END;
+		END IF;		
+
+		
+		--v_point_in_zone = (NEW.lon>=v_lon_min) AND (NEW.lon<=v_lon_max) AND (NEW.lat>=v_lat_min) AND (NEW.lat<=v_lat_max);
+		--4326
+		v_point_in_zone = st_contains(v_zone, ST_GeomFromText('POINT('||NEW.lon::text||' '||NEW.lat::text||')', V_SRID));
+		
+		IF (v_control_in AND v_point_in_zone)
+		OR (v_control_in=false AND v_point_in_zone=false) THEN
+			v_true_point = true;
+		ELSE
+			v_true_point = false;
+		END IF;
+		IF v_true_point THEN
+			--check last X points to be sure
+			v_true_point = false;
+			FOR v_car_rec IN SELECT lon,lat FROM car_tracking AS t
+					WHERE t.car_id = NEW.car_id AND t.gps_valid=1
+					ORDER BY t.period DESC
+					LIMIT constant_geo_zone_check_points_count()-1 OFFSET 1
+			LOOP	
+				--RAISE EXCEPTION 'v_lon_min=%,v_lon_max=%,v_lat_min=%,v_lat_max=%',v_lon_min,v_lon_max,v_lat_min,v_lat_max;
+				--RAISE EXCEPTION 'v_car_rec.lon=%,v_car_rec.lat=%',v_car_rec.lon,v_car_rec.lat;
+				
+				--v_point_in_zone = (v_car_rec.lon>=v_lon_min) AND (v_car_rec.lon<=v_lon_max) AND (v_car_rec.lat>=v_lat_min) AND (v_car_rec.lat<=v_lat_max);
+				--4326
+				v_point_in_zone = st_contains(v_zone, ST_GeomFromText('POINT('||v_car_rec.lon::text||' '||v_car_rec.lat::text||')', V_SRID));
+				
+				v_true_point = (v_control_in AND v_point_in_zone)
+					OR (v_control_in=false AND v_point_in_zone=false);
+				--RAISE EXCEPTION 'v_point_in_zone=%',v_point_in_zone;
+				IF v_true_point = false THEN
+					EXIT;
+				END IF;
+			END LOOP;
+
+			IF v_true_point THEN
+				--current position is inside/outside zone
+				IF (v_cur_state='busy'::vehicle_states) THEN
+					v_new_state = 'at_dest'::vehicle_states;
+				ELSEIF (v_cur_state='at_dest'::vehicle_states) THEN
+					v_new_state = 'left_for_base'::vehicle_states;
+				ELSEIF (v_cur_state='left_for_base'::vehicle_states) THEN
+					v_new_state = 'free'::vehicle_states;			
+				END IF;
+
+				--change position
+				INSERT INTO vehicle_schedule_states (date_time, schedule_id, state, tracker_id,destination_id,shipment_id)
+				VALUES (CURRENT_TIMESTAMP,v_schedule_id,v_new_state,NEW.car_id,v_destination_id,v_shipment_id);
+			END IF;
+		END IF;
+	END IF;
+	
+	--*** КОНТРОЛЬ ЗАПРЕЩЕННЫХ ЗОН!!! ****
+	INSERT INTO sms_for_sending
+		(tel, body, sms_type,event_key)
+	(WITH
+	zone_viol AS (
+		SELECT
+			string_agg(sms_text.body,',') AS body
+		FROM
+		(
+		SELECT
+			sms_templates_text(
+				ARRAY[
+					ROW('plate',(SELECT plate::text FROM vehicles WHERE tracker_id=NEW.car_id))::template_value,
+					ROW('zone',dest.name::text)::template_value,
+					ROW('date_time',to_char(now(),'DD/MM/YY HH24:MI'))::template_value
+				],
+				(SELECT pattern FROM sms_patterns WHERE sms_type='vehicle_zone_violation')
+			) AS body	
+		FROM
+		(	SELECT
+				zone_contains.zone_id,
+				bool_and(zone_contains.inside_zone) AS inside_zone
+			FROM
+			(SELECT
+				destinations.id AS zone_id,
+				st_contains(
+					destinations.zone,
+					ST_GeomFromText('POINT('||last_pos.lon::text||' '||last_pos.lat::text||')', 0)
+				) AS inside_zone
+		
+			FROM tracker_zone_controls
+			LEFT JOIN destinations ON destinations.id=tracker_zone_controls.destination_id
+			CROSS JOIN (
+				SELECT
+					tr.lon,tr.lat
+				FROM car_tracking AS tr
+				WHERE tr.car_id = NEW.car_id AND tr.gps_valid=1 --16/09/20!!!
+				--(SELECT tracker_id FROM vehicles WHERE plate='864')
+				ORDER BY tr.period DESC
+				LIMIT const_geo_zone_check_points_count_val()	
+			) AS last_pos
+			) AS zone_contains	
+			GROUP BY zone_contains.zone_id
+		) AS zone_check	
+		LEFT JOIN destinations AS dest ON dest.id=zone_check.zone_id
+		WHERE zone_check.inside_zone
+		) AS sms_text
+		WHERE NOT exists (
+			SELECT sms.id
+			FROM sms_for_sending sms
+			WHERE sms.event_key=NEW.car_id
+				AND (now()::timestamp-sms.date_time)<=const_zone_violation_alarm_interval_val()
+				AND sms.sms_type='vehicle_zone_violation'
+			)
+	)
+	SELECT 
+		us.phone_cel,
+		(SELECT zone_viol.body FROM zone_viol) AS body,
+		'vehicle_zone_violation',
+		NEW.car_id
+
+	FROM sms_pattern_user_phones AS u
+	LEFT JOIN sms_patterns AS p ON p.id=u.sms_pattern_id
+	LEFT JOIN users AS us ON us.id=u.user_id
+	WHERE p.sms_type='vehicle_zone_violation' AND (SELECT zone_viol.body FROM zone_viol) IS NOT NULL
+	);
+
+	IF NEW.gps_valid = 1 THEN
+	
+		IF v_shipment_id IS NOT NULL
+		AND ( (v_cur_state='left_for_dest'::vehicle_states)
+			OR (v_cur_state='left_for_base'::vehicle_states)
+			OR (v_cur_state='busy'::vehicle_states)
+		) THEN
+			SELECT
+				CASE
+					WHEN route->'routes' IS NOT NULL AND jsonb_array_length(route->'routes')>=1 THEN route->'routes'->0->>'geometry'
+					ELSE NULL
+				END AS route_geom
+			INTO
+				v_route_geom
+			FROM vehicle_route_cashe AS t
+			WHERE
+				t.shipment_id = v_shipment_id
+				AND t.vehicle_state = v_cur_state
+				AND t.tracker_id = NEW.car_id
+			;
+			
+			IF v_route_geom IS NOT NULL THEN
+				--route exists, check if rebuild is needed
+				SELECT
+					bool_and(sub.pt_on_route) AS veh_on_route
+				INTO v_veh_on_route
+				FROM (
+					SELECT 
+						st_contains(
+							ST_LineFromEncodedPolyline((SELECT route_geom FROM cashe_data))
+							,ST_Buffer(
+								ST_GeomFromText('POINT('||tr.lon::text||' '||tr.lat::text||')', 4326)
+								,(SELECT (const_deviation_for_reroute_val()->>'distance_m')::int)
+							)
+						) AS pt_on_route
+					FROM car_tracking AS tr
+					WHERE tr.car_id = NEW.car_id AND tr.gps_valid = 1
+					ORDER BY tr.period DESC
+					LIMIT (const_deviation_for_reroute_val()->>'points_cnt')::int
+				) AS sub;
+				
+				IF v_veh_on_route = FALSE THEN
+					--rebuild!
+					PERFORM pg_notify(
+						'Vehicle.rebuild_route'
+						,json_build_object(
+							'params',json_build_object(								
+								'tracker_id',NEW.car_id
+								,'shipment_id',v_shipment_id
+								,'vehicle_state', v_cur_state
+							)
+						)::text
+					);					
+				END IF;
+				
+			END IF;
+		END IF;
+			
+		--returns vehicles_last_pos struc
+		PERFORM pg_notify(
+			'Vehicle.position.'||NEW.car_id
+			,json_build_object(
+				'params',json_build_object(
+					'tracker_id',NEW.car_id
+					,'lon',NEW.lon
+					,'lat',NEW.lat
+					,'heading',NEW.heading
+					,'speed',NEW.speed
+					,'period',NEW.period+age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'ns',NEW.ns
+					,'ew',NEW.ew
+					,'recieved_dt',NEW.recieved_dt + age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'odometer',NEW.odometer::text
+					,'voltage',round(NEW.voltage,0)					
+				)
+			)::text
+		);
+	END IF;
+		
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION geo_zone_check()
+  OWNER TO beton;
+
+
+
+-- ******************* update 10/03/2021 16:53:32 ******************
+-- Function: geo_zone_check()
+
+-- DROP FUNCTION geo_zone_check();
+/**
+ */
+CREATE OR REPLACE FUNCTION geo_zone_check()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_tracker_date date;
+	v_cur_state vehicle_states;
+	v_shipment_id int;
+	v_schedule_id int;
+	v_destination_id int;
+	v_zone geometry;
+	
+	v_lon_min float;
+	v_lon_max float;
+	v_lat_min float;
+	v_lat_max float;
+	
+	v_car_rec RECORD;	
+	v_true_point boolean;
+	v_control_in boolean;
+	v_new_state vehicle_states;
+	v_point_in_zone boolean;
+
+	v_route_geom geometry;
+	v_veh_on_route bool;
+
+	V_SRID int;
+BEGIN
+	--RETURN NEW;
+	V_SRID = 0;
+	SELECT d1::date INTO v_tracker_date FROM get_shift_bounds(NEW.recieved_dt+age(now(), now() at time zone 'UTC')) AS (d1 timestamp,d2 timestamp);
+
+	--get last state
+	SELECT st.state,st.shipment_id,st.schedule_id,st.destination_id INTO v_cur_state,v_shipment_id,v_schedule_id,v_destination_id
+	FROM vehicle_schedule_states AS st
+	WHERE st.tracker_id=NEW.car_id AND st.date_time::date = v_tracker_date
+	ORDER BY st.date_time DESC LIMIT 1;
+
+	--controled states only
+	IF (v_cur_state='busy'::vehicle_states)
+	OR (v_cur_state='at_dest'::vehicle_states)
+	OR (v_cur_state='left_for_base'::vehicle_states)
+	THEN
+		-- direction to controle
+		IF (v_cur_state='busy'::vehicle_states)
+		OR (v_cur_state='left_for_base'::vehicle_states) THEN
+			v_control_in = true;
+		ELSE
+			v_control_in = false;--controling out
+		END IF;
+		
+		--coords to control
+		IF (v_cur_state='busy'::vehicle_states) THEN
+			--clients zone on shipment
+			SELECT destinations.id,
+				destinations.lon_min, destinations.lon_max,
+				destinations.lat_min, destinations.lat_max,
+				destinations.zone
+			INTO v_destination_id,v_lon_min,v_lon_max,v_lat_min,v_lat_max,v_zone
+			FROM shipments
+			LEFT JOIN orders ON orders.id=shipments.order_id
+			LEFT JOIN destinations ON destinations.id=orders.destination_id
+			WHERE shipments.id = v_shipment_id;
+
+		ELSE
+			-- base zone OR clients zone from state
+			SELECT destinations.lon_min, destinations.lon_max,
+				destinations.lat_min, destinations.lat_max,
+				destinations.zone
+			INTO v_lon_min,v_lon_max,v_lat_min,v_lat_max,v_zone
+			FROM destinations
+			WHERE destinations.id =
+				CASE v_cur_state
+					WHEN 'at_dest'::vehicle_states THEN v_destination_id
+					ELSE constant_base_geo_zone_id()
+				END;
+		END IF;		
+
+		
+		--v_point_in_zone = (NEW.lon>=v_lon_min) AND (NEW.lon<=v_lon_max) AND (NEW.lat>=v_lat_min) AND (NEW.lat<=v_lat_max);
+		--4326
+		v_point_in_zone = st_contains(v_zone, ST_GeomFromText('POINT('||NEW.lon::text||' '||NEW.lat::text||')', V_SRID));
+		
+		IF (v_control_in AND v_point_in_zone)
+		OR (v_control_in=false AND v_point_in_zone=false) THEN
+			v_true_point = true;
+		ELSE
+			v_true_point = false;
+		END IF;
+		IF v_true_point THEN
+			--check last X points to be sure
+			v_true_point = false;
+			FOR v_car_rec IN SELECT lon,lat FROM car_tracking AS t
+					WHERE t.car_id = NEW.car_id AND t.gps_valid=1
+					ORDER BY t.period DESC
+					LIMIT constant_geo_zone_check_points_count()-1 OFFSET 1
+			LOOP	
+				--RAISE EXCEPTION 'v_lon_min=%,v_lon_max=%,v_lat_min=%,v_lat_max=%',v_lon_min,v_lon_max,v_lat_min,v_lat_max;
+				--RAISE EXCEPTION 'v_car_rec.lon=%,v_car_rec.lat=%',v_car_rec.lon,v_car_rec.lat;
+				
+				--v_point_in_zone = (v_car_rec.lon>=v_lon_min) AND (v_car_rec.lon<=v_lon_max) AND (v_car_rec.lat>=v_lat_min) AND (v_car_rec.lat<=v_lat_max);
+				--4326
+				v_point_in_zone = st_contains(v_zone, ST_GeomFromText('POINT('||v_car_rec.lon::text||' '||v_car_rec.lat::text||')', V_SRID));
+				
+				v_true_point = (v_control_in AND v_point_in_zone)
+					OR (v_control_in=false AND v_point_in_zone=false);
+				--RAISE EXCEPTION 'v_point_in_zone=%',v_point_in_zone;
+				IF v_true_point = false THEN
+					EXIT;
+				END IF;
+			END LOOP;
+
+			IF v_true_point THEN
+				--current position is inside/outside zone
+				IF (v_cur_state='busy'::vehicle_states) THEN
+					v_new_state = 'at_dest'::vehicle_states;
+				ELSEIF (v_cur_state='at_dest'::vehicle_states) THEN
+					v_new_state = 'left_for_base'::vehicle_states;
+				ELSEIF (v_cur_state='left_for_base'::vehicle_states) THEN
+					v_new_state = 'free'::vehicle_states;			
+				END IF;
+
+				--change position
+				INSERT INTO vehicle_schedule_states (date_time, schedule_id, state, tracker_id,destination_id,shipment_id)
+				VALUES (CURRENT_TIMESTAMP,v_schedule_id,v_new_state,NEW.car_id,v_destination_id,v_shipment_id);
+			END IF;
+		END IF;
+	END IF;
+	
+	--*** КОНТРОЛЬ ЗАПРЕЩЕННЫХ ЗОН!!! ****
+	INSERT INTO sms_for_sending
+		(tel, body, sms_type,event_key)
+	(WITH
+	zone_viol AS (
+		SELECT
+			string_agg(sms_text.body,',') AS body
+		FROM
+		(
+		SELECT
+			sms_templates_text(
+				ARRAY[
+					ROW('plate',(SELECT plate::text FROM vehicles WHERE tracker_id=NEW.car_id))::template_value,
+					ROW('zone',dest.name::text)::template_value,
+					ROW('date_time',to_char(now(),'DD/MM/YY HH24:MI'))::template_value
+				],
+				(SELECT pattern FROM sms_patterns WHERE sms_type='vehicle_zone_violation')
+			) AS body	
+		FROM
+		(	SELECT
+				zone_contains.zone_id,
+				bool_and(zone_contains.inside_zone) AS inside_zone
+			FROM
+			(SELECT
+				destinations.id AS zone_id,
+				st_contains(
+					destinations.zone,
+					ST_GeomFromText('POINT('||last_pos.lon::text||' '||last_pos.lat::text||')', 0)
+				) AS inside_zone
+		
+			FROM tracker_zone_controls
+			LEFT JOIN destinations ON destinations.id=tracker_zone_controls.destination_id
+			CROSS JOIN (
+				SELECT
+					tr.lon,tr.lat
+				FROM car_tracking AS tr
+				WHERE tr.car_id = NEW.car_id AND tr.gps_valid=1 --16/09/20!!!
+				--(SELECT tracker_id FROM vehicles WHERE plate='864')
+				ORDER BY tr.period DESC
+				LIMIT const_geo_zone_check_points_count_val()	
+			) AS last_pos
+			) AS zone_contains	
+			GROUP BY zone_contains.zone_id
+		) AS zone_check	
+		LEFT JOIN destinations AS dest ON dest.id=zone_check.zone_id
+		WHERE zone_check.inside_zone
+		) AS sms_text
+		WHERE NOT exists (
+			SELECT sms.id
+			FROM sms_for_sending sms
+			WHERE sms.event_key=NEW.car_id
+				AND (now()::timestamp-sms.date_time)<=const_zone_violation_alarm_interval_val()
+				AND sms.sms_type='vehicle_zone_violation'
+			)
+	)
+	SELECT 
+		us.phone_cel,
+		(SELECT zone_viol.body FROM zone_viol) AS body,
+		'vehicle_zone_violation',
+		NEW.car_id
+
+	FROM sms_pattern_user_phones AS u
+	LEFT JOIN sms_patterns AS p ON p.id=u.sms_pattern_id
+	LEFT JOIN users AS us ON us.id=u.user_id
+	WHERE p.sms_type='vehicle_zone_violation' AND (SELECT zone_viol.body FROM zone_viol) IS NOT NULL
+	);
+
+	IF NEW.gps_valid = 1 THEN
+	
+		IF v_shipment_id IS NOT NULL
+		AND ( (v_cur_state='left_for_dest'::vehicle_states)
+			OR (v_cur_state='left_for_base'::vehicle_states)
+			OR (v_cur_state='busy'::vehicle_states)
+		) THEN
+			SELECT
+				CASE
+					WHEN route->'routes' IS NOT NULL AND jsonb_array_length(route->'routes')>=1 THEN route->'routes'->0->>'geometry'
+					ELSE NULL
+				END AS route_geom
+			INTO
+				v_route_geom
+			FROM vehicle_route_cashe AS t
+			WHERE
+				t.shipment_id = v_shipment_id
+				AND t.vehicle_state = v_cur_state
+				AND t.tracker_id = NEW.car_id
+			;
+			
+			IF v_route_geom IS NOT NULL THEN
+				--route exists, check if rebuild is needed
+				SELECT
+					bool_and(sub.pt_on_route) AS veh_on_route
+				INTO v_veh_on_route
+				FROM (
+					SELECT 
+						st_contains(
+							ST_LineFromEncodedPolyline(v_route_geom)
+							,ST_Buffer(
+								ST_GeomFromText('POINT('||tr.lon::text||' '||tr.lat::text||')', 4326)
+								,(SELECT (const_deviation_for_reroute_val()->>'distance_m')::int)
+							)
+						) AS pt_on_route
+					FROM car_tracking AS tr
+					WHERE tr.car_id = NEW.car_id AND tr.gps_valid = 1
+					ORDER BY tr.period DESC
+					LIMIT (const_deviation_for_reroute_val()->>'points_cnt')::int
+				) AS sub;
+				
+				IF v_veh_on_route = FALSE THEN
+					--rebuild!
+					PERFORM pg_notify(
+						'Vehicle.rebuild_route'
+						,json_build_object(
+							'params',json_build_object(								
+								'tracker_id',NEW.car_id
+								,'shipment_id',v_shipment_id
+								,'vehicle_state', v_cur_state
+							)
+						)::text
+					);					
+				END IF;
+				
+			END IF;
+		END IF;
+			
+		--returns vehicles_last_pos struc
+		PERFORM pg_notify(
+			'Vehicle.position.'||NEW.car_id
+			,json_build_object(
+				'params',json_build_object(
+					'tracker_id',NEW.car_id
+					,'lon',NEW.lon
+					,'lat',NEW.lat
+					,'heading',NEW.heading
+					,'speed',NEW.speed
+					,'period',NEW.period+age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'ns',NEW.ns
+					,'ew',NEW.ew
+					,'recieved_dt',NEW.recieved_dt + age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'odometer',NEW.odometer::text
+					,'voltage',round(NEW.voltage,0)					
+				)
+			)::text
+		);
+	END IF;
+		
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION geo_zone_check()
+  OWNER TO beton;
+
+
+
+-- ******************* update 10/03/2021 17:00:34 ******************
+-- Function: geo_zone_check()
+
+-- DROP FUNCTION geo_zone_check();
+/**
+ */
+CREATE OR REPLACE FUNCTION geo_zone_check()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_tracker_date date;
+	v_cur_state vehicle_states;
+	v_shipment_id int;
+	v_schedule_id int;
+	v_destination_id int;
+	v_zone geometry;
+	
+	v_lon_min float;
+	v_lon_max float;
+	v_lat_min float;
+	v_lat_max float;
+	
+	v_car_rec RECORD;	
+	v_true_point boolean;
+	v_control_in boolean;
+	v_new_state vehicle_states;
+	v_point_in_zone boolean;
+
+	v_route_geom geometry;
+	v_veh_on_route bool;
+
+	V_SRID int;
+BEGIN
+	--RETURN NEW;
+	V_SRID = 0;
+	SELECT d1::date INTO v_tracker_date FROM get_shift_bounds(NEW.recieved_dt+age(now(), now() at time zone 'UTC')) AS (d1 timestamp,d2 timestamp);
+
+	--get last state
+	SELECT st.state,st.shipment_id,st.schedule_id,st.destination_id INTO v_cur_state,v_shipment_id,v_schedule_id,v_destination_id
+	FROM vehicle_schedule_states AS st
+	WHERE st.tracker_id=NEW.car_id AND st.date_time::date = v_tracker_date
+	ORDER BY st.date_time DESC LIMIT 1;
+
+	--controled states only
+	IF (v_cur_state='busy'::vehicle_states)
+	OR (v_cur_state='at_dest'::vehicle_states)
+	OR (v_cur_state='left_for_base'::vehicle_states)
+	THEN
+		-- direction to controle
+		IF (v_cur_state='busy'::vehicle_states)
+		OR (v_cur_state='left_for_base'::vehicle_states) THEN
+			v_control_in = true;
+		ELSE
+			v_control_in = false;--controling out
+		END IF;
+		
+		--coords to control
+		IF (v_cur_state='busy'::vehicle_states) THEN
+			--clients zone on shipment
+			SELECT destinations.id,
+				destinations.lon_min, destinations.lon_max,
+				destinations.lat_min, destinations.lat_max,
+				destinations.zone
+			INTO v_destination_id,v_lon_min,v_lon_max,v_lat_min,v_lat_max,v_zone
+			FROM shipments
+			LEFT JOIN orders ON orders.id=shipments.order_id
+			LEFT JOIN destinations ON destinations.id=orders.destination_id
+			WHERE shipments.id = v_shipment_id;
+
+		ELSE
+			-- base zone OR clients zone from state
+			SELECT destinations.lon_min, destinations.lon_max,
+				destinations.lat_min, destinations.lat_max,
+				destinations.zone
+			INTO v_lon_min,v_lon_max,v_lat_min,v_lat_max,v_zone
+			FROM destinations
+			WHERE destinations.id =
+				CASE v_cur_state
+					WHEN 'at_dest'::vehicle_states THEN v_destination_id
+					ELSE constant_base_geo_zone_id()
+				END;
+		END IF;		
+
+		
+		--v_point_in_zone = (NEW.lon>=v_lon_min) AND (NEW.lon<=v_lon_max) AND (NEW.lat>=v_lat_min) AND (NEW.lat<=v_lat_max);
+		--4326
+		v_point_in_zone = st_contains(v_zone, ST_GeomFromText('POINT('||NEW.lon::text||' '||NEW.lat::text||')', V_SRID));
+		
+		IF (v_control_in AND v_point_in_zone)
+		OR (v_control_in=false AND v_point_in_zone=false) THEN
+			v_true_point = true;
+		ELSE
+			v_true_point = false;
+		END IF;
+		IF v_true_point THEN
+			--check last X points to be sure
+			v_true_point = false;
+			FOR v_car_rec IN SELECT lon,lat FROM car_tracking AS t
+					WHERE t.car_id = NEW.car_id AND t.gps_valid=1
+					ORDER BY t.period DESC
+					LIMIT constant_geo_zone_check_points_count()-1 OFFSET 1
+			LOOP	
+				--RAISE EXCEPTION 'v_lon_min=%,v_lon_max=%,v_lat_min=%,v_lat_max=%',v_lon_min,v_lon_max,v_lat_min,v_lat_max;
+				--RAISE EXCEPTION 'v_car_rec.lon=%,v_car_rec.lat=%',v_car_rec.lon,v_car_rec.lat;
+				
+				--v_point_in_zone = (v_car_rec.lon>=v_lon_min) AND (v_car_rec.lon<=v_lon_max) AND (v_car_rec.lat>=v_lat_min) AND (v_car_rec.lat<=v_lat_max);
+				--4326
+				v_point_in_zone = st_contains(v_zone, ST_GeomFromText('POINT('||v_car_rec.lon::text||' '||v_car_rec.lat::text||')', V_SRID));
+				
+				v_true_point = (v_control_in AND v_point_in_zone)
+					OR (v_control_in=false AND v_point_in_zone=false);
+				--RAISE EXCEPTION 'v_point_in_zone=%',v_point_in_zone;
+				IF v_true_point = false THEN
+					EXIT;
+				END IF;
+			END LOOP;
+
+			IF v_true_point THEN
+				--current position is inside/outside zone
+				IF (v_cur_state='busy'::vehicle_states) THEN
+					v_new_state = 'at_dest'::vehicle_states;
+				ELSEIF (v_cur_state='at_dest'::vehicle_states) THEN
+					v_new_state = 'left_for_base'::vehicle_states;
+				ELSEIF (v_cur_state='left_for_base'::vehicle_states) THEN
+					v_new_state = 'free'::vehicle_states;			
+				END IF;
+
+				--change position
+				INSERT INTO vehicle_schedule_states (date_time, schedule_id, state, tracker_id,destination_id,shipment_id)
+				VALUES (CURRENT_TIMESTAMP,v_schedule_id,v_new_state,NEW.car_id,v_destination_id,v_shipment_id);
+			END IF;
+		END IF;
+	END IF;
+	
+	--*** КОНТРОЛЬ ЗАПРЕЩЕННЫХ ЗОН!!! ****
+	INSERT INTO sms_for_sending
+		(tel, body, sms_type,event_key)
+	(WITH
+	zone_viol AS (
+		SELECT
+			string_agg(sms_text.body,',') AS body
+		FROM
+		(
+		SELECT
+			sms_templates_text(
+				ARRAY[
+					ROW('plate',(SELECT plate::text FROM vehicles WHERE tracker_id=NEW.car_id))::template_value,
+					ROW('zone',dest.name::text)::template_value,
+					ROW('date_time',to_char(now(),'DD/MM/YY HH24:MI'))::template_value
+				],
+				(SELECT pattern FROM sms_patterns WHERE sms_type='vehicle_zone_violation')
+			) AS body	
+		FROM
+		(	SELECT
+				zone_contains.zone_id,
+				bool_and(zone_contains.inside_zone) AS inside_zone
+			FROM
+			(SELECT
+				destinations.id AS zone_id,
+				st_contains(
+					destinations.zone,
+					ST_GeomFromText('POINT('||last_pos.lon::text||' '||last_pos.lat::text||')', 0)
+				) AS inside_zone
+		
+			FROM tracker_zone_controls
+			LEFT JOIN destinations ON destinations.id=tracker_zone_controls.destination_id
+			CROSS JOIN (
+				SELECT
+					tr.lon,tr.lat
+				FROM car_tracking AS tr
+				WHERE tr.car_id = NEW.car_id AND tr.gps_valid=1 --16/09/20!!!
+				--(SELECT tracker_id FROM vehicles WHERE plate='864')
+				ORDER BY tr.period DESC
+				LIMIT const_geo_zone_check_points_count_val()	
+			) AS last_pos
+			) AS zone_contains	
+			GROUP BY zone_contains.zone_id
+		) AS zone_check	
+		LEFT JOIN destinations AS dest ON dest.id=zone_check.zone_id
+		WHERE zone_check.inside_zone
+		) AS sms_text
+		WHERE NOT exists (
+			SELECT sms.id
+			FROM sms_for_sending sms
+			WHERE sms.event_key=NEW.car_id
+				AND (now()::timestamp-sms.date_time)<=const_zone_violation_alarm_interval_val()
+				AND sms.sms_type='vehicle_zone_violation'
+			)
+	)
+	SELECT 
+		us.phone_cel,
+		(SELECT zone_viol.body FROM zone_viol) AS body,
+		'vehicle_zone_violation',
+		NEW.car_id
+
+	FROM sms_pattern_user_phones AS u
+	LEFT JOIN sms_patterns AS p ON p.id=u.sms_pattern_id
+	LEFT JOIN users AS us ON us.id=u.user_id
+	WHERE p.sms_type='vehicle_zone_violation' AND (SELECT zone_viol.body FROM zone_viol) IS NOT NULL
+	);
+
+	IF NEW.gps_valid = 1 THEN
+	
+		IF v_shipment_id IS NOT NULL
+		AND ( (v_cur_state='left_for_dest'::vehicle_states)
+			OR (v_cur_state='left_for_base'::vehicle_states)
+			OR (v_cur_state='busy'::vehicle_states)
+		) THEN
+			SELECT
+				CASE
+					WHEN route->'routes' IS NOT NULL AND jsonb_array_length(route->'routes')>=1
+					THEN ST_LineFromEncodedPolyline(route->'routes'->0->>'geometry')
+					ELSE NULL
+				END AS route_geom
+			INTO
+				v_route_geom
+			FROM vehicle_route_cashe AS t
+			WHERE
+				t.shipment_id = v_shipment_id
+				AND t.vehicle_state = v_cur_state
+				AND t.tracker_id = NEW.car_id
+			;
+			
+			IF v_route_geom IS NOT NULL THEN
+				--route exists, check if rebuild is needed
+				SELECT
+					bool_and(sub.pt_on_route) AS veh_on_route
+				INTO v_veh_on_route
+				FROM (
+					SELECT 
+						st_contains(
+							v_route_geom
+							,ST_Buffer(
+								ST_GeomFromText('POINT('||tr.lon::text||' '||tr.lat::text||')', 4326)
+								,(SELECT (const_deviation_for_reroute_val()->>'distance_m')::int)
+							)
+						) AS pt_on_route
+					FROM car_tracking AS tr
+					WHERE tr.car_id = NEW.car_id AND tr.gps_valid = 1
+					ORDER BY tr.period DESC
+					LIMIT (const_deviation_for_reroute_val()->>'points_cnt')::int
+				) AS sub;
+				
+				IF v_veh_on_route = FALSE THEN
+					--rebuild!
+					PERFORM pg_notify(
+						'Vehicle.rebuild_route'
+						,json_build_object(
+							'params',json_build_object(								
+								'tracker_id',NEW.car_id
+								,'shipment_id',v_shipment_id
+								,'vehicle_state', v_cur_state
+							)
+						)::text
+					);					
+				END IF;
+				
+			END IF;
+		END IF;
+			
+		--returns vehicles_last_pos struc
+		PERFORM pg_notify(
+			'Vehicle.position.'||NEW.car_id
+			,json_build_object(
+				'params',json_build_object(
+					'tracker_id',NEW.car_id
+					,'lon',NEW.lon
+					,'lat',NEW.lat
+					,'heading',NEW.heading
+					,'speed',NEW.speed
+					,'period',NEW.period+age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'ns',NEW.ns
+					,'ew',NEW.ew
+					,'recieved_dt',NEW.recieved_dt + age(now(), timezone('UTC'::text, now())::timestamp with time zone)
+					,'odometer',NEW.odometer::text
+					,'voltage',round(NEW.voltage,0)					
+				)
+			)::text
+		);
+	END IF;
+		
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION geo_zone_check()
+  OWNER TO beton;
+
+
+
+-- ******************* update 11/03/2021 08:55:50 ******************
+-- Function: const_base_geo_zone_process()
+
+-- DROP FUNCTION const_base_geo_zone_process();
+
+CREATE OR REPLACE FUNCTION const_base_geo_zone_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	IF (TG_WHEN='AFTER' AND TG_OP='UPDATE') THEN
+		IF coalesce(OLD.val,'') <> coalesce(NEW.val) AND NEW.val IS NOT NULL AND NEW.val->'keys' IS NOT NULL THEN		
+			UPDATE const_base_geo_zone_id SET val = (NEW.val->'keys'->>'id')::int;
+		END IF;
+		
+		RETURN NEW;
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION const_base_geo_zone_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 11/03/2021 08:56:54 ******************
+-- Trigger: const_base_geo_zone_trigger_after on public.const_base_geo_zone
+
+-- DROP TRIGGER const_base_geo_zone_trigger_after ON public.const_base_geo_zone;
+
+
+CREATE TRIGGER const_base_geo_zone_trigger_after
+  AFTER UPDATE
+  ON public.const_base_geo_zone
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.const_base_geo_zone_process();
+
+

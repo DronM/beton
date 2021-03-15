@@ -25,6 +25,9 @@ DECLARE
 	v_new_state vehicle_states;
 	v_point_in_zone boolean;
 
+	v_route_geom geometry;
+	v_veh_on_route bool;
+
 	V_SRID int;
 BEGIN
 	--RETURN NEW;
@@ -196,6 +199,64 @@ BEGIN
 	);
 
 	IF NEW.gps_valid = 1 THEN
+	
+		IF v_shipment_id IS NOT NULL
+		AND ( (v_cur_state='left_for_dest'::vehicle_states)
+			OR (v_cur_state='left_for_base'::vehicle_states)
+			OR (v_cur_state='busy'::vehicle_states)
+		) THEN
+			SELECT
+				CASE
+					WHEN route->'routes' IS NOT NULL AND jsonb_array_length(route->'routes')>=1
+					THEN ST_LineFromEncodedPolyline(route->'routes'->0->>'geometry')
+					ELSE NULL
+				END AS route_geom
+			INTO
+				v_route_geom
+			FROM vehicle_route_cashe AS t
+			WHERE
+				t.shipment_id = v_shipment_id
+				AND t.vehicle_state = v_cur_state
+				AND t.tracker_id = NEW.car_id
+			;
+			
+			IF v_route_geom IS NOT NULL THEN
+				--route exists, check if rebuild is needed
+				SELECT
+					bool_and(sub.pt_on_route) AS veh_on_route
+				INTO v_veh_on_route
+				FROM (
+					SELECT 
+						st_contains(
+							v_route_geom
+							,ST_Buffer(
+								ST_GeomFromText('POINT('||tr.lon::text||' '||tr.lat::text||')', 4326)
+								,(SELECT (const_deviation_for_reroute_val()->>'distance_m')::int)
+							)
+						) AS pt_on_route
+					FROM car_tracking AS tr
+					WHERE tr.car_id = NEW.car_id AND tr.gps_valid = 1
+					ORDER BY tr.period DESC
+					LIMIT (const_deviation_for_reroute_val()->>'points_cnt')::int
+				) AS sub;
+				
+				IF v_veh_on_route = FALSE THEN
+					--rebuild!
+					PERFORM pg_notify(
+						'Vehicle.rebuild_route'
+						,json_build_object(
+							'params',json_build_object(								
+								'tracker_id',NEW.car_id
+								,'shipment_id',v_shipment_id
+								,'vehicle_state', v_cur_state
+							)
+						)::text
+					);					
+				END IF;
+				
+			END IF;
+		END IF;
+			
 		--returns vehicles_last_pos struc
 		PERFORM pg_notify(
 			'Vehicle.position.'||NEW.car_id

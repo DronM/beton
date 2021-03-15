@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2021-03-05 08:55:29</lastBuild></version>
+		<lastBuild>2021-03-15 07:18:45</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -99,7 +99,7 @@
 		<version dateOpen="2020-11-02 17:11:16" dateClose="2020-11-03 05:11:41">1.00193</version>
 		<version dateOpen="2020-11-03 13:11:14" dateClose="2020-11-03 13:11:16">1.00194</version>
 		<version dateOpen="2020-12-01 17:12:50" dateClose="2021-02-18 12:02:39">1.00195</version>
-	<version dateOpen="2021-02-18 14:02:48" dateClose="2021-02-18 16:02:57">1.00196</version><version dateOpen="2021-02-25 11:02:29" dateClose="2021-02-26 09:02:08">1.00197</version><version dateOpen="2021-02-26 17:02:26" dateClose="2021-02-26 17:02:27">1.00198</version><version dateOpen="2021-03-05 08:03:54" dateClose="2021-03-05 08:03:55">1.00199</version></versions>
+	<version dateOpen="2021-02-18 14:02:48" dateClose="2021-02-18 16:02:57">1.00196</version><version dateOpen="2021-02-25 11:02:29" dateClose="2021-02-26 09:02:08">1.00197</version><version dateOpen="2021-02-26 17:02:26" dateClose="2021-02-26 17:02:27">1.00198</version><version dateOpen="2021-03-05 08:03:54" dateClose="2021-03-05 08:03:55">1.00199</version><version dateOpen="2021-03-05 09:03:04" dateClose="2021-03-15 07:03:18">1.00200</version></versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
 		<field id="vehicle_owner_client_list"/>
@@ -1736,7 +1736,7 @@
 				<field id="date_time"/>
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
-			<field id="date_time" dataType="DateTime" required="TRUE" alias="Дата"/>
+			<field id="date_time" dataType="DateTime" dbRequired="TRUE" alias="Дата"/>
 			<field id="number" dataType="String" length="11" alias="Номер"/>
 			<field id="doc_ref" dataType="String" length="36"/>
 			<field id="processed" dataType="Bool" alias="Проведен" default="false"/>
@@ -1762,13 +1762,23 @@
 			<index id="doc_material_procurements_material_id_index">
 				<field id="material_id"/>
 			</index>
+			<index id="doc_material_procurements_driver_idx">
+				<field id="driver"/>
+			</index>
+			<index id="doc_material_procurements_vehicle_plate_idx">
+				<field id="vehicle_plate"/>
+			</index>
+			<index id="doc_material_procurements_store_idx">
+				<field id="store"/>
+			</index>
+			
 			<registerAtcs>
 				<register id="RAMaterial"/>
 				<register id="RAMaterialFact"/>
 				<register id="RACement"/>
 			</registerAtcs>
 		</model>
-		<model id="DOCMaterialProcurementList" parent="ModelSQLDOC" dataTable="doc_material_procurements_list" virtual="TRUE">
+		<model id="DOCMaterialProcurementList" parent="ModelSQLDOC" dataTable="doc_material_procurements_list" virtual="TRUE" baseModelId="DOCMaterialProcurement">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Идентификатор"/>
 			<field id="date_time" dataType="DateTime" alias="Дата"/>
 			<field id="number" dataType="String" alias="Номер 1с"/>
@@ -1787,6 +1797,16 @@
 			<field id="quant_net" dataType="Float" length="19" precision="4" alias="Вес чистый"/>
 			<field id="store" dataType="String" alias="Склад"/>
 		</model>
+		<model id="DOCMaterialProcurementDriverList" parent="ModelSQLDOC" dataTable="doc_material_procurements_driver_list" virtual="TRUE">
+			<field id="driver" dataType="String" primaryKey="TRUE" alias="Водитель"/>
+		</model>
+		<model id="DOCMaterialProcurementVehicleList" parent="ModelSQLDOC" dataTable="doc_material_procurements_vehicle_list" virtual="TRUE">
+			<field id="vehicle_plate" dataType="String" primaryKey="TRUE" alias="ТС"/>
+		</model>
+		<model id="DOCMaterialProcurementStoreList" parent="ModelSQLDOC" dataTable="doc_material_procurements_store_list" virtual="TRUE">
+			<field id="store" dataType="String" primaryKey="TRUE" alias="Склад"/>
+		</model>
+		
 		<model id="DOCMaterialProcurementShiftList" parent="ModelSQLDOC" dataTable="doc_material_procurements_shift_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="shift_date_time" dataType="DateTime"/>
@@ -3415,7 +3435,7 @@
 		<constant id="order_grid_refresh_interval" name="Период обновления таблицы с заявками" descr="Период обновления таблицы с заявками в секундах" dataType="Int" defaultValue="5" autoload="TRUE"/>
 		<constant id="backup_vehicles_feature" name="Свойство - запасные автомобили" descr="Автомобили с таким значением свойств являются запасными" dataType="String" length="20" defaultValue="запас"/>
 		<constant id="base_geo_zone_id" name="Код зоны завода" descr="" dataType="Int" defaultValue="0"/>
-		<constant id="base_geo_zone" name="Зона завода" descr="" dataType="Int" refTable="destinations" refField="id" defaultValue="0"/>
+		<constant id="base_geo_zone" name="Зона завода" descr="" dataType="Int" refTable="destinations" refField="id" defaultValue="0" ctrlClass="DestinationEdit"/>
 		<constant id="chart_step_min" name="Шаг для графика (минут)" descr="Определяет значение в минутах с каким шагом отрисовывать график" dataType="Int" defaultValue="60"/>
 		<constant id="day_shift_length" name="Интервал дневной смены" descr="Используется для расчета разных значений, например 13 часов, если день считается с 7-00 до 20-00" dataType="Time" defaultValue="13:00"/>
 		<constant id="days_allowed_with_broken_tracker" name="Сколько дней будет разрешена отгрузка со сломанным трэкером" descr="" dataType="Int" defaultValue="5"/>
@@ -3562,6 +3582,12 @@
 				<field id="id" dataType="Int"/>
 			</publicMethod>
 			<publicMethod id="get_current_position_all"/>
+			<publicMethod id="get_route">
+				<field id="shipment_id" dataType="Int" required="TRUE"/>
+				<field id="tracker_id" dataType="String" length="20" required="TRUE"/>
+				<field id="vehicle_state" dataType="Enum" enumId="vehicle_states" required="TRUE"/>
+			</publicMethod>
+			
 			<publicMethod id="get_track">
 				<field id="id" dataType="Int"/>
 				<field id="dt_from" dataType="DateTime"/>
@@ -4073,6 +4099,22 @@
 			</publicMethod>
 			<publicMethod id="get_material_list" condFields="TRUE"/>
 			<publicMethod id="get_shift_list" condFields="TRUE" modelId="DOCMaterialProcurementShiftList"/>
+			<publicMethod id="complete_driver" modelId="DOCMaterialProcurementDriverList">
+				<field id="driver" dataType="String" length="300"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="complete_vehicle_plate" modelId="DOCMaterialProcurementVehicleList">
+				<field id="vehicle_plate" dataType="String" length="300"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="complete_store" modelId="DOCMaterialProcurementStoreList">
+				<field id="store" dataType="String" length="300"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
+			
 		</controller>
 		<controller id="DOCMaterialInventory" parentId="ControllerSQLDOC" state="TRUE">
 			<publicMethod id="insert" modelId="DOCMaterialInventory"/>
@@ -5449,6 +5491,7 @@
 		<jsScript file="views/ShipmentDateList_View.js"/>
 		<jsScript file="views/AstCallList_View.js"/>
 		<jsScript file="views/DOCMaterialProcurementList_View.js"/>
+		<jsScript file="views/DOCMaterialProcurementDialog_View.js"/>
 		<jsScript file="views/DOCMaterialProcurementShiftList_View.js"/>
 		<jsScript file="views/ShipmentForOrderList_View.js"/>
 		<jsScript file="views/RawMaterialConsRateDateList_View.js"/>
@@ -5581,6 +5624,8 @@
 		<jsScript file="forms/ShipmentList_Form.js"/>
 		<jsScript file="forms/RawMaterial_Form.js"/>
 		<jsScript file="forms/RawMaterialConsRateDateList_Form.js"/>
+		<jsScript file="forms/DOCMaterialProcurementDialog_Form.js"/>
+		
 		<!--custom controls-->
 		<jsScript file="tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="custom_controls/App.enums.js"/>
@@ -6000,7 +6045,7 @@
 		<jsScript file="models/LoginDeviceList_Model.js"/>
 		<jsScript file="models/LoginDeviceBan_Model.js"/>
 		<jsScript file="controllers/LoginDeviceBan_Controller.js"/>
-	<jsScript file="models/Event_Model.js"/></jsScripts>
+	<jsScript file="models/Event_Model.js"/><jsScript file="models/DOCMaterialProcurementDriverList_Model.js"/><jsScript file="models/DOCMaterialProcurementVehicleList_Model.js"/><jsScript file="models/DOCMaterialProcurementStoreList_Model.js"/></jsScripts>
 	<cssScripts>
 		<cssScript file="assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>
 		<cssScript file="assets/css/bootstrap.css" compressed="FALSE" standalone="TRUE"/>

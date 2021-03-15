@@ -11,6 +11,7 @@ DECLARE
 	v_client_repres_post text;
 	v_client_name text;
 	v_tel_formatted text;
+	v_event_id text;
 BEGIN
 	IF (TG_OP='INSERT') THEN
 		NEW.dt = now()::timestamp;
@@ -56,28 +57,29 @@ BEGIN
 			IF NEW.call_type='in'::call_types
 			AND NEW.end_time IS NULL
 			THEN
-				PERFORM pg_notify(
-					'AstCall.in_call'
-					,json_build_object(
-						'params',json_build_object(
-							'client_id',NEW.client_id
-							,'client_name',v_client_name
-							,'tel',v_tel_formatted
-							,'client_repres_name',v_client_repres_name
-							,'client_repres_post',v_client_repres_post
-							,'oper','insert'
-							,'unique_id',NEW.unique_id
-						)
-					)::text
-				);
-					
-				IF NEW.ext IS NOT NULL THEN
+				IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+					v_event_id = 'AstCall.in_call';
+				ELSIF NEW.ext IS NOT NULL THEN
 					--extension exists!
-					PERFORM pg_notify(
-						'AstCall.in_call.'||NEW.ext
-						,NULL
-					);
+					v_event_id = 'AstCall.in_call.'||NEW.ext;
 				END IF;	
+				
+				IF v_event_id IS NOT NULL THEN
+					PERFORM pg_notify(
+						v_event_id
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+								,'ext',NEW.ext
+								,'unique_id',NEW.unique_id
+							)
+						)::text
+					);
+				END IF;
 			END IF;			
 			
 		END IF;
@@ -113,35 +115,45 @@ BEGIN
 					ORDER BY ast_calls.dt DESC NULLS LAST
 					LIMIT 1;
 					
-					PERFORM pg_notify(
-						'AstCall.in_call'
-						,json_build_object(
-							'params',json_build_object(
-								'client_id',NEW.client_id
-								,'client_name',v_client_name
-								,'tel',v_tel_formatted
-								,'client_repres_name',v_client_repres_name
-								,'client_repres_post',v_client_repres_post
-								,'oper','update'
-								,'unique_id',NEW.unique_id
-							)
-						)::text
-					);
+					IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+						v_event_id = 'AstCall.in_call';
+					ELSIF NEW.ext IS NOT NULL THEN
+						--extension exists!
+						v_event_id = 'AstCall.in_call.'||NEW.ext;
+					END IF;	
+					
+					IF v_event_id IS NOT NULL THEN
+						PERFORM pg_notify(
+							v_event_id
+							,json_build_object(
+								'params',json_build_object(
+									'client_id',NEW.client_id
+									,'client_name',v_client_name
+									,'tel',v_tel_formatted
+									,'client_repres_name',v_client_repres_name
+									,'client_repres_post',v_client_repres_post
+									,'ext',NEW.ext
+									,'unique_id',NEW.unique_id
+								)
+							)::text
+						);
+					END IF;
 					
 				END IF;
 				
 			END IF;
 		
 			--notifications
-			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL THEN
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
 				PERFORM pg_notify(
 					'AstCall.hangup.'||NEW.ext
 					,NULL
 				);
 				
-			ELSIF NEW.end_time IS NULL AND coalesce(OLD.ext,'')<>coalesce(NEW.ext,'') THEN	
+			ELSIF NEW.end_time IS NULL AND OLD.start_time IS NULL AND NEW.start_time IS NOT NULL
+			 AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
 				PERFORM pg_notify(
-					'AstCall.in_call.'||NEW.ext
+					'AstCall.pickup.'||NEW.ext
 					,NULL
 				);
 				

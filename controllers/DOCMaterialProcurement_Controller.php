@@ -27,7 +27,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
-class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
+class DOCMaterialProcurement_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL){
 		parent::__construct($dbLinkMaster);
 			
@@ -35,7 +35,7 @@ class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
 		/* insert */
 		$pm = new PublicMethod('insert');
 		$param = new FieldExtDateTime('date_time'
-				,array('required'=>TRUE,
+				,array(
 				'alias'=>'Дата'
 			));
 		$pm->addParam($param);
@@ -336,14 +336,88 @@ class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
 
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('complete_driver');
+		
+				
+	$opts=array();
+	
+		$opts['alias']='Водитель';		
+		$pm->addParam(new FieldExtString('driver',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('ic',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('mid',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('complete_vehicle_plate');
+		
+				
+	$opts=array();
+	
+		$opts['alias']='ТС';		
+		$pm->addParam(new FieldExtString('vehicle_plate',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('ic',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('mid',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('complete_store');
+		
+				
+	$opts=array();
+	
+		$opts['alias']='Склад';		
+		$pm->addParam(new FieldExtString('store',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('ic',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('mid',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
 		
 	}
 	
 	public function insert($pm){
 		//doc owner
-		$pm->setParamValue('user_id',$_SESSION['user_id']);
-		parent::insert($pm);		
+		if(!$pm->getParamValue('date_time')){
+			$pm->setParamValue('date_time',date('Y-m-d H:i:s'));
+		}
+		if(!$pm->getParamValue('user_id') || $_SESSION['role_id']!='owner'){
+			$pm->setParamValue('user_id',$_SESSION['user_id']);
+		}
+		
+		return parent::insert($pm);		
 	}
+	
 	public function get_details($pm){		
 		$model = new DOCMaterialProcurementMaterialList_Model($this->getDbLink());	
 		$from = null; $count = null;
@@ -477,5 +551,36 @@ class DOCMaterialProcurement_Controller extends ControllerSQLDOC{
 		$this->add_material_model($link);
 	}
 	*/
+	
+	public function complete_driver($pm){
+		$q_id = $this->getDbLink()->query(sprintf(
+			"SELECT driver FROM doc_material_procurements_driver_list
+			WHERE lower(driver) LIKE '%%'||lower(%s)||'%%
+			ORDER BY driver'
+			LIMIT 10"
+			,$this->getExtDbVal($pm,'driver')
+		));
+	}
+
+	public function complete_store($pm){
+		$q_id = $this->getDbLink()->query(sprintf(
+			"SELECT store FROM doc_material_procurements_store_list
+			WHERE lower(store) LIKE '%%'||lower(%s)||'%%
+			ORDER BY store'
+			LIMIT 10"
+			,$this->getExtDbVal($pm,'store')
+		));
+	}
+	public function complete_vehicle_plate($pm){
+		$q_id = $this->getDbLink()->query(sprintf(
+			"SELECT vehicle_plate FROM doc_material_procurements_vehicle_list
+			WHERE lower(vehicle_plate) LIKE '%%'||lower(%s)||'%%
+			ORDER BY vehicle_plate'
+			LIMIT 10"
+			,$this->getExtDbVal($pm,'vehicle_plate')
+		));
+	}
+	
+	
 }
 ?>

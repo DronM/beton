@@ -22,16 +22,23 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
-class <xsl:value-of select="@id"/>_Controller extends ControllerSQLDOC{
+class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL){
 		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
 	}
 	
 	public function insert($pm){
 		//doc owner
-		$pm->setParamValue('user_id',$_SESSION['user_id']);
-		parent::insert($pm);		
+		if(!$pm->getParamValue('date_time')){
+			$pm->setParamValue('date_time',date('Y-m-d H:i:s'));
+		}
+		if(!$pm->getParamValue('user_id') || $_SESSION['role_id']!='owner'){
+			$pm->setParamValue('user_id',$_SESSION['user_id']);
+		}
+		
+		return parent::insert($pm);		
 	}
+	
 	public function get_details($pm){		
 		$model = new DOCMaterialProcurementMaterialList_Model($this->getDbLink());	
 		$from = null; $count = null;
@@ -165,6 +172,37 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQLDOC{
 		$this->add_material_model($link);
 	}
 	*/
+	
+	public function complete_driver($pm){
+		$q_id = $this->getDbLink()->query(sprintf(
+			"SELECT driver FROM doc_material_procurements_driver_list
+			WHERE lower(driver) LIKE '%%'||lower(%s)||'%%
+			ORDER BY driver'
+			LIMIT 10"
+			,$this->getExtDbVal($pm,'driver')
+		));
+	}
+
+	public function complete_store($pm){
+		$q_id = $this->getDbLink()->query(sprintf(
+			"SELECT store FROM doc_material_procurements_store_list
+			WHERE lower(store) LIKE '%%'||lower(%s)||'%%
+			ORDER BY store'
+			LIMIT 10"
+			,$this->getExtDbVal($pm,'store')
+		));
+	}
+	public function complete_vehicle_plate($pm){
+		$q_id = $this->getDbLink()->query(sprintf(
+			"SELECT vehicle_plate FROM doc_material_procurements_vehicle_list
+			WHERE lower(vehicle_plate) LIKE '%%'||lower(%s)||'%%
+			ORDER BY vehicle_plate'
+			LIMIT 10"
+			,$this->getExtDbVal($pm,'vehicle_plate')
+		));
+	}
+	
+	
 }
 <![CDATA[?>]]>
 </xsl:template>

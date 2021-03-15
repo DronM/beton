@@ -96,6 +96,8 @@ $permissions = array();
 				
 					$permissions['Vehicle_Controller_get_current_position_all']=TRUE;
 				
+					$permissions['Vehicle_Controller_get_route']=TRUE;
+				
 					$permissions['Vehicle_Controller_get_track']=TRUE;
 				
 					$permissions['Vehicle_Controller_get_tool_tip']=TRUE;
@@ -505,6 +507,12 @@ $permissions = array();
 					$permissions['DOCMaterialProcurement_Controller_get_material_list']=TRUE;
 				
 					$permissions['DOCMaterialProcurement_Controller_get_shift_list']=TRUE;
+				
+					$permissions['DOCMaterialProcurement_Controller_complete_driver']=TRUE;
+				
+					$permissions['DOCMaterialProcurement_Controller_complete_vehicle_plate']=TRUE;
+				
+					$permissions['DOCMaterialProcurement_Controller_complete_store']=TRUE;
 				
 					$permissions['DOCMaterialInventory_Controller_insert']=TRUE;
 				

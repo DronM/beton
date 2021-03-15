@@ -37,6 +37,7 @@ function Vehicle_Controller(options){
 	this.add_vehicles_with_trackers();
 	this.add_get_current_position();
 	this.add_get_current_position_all();
+	this.add_get_route();
 	this.add_get_track();
 	this.add_get_tool_tip();
 	this.add_get_stops_at_dest();
@@ -411,6 +412,41 @@ extend(Vehicle_Controller,ControllerObjServer);
 	this.addPublicMethod(pm);
 }
 
+			Vehicle_Controller.prototype.add_get_route = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_route',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("shipment_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "20";
+	
+		pm.addField(new FieldString("tracker_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldEnum("vehicle_state",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			
 			Vehicle_Controller.prototype.add_get_track = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_track',opts);

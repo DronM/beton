@@ -18,5 +18,5 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 ALTER FUNCTION const_base_geo_zone_process()
-  OWNER TO beton;
+  OWNER TO ;
 

@@ -125,6 +125,34 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		);		
 	}
 	
+	/**
+	 * Returns existing route
+	 */
+	public function get_route($pm){
+		$route_ar = $this->getDbLink->query_first(sprintf(
+			"SELECT
+				t.route
+			FROM vehicle_route_cashe AS t
+			WHERE
+				t.tracker_id = %s
+				AND t.shipment_id = %d
+				AND t.vehicle_state = %s"				
+			,$this->getExtDbVal($pm,'tracker_id')
+			,$this->getExtDbVal($pm,'shipment_id')
+			,$this->getExtDbVal($pm,'vehicle_state')
+		));
+		if(is_array($route_ar) &amp;&amp; count($route_ar)){
+			$this->addModel(new ModelVars(
+				array('id'=>'Route_Model',
+					'values'=>array(
+						new Field('route',DT_STRING,
+							array('value'=>$route_ar['route']))
+					)
+				)
+			));	
+		}
+	}
+	
 	public function get_current_position($pm){
 		
 		$vehicle_id = $this->getExtDbVal($pm,'id');

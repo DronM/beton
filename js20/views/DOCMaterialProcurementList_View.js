@@ -18,11 +18,11 @@ function DOCMaterialProcurementList_View(id,options){
 		"model":model,
 		"controller":contr,
 		"editInline":false,
-		"editWinClass":null,
+		"editWinClass":DOCMaterialProcurementDialog_Form,
 		"contClassName":options.detailFilters? window.getBsCol(11):null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
-			"cmdInsert":false,
-			"cmdInsert":false,
+			"cmdInsert":true,
+			"cmdEdit":true,
 			"cmdDelete":true
 			//"cmdFilter":false
 			//"cmdSearch":false

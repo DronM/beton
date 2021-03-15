@@ -1249,6 +1249,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentDateList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/AstCallList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/DOCMaterialProcurementList_View.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/DOCMaterialProcurementDialog_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/DOCMaterialProcurementShiftList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/ShipmentForOrderList_View.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'views/RawMaterialConsRateDateList_View.js'));
@@ -1381,6 +1382,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/ShipmentList_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/RawMaterial_Form.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/RawMaterialConsRateDateList_Form.js'));
+		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'forms/DOCMaterialProcurementDialog_Form.js'));
+		
 		
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'tmpl/App.templates.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'custom_controls/App.enums.js'));
@@ -1798,7 +1801,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/LoginDeviceList_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/LoginDeviceBan_Model.js'));
 		$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'controllers/LoginDeviceBan_Controller.js'));
-	$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/Event_Model.js'));			
+	$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/Event_Model.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/DOCMaterialProcurementDriverList_Model.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/DOCMaterialProcurementVehicleList_Model.js'));$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'models/DOCMaterialProcurementStoreList_Model.js'));			
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];
 			}

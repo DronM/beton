@@ -256,26 +256,31 @@ function OrderMakeForLabList_View(id,options){
 	}
 	
 	//,"params":{"cond_date":cond_date}
-	options.srvEvents = [
-		//{"id":"Graph.change"}
-		{"id":"Order.insert"}
-		,{"id":"Order.update"}
-		,{"id":"Order.delete"}
-		,{"id":"VehicleScheduleState.insert"}
-		,{"id":"VehicleScheduleState.update"}
-		,{"id":"VehicleScheduleState.delete"}
-		,{"id":"RAMaterialFact.change"}
-		,{"id":"LabEntry.insert"}
-		,{"id":"LabEntry.update"}
-		,{"id":"LabEntry.delete"}
-	];
-	options.srvEventsCallBack = function(json){
-		self.srvEventsCallBack(json);
-	};
+	options.srvEvents = {
+		"events":[
+			{"id":"Order.insert"}
+			,{"id":"Order.update"}
+			,{"id":"Order.delete"}
+			,{"id":"VehicleScheduleState.insert"}
+			,{"id":"VehicleScheduleState.update"}
+			,{"id":"VehicleScheduleState.delete"}
+			,{"id":"RAMaterialFact.change"}
+			,{"id":"LabEntry.insert"}
+			,{"id":"LabEntry.update"}
+			,{"id":"LabEntry.delete"}
+		]
+		,"onEvent":function(json){
+			self.srvEventsCallBack(json);
+		}
+		,"onSubscribed": function(){
+			self.setRefreshInterval(self.FORCE_REFRESH_INTERVAL);
+		}
+		,"onClose": function(message){
+			self.setRefreshInterval(self.m_httpRefreshInterval);
+		}		
+	}
 	
-	this.m_refreshInterval = window["AppSrv"]? 
-		this.FORCE_REFRESH_INTERVAL : constants.order_grid_refresh_interval.getValue()*1000;
-		
+	this.m_httpRefreshInterval = constants.order_grid_refresh_interval.getValue()*1000;
 	
 	OrderMakeForLabList_View.superclass.constructor.call(this,id,options);
 		
@@ -296,6 +301,24 @@ OrderMakeForLabList_View.prototype.m_startShiftMS;
 OrderMakeForLabList_View.prototype.m_endShiftMS;
 
 
+OrderMakeForLabList_View.prototype.setRefreshInterval = function(v){
+	if(this.m_refreshInterval == v){
+		return;
+	}
+console.log("OrderMakeForLabList_View.prototype.setRefreshInterval v="+v)
+	this.m_refreshInterval = v;
+	if (this.m_refreshTimer!=undefined){		
+		console.log("clearing timer")
+		window.clearInterval(this.m_refreshTimer);
+	}
+	if (v>0){
+		var self = this;
+		this.m_refreshTimer = setInterval(function(){
+			self.refresh();
+		},v);
+	}
+}
+
 /**
  * Все обновляется разом за один запрос из нескольких моделей
  */
@@ -314,19 +337,15 @@ OrderMakeForLabList_View.prototype.toDOM = function(p){
 	
 	OrderMakeForLabList_View.superclass.toDOM.call(this,p);
 	
-	var self = this;
-	this.m_forceRefreshTimer = setInterval(
-		function(){
-			self.refresh();
-		}
-		,this.m_refreshInterval
-	);	
+	if(!window.getApp().getAppSrv()){
+		this.setRefreshInterval(this.m_httpRefreshInterval);
+	}
 	
 }
 
 OrderMakeForLabList_View.prototype.delDOM = function(){
-	if(this.m_forceRefreshTimer){
-		clearTimeout(this.m_forceRefreshTimer);
+	if (this.m_refreshTimer!=undefined){		
+		window.clearInterval(this.m_refreshTimer);
 	}
 	OrderMakeForLabList_View.superclass.delDOM.call(this);
 	

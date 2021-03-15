@@ -19,6 +19,11 @@ function AssignedVehicleList_View(id,options){
 	};
 	*/
 	
+	var constants = {
+		"order_grid_refresh_interval":null
+	};
+	window.getApp().getConstantManager().get(constants);
+	
 	this.m_noAutoRefresh = options.noAutoRefresh;
 	
 	options.addElement = function(){
@@ -104,7 +109,26 @@ function AssignedVehicleList_View(id,options){
 			}));
 		}
 	}
-		
+	if(!this.m_noAutoRefresh){
+		var self = this;
+		options.srvEvents = {
+			"events":[
+				{"id":"VehicleScheduleState.insert"}
+				,{"id":"VehicleScheduleState.update"}
+				,{"id":"VehicleScheduleState.delete"}
+			]
+			,"onEvent": function(json){
+				self.srvEventsCallBack(json);
+			}
+			,"onSubscribed": function(){
+				self.setRefreshInterval(0);
+			}
+			,"onClose": function(message){
+				self.setRefreshInterval(self.m_httpRefreshInterval);
+			}		
+		};
+		this.m_httpRefreshInterval = constants.order_grid_refresh_interval.getValue()*1000;
+	}		
 	AssignedVehicleList_View.superclass.constructor.call(this,id,options);
 }
 //ViewObjectAjx,ViewAjxList
@@ -165,7 +189,6 @@ AssignedVehicleList_View.prototype.onRefresh = function(){
 		this.m_refreshPublicMethod = (new Shipment_Controller()).getPublicMethod("get_assigned_vehicle_list");
 	}
 	var self = this;
-	this.stopRefreshTimer();
 	this.m_refreshPublicMethod.run({
 		"ok":function(resp){
 			for(var i=0;i<self.m_prodSiteControlList.length;i++){
@@ -174,48 +197,59 @@ AssignedVehicleList_View.prototype.onRefresh = function(){
 			}
 			
 			var sh_gr = self.getElement("shipped_vehicles_list");
-			sh_gr.m_model = resp.getModel("ShippedVehicleList_Model");
-			sh_gr.onGetData();
-			
+			if(sh_gr){
+				sh_gr.m_model = resp.getModel("ShippedVehicleList_Model");
+				sh_gr.onGetData();
+			}			
 		}
-		,"all":function(){
-			self.startRefreshTimer();
-		}
-	})
+	});
 }
 
-AssignedVehicleList_View.prototype.stopRefreshTimer = function(){
-	if(this.m_refreshTimer){
-		clearInterval(this.m_refreshTimer);
+AssignedVehicleList_View.prototype.setRefreshInterval = function(v){
+	if(this.m_refreshInterval == v){
+		return;
+	}
+console.log("AssignedVehicleList_View.prototype.setRefreshInterval v="+v)
+	this.m_refreshInterval = v;
+	if (this.m_refreshTimer!=undefined){		
+		console.log("clearing timer")
+		window.clearInterval(this.m_refreshTimer);
+	}
+	if (v>0){
+		var self = this;
+		this.m_refreshTimer = setInterval(function(){
+			self.onRefresh();
+		},v);
 	}
 }
 
-AssignedVehicleList_View.prototype.startRefreshTimer = function(){
-	var self = this;
-	this.m_refreshTimer = setInterval(function(){
-		self.onRefresh();
-	},this.m_refreshInterval);
-}
 
 AssignedVehicleList_View.prototype.toDOM = function(p){
 	
 	AssignedVehicleList_View.superclass.toDOM.call(this,p);
 	
+	if(!this.m_noAutoRefresh && !window.getApp().getAppSrv()){
+		this.setRefreshInterval(this.m_httpRefreshInterval);
+	}
+	
 	var self = this;
 	EventHelper.add(document.getElementById(this.getId()+":menu_toggle"),"click",function(){
 		self.toggleMenu();
-	});
-	
-	if (this.m_noAutoRefresh!==true){
-		var constants = {"order_grid_refresh_interval":null};
-		window.getApp().getConstantManager().get(constants);			
-		this.m_refreshInterval = constants.order_grid_refresh_interval.getValue() * 1000;
-		this.startRefreshTimer();
-	}
-		
+	});	
 }
 
 AssignedVehicleList_View.prototype.delDOM = function(){
-	this.stopRefreshTimer();
+	if (this.m_refreshTimer!=undefined){		
+		window.clearInterval(this.m_refreshTimer);
+	}
+	
 	AssignedVehicleList_View.superclass.delDOM.call(this);
 }
+
+AssignedVehicleList_View.prototype.srvEventsCallBack = function(json){
+	if(json.controllerId=="VehicleScheduleState"){
+		this.onRefresh();
+	}
+}
+
+
