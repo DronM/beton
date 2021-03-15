@@ -38,6 +38,7 @@ require_once('common/SMSService.php');
 require_once('functions/CustomEmailSender.php');
 
 //User Agent parser
+//if (PHP_VERSION_ID >= 70000) {
 require_once 'common/matomo/device-detector/autoload.php';
 require_once 'common/matomo/device-detector/DeviceDetector.php';
 require_once 'common/matomo/device-detector/Parser/AbstractParser.php';
@@ -71,7 +72,7 @@ require_once 'common/matomo/device-detector/Parser/Device/Mobile.php';
 use DeviceDetector\DeviceDetector;
 use DeviceDetector\Parser\Device\AbstractDeviceParser;
 AbstractDeviceParser::setVersionTruncation(AbstractDeviceParser::VERSION_TRUNCATION_NONE);
-
+//}
 class User_Controller extends ControllerSQL{
 
 	const PWD_LEN = 6;
@@ -545,19 +546,23 @@ class User_Controller extends ControllerSQL{
 		
 		if (isset($headers['User-Agent'])){
 			$userAgent = $headers['User-Agent'];//$_SERVER['HTTP_USER_AGENT'];
-			$dd = new DeviceDetector($userAgent);
-			$dd->skipBotDetection();
-			$dd->parse();
-			$header_user_agent = json_encode(array(
-				'clientInfo'	=> $dd->getClient()
-				,'osInfo'	=> $dd->getOs()
-				,'device'	=> $dd->getDeviceName()
-				,'brand'	=> $dd->getBrandName()
-				,'model'	=> $dd->getModel()
-			));
+			//if (PHP_VERSION_ID >= 70000) {
+				$dd = new DeviceDetector($userAgent);
+				$dd->skipBotDetection();
+				$dd->parse();
+				$header_user_agent = json_encode(array(
+					'clientInfo'	=> $dd->getClient()
+					,'osInfo'	=> $dd->getOs()
+					,'device'	=> $dd->getDeviceName()
+					,'brand'	=> $dd->getBrandName()
+					,'model'	=> $dd->getModel()
+				));
+			/*}else{
+				$header_user_agent = NULL;
+			}*/
 		}
 		else{
-			$header_user_agent = 'NULL';
+			$header_user_agent = NULL;
 		}
 		$this->setLogged(TRUE);
 		
@@ -773,7 +778,7 @@ class User_Controller extends ControllerSQL{
 					date_time_in = now(),
 					set_date_time = now(),
 					headers_j='%s',
-					user_agent='%s'
+					user_agent=%s
 					FROM (
 						SELECT
 							l.id AS id
@@ -787,7 +792,7 @@ class User_Controller extends ControllerSQL{
 					intval($ar['id']),
 					$pubKey,
 					$headers_json,
-					$header_user_agent,
+					is_null($header_user_agent)? 'NULL':"'".$header_user_agent."'",
 					session_id()
 				)
 			);				

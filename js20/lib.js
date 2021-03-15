@@ -5537,7 +5537,7 @@ options.keyIds=options.keyIds||["id"];options.modelKeyFields=[options.model.getF
 extend(DestinationForClientEdit,EditSelectRef); 
 function DestinationForOrderEdit(id,options){options=options||{};if(options.labelCaption!=""){options.labelCaption=options.labelCaption||"Объект:";}
 var self=this;options.cmdInsert=true;options.cmdSmInsert=true;options.buttonInsert=new ButtonInsert(id+":btn_insert",{"editControl":this,"onClick":function(e){if(CommonHelper.isEmpty(this.getEditControl().getKeys())){self.openNewDest(this.getEditControl().getNode().value);}}});options.keyIds=options.keyIds||["id"];options.selectWinClass=DestinationList_Form;options.selectDescrIds=options.selectDescrIds||["name"];options.editWinClass=Destination_Form;this.m_orig_onSelect=options.onSelect;options.onSelect=(function(orig_onSelect){return function(fields){if(CommonHelper.isEmpty(this.getKeys())){DOMHelper.addClass(this.getNode(),"null-ref");}
-if(orig_onSelect){orig_onSelect();}}})(this.m_orig_onSelect);options.acOnCompleteTextOut=function(textHTML,modelRow){var pref="";if(modelRow&&modelRow.is_address.getValue()){pref="<span class='glyphicon glyphicon-envelope'></span> ";}
+if(orig_onSelect){orig_onSelect(fields);}}})(this.m_orig_onSelect);options.acOnCompleteTextOut=function(textHTML,modelRow){var pref="";if(modelRow&&modelRow.is_address.getValue()){pref="<span class='glyphicon glyphicon-envelope'></span> ";}
 else if(modelRow&&modelRow.client_dest.getValue()){pref="<i class='icon-user-check'></i> ";}
 else if(modelRow){pref="<i class='icon-truck'></i> ";}
 return pref+textHTML;}

@@ -1,8 +1,8 @@
 -- View: ast_calls_current
 
- DROP VIEW ast_calls_current;
+-- DROP VIEW ast_calls_current;
 
-CREATE OR REPLACE VIEW ast_calls_current AS 
+CREATE OR REPLACE VIEW ast_calls_current_test AS 
 	SELECT DISTINCT ON (ast.ext)
 		ast.unique_id,
 		ast.ext,
@@ -48,9 +48,9 @@ CREATE OR REPLACE VIEW ast_calls_current AS
   	ast.end_time IS NULL
   	AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
   	AND ast.caller_id_num::text <> ''::text
-  	AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  	--AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
   ORDER BY ast.ext, ast.dt DESC;
 
-ALTER TABLE ast_calls_current
+ALTER TABLE ast_calls_current_test
   OWNER TO beton;
 

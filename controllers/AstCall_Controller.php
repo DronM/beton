@@ -372,7 +372,8 @@ class AstCall_Controller extends ControllerSQL{
 		
 	}	
 	
-	private function active_call_query($extraCond='',$commonExt=FALSE){		
+
+	private static function active_call_query($extraCond='',$commonExt=FALSE){		
 		//return "SELECT t.* FROM ast_calls_current t LIMIT 1";
 	
 		return sprintf("SELECT t.* FROM ast_calls_current t
@@ -392,7 +393,7 @@ class AstCall_Controller extends ControllerSQL{
 			RETURNING unique_id,caller_id_num AS num,
 				(SELECT cl.name
 				FROM clients cl WHERE cl.id=client_id) AS client_descr",
-			$this->active_call_query(' AND coalesce(t.informed,FALSE)=FALSE')
+			self::active_call_query(' AND coalesce(t.informed,FALSE)=FALSE')
 			);
 			$ar = $this->getDbLinkMaster()->query_first($q);
 			
@@ -406,14 +407,14 @@ class AstCall_Controller extends ControllerSQL{
 			$this->addModel($m);
 		}
 		$this->addNewModel(
-			$this->active_call_query(' AND t.answer_time IS NULL',TRUE),
+			self::active_call_query(' AND t.answer_time IS NULL',TRUE),
 			'active_call_common'
 			);
 		
 	}
 	public function active_call($pm){		
 		if ($_SESSION['tel_ext']){
-			$q = $this->active_call_query();
+			$q = self::active_call_query();
 			$ar = $this->getDbLink()->query_first($q);
 			$this->addNewModel($q,'AstCallCurrent_Model');
 			
@@ -426,42 +427,99 @@ class AstCall_Controller extends ControllerSQL{
 			}			
 		}		
 	}
+
+	public static function add_active_call($dbLink,$models){		
+		$q = self::active_call_query();
+		$ar = $dbLink->query_first($q);
+		
+		if (is_array($ar)&&count($ar)>0){
+			$models->append(new ModelVars(
+				array('name'=>'Vars',
+					'id'=>'AstCallCurrent_Model',
+					'values'=>array(
+						new Field('unique_id',DT_STRING, array('value'=>$ar['unique_id'])),
+						new Field('ext',DT_STRING,array('value'=>$ar['ext'])),
+						new Field('contact_tel',DT_STRING,array('value'=>$ar['contact_tel'])),
+						new Field('ring_time',DT_DATETIME,array('value'=>$ar['ring_time'])),
+						new Field('answer_time',DT_DATETIME,array('value'=>$ar['answer_time'])),
+						new Field('hangup_time',DT_DATETIME,array('value'=>$ar['hangup_time'])),
+						new Field('client_id',DT_INT,array('value'=>$ar['client_id'])),
+						new Field('clients_ref',DT_JSON,array('value'=>$ar['clients_ref'])),
+						new Field('client_kind',DT_STRING,array('value'=>$ar['client_kind'])),
+						new Field('manager_comment',DT_STRING,array('value'=>$ar['manager_comment'])),
+						new Field('informed',DT_BOOL,array('value'=>$ar['informed'])),
+						new Field('contact_name',DT_STRING,array('value'=>$ar['contact_name'])),
+						new Field('debt',DT_FLOAT,array('value'=>$ar['debt'])),
+						new Field('client_manager_descr',DT_STRING,array('value'=>$ar['client_manager_descr'])),
+						new Field('client_types_ref',DT_JSON,array('value'=>$ar['client_types_ref'])),
+						new Field('client_come_from_ref',DT_JSON,array('value'=>$ar['client_come_from_ref'])),
+					)
+				)
+			));		
+		
+			$model = new ModelSQL($dbLink,array('id'=>'AstCallCurrent_Model'));
+			$models->append($model);
+			
+			if ($ar['client_id']){
+				$models->append(self::get_client_call_hist_model($dbLink,$ar['client_id']));
+				$models->append(self::get_client_ship_hist_model($dbLink,$ar['client_id']));
+			}
+		}			
+	}
+
+	public static function get_client_call_hist_model($dbLink,$clientId){		
+		$model = new ModelSQL($dbLink,array('id'=>'AstCallClientCallHistoryList_Model'));
+		$model->query(
+			sprintf(
+				"SELECT * FROM ast_calls_client_call_history_list
+				WHERE client_id=%s
+				ORDER BY dt DESC
+				LIMIT const_call_history_count_val()"
+			,$clientId
+			)
+			,TRUE
+		);
+		return $model;
+	}
+	
 	
 	protected function add_client_call_hist($clientId){		
-		$this->addNewModel(sprintf(
-		"SELECT * FROM ast_calls_client_call_history_list
-		WHERE client_id=%s
-		ORDER BY dt DESC
-		LIMIT const_call_history_count_val()",
-		$clientId),
-		'AstCallClientCallHistoryList_Model');
+		$m = self::get_client_call_hist_model($this->getDbLink(),$clientId);
+		$this->addModel($m);
 	}
 	
 	public function client_call_hist($pm){		
 		$this->add_client_call_hist(
 			sprintf(
 				'(SELECT t.client_id FROM (%s) t)'
-				,$this->active_call_query()
+				,self::active_call_query()
 			)
 		);
 	}
+
+	public static function get_client_ship_hist_model($dbLink,$clientId){			
+		$model = new ModelSQL($dbLink,array('id'=>'AstCallClientShipHistoryList_Model'));
+		$model->query(
+			sprintf(
+			"SELECT * FROM ast_calls_client_ship_history_list
+			WHERE client_id=%s
+			ORDER BY date_time DESC
+			LIMIT const_call_history_count_val()",
+			$clientId)
+		);
+		return $model;
+	}
 	
 	public function add_client_ship_hist($clientId){			
-		$this->addNewModel(sprintf(
-		"SELECT * FROM ast_calls_client_ship_history_list
-		WHERE client_id=%s
-		ORDER BY date_time DESC
-		LIMIT const_call_history_count_val()",
-		$clientId),
-		'AstCallClientShipHistoryList_Model');
-	
+		self::get_client_ship_hist_model($this->getDbLink(),$clientId);
+		$this->addModel($m);
 	}
 	
 	public function client_ship_hist($pm){			
 		$this->add_client_ship_hist(
 			sprintf(
 				'(SELECT t.client_id FROM (%s) t)'
-				,$this->active_call_query()
+				,self::active_call_query()
 			)
 		);	
 	}
@@ -526,11 +584,15 @@ class AstCall_Controller extends ControllerSQL{
 					}
 					if (strlen($pm->getParamValue('client_type_id'))&&$ar['client_type_id']!=$pm->getParamValue('client_type_id')){
 						$client_upd_fields.= ($client_upd_fields=='')? '':',';
-						$client_upd_fields.= sprintf('client_type_id=%d',$p->getParamById('client_type_id'));
+						if($p->getParamById('client_type_id')!=0){
+							$client_upd_fields.= sprintf('client_type_id=%d',$p->getParamById('client_type_id'));
+						}
 					}
 					if (strlen($pm->getParamValue('client_come_from_id'))&&$ar['client_come_from_id']!=$pm->getParamValue('client_come_from_id')){
 						$client_upd_fields.= ($client_upd_fields=='')? '':',';
-						$client_upd_fields.= sprintf('client_come_from_id=%d',$p->getParamById('client_come_from_id'));
+						if($p->getParamById('client_come_from_id')!=0){
+							$client_upd_fields.= sprintf('client_come_from_id=%d',$p->getParamById('client_come_from_id'));
+						}
 					}
 					if (strlen($pm->getParamValue('client_kind'))&&$ar['client_kind']!=$pm->getParamValue('client_kind')){
 						$client_upd_fields.= ($client_upd_fields=='')? '':',';
@@ -814,6 +876,7 @@ class AstCall_Controller extends ControllerSQL{
 		$manager_id
 		));
 	}
+	
 	public function get_list($pm){		
 		$model = new AstCallList_Model($this->getDbLink());
 		$from = null; $count = null;

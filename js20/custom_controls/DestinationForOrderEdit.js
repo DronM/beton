@@ -38,7 +38,7 @@ function DestinationForOrderEdit(id,options){
 				DOMHelper.addClass(this.getNode(),"null-ref");
 			}
 			if (orig_onSelect){
-				orig_onSelect();
+				orig_onSelect(fields);
 			}
 		}
 	})(this.m_orig_onSelect);

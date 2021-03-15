@@ -7,6 +7,9 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelTemplate.php');
 require_once(USER_CONTROLLERS_PATH.'Constant_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'MainMenuConstructor_Controller.php');
 
+require_once(USER_CONTROLLERS_PATH.'AstCall_Controller.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelVars.php');
+
 
 			
 if (file_exists('models/MainMenu_Model_admin.php')){
@@ -1899,6 +1902,11 @@ class ViewBase extends ViewHTMLXSLT {
 				)
 			)
 		));
+		
+		//active call
+		if ($_SESSION['role_id'] && $_SESSION['tel_ext'] && $GLOBALS['dbLink']){
+			AstCall_Controller::add_active_call($GLOBALS['dbLink'],$models);
+		}
 		
 		parent::write($models,$errorCode);
 	}	

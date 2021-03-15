@@ -14,6 +14,9 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelTemplate.php');
 require_once(USER_CONTROLLERS_PATH.'Constant_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'MainMenuConstructor_Controller.php');
 
+require_once(USER_CONTROLLERS_PATH.'AstCall_Controller.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelVars.php');
+
 <xsl:apply-templates select="metadata/enums/enum[@id='role_types']"/>
 class ViewBase extends ViewHTMLXSLT {	
 
@@ -188,6 +191,11 @@ class ViewBase extends ViewHTMLXSLT {
 				)
 			)
 		));
+		
+		//active call
+		if ($_SESSION['role_id'] &amp;&amp; $_SESSION['tel_ext'] &amp;&amp; $GLOBALS['dbLink']){
+			AstCall_Controller::add_active_call($GLOBALS['dbLink'],$models);
+		}
 		
 		parent::write($models,$errorCode);
 	}	
