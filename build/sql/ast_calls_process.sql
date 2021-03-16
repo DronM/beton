@@ -85,6 +85,10 @@ BEGIN
 		END IF;
 		--********* Client ********************
 		
+		--grid notification
+		PERFORM pg_notify('AstCall.insert', NULL);
+		
+		
 	ELSIF (TG_OP='UPDATE') THEN
 		--****** User ****************
 		IF NEW.call_type='in'::call_types THEN
@@ -193,6 +197,10 @@ BEGIN
 			
 		END IF;
 		*/
+		
+		--grid notification
+		PERFORM pg_notify('AstCall.update', NULL);
+		
 	END IF;
 	
 	RETURN NEW;

@@ -79092,3 +79092,885 @@ ALTER TABLE ast_calls_current_test
   OWNER TO beton;
 
 
+
+-- ******************* update 15/03/2021 14:02:33 ******************
+-- View: ast_calls_current
+
+-- DROP VIEW ast_calls_current;
+
+CREATE OR REPLACE VIEW ast_calls_current_test AS 
+	SELECT DISTINCT ON (ast.ext)
+		ast.unique_id,
+		ast.ext,
+				
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS contact_tel,
+		
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
+		
+		ast.dt AS ring_time,
+		ast.start_time AS answer_time,
+		ast.end_time AS hangup_time,
+		ast.client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
+		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
+		ast.manager_comment,
+		ast.informed,
+		clt.name AS contact_name,
+		cld.debt,
+		man.name AS client_manager_descr,
+		client_types_ref(ctp) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref
+		
+		
+   FROM ast_calls ast
+     LEFT JOIN clients cl ON cl.id = ast.client_id
+     LEFT JOIN users man ON cl.manager_id = man.id
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
+     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
+     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
+     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+  WHERE
+  	
+  	char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	AND ast.caller_id_num::text <> ''::text
+  	--AND ast.end_time IS NULL
+  	--AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  ORDER BY ast.ext, ast.dt DESC;
+
+ALTER TABLE ast_calls_current_test
+  OWNER TO beton;
+
+
+
+-- ******************* update 15/03/2021 14:09:07 ******************
+-- View: ast_calls_current
+
+-- DROP VIEW ast_calls_current;
+
+CREATE OR REPLACE VIEW ast_calls_current_test AS 
+	SELECT DISTINCT ON (ast.ext)
+		ast.unique_id,
+		ast.ext,
+				
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS contact_tel,
+		
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
+		
+		ast.dt AS ring_time,
+		ast.start_time AS answer_time,
+		ast.end_time AS hangup_time,
+		ast.client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
+		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
+		ast.manager_comment,
+		ast.informed,
+		clt.name AS contact_name,
+		cld.debt,
+		man.name AS client_manager_descr,
+		client_types_ref(ctp) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref
+		
+		
+   FROM ast_calls ast
+     LEFT JOIN clients cl ON cl.id = ast.client_id
+     LEFT JOIN users man ON cl.manager_id = man.id
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
+     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
+     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
+     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+  --WHERE
+  	
+  	--char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	--AND ast.caller_id_num::text <> ''::text
+  	--AND ast.end_time IS NULL
+  	--AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  ORDER BY ast.ext, ast.dt DESC;
+
+ALTER TABLE ast_calls_current_test
+  OWNER TO beton;
+
+
+
+-- ******************* update 15/03/2021 14:11:42 ******************
+-- View: ast_calls_current
+
+-- DROP VIEW ast_calls_current;
+
+CREATE OR REPLACE VIEW ast_calls_current_test AS 
+	SELECT
+		--DISTINCT ON (ast.ext)
+		ast.unique_id,
+		ast.ext,
+				
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS contact_tel,
+		
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
+		
+		ast.dt AS ring_time,
+		ast.start_time AS answer_time,
+		ast.end_time AS hangup_time,
+		ast.client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
+		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
+		ast.manager_comment,
+		ast.informed,
+		clt.name AS contact_name,
+		cld.debt,
+		man.name AS client_manager_descr,
+		client_types_ref(ctp) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref
+		
+		
+   FROM ast_calls ast
+     LEFT JOIN clients cl ON cl.id = ast.client_id
+     LEFT JOIN users man ON cl.manager_id = man.id
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
+     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
+     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
+     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+  --WHERE
+  	
+  	--char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	--AND ast.caller_id_num::text <> ''::text
+  	--AND ast.end_time IS NULL
+  	--AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  ORDER BY ast.ext, ast.dt DESC;
+
+ALTER TABLE ast_calls_current_test
+  OWNER TO beton;
+
+
+
+-- ******************* update 15/03/2021 14:59:00 ******************
+-- View: ast_calls_current
+
+-- DROP VIEW ast_calls_current;
+
+CREATE OR REPLACE VIEW ast_calls_current_test AS 
+	SELECT
+		--DISTINCT ON (ast.ext)
+		ast.unique_id,
+		ast.ext,
+				
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS contact_tel,
+		
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN clt.tel
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
+		
+		ast.dt AS ring_time,
+		ast.start_time AS answer_time,
+		ast.end_time AS hangup_time,
+		ast.client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
+		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
+		ast.manager_comment,
+		ast.informed,
+		clt.name AS contact_name,
+		cld.debt,
+		man.name AS client_manager_descr,
+		client_types_ref(ctp) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref
+		
+		
+   FROM ast_calls ast
+     LEFT JOIN clients cl ON cl.id = ast.client_id
+     LEFT JOIN users man ON cl.manager_id = man.id
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
+     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
+     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
+     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+  --WHERE
+  	
+  	--char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	--AND ast.caller_id_num::text <> ''::text
+  	--AND ast.end_time IS NULL
+  	--AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  ORDER BY ast.ext, ast.dt DESC;
+
+ALTER TABLE ast_calls_current_test
+  OWNER TO beton;
+
+
+
+-- ******************* update 15/03/2021 15:17:32 ******************
+-- View: ast_calls_current
+
+-- DROP VIEW ast_calls_current;
+
+CREATE OR REPLACE VIEW ast_calls_current_test AS 
+	SELECT
+		--DISTINCT ON (ast.ext)
+		ast.unique_id,
+		ast.ext,
+				
+		CASE
+			WHEN clt.tel IS NOT NULL THEN
+				replace(
+					(CASE WHEN substr(clt.tel,1,2)='8-' THEN
+						substr(clt.tel,3)
+					ELSE clt.tel
+					END),'-','')
+			
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS contact_tel,
+		
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN
+				replace(
+					(CASE WHEN substr(clt.tel,1,2)='8-' THEN
+						substr(clt.tel,3)
+					ELSE clt.tel
+					END),'-','')
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
+		
+		ast.dt AS ring_time,
+		ast.start_time AS answer_time,
+		ast.end_time AS hangup_time,
+		ast.client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
+		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
+		ast.manager_comment,
+		ast.informed,
+		clt.name AS contact_name,
+		cld.debt,
+		man.name AS client_manager_descr,
+		client_types_ref(ctp) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref
+		
+		
+   FROM ast_calls ast
+     LEFT JOIN clients cl ON cl.id = ast.client_id
+     LEFT JOIN users man ON cl.manager_id = man.id
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
+     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
+     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
+     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+  --WHERE
+  	
+  	--char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	--AND ast.caller_id_num::text <> ''::text
+  	--AND ast.end_time IS NULL
+  	--AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  ORDER BY ast.ext, ast.dt DESC;
+
+ALTER TABLE ast_calls_current_test
+  OWNER TO beton;
+
+
+
+-- ******************* update 15/03/2021 15:18:15 ******************
+-- View: ast_calls_current
+
+-- DROP VIEW ast_calls_current;
+
+CREATE OR REPLACE VIEW ast_calls_current AS 
+	SELECT DISTINCT ON (ast.ext)
+		ast.unique_id,
+		ast.ext,
+				
+		CASE
+			WHEN clt.tel IS NOT NULL THEN
+				replace(
+					(CASE WHEN substr(clt.tel,1,2)='8-' THEN
+						substr(clt.tel,3)
+					ELSE clt.tel
+					END),'-','')
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS contact_tel,
+		
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN
+				replace(
+					(CASE WHEN substr(clt.tel,1,2)='8-' THEN
+						substr(clt.tel,3)
+					ELSE clt.tel
+					END),'-','')
+			
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
+		
+		ast.dt AS ring_time,
+		ast.start_time AS answer_time,
+		ast.end_time AS hangup_time,
+		ast.client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
+		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
+		ast.manager_comment,
+		ast.informed,
+		clt.name AS contact_name,
+		cld.debt,
+		man.name AS client_manager_descr,
+		client_types_ref(ctp) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref
+		
+		
+   FROM ast_calls ast
+     LEFT JOIN clients cl ON cl.id = ast.client_id
+     LEFT JOIN users man ON cl.manager_id = man.id
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
+     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
+     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
+     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+  WHERE
+  	ast.end_time IS NULL
+  	AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	AND ast.caller_id_num::text <> ''::text
+  	--AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  ORDER BY ast.ext, ast.dt DESC;
+
+ALTER TABLE ast_calls_current
+  OWNER TO beton;
+
+
+
+-- ******************* update 15/03/2021 15:58:10 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+	v_event_id text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+					v_event_id = 'AstCall.in_call';
+				ELSIF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					v_event_id = 'AstCall.in_call.'||NEW.ext;
+				END IF;	
+				
+				IF v_event_id IS NOT NULL THEN
+					PERFORM pg_notify(
+						v_event_id
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+								,'ext',NEW.ext
+								,'unique_id',NEW.unique_id
+							)
+						)::text
+					);
+				END IF;
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+		--grid notification
+		PERFORM pg_notify('AstCall.insert', NULL);
+		
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+						v_event_id = 'AstCall.in_call';
+					ELSIF NEW.ext IS NOT NULL THEN
+						--extension exists!
+						v_event_id = 'AstCall.in_call.'||NEW.ext;
+					END IF;	
+					
+					IF v_event_id IS NOT NULL THEN
+						PERFORM pg_notify(
+							v_event_id
+							,json_build_object(
+								'params',json_build_object(
+									'client_id',NEW.client_id
+									,'client_name',v_client_name
+									,'tel',v_tel_formatted
+									,'client_repres_name',v_client_repres_name
+									,'client_repres_post',v_client_repres_post
+									,'ext',NEW.ext
+									,'unique_id',NEW.unique_id
+								)
+							)::text
+						);
+					END IF;
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NULL AND OLD.start_time IS NULL AND NEW.start_time IS NOT NULL
+			 AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
+				PERFORM pg_notify(
+					'AstCall.pickup.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 15/03/2021 16:03:44 ******************
+-- Function: ast_calls_process()
+
+-- DROP FUNCTION ast_calls_process();
+
+CREATE OR REPLACE FUNCTION ast_calls_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	v_search text;
+	v_client_repres_name text;
+	v_client_repres_post text;
+	v_client_name text;
+	v_tel_formatted text;
+	v_event_id text;
+BEGIN
+	IF (TG_OP='INSERT') THEN
+		NEW.dt = now()::timestamp;
+		
+		--********* Client ********************
+		IF NEW.call_type='in'::call_types THEN			
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+			v_search = NEW.caller_id_num;
+		ELSE
+			v_search = NEW.ext;
+			IF (char_length(v_search)>3 AND char_length(v_search)<10) THEN
+				v_search = const_city_ext_val()::text||v_search;
+			END IF;
+			
+		END IF;
+
+		IF (char_length(v_search)>3) THEN
+			--!!! v_search = format_cel_phone(RIGHT(v_search,10));
+				
+			v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+			SELECT
+				client_tels.client_id,
+				client_tels.name,
+				client_tels.post,
+				cl.name_full
+			INTO
+				NEW.client_id,
+				v_client_repres_name,
+				v_client_repres_post,
+				v_client_name
+			FROM client_tels
+			LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+			LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+			WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+			ORDER BY ast_calls.dt DESC NULLS LAST
+			LIMIT 1;
+			
+			NEW.client_tel = v_search;
+			
+			--In call for all notification
+			IF NEW.call_type='in'::call_types
+			AND NEW.end_time IS NULL
+			THEN
+				IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+					v_event_id = 'AstCall.in_call';
+				ELSIF NEW.ext IS NOT NULL THEN
+					--extension exists!
+					v_event_id = 'AstCall.in_call.'||NEW.ext;
+				END IF;	
+				
+				IF v_event_id IS NOT NULL THEN
+					PERFORM pg_notify(
+						v_event_id
+						,json_build_object(
+							'params',json_build_object(
+								'client_id',NEW.client_id
+								,'client_name',v_client_name
+								,'tel',v_tel_formatted
+								,'client_repres_name',v_client_repres_name
+								,'client_repres_post',v_client_repres_post
+								,'ext',NEW.ext
+								,'unique_id',NEW.unique_id
+							)
+						)::text
+					);
+				END IF;
+			END IF;			
+			
+		END IF;
+		--********* Client ********************
+		
+		--grid notification
+		PERFORM pg_notify('AstCall.insert', NULL);
+		
+		
+	ELSIF (TG_OP='UPDATE') THEN
+		--****** User ****************
+		IF NEW.call_type='in'::call_types THEN
+			IF substring(NEW.caller_id_num from 1 for 2)='+7' THEN
+				NEW.caller_id_num = substring(NEW.caller_id_num from 3);
+			END IF;
+		
+			IF NEW.client_id IS NULL AND OLD.client_id IS NULL THEN
+				v_search = NEW.caller_id_num;
+				
+				IF (char_length(v_search)>3) THEN
+					v_tel_formatted = format_cel_phone(RIGHT(v_search,10));
+				
+					SELECT
+						client_tels.client_id,
+						client_tels.name,
+						client_tels.post,
+						cl.name_full
+					INTO
+						NEW.client_id,
+						v_client_repres_name,
+						v_client_repres_post,
+						v_client_name
+					FROM client_tels
+					LEFT JOIN ast_calls ON ast_calls.client_id=client_tels.client_id
+					LEFT JOIN clients AS cl ON ast_calls.client_id=cl.id
+					WHERE client_tels.tel=v_search OR client_tels.tel=v_tel_formatted
+					ORDER BY ast_calls.dt DESC NULLS LAST
+					LIMIT 1;
+					
+					IF NEW.ext IS NOT NULL AND LENGTH(NEW.ext)>3 THEN
+						v_event_id = 'AstCall.in_call';
+					ELSIF NEW.ext IS NOT NULL THEN
+						--extension exists!
+						v_event_id = 'AstCall.in_call.'||NEW.ext;
+					END IF;	
+					
+					IF v_event_id IS NOT NULL THEN
+						PERFORM pg_notify(
+							v_event_id
+							,json_build_object(
+								'params',json_build_object(
+									'client_id',NEW.client_id
+									,'client_name',v_client_name
+									,'tel',v_tel_formatted
+									,'client_repres_name',v_client_repres_name
+									,'client_repres_post',v_client_repres_post
+									,'ext',NEW.ext
+									,'unique_id',NEW.unique_id
+								)
+							)::text
+						);
+					END IF;
+					
+				END IF;
+				
+			END IF;
+		
+			--notifications
+			IF NEW.end_time IS NOT NULL AND OLD.end_time IS NULL AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
+				PERFORM pg_notify(
+					'AstCall.hangup.'||NEW.ext
+					,NULL
+				);
+				
+			ELSIF NEW.end_time IS NULL AND OLD.start_time IS NULL AND NEW.start_time IS NOT NULL
+			 AND NEW.ext IS NOT NULL AND LENGTH(NEW.ext)=3 THEN
+				PERFORM pg_notify(
+					'AstCall.pickup.'||NEW.ext
+					,NULL
+				);
+				
+			END IF;
+			
+		
+			v_search = NEW.ext;
+		ELSE		
+			v_search = NEW.caller_id_num;
+		END IF;
+
+		--setting user from logged in
+		SELECT
+			u.id
+		INTO
+			NEW.user_id
+		FROM users AS u
+		WHERE u.tel_ext=v_search
+		AND (
+			SELECT TRUE
+			FROM logins
+			WHERE user_id=u.id and date_time_out IS NULL
+			ORDER BY date_time_in desc LIMIT 1
+		)
+		LIMIT 1;
+		
+		
+		--************ USER TO ***************
+		/*
+		IF NEW.call_type='out'::call_types
+		AND char_length(NEW.ext)<=3 THEN
+			--Внутренний номер
+			NEW.user_id_to = (SELECT id
+					FROM users
+				WHERE tel_ext=NEW.ext
+			);
+			
+		END IF;
+		*/
+		
+		--grid notification
+		PERFORM pg_notify('AstCall.update', NULL);
+		
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ast_calls_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 16/03/2021 12:14:54 ******************
+-- View: ast_calls_current
+
+-- DROP VIEW ast_calls_current;
+
+CREATE OR REPLACE VIEW ast_calls_current AS 
+	SELECT DISTINCT ON (ast.ext)
+		ast.unique_id,
+		ast.ext,
+				
+		CASE
+			WHEN clt.tel IS NOT NULL THEN
+				replace(
+					(CASE WHEN substr(clt.tel,1,2)='8-' THEN
+						substr(clt.tel,3)
+					ELSE clt.tel
+					END),'-','')
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS contact_tel,
+		
+		--backward compatibility
+		CASE
+			WHEN clt.tel IS NOT NULL THEN
+				replace(
+					(CASE WHEN substr(clt.tel,1,2)='8-' THEN
+						substr(clt.tel,3)
+					ELSE clt.tel
+					END),'-','')
+			
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			ELSE ast.caller_id_num::text
+		END AS num,
+		
+		ast.dt AS ring_time,
+		ast.start_time AS answer_time,
+		ast.end_time AS hangup_time,
+		ast.client_id,
+		clients_ref(cl) AS clients_ref,
+		cl.name AS client_descr,
+		cl.client_kind,
+		get_client_kinds_descr(cl.client_kind) AS client_kind_descr,
+		ast.manager_comment,
+		ast.informed,
+		clt.name AS contact_name,
+		cld.debt,
+		man.name AS client_manager_descr,
+		client_types_ref(ctp) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref
+		
+		
+   FROM ast_calls ast
+     LEFT JOIN clients cl ON cl.id = ast.client_id
+     LEFT JOIN users man ON cl.manager_id = man.id
+     LEFT JOIN client_tels clt ON clt.client_id = ast.client_id AND (clt.tel=ast.caller_id_num OR clt.tel::text = format_cel_phone("right"(ast.caller_id_num::text, 10)))
+     LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
+     LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
+     LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+  WHERE
+  	ast.end_time IS NULL
+  	AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	AND ast.caller_id_num::text <> ''::text
+  	AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  ORDER BY ast.ext, ast.dt DESC;
+
+ALTER TABLE ast_calls_current
+  OWNER TO beton;
+
+

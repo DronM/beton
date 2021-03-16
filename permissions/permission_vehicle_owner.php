@@ -12,6 +12,8 @@ $permissions = array();
 		
 			$permissions['User_Controller_login_k']=TRUE;
 		
+			$permissions['User_Controller_login_ks']=TRUE;
+		
 			$permissions['User_Controller_login_ext']=TRUE;
 		
 			$permissions['User_Controller_logged']=TRUE;

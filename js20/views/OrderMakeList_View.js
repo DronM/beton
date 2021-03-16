@@ -191,9 +191,7 @@ function OrderMakeList_View(id,options){
 	//,"params":{"cond_date":cond_date}
 	options.srvEvents = {
 		"events":[
-			{"id":"Order.insert"}
-			,{"id":"Order.update"}
-			,{"id":"Order.delete"}
+			{"id":"Graph.change"}
 			,{"id":"VehicleScheduleState.insert"}
 			,{"id":"VehicleScheduleState.update"}
 			,{"id":"VehicleScheduleState.delete"}
@@ -391,7 +389,8 @@ OrderMakeList_View.prototype.runSpecificUpdateMethod = function(meth){
 }
 
 OrderMakeList_View.prototype.srvEventsCallBack = function(json){
-	if(json.controllerId=="Order" || json.methodId=="Graph.change"){
+console.log((new Date()),"OrderMakeList_View.prototype.srvEventsCallBack json=",json)
+	if(json.controllerId=="Order" || json.controllerId=="Shipment" || json.controllerId=="Graph"){
 		//analyse cond_date!
 		this.runSpecificUpdateMethod("get_make_orders_form_ord");
 	}

@@ -374,7 +374,7 @@ class AstCall_Controller extends ControllerSQL{
 	
 
 	private static function active_call_query($extraCond='',$commonExt=FALSE){		
-		//return "SELECT t.* FROM ast_calls_current t LIMIT 1";
+		//return "SELECT t.* FROM ast_calls_current_test t WHERE t.unique_id='1615797498.13391' limit 1";
 	
 		return sprintf("SELECT t.* FROM ast_calls_current t
 		WHERE t.ext='%s'
@@ -457,9 +457,6 @@ class AstCall_Controller extends ControllerSQL{
 				)
 			));		
 		
-			$model = new ModelSQL($dbLink,array('id'=>'AstCallCurrent_Model'));
-			$models->append($model);
-			
 			if ($ar['client_id']){
 				$models->append(self::get_client_call_hist_model($dbLink,$ar['client_id']));
 				$models->append(self::get_client_ship_hist_model($dbLink,$ar['client_id']));
@@ -511,7 +508,7 @@ class AstCall_Controller extends ControllerSQL{
 	}
 	
 	public function add_client_ship_hist($clientId){			
-		self::get_client_ship_hist_model($this->getDbLink(),$clientId);
+		$m = self::get_client_ship_hist_model($this->getDbLink(),$clientId);
 		$this->addModel($m);
 	}
 	

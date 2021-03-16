@@ -1903,8 +1903,8 @@ class ViewBase extends ViewHTMLXSLT {
 			)
 		));
 		
-		//active call
-		if ($_SESSION['role_id'] && $_SESSION['tel_ext'] && $GLOBALS['dbLink']){
+		//active call		
+		if (isset($_SESSION['role_id']) && isset($_SESSION['tel_ext']) && isset($GLOBALS['dbLink'])){
 			AstCall_Controller::add_active_call($GLOBALS['dbLink'],$models);
 		}
 		

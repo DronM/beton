@@ -140,7 +140,7 @@ DestinationDialog_View.prototype.onGetData = function(resp,cmd){
 }
 
 DestinationDialog_View.prototype.updateZone = function(zoneStr){
-//console.log("DestinationDialog_View.prototype.updateZone zoneStr="+zoneStr)
+console.log("DestinationDialog_View.prototype.updateZone zoneStr="+zoneStr)
 	this.getController().getPublicMethod("update").setFieldValue("zone",zoneStr);
 	this.getController().getPublicMethod("insert").setFieldValue("zone",zoneStr);
 }
@@ -340,6 +340,6 @@ DestinationDialog_View.prototype.toDOM = function(parent){
 }
 
 DestinationDialog_View.prototype.drawComplete = function(coordsStr){
-	//console.log("DestinationDialog_View.prototype.drawComplete coordsStr="+coordsStr)
+	console.log("DestinationDialog_View.prototype.drawComplete coordsStr="+coordsStr)
 	this.updateZone(coordsStr);
 }

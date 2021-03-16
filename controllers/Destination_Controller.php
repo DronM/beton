@@ -577,11 +577,41 @@ class Destination_Controller extends ControllerSQL{
 			$model = new DestinationForOrderList_Model($this->getDbLink());
 		
 			$model->query(sprintf(
-				"SELECT DISTINCT ON (o.destination_id)
+				"WITH
+				last_price AS
+					(SELECT
+						max(t.date) AS date,
+						t.distance_to
+					FROM shipment_for_owner_costs AS t
+					GROUP BY t.distance_to
+					ORDER BY t.distance_to
+					)
+				,act_price AS
+					(SELECT
+						t.distance_to,
+						t.price
+					FROM last_price
+					LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
+					ORDER BY t.distance_to
+					)							
+				SELECT DISTINCT ON (o.destination_id)
 					dest.id
 					,dest.name
 					,dest.distance
 					,dest.time_route
+					,CASE
+						WHEN coalesce(dest.special_price,FALSE) = TRUE THEN coalesce(dest.price,0)
+						ELSE
+							coalesce(
+								coalesce(
+									(SELECT act_price.price
+									FROM act_price
+									WHERE dest.distance <= act_price.distance_to
+									LIMIT 1
+									)
+								,dest.price)
+							,0)
+					END AS price
 					,TRUE AS client_dest
 					,FALSE AS is_address
 				FROM orders AS o
@@ -613,12 +643,41 @@ class Destination_Controller extends ControllerSQL{
 		
 			//client destinations
 			$q_id = $this->getDbLink()->query(sprintf(
-			"SELECT
+			"WITH
+			last_price AS
+				(SELECT
+					max(t.date) AS date,
+					t.distance_to
+				FROM shipment_for_owner_costs AS t
+				GROUP BY t.distance_to
+				ORDER BY t.distance_to
+				)
+			,act_price AS
+				(SELECT
+					t.distance_to,
+					t.price
+				FROM last_price
+				LEFT JOIN shipment_for_owner_costs AS t ON last_price.date=t.date AND last_price.distance_to=t.distance_to
+				ORDER BY t.distance_to
+				)			
+			SELECT
 				id
 				,name
 				,distance
 				,time_route
-				,price
+				,CASE
+					WHEN coalesce(special_price,FALSE) = TRUE THEN coalesce(price,0)
+					ELSE
+						coalesce(
+							coalesce(
+								(SELECT act_price.price
+								FROM act_price
+								WHERE distance <= act_price.distance_to
+								LIMIT 1
+								)
+							,price)
+						,0)
+				END AS price
 				,".$client_dest_col."
 			FROM destinations
 			WHERE name ilike '%%'||%s||'%%'

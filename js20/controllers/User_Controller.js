@@ -35,6 +35,7 @@ function User_Controller(options){
 	this.add_login_ext();
 	this.add_login_refresh();
 	this.add_login_k();
+	this.add_login_ks();
 	this.add_logout();
 	this.add_logout_html();
 	this.add_login_html();
@@ -392,6 +393,22 @@ extend(User_Controller,ControllerObjServer);
 	this.addPublicMethod(pm);
 }
 
+			User_Controller.prototype.add_login_ks = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('login_ks',opts);
+	
+				
+	
+	var options = {};
+	
+		options.maxlength = "50";
+	
+		pm.addField(new FieldString("ks",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+			
 			User_Controller.prototype.add_logout = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('logout',opts);

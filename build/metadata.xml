@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2021-03-15 12:09:06</lastBuild></version>
+		<lastBuild>2021-03-16 14:19:40</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -99,7 +99,7 @@
 		<version dateOpen="2020-11-02 17:11:16" dateClose="2020-11-03 05:11:41">1.00193</version>
 		<version dateOpen="2020-11-03 13:11:14" dateClose="2020-11-03 13:11:16">1.00194</version>
 		<version dateOpen="2020-12-01 17:12:50" dateClose="2021-02-18 12:02:39">1.00195</version>
-	<version dateOpen="2021-02-18 14:02:48" dateClose="2021-02-18 16:02:57">1.00196</version><version dateOpen="2021-02-25 11:02:29" dateClose="2021-02-26 09:02:08">1.00197</version><version dateOpen="2021-02-26 17:02:26" dateClose="2021-02-26 17:02:27">1.00198</version><version dateOpen="2021-03-05 08:03:54" dateClose="2021-03-05 08:03:55">1.00199</version><version dateOpen="2021-03-05 09:03:04" dateClose="2021-03-15 07:03:18">1.00200</version><version dateOpen="2021-03-15 09:03:48" dateClose="2021-03-15 12:03:09">1.00201</version></versions>
+	<version dateOpen="2021-02-18 14:02:48" dateClose="2021-02-18 16:02:57">1.00196</version><version dateOpen="2021-02-25 11:02:29" dateClose="2021-02-26 09:02:08">1.00197</version><version dateOpen="2021-02-26 17:02:26" dateClose="2021-02-26 17:02:27">1.00198</version><version dateOpen="2021-03-05 08:03:54" dateClose="2021-03-05 08:03:55">1.00199</version><version dateOpen="2021-03-05 09:03:04" dateClose="2021-03-15 07:03:18">1.00200</version><version dateOpen="2021-03-15 09:03:48" dateClose="2021-03-15 12:03:09">1.00201</version><version dateOpen="2021-03-16 09:03:42" dateClose="2021-03-16 14:03:19">1.00202</version></versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
 		<field id="vehicle_owner_client_list"/>
@@ -3942,6 +3942,9 @@
 			<publicMethod id="login_k">
 				<field id="k" dataType="String" length="50"/>
 			</publicMethod>
+			<publicMethod id="login_ks">
+				<field id="ks" dataType="String" length="50"/>
+			</publicMethod>			
 			<publicMethod id="logout"/>
 			<publicMethod id="logout_html"/>
 			<publicMethod id="login_html">
@@ -4741,6 +4744,7 @@
 		<permission type="allow" controllerId="User" methodId="login" roleId="guest"/>
 		<permission type="allow" controllerId="User" methodId="login_html" roleId="guest"/>
 		<permission type="allow" controllerId="User" methodId="login_k" roleId="guest"/>
+		<permission type="allow" controllerId="User" methodId="login_ks" roleId="guest"/>
 		<permission type="allow" controllerId="User" methodId="login_ext" roleId="guest"/>
 		<permission type="allow" controllerId="User" methodId="logged" roleId="guest"/>
 		<permission type="allow" controllerId="User" methodId="logout" roleId="guest"/>
@@ -4749,6 +4753,7 @@
 		<permission type="allow" controllerId="User" methodId="login" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="User" methodId="login_html" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="User" methodId="login_k" roleId="vehicle_owner"/>
+		<permission type="allow" controllerId="User" methodId="login_ks" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="User" methodId="login_ext" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="User" methodId="logged" roleId="vehicle_owner"/>
 		<permission type="allow" controllerId="User" methodId="logout" roleId="vehicle_owner"/>
@@ -4789,6 +4794,7 @@
 		<permission type="allow" controllerId="User" methodId="login" roleId="client"/>
 		<permission type="allow" controllerId="User" methodId="login_html" roleId="client"/>
 		<permission type="allow" controllerId="User" methodId="login_k" roleId="client"/>
+		<permission type="allow" controllerId="User" methodId="login_ks" roleId="client"/>
 		<permission type="allow" controllerId="User" methodId="login_ext" roleId="client"/>
 		<permission type="allow" controllerId="User" methodId="logged" roleId="client"/>
 		<permission type="allow" controllerId="User" methodId="logout" roleId="client"/>

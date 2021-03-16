@@ -15,6 +15,7 @@ function AstCallList_View(id,options){
 		"field":new FieldDateTime("start_time")
 	});
 	
+	var self = this;
 	var filters = {
 		"period":{
 			"binding":new CommandBinding({
@@ -277,6 +278,19 @@ function AstCallList_View(id,options){
 		"pagination":new pagClass(id+"_page",
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
 		"autoRefresh":false,
+		"srvEvents":{
+			"events":[{"id":"AstCall.insert"},{"id":"AstCall.update"}]
+			,"onEvent":function(json){
+				self.getElement("grid").onRefresh();
+			}
+			,"onSubscribed":function(message){
+				self.getElement("grid").srvEventsOnSubscribed();
+			}
+			,"onClose":function(message){
+				self.getElement("grid").srvEventsOnClose(message);
+			}
+		},
+		
 		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true

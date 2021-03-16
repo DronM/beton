@@ -2,8 +2,9 @@
 
 -- DROP VIEW ast_calls_current;
 
-CREATE OR REPLACE VIEW ast_calls_current AS 
-	SELECT DISTINCT ON (ast.ext)
+CREATE OR REPLACE VIEW ast_calls_current_test AS 
+	SELECT
+		--DISTINCT ON (ast.ext)
 		ast.unique_id,
 		ast.ext,
 				
@@ -14,7 +15,8 @@ CREATE OR REPLACE VIEW ast_calls_current AS
 						substr(clt.tel,3)
 					ELSE clt.tel
 					END),'-','')
-			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN substr(ast.caller_id_num,2)			
 			ELSE ast.caller_id_num::text
 		END AS contact_tel,
 		
@@ -26,8 +28,7 @@ CREATE OR REPLACE VIEW ast_calls_current AS
 						substr(clt.tel,3)
 					ELSE clt.tel
 					END),'-','')
-			
-			WHEN substr(ast.caller_id_num,1,1)='+' THEN '8'||substr(ast.caller_id_num,2)			
+			WHEN substr(ast.caller_id_num,1,1)='+' THEN substr(ast.caller_id_num,2)			
 			ELSE ast.caller_id_num::text
 		END AS num,
 		
@@ -55,13 +56,14 @@ CREATE OR REPLACE VIEW ast_calls_current AS
      LEFT JOIN client_debts cld ON cld.client_id = ast.client_id
      LEFT JOIN client_types ctp ON ctp.id = cl.client_type_id
      LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
-  WHERE
-  	ast.end_time IS NULL
-  	AND char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
-  	AND ast.caller_id_num::text <> ''::text
-  	AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
+  --WHERE
+  	
+  	--char_length(ast.ext::text) <> char_length(ast.caller_id_num::text)
+  	--AND ast.caller_id_num::text <> ''::text
+  	--AND ast.end_time IS NULL
+  	--AND ( (ast.start_time IS NULL AND ast.dt::date=now()::date) OR (ast.start_time IS NOT NULL AND ast.start_time::date=now()::date) )
   ORDER BY ast.ext, ast.dt DESC;
 
-ALTER TABLE ast_calls_current
+ALTER TABLE ast_calls_current_test
   OWNER TO beton;
 

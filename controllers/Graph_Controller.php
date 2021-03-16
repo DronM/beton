@@ -4,7 +4,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelVars.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTime.php');
 
 require_once(FRAME_WORK_PATH.'basic_classes/SessionVarManager.php');
-require_once(FRAME_WORK_PATH.'basic_classes/EventSrv.php');
+//require_once(FRAME_WORK_PATH.'basic_classes/EventSrv.php');
+require_once(FUNC_PATH.'BetonEventSrv.php');
 
 include("common/pChart2.1.3/class/pData.class.php");
 include("common/pChart2.1.3/class/pDraw.class.php");
@@ -48,6 +49,19 @@ class Graph_Controller extends Controller{
 		ob_end_clean();		
 		return $contents;
 	}
+	
+	private static function sendEvent($date_from){
+		//event
+		//change to all
+		//'emitterId'=>SessionVarManager::getValue('eventServerClientId')			
+		$event_par = [				
+			'cond_date'=>date('Y-m-d',$date_from)
+			,'emitterId' => SessionVarManager::getValue('eventServerClientId')
+		];
+		//EventSrv::publishAsync('Graph.change',$event_par,APP_NAME,APP_SERVER_HOST,APP_SERVER_PORT,APP_SERVER_SECURED);
+		BetonEventSrv::publishAsync('Graph.change',$event_par);
+	}
+	
 	/* ???? Переделать очистку кэша из контроллеров*/
 	private static function clearCache($date_from,$date_to,$on_slave=FALSE){
 		$link_master = Graph_Controller::get_db_con_master();
@@ -56,17 +70,6 @@ class Graph_Controller extends Controller{
 			date('Y-m-d',$date_from))
 		);
 		
-		//event
-		/*if(defined('APP_NAME') && defined('APP_SERVER_HOST') && defined('APP_SERVER_PORT')
-		){
-			//change to all
-			//'emitterId'=>SessionVarManager::getValue('eventServerClientId')			
-			$event_par = [				
-				'cond_date'=>date('Y-m-d',$date_from)
-				,'emitterId' => SessionVarManager::getValue('eventServerClientId')
-			];
-			EventSrv::publishAsync('Graph.change',$event_par,APP_NAME,APP_SERVER_HOST,APP_SERVER_PORT);
-		}*/		
 	}
 	private static function get_db_con(){
 		$dbLink = new DB_Sql;
@@ -287,7 +290,8 @@ class Graph_Controller extends Controller{
 		$shift_from = Beton::shiftStart($dateTime);
 		$shift_to = Beton::shiftEnd($shift_from);
 
-		Graph_Controller::clearCache($shift_from,$shift_to);	
+		self::clearCache($shift_from,$shift_to);	
+		self::sendEvent($shift_from);
 	}	
 	public static function clearCacheOnOrderId($dbLink,$orderId){
 		$ar = $dbLink->query_first(
@@ -297,10 +301,11 @@ class Graph_Controller extends Controller{
 			AS (d1 timestamp, d2 timestamp)",
 				$orderId)
 			);
+		$d1 = strtotime($ar["d1"]);
 		if (is_array($ar)){
-			Graph_Controller::clearCache(strtotime($ar["d1"]),
-				strtotime($ar["d2"]));
-		}	
+			self::clearCache($d1,strtotime($ar["d2"]));
+		}
+		self::sendEvent($d1);	
 	}		
 	public static function clearCacheOnShipId($dbLink,$shipId){
 		$ar = $dbLink->query_first(
@@ -311,14 +316,18 @@ class Graph_Controller extends Controller{
 			AS (d1 timestamp, d2 timestamp)",
 				$shipId)
 			);
+		$d1 = strtotime($ar["d1"]);
 		if (is_array($ar)){
-			Graph_Controller::clearCache(strtotime($ar["d1"]),strtotime($ar["d2"]));
-		}	
+			self::clearCache($d1,strtotime($ar["d2"]));
+		}
+		self::sendEvent($d1);		
 	}		
 	public function clear_cache($pm){
 		$date_from = $pm->getParamValue('date_from');
 		$date_to = $pm->getParamValue('date_to');
-		Graph_Controller::clearCache($date_from,$date_to);
+		
+		self::clearCache($date_from,$date_to);
+		self::sendEvent($date_from);		
 	}
 }
 ?>

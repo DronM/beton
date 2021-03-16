@@ -384,6 +384,8 @@ $permissions = array();
 				
 					$permissions['User_Controller_login_k']=TRUE;
 				
+					$permissions['User_Controller_login_ks']=TRUE;
+				
 					$permissions['User_Controller_logout']=TRUE;
 				
 					$permissions['User_Controller_logout_html']=TRUE;

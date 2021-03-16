@@ -34,6 +34,7 @@ require_once('functions/CustomEmailSender.php');
 
 //User Agent parser
 //if (PHP_VERSION_ID &gt;= 70000) {
+/*
 require_once 'common/matomo/device-detector/autoload.php';
 require_once 'common/matomo/device-detector/DeviceDetector.php';
 require_once 'common/matomo/device-detector/Parser/AbstractParser.php';
@@ -67,6 +68,7 @@ require_once 'common/matomo/device-detector/Parser/Device/Mobile.php';
 use DeviceDetector\DeviceDetector;
 use DeviceDetector\Parser\Device\AbstractDeviceParser;
 AbstractDeviceParser::setVersionTruncation(AbstractDeviceParser::VERSION_TRUNCATION_NONE);
+*/
 //}
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
@@ -176,6 +178,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		if (isset($headers['User-Agent'])){
 			$userAgent = $headers['User-Agent'];//$_SERVER['HTTP_USER_AGENT'];
 			//if (PHP_VERSION_ID &gt;= 70000) {
+			/*
 				$dd = new DeviceDetector($userAgent);
 				$dd->skipBotDetection();
 				$dd->parse();
@@ -186,6 +189,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					,'brand'	=> $dd->getBrandName()
 					,'model'	=> $dd->getModel()
 				));
+			*/
+			$header_user_agent = NULL;
 			/*}else{
 				$header_user_agent = NULL;
 			}*/
@@ -775,20 +780,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$this->addModel($m);
 	}
 	
-	public function login_k($pm){
+	//depricated use login_ks
+	private function login_k_f($pm,$field){
 		$link = $this->getDbLink();
 		
 		$k = NULL;
 		FieldSQLString::formatForDb($link,$pm->getParamValue('k'),$k);
 		
-		/*
-				u.name,
-				u.role_id,
-				u.id,
-				get_role_types_descr(u.role_id) AS role_descr,
-				u.tel_ext,
-		
-		*/
 		$ar = $link->query_first(
 			sprintf(
 			"SELECT 
@@ -807,8 +805,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			FROM user_mac_addresses AS ma
 			LEFT JOIN users_dialog AS u ON u.id=ma.user_id
 			LEFT JOIN users AS usr ON usr.id=ma.user_id
-			WHERE ma.mac_address_hash=%s",
-			$k));
+			WHERE ma.%s=%s"
+			,$field
+			,$k
+			));
 			
 		if ($ar){
 			$pub_key = '';
@@ -837,6 +837,16 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			throw new Exception(ERR_AUTH);
 		}
 	
+	}
+
+	//depricated use login_ks
+	private function login_k($pm){
+		$this->login_k_f($pm, 'mac_address');
+	}
+	
+	//new method
+	private function login_ks($pm){
+		$this->login_k_f($pm, 'mac_address_hash');
 	}
 	
 	private function update_pwd($userId,$pwd,$email,$tel){
